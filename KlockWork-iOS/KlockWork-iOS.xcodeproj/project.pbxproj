@@ -24,23 +24,23 @@
 		53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB772BFE93B000AFEDEA /* Jobs.swift */; };
 		53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB782BFE93B000AFEDEA /* Notes.swift */; };
 		53D4CB882BFE93B000AFEDEA /* Tasks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB792BFE93B000AFEDEA /* Tasks.swift */; };
-		53D4CBA92BFE944D00AFEDEA /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBA62BFE944D00AFEDEA /* Data.xcdatamodeld */; };
-		53D4CBAA2BFE944D00AFEDEA /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBA82BFE944D00AFEDEA /* PersistenceController.swift */; };
 		53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAB2BFE947900AFEDEA /* Theme.swift */; };
-		53D4CBB82BFE94A300AFEDEA /* CoreDataPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAD2BFE94A200AFEDEA /* CoreDataPlan.swift */; };
-		53D4CBB92BFE94A300AFEDEA /* CoreDataNoteVersions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAE2BFE94A200AFEDEA /* CoreDataNoteVersions.swift */; };
-		53D4CBBA2BFE94A300AFEDEA /* CoreDataProjectConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAF2BFE94A200AFEDEA /* CoreDataProjectConfiguration.swift */; };
-		53D4CBBB2BFE94A300AFEDEA /* CoreDataNotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB02BFE94A200AFEDEA /* CoreDataNotes.swift */; };
-		53D4CBBC2BFE94A300AFEDEA /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
-		53D4CBBD2BFE94A300AFEDEA /* CoreDataTasks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB22BFE94A300AFEDEA /* CoreDataTasks.swift */; };
-		53D4CBBE2BFE94A300AFEDEA /* CoreDataPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB32BFE94A300AFEDEA /* CoreDataPerson.swift */; };
-		53D4CBBF2BFE94A300AFEDEA /* CoreDataProjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB42BFE94A300AFEDEA /* CoreDataProjects.swift */; };
-		53D4CBC02BFE94A300AFEDEA /* CoreDataRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB52BFE94A300AFEDEA /* CoreDataRecords.swift */; };
-		53D4CBC12BFE94A300AFEDEA /* CoreDataJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB62BFE94A300AFEDEA /* CoreDataJob.swift */; };
-		53D4CBC22BFE94A300AFEDEA /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
 		53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC32BFE94C900AFEDEA /* DateHelper.swift */; };
 		53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */; };
 		53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC92BFE955000AFEDEA /* SaveSource.swift */; };
+		53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */; };
+		53F926052BFE9B3000948076 /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCB2BFE97CC00AFEDEA /* Data.xcdatamodeld */; };
+		53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
+		53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
+		53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB62BFE94A300AFEDEA /* CoreDataJob.swift */; };
+		53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB02BFE94A200AFEDEA /* CoreDataNotes.swift */; };
+		53F9260A2BFE9BF300948076 /* CoreDataNoteVersions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAE2BFE94A200AFEDEA /* CoreDataNoteVersions.swift */; };
+		53F9260B2BFE9BF300948076 /* CoreDataPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB32BFE94A300AFEDEA /* CoreDataPerson.swift */; };
+		53F9260C2BFE9BF300948076 /* CoreDataPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAD2BFE94A200AFEDEA /* CoreDataPlan.swift */; };
+		53F9260D2BFE9BF300948076 /* CoreDataProjectConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAF2BFE94A200AFEDEA /* CoreDataProjectConfiguration.swift */; };
+		53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB42BFE94A300AFEDEA /* CoreDataProjects.swift */; };
+		53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB52BFE94A300AFEDEA /* CoreDataRecords.swift */; };
+		53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB22BFE94A300AFEDEA /* CoreDataTasks.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,32 +63,6 @@
 		53D4CB772BFE93B000AFEDEA /* Jobs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Jobs.swift; sourceTree = "<group>"; };
 		53D4CB782BFE93B000AFEDEA /* Notes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
 		53D4CB792BFE93B000AFEDEA /* Tasks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tasks.swift; sourceTree = "<group>"; };
-		53D4CB892BFE940600AFEDEA /* CoreDataCalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCalendarEvent.swift; sourceTree = "<group>"; };
-		53D4CB8A2BFE940600AFEDEA /* CoreDataCompanies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCompanies.swift; sourceTree = "<group>"; };
-		53D4CB8B2BFE940600AFEDEA /* CoreDataJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataJob.swift; sourceTree = "<group>"; };
-		53D4CB8C2BFE940600AFEDEA /* CoreDataNotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNotes.swift; sourceTree = "<group>"; };
-		53D4CB8D2BFE940600AFEDEA /* CoreDataNoteVersions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNoteVersions.swift; sourceTree = "<group>"; };
-		53D4CB8E2BFE940600AFEDEA /* CoreDataPerson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPerson.swift; sourceTree = "<group>"; };
-		53D4CB8F2BFE940600AFEDEA /* CoreDataPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPlan.swift; sourceTree = "<group>"; };
-		53D4CB902BFE940600AFEDEA /* CoreDataProjectConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProjectConfiguration.swift; sourceTree = "<group>"; };
-		53D4CB912BFE940600AFEDEA /* CoreDataProjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProjects.swift; sourceTree = "<group>"; };
-		53D4CB922BFE940600AFEDEA /* CoreDataRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRecords.swift; sourceTree = "<group>"; };
-		53D4CB932BFE940600AFEDEA /* CoreDataTasks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataTasks.swift; sourceTree = "<group>"; };
-		53D4CB952BFE940700AFEDEA /* CoreDataCalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCalendarEvent.swift; sourceTree = "<group>"; };
-		53D4CB962BFE940700AFEDEA /* CoreDataCompanies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCompanies.swift; sourceTree = "<group>"; };
-		53D4CB972BFE940700AFEDEA /* CoreDataJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataJob.swift; sourceTree = "<group>"; };
-		53D4CB982BFE940700AFEDEA /* CoreDataNotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNotes.swift; sourceTree = "<group>"; };
-		53D4CB992BFE940700AFEDEA /* CoreDataNoteVersions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNoteVersions.swift; sourceTree = "<group>"; };
-		53D4CB9A2BFE940700AFEDEA /* CoreDataPerson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPerson.swift; sourceTree = "<group>"; };
-		53D4CB9B2BFE940700AFEDEA /* CoreDataPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPlan.swift; sourceTree = "<group>"; };
-		53D4CB9C2BFE940700AFEDEA /* CoreDataProjectConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProjectConfiguration.swift; sourceTree = "<group>"; };
-		53D4CB9D2BFE940700AFEDEA /* CoreDataProjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProjects.swift; sourceTree = "<group>"; };
-		53D4CB9E2BFE940700AFEDEA /* CoreDataRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRecords.swift; sourceTree = "<group>"; };
-		53D4CB9F2BFE940700AFEDEA /* CoreDataTasks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataTasks.swift; sourceTree = "<group>"; };
-		53D4CBA32BFE940700AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
-		53D4CBA52BFE940700AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
-		53D4CBA72BFE944D00AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
-		53D4CBA82BFE944D00AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PersistenceController.swift; path = ../../DLPrototype/DLPrototype/CoreData/PersistenceController.swift; sourceTree = "<group>"; };
 		53D4CBAB2BFE947900AFEDEA /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Theme.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/Theme.swift; sourceTree = "<group>"; };
 		53D4CBAD2BFE94A200AFEDEA /* CoreDataPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataPlan.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataPlan.swift; sourceTree = "<group>"; };
 		53D4CBAE2BFE94A200AFEDEA /* CoreDataNoteVersions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataNoteVersions.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataNoteVersions.swift; sourceTree = "<group>"; };
@@ -104,6 +78,8 @@
 		53D4CBC32BFE94C900AFEDEA /* DateHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DateHelper.swift; path = ../../DLPrototype/DLPrototype/Helpers/DateHelper.swift; sourceTree = "<group>"; };
 		53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomPickerItem.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/CustomPickerItem.swift; sourceTree = "<group>"; };
 		53D4CBC92BFE955000AFEDEA /* SaveSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SaveSource.swift; path = ../../DLPrototype/DLPrototype/Enums/SaveSource.swift; sourceTree = "<group>"; };
+		53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		53D4CBCE2BFE97CC00AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +96,7 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				53D4CBCD2BFE97CC00AFEDEA /* CoreData */,
 				53D4CBC92BFE955000AFEDEA /* SaveSource.swift */,
 				53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */,
 				53D4CBC32BFE94C900AFEDEA /* DateHelper.swift */,
@@ -135,11 +112,6 @@
 				53D4CBB52BFE94A300AFEDEA /* CoreDataRecords.swift */,
 				53D4CBB22BFE94A300AFEDEA /* CoreDataTasks.swift */,
 				53D4CBAB2BFE947900AFEDEA /* Theme.swift */,
-				53D4CBA62BFE944D00AFEDEA /* Data.xcdatamodeld */,
-				53D4CBA82BFE944D00AFEDEA /* PersistenceController.swift */,
-				53D4CBA42BFE940700AFEDEA /* CoreData */,
-				53D4CB942BFE940600AFEDEA /* CoreData */,
-				53D4CBA12BFE940700AFEDEA /* Models */,
 				53D4CB552BFE930100AFEDEA /* KlockWork-iOS */,
 				53D4CB542BFE930100AFEDEA /* Products */,
 			);
@@ -210,57 +182,11 @@
 			path = Entities;
 			sourceTree = "<group>";
 		};
-		53D4CB942BFE940600AFEDEA /* CoreData */ = {
+		53D4CBCD2BFE97CC00AFEDEA /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				53D4CB892BFE940600AFEDEA /* CoreDataCalendarEvent.swift */,
-				53D4CB8A2BFE940600AFEDEA /* CoreDataCompanies.swift */,
-				53D4CB8B2BFE940600AFEDEA /* CoreDataJob.swift */,
-				53D4CB8C2BFE940600AFEDEA /* CoreDataNotes.swift */,
-				53D4CB8D2BFE940600AFEDEA /* CoreDataNoteVersions.swift */,
-				53D4CB8E2BFE940600AFEDEA /* CoreDataPerson.swift */,
-				53D4CB8F2BFE940600AFEDEA /* CoreDataPlan.swift */,
-				53D4CB902BFE940600AFEDEA /* CoreDataProjectConfiguration.swift */,
-				53D4CB912BFE940600AFEDEA /* CoreDataProjects.swift */,
-				53D4CB922BFE940600AFEDEA /* CoreDataRecords.swift */,
-				53D4CB932BFE940600AFEDEA /* CoreDataTasks.swift */,
-			);
-			name = CoreData;
-			path = ../../DLPrototype/DLPrototype/Models/CoreData;
-			sourceTree = "<group>";
-		};
-		53D4CBA02BFE940700AFEDEA /* CoreData */ = {
-			isa = PBXGroup;
-			children = (
-				53D4CB952BFE940700AFEDEA /* CoreDataCalendarEvent.swift */,
-				53D4CB962BFE940700AFEDEA /* CoreDataCompanies.swift */,
-				53D4CB972BFE940700AFEDEA /* CoreDataJob.swift */,
-				53D4CB982BFE940700AFEDEA /* CoreDataNotes.swift */,
-				53D4CB992BFE940700AFEDEA /* CoreDataNoteVersions.swift */,
-				53D4CB9A2BFE940700AFEDEA /* CoreDataPerson.swift */,
-				53D4CB9B2BFE940700AFEDEA /* CoreDataPlan.swift */,
-				53D4CB9C2BFE940700AFEDEA /* CoreDataProjectConfiguration.swift */,
-				53D4CB9D2BFE940700AFEDEA /* CoreDataProjects.swift */,
-				53D4CB9E2BFE940700AFEDEA /* CoreDataRecords.swift */,
-				53D4CB9F2BFE940700AFEDEA /* CoreDataTasks.swift */,
-			);
-			path = CoreData;
-			sourceTree = "<group>";
-		};
-		53D4CBA12BFE940700AFEDEA /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				53D4CBA02BFE940700AFEDEA /* CoreData */,
-			);
-			name = Models;
-			path = ../../DLPrototype/DLPrototype/Models;
-			sourceTree = "<group>";
-		};
-		53D4CBA42BFE940700AFEDEA /* CoreData */ = {
-			isa = PBXGroup;
-			children = (
-				53D4CBA22BFE940700AFEDEA /* Data.xcdatamodeld */,
-				53D4CBA32BFE940700AFEDEA /* PersistenceController.swift */,
+				53D4CBCB2BFE97CC00AFEDEA /* Data.xcdatamodeld */,
+				53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */,
 			);
 			name = CoreData;
 			path = ../../DLPrototype/DLPrototype/CoreData;
@@ -336,23 +262,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */,
+				53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */,
+				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
+				53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */,
+				53F9260A2BFE9BF300948076 /* CoreDataNoteVersions.swift in Sources */,
+				53F9260B2BFE9BF300948076 /* CoreDataPerson.swift in Sources */,
+				53F9260C2BFE9BF300948076 /* CoreDataPlan.swift in Sources */,
+				53F9260D2BFE9BF300948076 /* CoreDataProjectConfiguration.swift in Sources */,
+				53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */,
+				53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */,
+				53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */,
+				53F926052BFE9B3000948076 /* Data.xcdatamodeld in Sources */,
+				53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */,
 				53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */,
 				53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */,
 				53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */,
-				53D4CBB82BFE94A300AFEDEA /* CoreDataPlan.swift in Sources */,
-				53D4CBB92BFE94A300AFEDEA /* CoreDataNoteVersions.swift in Sources */,
-				53D4CBBA2BFE94A300AFEDEA /* CoreDataProjectConfiguration.swift in Sources */,
-				53D4CBBB2BFE94A300AFEDEA /* CoreDataNotes.swift in Sources */,
-				53D4CBBC2BFE94A300AFEDEA /* CoreDataCalendarEvent.swift in Sources */,
-				53D4CBBD2BFE94A300AFEDEA /* CoreDataTasks.swift in Sources */,
-				53D4CBBE2BFE94A300AFEDEA /* CoreDataPerson.swift in Sources */,
-				53D4CBBF2BFE94A300AFEDEA /* CoreDataProjects.swift in Sources */,
-				53D4CBC02BFE94A300AFEDEA /* CoreDataRecords.swift in Sources */,
-				53D4CBC12BFE94A300AFEDEA /* CoreDataJob.swift in Sources */,
-				53D4CBC22BFE94A300AFEDEA /* CoreDataCompanies.swift in Sources */,
 				53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */,
-				53D4CBA92BFE944D00AFEDEA /* Data.xcdatamodeld in Sources */,
-				53D4CBAA2BFE944D00AFEDEA /* PersistenceController.swift in Sources */,
 				53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */,
 				53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */,
 				53D4CB7F2BFE93B000AFEDEA /* Today.swift in Sources */,
@@ -588,23 +514,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		53D4CBA22BFE940700AFEDEA /* Data.xcdatamodeld */ = {
+		53D4CBCB2BFE97CC00AFEDEA /* Data.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				53D4CBA52BFE940700AFEDEA /* Note.xcdatamodel */,
+				53D4CBCE2BFE97CC00AFEDEA /* Note.xcdatamodel */,
 			);
-			currentVersion = 53D4CBA52BFE940700AFEDEA /* Note.xcdatamodel */;
-			name = Data.xcdatamodeld;
-			path = /Users/prieber/Code/Personal/DLPrototype/DLPrototype/CoreData/Data.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-		53D4CBA62BFE944D00AFEDEA /* Data.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				53D4CBA72BFE944D00AFEDEA /* Note.xcdatamodel */,
-			);
-			currentVersion = 53D4CBA72BFE944D00AFEDEA /* Note.xcdatamodel */;
+			currentVersion = 53D4CBCE2BFE97CC00AFEDEA /* Note.xcdatamodel */;
 			name = Data.xcdatamodeld;
 			path = /Users/prieber/Code/Personal/DLPrototype/DLPrototype/CoreData/Data.xcdatamodeld;
 			sourceTree = "<group>";
