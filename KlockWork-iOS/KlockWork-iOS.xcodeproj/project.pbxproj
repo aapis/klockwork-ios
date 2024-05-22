@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
-		53D4CB602BFE930300AFEDEA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB5F2BFE930300AFEDEA /* Assets.xcassets */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
 		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
 		53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6B2BFE93B000AFEDEA /* AppSettings.swift */; };
@@ -41,6 +40,17 @@
 		53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB42BFE94A300AFEDEA /* CoreDataProjects.swift */; };
 		53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB52BFE94A300AFEDEA /* CoreDataRecords.swift */; };
 		53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB22BFE94A300AFEDEA /* CoreDataTasks.swift */; };
+		53F926292BFEA00E00948076 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F9261F2BFEA00E00948076 /* Project.swift */; };
+		53F9262A2BFEA00E00948076 /* Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926202BFEA00E00948076 /* Job.swift */; };
+		53F9262B2BFEA00E00948076 /* EKEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926212BFEA00E00948076 /* EKEvent.swift */; };
+		53F9262C2BFEA00E00948076 /* LosslessStringConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926222BFEA00E00948076 /* LosslessStringConvertible.swift */; };
+		53F9262D2BFEA00E00948076 /* Plan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926232BFEA00E00948076 /* Plan.swift */; };
+		53F9262E2BFEA00E00948076 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926242BFEA00E00948076 /* Color.swift */; };
+		53F9262F2BFEA00E00948076 /* DispatchQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926252BFEA00E00948076 /* DispatchQueue.swift */; };
+		53F926302BFEA00E00948076 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926262BFEA00E00948076 /* View.swift */; };
+		53F926312BFEA00E00948076 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926272BFEA00E00948076 /* Date.swift */; };
+		53F926322BFEA00E00948076 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F926282BFEA00E00948076 /* String.swift */; };
+		53F926342BFEA0F900948076 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53F926332BFEA0F900948076 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +90,17 @@
 		53D4CBC92BFE955000AFEDEA /* SaveSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SaveSource.swift; path = ../../DLPrototype/DLPrototype/Enums/SaveSource.swift; sourceTree = "<group>"; };
 		53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		53D4CBCE2BFE97CC00AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
+		53F9261F2BFEA00E00948076 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Project.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Project.swift; sourceTree = "<group>"; };
+		53F926202BFEA00E00948076 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Job.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Job.swift; sourceTree = "<group>"; };
+		53F926212BFEA00E00948076 /* EKEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EKEvent.swift; path = ../../DLPrototype/DLPrototype/Extensions/EKEvent.swift; sourceTree = "<group>"; };
+		53F926222BFEA00E00948076 /* LosslessStringConvertible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LosslessStringConvertible.swift; path = ../../DLPrototype/DLPrototype/Extensions/LosslessStringConvertible.swift; sourceTree = "<group>"; };
+		53F926232BFEA00E00948076 /* Plan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Plan.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Plan.swift; sourceTree = "<group>"; };
+		53F926242BFEA00E00948076 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Color.swift; path = ../../DLPrototype/DLPrototype/Extensions/Color.swift; sourceTree = "<group>"; };
+		53F926252BFEA00E00948076 /* DispatchQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DispatchQueue.swift; path = ../../DLPrototype/DLPrototype/Extensions/DispatchQueue.swift; sourceTree = "<group>"; };
+		53F926262BFEA00E00948076 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = View.swift; path = ../../DLPrototype/DLPrototype/Extensions/View.swift; sourceTree = "<group>"; };
+		53F926272BFEA00E00948076 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Date.swift; path = ../../DLPrototype/DLPrototype/Extensions/Date.swift; sourceTree = "<group>"; };
+		53F926282BFEA00E00948076 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = String.swift; path = ../../DLPrototype/DLPrototype/Extensions/String.swift; sourceTree = "<group>"; };
+		53F926332BFEA0F900948076 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../../DLPrototype/DLPrototype/Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +117,17 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				53F926332BFEA0F900948076 /* Assets.xcassets */,
+				53F926242BFEA00E00948076 /* Color.swift */,
+				53F926272BFEA00E00948076 /* Date.swift */,
+				53F926252BFEA00E00948076 /* DispatchQueue.swift */,
+				53F926212BFEA00E00948076 /* EKEvent.swift */,
+				53F926202BFEA00E00948076 /* Job.swift */,
+				53F926222BFEA00E00948076 /* LosslessStringConvertible.swift */,
+				53F926232BFEA00E00948076 /* Plan.swift */,
+				53F9261F2BFEA00E00948076 /* Project.swift */,
+				53F926282BFEA00E00948076 /* String.swift */,
+				53F926262BFEA00E00948076 /* View.swift */,
 				53D4CBCD2BFE97CC00AFEDEA /* CoreData */,
 				53D4CBC92BFE955000AFEDEA /* SaveSource.swift */,
 				53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */,
@@ -250,8 +282,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53F926342BFEA0F900948076 /* Assets.xcassets in Resources */,
 				53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */,
-				53D4CB602BFE930300AFEDEA /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +294,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53F926292BFEA00E00948076 /* Project.swift in Sources */,
+				53F9262A2BFEA00E00948076 /* Job.swift in Sources */,
+				53F9262B2BFEA00E00948076 /* EKEvent.swift in Sources */,
+				53F9262C2BFEA00E00948076 /* LosslessStringConvertible.swift in Sources */,
+				53F9262D2BFEA00E00948076 /* Plan.swift in Sources */,
+				53F9262E2BFEA00E00948076 /* Color.swift in Sources */,
+				53F9262F2BFEA00E00948076 /* DispatchQueue.swift in Sources */,
+				53F926302BFEA00E00948076 /* View.swift in Sources */,
+				53F926312BFEA00E00948076 /* Date.swift in Sources */,
+				53F926322BFEA00E00948076 /* String.swift in Sources */,
 				53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */,
 				53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */,
 				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
@@ -417,7 +459,7 @@
 		53D4CB682BFE930300AFEDEA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = iOS.Beta.Icon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
@@ -427,6 +469,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = KlockWork;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -455,7 +498,7 @@
 		53D4CB692BFE930300AFEDEA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = iOS.Beta.Icon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
@@ -465,6 +508,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = KlockWork;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

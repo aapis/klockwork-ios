@@ -33,6 +33,7 @@ struct Main: View {
                 Text("Settings")
             }
         }
+        .tint(.red)
     }
 }
 

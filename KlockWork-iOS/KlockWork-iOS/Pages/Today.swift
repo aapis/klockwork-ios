@@ -14,13 +14,28 @@ struct Today: View {
     var body: some View {
         VStack {
             if records.count > 0 {
-                ForEach(records) { record in
-                    SingleRecord(record: record)
+                VStack(alignment: .leading) {
+                    Text("Today")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    ScrollView {
+                        VStack(spacing: 1) {
+                            ForEach(records) { record in
+                                SingleRecord(record: record)
+                            }
+                        }
+                    }
+                    .scrollIndicators(.hidden)
+                    
+                    Editor()
+                    Spacer()
                 }
+                
             } else {
-                Text("No records :((((")
+                Text("No records found for \(Date().formatted())")
             }
         }
+        .background(Theme.cPurple)
     }
     
     init() {
@@ -32,6 +47,29 @@ struct SingleRecord: View {
     public let record: LogRecord
     
     var body: some View {
-        Text(record.message!)
+        HStack(alignment: .firstTextBaseline, spacing: 5) {
+            Text(record.message!)
+                .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .white)
+                .padding(5)
+            Spacer()
+            Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
+                .foregroundStyle(.gray)
+                .padding(5)
+        }
+        .background(record.job!.backgroundColor)
+    }
+}
+
+struct Editor: View {
+    @State private var text: String = ""
+
+    var body: some View {
+        VStack {
+            TextField("What are you working on?", text: $text)
+                .textSelection(.enabled)
+                .lineLimit(1)
+                .padding()
+        }
+        .background(Theme.textBackground)
     }
 }
