@@ -1,0 +1,616 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
+		53D4CB602BFE930300AFEDEA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB5F2BFE930300AFEDEA /* Assets.xcassets */; };
+		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
+		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
+		53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6B2BFE93B000AFEDEA /* AppSettings.swift */; };
+		53D4CB7D2BFE93B000AFEDEA /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6C2BFE93B000AFEDEA /* Home.swift */; };
+		53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6D2BFE93B000AFEDEA /* Planning.swift */; };
+		53D4CB7F2BFE93B000AFEDEA /* Today.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6E2BFE93B000AFEDEA /* Today.swift */; };
+		53D4CB802BFE93B000AFEDEA /* CompanyDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB702BFE93B000AFEDEA /* CompanyDetail.swift */; };
+		53D4CB812BFE93B000AFEDEA /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB712BFE93B000AFEDEA /* Item.swift */; };
+		53D4CB822BFE93B000AFEDEA /* JobDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB722BFE93B000AFEDEA /* JobDetail.swift */; };
+		53D4CB832BFE93B000AFEDEA /* NoteDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB732BFE93B000AFEDEA /* NoteDetail.swift */; };
+		53D4CB842BFE93B000AFEDEA /* TaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB742BFE93B000AFEDEA /* TaskDetail.swift */; };
+		53D4CB852BFE93B000AFEDEA /* Companies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB762BFE93B000AFEDEA /* Companies.swift */; };
+		53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB772BFE93B000AFEDEA /* Jobs.swift */; };
+		53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB782BFE93B000AFEDEA /* Notes.swift */; };
+		53D4CB882BFE93B000AFEDEA /* Tasks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB792BFE93B000AFEDEA /* Tasks.swift */; };
+		53D4CBA92BFE944D00AFEDEA /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBA62BFE944D00AFEDEA /* Data.xcdatamodeld */; };
+		53D4CBAA2BFE944D00AFEDEA /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBA82BFE944D00AFEDEA /* PersistenceController.swift */; };
+		53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAB2BFE947900AFEDEA /* Theme.swift */; };
+		53D4CBB82BFE94A300AFEDEA /* CoreDataPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAD2BFE94A200AFEDEA /* CoreDataPlan.swift */; };
+		53D4CBB92BFE94A300AFEDEA /* CoreDataNoteVersions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAE2BFE94A200AFEDEA /* CoreDataNoteVersions.swift */; };
+		53D4CBBA2BFE94A300AFEDEA /* CoreDataProjectConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBAF2BFE94A200AFEDEA /* CoreDataProjectConfiguration.swift */; };
+		53D4CBBB2BFE94A300AFEDEA /* CoreDataNotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB02BFE94A200AFEDEA /* CoreDataNotes.swift */; };
+		53D4CBBC2BFE94A300AFEDEA /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
+		53D4CBBD2BFE94A300AFEDEA /* CoreDataTasks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB22BFE94A300AFEDEA /* CoreDataTasks.swift */; };
+		53D4CBBE2BFE94A300AFEDEA /* CoreDataPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB32BFE94A300AFEDEA /* CoreDataPerson.swift */; };
+		53D4CBBF2BFE94A300AFEDEA /* CoreDataProjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB42BFE94A300AFEDEA /* CoreDataProjects.swift */; };
+		53D4CBC02BFE94A300AFEDEA /* CoreDataRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB52BFE94A300AFEDEA /* CoreDataRecords.swift */; };
+		53D4CBC12BFE94A300AFEDEA /* CoreDataJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB62BFE94A300AFEDEA /* CoreDataJob.swift */; };
+		53D4CBC22BFE94A300AFEDEA /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
+		53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC32BFE94C900AFEDEA /* DateHelper.swift */; };
+		53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */; };
+		53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC92BFE955000AFEDEA /* SaveSource.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
+		53D4CB5F2BFE930300AFEDEA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KlockWork_iOS.entitlements; sourceTree = "<group>"; };
+		53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		53D4CB6A2BFE93B000AFEDEA /* Main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
+		53D4CB6B2BFE93B000AFEDEA /* AppSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		53D4CB6C2BFE93B000AFEDEA /* Home.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
+		53D4CB6D2BFE93B000AFEDEA /* Planning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Planning.swift; sourceTree = "<group>"; };
+		53D4CB6E2BFE93B000AFEDEA /* Today.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Today.swift; sourceTree = "<group>"; };
+		53D4CB702BFE93B000AFEDEA /* CompanyDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompanyDetail.swift; sourceTree = "<group>"; };
+		53D4CB712BFE93B000AFEDEA /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		53D4CB722BFE93B000AFEDEA /* JobDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JobDetail.swift; sourceTree = "<group>"; };
+		53D4CB732BFE93B000AFEDEA /* NoteDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteDetail.swift; sourceTree = "<group>"; };
+		53D4CB742BFE93B000AFEDEA /* TaskDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskDetail.swift; sourceTree = "<group>"; };
+		53D4CB762BFE93B000AFEDEA /* Companies.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Companies.swift; sourceTree = "<group>"; };
+		53D4CB772BFE93B000AFEDEA /* Jobs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Jobs.swift; sourceTree = "<group>"; };
+		53D4CB782BFE93B000AFEDEA /* Notes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
+		53D4CB792BFE93B000AFEDEA /* Tasks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tasks.swift; sourceTree = "<group>"; };
+		53D4CB892BFE940600AFEDEA /* CoreDataCalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCalendarEvent.swift; sourceTree = "<group>"; };
+		53D4CB8A2BFE940600AFEDEA /* CoreDataCompanies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCompanies.swift; sourceTree = "<group>"; };
+		53D4CB8B2BFE940600AFEDEA /* CoreDataJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataJob.swift; sourceTree = "<group>"; };
+		53D4CB8C2BFE940600AFEDEA /* CoreDataNotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNotes.swift; sourceTree = "<group>"; };
+		53D4CB8D2BFE940600AFEDEA /* CoreDataNoteVersions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNoteVersions.swift; sourceTree = "<group>"; };
+		53D4CB8E2BFE940600AFEDEA /* CoreDataPerson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPerson.swift; sourceTree = "<group>"; };
+		53D4CB8F2BFE940600AFEDEA /* CoreDataPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPlan.swift; sourceTree = "<group>"; };
+		53D4CB902BFE940600AFEDEA /* CoreDataProjectConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProjectConfiguration.swift; sourceTree = "<group>"; };
+		53D4CB912BFE940600AFEDEA /* CoreDataProjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProjects.swift; sourceTree = "<group>"; };
+		53D4CB922BFE940600AFEDEA /* CoreDataRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRecords.swift; sourceTree = "<group>"; };
+		53D4CB932BFE940600AFEDEA /* CoreDataTasks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataTasks.swift; sourceTree = "<group>"; };
+		53D4CB952BFE940700AFEDEA /* CoreDataCalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCalendarEvent.swift; sourceTree = "<group>"; };
+		53D4CB962BFE940700AFEDEA /* CoreDataCompanies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCompanies.swift; sourceTree = "<group>"; };
+		53D4CB972BFE940700AFEDEA /* CoreDataJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataJob.swift; sourceTree = "<group>"; };
+		53D4CB982BFE940700AFEDEA /* CoreDataNotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNotes.swift; sourceTree = "<group>"; };
+		53D4CB992BFE940700AFEDEA /* CoreDataNoteVersions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataNoteVersions.swift; sourceTree = "<group>"; };
+		53D4CB9A2BFE940700AFEDEA /* CoreDataPerson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPerson.swift; sourceTree = "<group>"; };
+		53D4CB9B2BFE940700AFEDEA /* CoreDataPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPlan.swift; sourceTree = "<group>"; };
+		53D4CB9C2BFE940700AFEDEA /* CoreDataProjectConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProjectConfiguration.swift; sourceTree = "<group>"; };
+		53D4CB9D2BFE940700AFEDEA /* CoreDataProjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProjects.swift; sourceTree = "<group>"; };
+		53D4CB9E2BFE940700AFEDEA /* CoreDataRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRecords.swift; sourceTree = "<group>"; };
+		53D4CB9F2BFE940700AFEDEA /* CoreDataTasks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataTasks.swift; sourceTree = "<group>"; };
+		53D4CBA32BFE940700AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		53D4CBA52BFE940700AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
+		53D4CBA72BFE944D00AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
+		53D4CBA82BFE944D00AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PersistenceController.swift; path = ../../DLPrototype/DLPrototype/CoreData/PersistenceController.swift; sourceTree = "<group>"; };
+		53D4CBAB2BFE947900AFEDEA /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Theme.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/Theme.swift; sourceTree = "<group>"; };
+		53D4CBAD2BFE94A200AFEDEA /* CoreDataPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataPlan.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataPlan.swift; sourceTree = "<group>"; };
+		53D4CBAE2BFE94A200AFEDEA /* CoreDataNoteVersions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataNoteVersions.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataNoteVersions.swift; sourceTree = "<group>"; };
+		53D4CBAF2BFE94A200AFEDEA /* CoreDataProjectConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataProjectConfiguration.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataProjectConfiguration.swift; sourceTree = "<group>"; };
+		53D4CBB02BFE94A200AFEDEA /* CoreDataNotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataNotes.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataNotes.swift; sourceTree = "<group>"; };
+		53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataCalendarEvent.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataCalendarEvent.swift; sourceTree = "<group>"; };
+		53D4CBB22BFE94A300AFEDEA /* CoreDataTasks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataTasks.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataTasks.swift; sourceTree = "<group>"; };
+		53D4CBB32BFE94A300AFEDEA /* CoreDataPerson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataPerson.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataPerson.swift; sourceTree = "<group>"; };
+		53D4CBB42BFE94A300AFEDEA /* CoreDataProjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataProjects.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataProjects.swift; sourceTree = "<group>"; };
+		53D4CBB52BFE94A300AFEDEA /* CoreDataRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataRecords.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataRecords.swift; sourceTree = "<group>"; };
+		53D4CBB62BFE94A300AFEDEA /* CoreDataJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataJob.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataJob.swift; sourceTree = "<group>"; };
+		53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataCompanies.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataCompanies.swift; sourceTree = "<group>"; };
+		53D4CBC32BFE94C900AFEDEA /* DateHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DateHelper.swift; path = ../../DLPrototype/DLPrototype/Helpers/DateHelper.swift; sourceTree = "<group>"; };
+		53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomPickerItem.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/CustomPickerItem.swift; sourceTree = "<group>"; };
+		53D4CBC92BFE955000AFEDEA /* SaveSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SaveSource.swift; path = ../../DLPrototype/DLPrototype/Enums/SaveSource.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		53D4CB502BFE930100AFEDEA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		53D4CB4A2BFE930100AFEDEA = {
+			isa = PBXGroup;
+			children = (
+				53D4CBC92BFE955000AFEDEA /* SaveSource.swift */,
+				53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */,
+				53D4CBC32BFE94C900AFEDEA /* DateHelper.swift */,
+				53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */,
+				53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */,
+				53D4CBB62BFE94A300AFEDEA /* CoreDataJob.swift */,
+				53D4CBB02BFE94A200AFEDEA /* CoreDataNotes.swift */,
+				53D4CBAE2BFE94A200AFEDEA /* CoreDataNoteVersions.swift */,
+				53D4CBB32BFE94A300AFEDEA /* CoreDataPerson.swift */,
+				53D4CBAD2BFE94A200AFEDEA /* CoreDataPlan.swift */,
+				53D4CBAF2BFE94A200AFEDEA /* CoreDataProjectConfiguration.swift */,
+				53D4CBB42BFE94A300AFEDEA /* CoreDataProjects.swift */,
+				53D4CBB52BFE94A300AFEDEA /* CoreDataRecords.swift */,
+				53D4CBB22BFE94A300AFEDEA /* CoreDataTasks.swift */,
+				53D4CBAB2BFE947900AFEDEA /* Theme.swift */,
+				53D4CBA62BFE944D00AFEDEA /* Data.xcdatamodeld */,
+				53D4CBA82BFE944D00AFEDEA /* PersistenceController.swift */,
+				53D4CBA42BFE940700AFEDEA /* CoreData */,
+				53D4CB942BFE940600AFEDEA /* CoreData */,
+				53D4CBA12BFE940700AFEDEA /* Models */,
+				53D4CB552BFE930100AFEDEA /* KlockWork-iOS */,
+				53D4CB542BFE930100AFEDEA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		53D4CB542BFE930100AFEDEA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		53D4CB552BFE930100AFEDEA /* KlockWork-iOS */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */,
+				53D4CB7A2BFE93B000AFEDEA /* Entities */,
+				53D4CB6A2BFE93B000AFEDEA /* Main.swift */,
+				53D4CB6F2BFE93B000AFEDEA /* Pages */,
+				53D4CB5F2BFE930300AFEDEA /* Assets.xcassets */,
+				53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */,
+				53D4CB622BFE930300AFEDEA /* Preview Content */,
+			);
+			path = "KlockWork-iOS";
+			sourceTree = "<group>";
+		};
+		53D4CB622BFE930300AFEDEA /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		53D4CB6F2BFE93B000AFEDEA /* Pages */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CB6B2BFE93B000AFEDEA /* AppSettings.swift */,
+				53D4CB6C2BFE93B000AFEDEA /* Home.swift */,
+				53D4CB6D2BFE93B000AFEDEA /* Planning.swift */,
+				53D4CB6E2BFE93B000AFEDEA /* Today.swift */,
+			);
+			path = Pages;
+			sourceTree = "<group>";
+		};
+		53D4CB752BFE93B000AFEDEA /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CB702BFE93B000AFEDEA /* CompanyDetail.swift */,
+				53D4CB712BFE93B000AFEDEA /* Item.swift */,
+				53D4CB722BFE93B000AFEDEA /* JobDetail.swift */,
+				53D4CB732BFE93B000AFEDEA /* NoteDetail.swift */,
+				53D4CB742BFE93B000AFEDEA /* TaskDetail.swift */,
+			);
+			path = Detail;
+			sourceTree = "<group>";
+		};
+		53D4CB7A2BFE93B000AFEDEA /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CB752BFE93B000AFEDEA /* Detail */,
+				53D4CB762BFE93B000AFEDEA /* Companies.swift */,
+				53D4CB772BFE93B000AFEDEA /* Jobs.swift */,
+				53D4CB782BFE93B000AFEDEA /* Notes.swift */,
+				53D4CB792BFE93B000AFEDEA /* Tasks.swift */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
+		53D4CB942BFE940600AFEDEA /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CB892BFE940600AFEDEA /* CoreDataCalendarEvent.swift */,
+				53D4CB8A2BFE940600AFEDEA /* CoreDataCompanies.swift */,
+				53D4CB8B2BFE940600AFEDEA /* CoreDataJob.swift */,
+				53D4CB8C2BFE940600AFEDEA /* CoreDataNotes.swift */,
+				53D4CB8D2BFE940600AFEDEA /* CoreDataNoteVersions.swift */,
+				53D4CB8E2BFE940600AFEDEA /* CoreDataPerson.swift */,
+				53D4CB8F2BFE940600AFEDEA /* CoreDataPlan.swift */,
+				53D4CB902BFE940600AFEDEA /* CoreDataProjectConfiguration.swift */,
+				53D4CB912BFE940600AFEDEA /* CoreDataProjects.swift */,
+				53D4CB922BFE940600AFEDEA /* CoreDataRecords.swift */,
+				53D4CB932BFE940600AFEDEA /* CoreDataTasks.swift */,
+			);
+			name = CoreData;
+			path = ../../DLPrototype/DLPrototype/Models/CoreData;
+			sourceTree = "<group>";
+		};
+		53D4CBA02BFE940700AFEDEA /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CB952BFE940700AFEDEA /* CoreDataCalendarEvent.swift */,
+				53D4CB962BFE940700AFEDEA /* CoreDataCompanies.swift */,
+				53D4CB972BFE940700AFEDEA /* CoreDataJob.swift */,
+				53D4CB982BFE940700AFEDEA /* CoreDataNotes.swift */,
+				53D4CB992BFE940700AFEDEA /* CoreDataNoteVersions.swift */,
+				53D4CB9A2BFE940700AFEDEA /* CoreDataPerson.swift */,
+				53D4CB9B2BFE940700AFEDEA /* CoreDataPlan.swift */,
+				53D4CB9C2BFE940700AFEDEA /* CoreDataProjectConfiguration.swift */,
+				53D4CB9D2BFE940700AFEDEA /* CoreDataProjects.swift */,
+				53D4CB9E2BFE940700AFEDEA /* CoreDataRecords.swift */,
+				53D4CB9F2BFE940700AFEDEA /* CoreDataTasks.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		53D4CBA12BFE940700AFEDEA /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CBA02BFE940700AFEDEA /* CoreData */,
+			);
+			name = Models;
+			path = ../../DLPrototype/DLPrototype/Models;
+			sourceTree = "<group>";
+		};
+		53D4CBA42BFE940700AFEDEA /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				53D4CBA22BFE940700AFEDEA /* Data.xcdatamodeld */,
+				53D4CBA32BFE940700AFEDEA /* PersistenceController.swift */,
+			);
+			name = CoreData;
+			path = ../../DLPrototype/DLPrototype/CoreData;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		53D4CB522BFE930100AFEDEA /* KlockWork-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53D4CB672BFE930300AFEDEA /* Build configuration list for PBXNativeTarget "KlockWork-iOS" */;
+			buildPhases = (
+				53D4CB4F2BFE930100AFEDEA /* Sources */,
+				53D4CB502BFE930100AFEDEA /* Frameworks */,
+				53D4CB512BFE930100AFEDEA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "KlockWork-iOS";
+			productName = "KlockWork-iOS";
+			productReference = 53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		53D4CB4B2BFE930100AFEDEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					53D4CB522BFE930100AFEDEA = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = 53D4CB4E2BFE930100AFEDEA /* Build configuration list for PBXProject "KlockWork-iOS" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 53D4CB4A2BFE930100AFEDEA;
+			productRefGroup = 53D4CB542BFE930100AFEDEA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				53D4CB522BFE930100AFEDEA /* KlockWork-iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		53D4CB512BFE930100AFEDEA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */,
+				53D4CB602BFE930300AFEDEA /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		53D4CB4F2BFE930100AFEDEA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */,
+				53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */,
+				53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */,
+				53D4CBB82BFE94A300AFEDEA /* CoreDataPlan.swift in Sources */,
+				53D4CBB92BFE94A300AFEDEA /* CoreDataNoteVersions.swift in Sources */,
+				53D4CBBA2BFE94A300AFEDEA /* CoreDataProjectConfiguration.swift in Sources */,
+				53D4CBBB2BFE94A300AFEDEA /* CoreDataNotes.swift in Sources */,
+				53D4CBBC2BFE94A300AFEDEA /* CoreDataCalendarEvent.swift in Sources */,
+				53D4CBBD2BFE94A300AFEDEA /* CoreDataTasks.swift in Sources */,
+				53D4CBBE2BFE94A300AFEDEA /* CoreDataPerson.swift in Sources */,
+				53D4CBBF2BFE94A300AFEDEA /* CoreDataProjects.swift in Sources */,
+				53D4CBC02BFE94A300AFEDEA /* CoreDataRecords.swift in Sources */,
+				53D4CBC12BFE94A300AFEDEA /* CoreDataJob.swift in Sources */,
+				53D4CBC22BFE94A300AFEDEA /* CoreDataCompanies.swift in Sources */,
+				53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */,
+				53D4CBA92BFE944D00AFEDEA /* Data.xcdatamodeld in Sources */,
+				53D4CBAA2BFE944D00AFEDEA /* PersistenceController.swift in Sources */,
+				53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */,
+				53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */,
+				53D4CB7F2BFE93B000AFEDEA /* Today.swift in Sources */,
+				53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */,
+				53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */,
+				53D4CB832BFE93B000AFEDEA /* NoteDetail.swift in Sources */,
+				53D4CB852BFE93B000AFEDEA /* Companies.swift in Sources */,
+				53D4CB842BFE93B000AFEDEA /* TaskDetail.swift in Sources */,
+				53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */,
+				53D4CB812BFE93B000AFEDEA /* Item.swift in Sources */,
+				53D4CB7D2BFE93B000AFEDEA /* Home.swift in Sources */,
+				53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */,
+				53D4CB802BFE93B000AFEDEA /* CompanyDetail.swift in Sources */,
+				53D4CB882BFE93B000AFEDEA /* Tasks.swift in Sources */,
+				53D4CB822BFE93B000AFEDEA /* JobDetail.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		53D4CB652BFE930300AFEDEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		53D4CB662BFE930300AFEDEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		53D4CB682BFE930300AFEDEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
+				DEVELOPMENT_TEAM = 6DT7L2N5X6;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yegcollective.KlockWork-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		53D4CB692BFE930300AFEDEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
+				DEVELOPMENT_TEAM = 6DT7L2N5X6;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yegcollective.KlockWork-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		53D4CB4E2BFE930100AFEDEA /* Build configuration list for PBXProject "KlockWork-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53D4CB652BFE930300AFEDEA /* Debug */,
+				53D4CB662BFE930300AFEDEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		53D4CB672BFE930300AFEDEA /* Build configuration list for PBXNativeTarget "KlockWork-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53D4CB682BFE930300AFEDEA /* Debug */,
+				53D4CB692BFE930300AFEDEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		53D4CBA22BFE940700AFEDEA /* Data.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				53D4CBA52BFE940700AFEDEA /* Note.xcdatamodel */,
+			);
+			currentVersion = 53D4CBA52BFE940700AFEDEA /* Note.xcdatamodel */;
+			name = Data.xcdatamodeld;
+			path = /Users/prieber/Code/Personal/DLPrototype/DLPrototype/CoreData/Data.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		53D4CBA62BFE944D00AFEDEA /* Data.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				53D4CBA72BFE944D00AFEDEA /* Note.xcdatamodel */,
+			);
+			currentVersion = 53D4CBA72BFE944D00AFEDEA /* Note.xcdatamodel */;
+			name = Data.xcdatamodeld;
+			path = /Users/prieber/Code/Personal/DLPrototype/DLPrototype/CoreData/Data.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 53D4CB4B2BFE930100AFEDEA /* Project object */;
+}
