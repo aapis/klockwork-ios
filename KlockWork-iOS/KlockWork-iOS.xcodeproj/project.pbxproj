@@ -80,8 +80,6 @@
 		53D4CBC92BFE955000AFEDEA /* SaveSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SaveSource.swift; path = ../../DLPrototype/DLPrototype/Enums/SaveSource.swift; sourceTree = "<group>"; };
 		53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		53D4CBCE2BFE97CC00AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
-		53F926112BFE9D6900948076 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		53F926122BFE9D7600948076 /* PRIVACY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIVACY.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,8 +135,6 @@
 				53D4CB5F2BFE930300AFEDEA /* Assets.xcassets */,
 				53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */,
 				53D4CB622BFE930300AFEDEA /* Preview Content */,
-				53F926112BFE9D6900948076 /* README.md */,
-				53F926122BFE9D7600948076 /* PRIVACY.md */,
 			);
 			path = "KlockWork-iOS";
 			sourceTree = "<group>";
