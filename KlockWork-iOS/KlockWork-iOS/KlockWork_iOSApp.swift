@@ -23,6 +23,6 @@ struct KlockWorkiOSApp: App {
 
 extension Double {
     var string: String {
-        return self.formatted()
+        return String(format: "%.0f", self)
     }
 }
