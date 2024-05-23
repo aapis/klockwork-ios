@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct Main: View {
+    @Environment(\.managedObjectContext) var moc
+
     var body: some View {
         TabView {
             Home()
@@ -34,6 +36,12 @@ struct Main: View {
             }
         }
         .tint(.red)
+        .onAppear(perform: actionOnAppear)
     }
 }
 
+extension Main {
+    private func actionOnAppear() -> Void {
+        
+    }
+}

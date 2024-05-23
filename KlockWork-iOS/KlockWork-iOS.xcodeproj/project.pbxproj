@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 537582C52BFFB37900CB528C /* Data.xcdatamodeld */; };
+		537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CB2BFFD70D00CB528C /* RecordDetail.swift */; };
+		537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CD2BFFEB7500CB528C /* EdgeBorder.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
 		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
@@ -28,7 +31,6 @@
 		53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */; };
 		53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC92BFE955000AFEDEA /* SaveSource.swift */; };
 		53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */; };
-		53F926052BFE9B3000948076 /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCB2BFE97CC00AFEDEA /* Data.xcdatamodeld */; };
 		53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
 		53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
 		53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB62BFE94A300AFEDEA /* CoreDataJob.swift */; };
@@ -54,9 +56,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		537582C62BFFB37900CB528C /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
+		537582CB2BFFD70D00CB528C /* RecordDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDetail.swift; sourceTree = "<group>"; };
+		537582CD2BFFEB7500CB528C /* EdgeBorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EdgeBorder.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/EdgeBorder.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
-		53D4CB5F2BFE930300AFEDEA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KlockWork_iOS.entitlements; sourceTree = "<group>"; };
 		53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		53D4CB6A2BFE93B000AFEDEA /* Main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
@@ -114,9 +118,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		537582C82BFFCA3300CB528C /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				537582CD2BFFEB7500CB528C /* EdgeBorder.swift */,
+				537582C52BFFB37900CB528C /* Data.xcdatamodeld */,
 				53F926332BFEA0F900948076 /* Assets.xcassets */,
 				53F926242BFEA00E00948076 /* Color.swift */,
 				53F926272BFEA00E00948076 /* Date.swift */,
@@ -160,11 +173,11 @@
 		53D4CB552BFE930100AFEDEA /* KlockWork-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				537582C82BFFCA3300CB528C /* Extensions */,
 				53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */,
 				53D4CB7A2BFE93B000AFEDEA /* Entities */,
 				53D4CB6A2BFE93B000AFEDEA /* Main.swift */,
 				53D4CB6F2BFE93B000AFEDEA /* Pages */,
-				53D4CB5F2BFE930300AFEDEA /* Assets.xcassets */,
 				53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */,
 				53D4CB622BFE930300AFEDEA /* Preview Content */,
 			);
@@ -198,6 +211,7 @@
 				53D4CB722BFE93B000AFEDEA /* JobDetail.swift */,
 				53D4CB732BFE93B000AFEDEA /* NoteDetail.swift */,
 				53D4CB742BFE93B000AFEDEA /* TaskDetail.swift */,
+				537582CB2BFFD70D00CB528C /* RecordDetail.swift */,
 			);
 			path = Detail;
 			sourceTree = "<group>";
@@ -294,6 +308,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
+				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
 				53F926292BFEA00E00948076 /* Project.swift in Sources */,
 				53F9262A2BFEA00E00948076 /* Job.swift in Sources */,
 				53F9262B2BFEA00E00948076 /* EKEvent.swift in Sources */,
@@ -315,7 +331,6 @@
 				53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */,
 				53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */,
 				53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */,
-				53F926052BFE9B3000948076 /* Data.xcdatamodeld in Sources */,
 				53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */,
 				53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */,
 				53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */,
@@ -332,6 +347,7 @@
 				53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */,
 				53D4CB812BFE93B000AFEDEA /* Item.swift in Sources */,
 				53D4CB7D2BFE93B000AFEDEA /* Home.swift in Sources */,
+				537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */,
 				53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */,
 				53D4CB802BFE93B000AFEDEA /* CompanyDetail.swift in Sources */,
 				53D4CB882BFE93B000AFEDEA /* Tasks.swift in Sources */,
@@ -558,6 +574,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
+		537582C52BFFB37900CB528C /* Data.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				537582C62BFFB37900CB528C /* Note.xcdatamodel */,
+			);
+			currentVersion = 537582C62BFFB37900CB528C /* Note.xcdatamodel */;
+			name = Data.xcdatamodeld;
+			path = /Users/prieber/Documents/CloudCode/Personal/DLPrototype/DLPrototype/CoreData/Data.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
 		53D4CBCB2BFE97CC00AFEDEA /* Data.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (

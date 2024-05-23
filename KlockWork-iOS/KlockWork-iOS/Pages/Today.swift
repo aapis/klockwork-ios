@@ -9,37 +9,124 @@
 import SwiftUI
 
 struct Today: View {
-    @FetchRequest private var records: FetchedResults<LogRecord>
+    @Environment(\.managedObjectContext) var moc
+    @State private var job: Job? = nil
+    @State private var showJobPanel: Bool = false
 
     var body: some View {
-        VStack {
-            if records.count > 0 {
-                VStack(alignment: .leading) {
-                    Text("Today")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    ScrollView {
-                        VStack(spacing: 1) {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 0) {
+                Header(job: $job, showJobPanel: $showJobPanel)
+                ZStack(alignment: .bottomLeading) {
+                    Content(job: $job, showJobPanel: $showJobPanel)
+                    LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
+                        .frame(height: 50)
+                        .opacity(0.1)
+                }
+
+                if !showJobPanel {
+                    Editor()
+                    .background(job != nil ? job!.backgroundColor : .clear)
+                }
+                Spacer()
+                .frame(height: 1)
+            }
+            .background(Theme.cPurple)
+            .onChange(of: job) {
+                showJobPanel = false
+            }
+        }
+    }
+}
+
+extension Today {
+    struct Header: View {
+        @Binding public var job: Job?
+        @Binding public var showJobPanel: Bool
+
+        var body: some View {
+            HStack(spacing: 0) {
+                Text("Today")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding()
+                Spacer()
+                Button {
+                    showJobPanel.toggle()
+                } label: {
+                    ZStack {
+                        if let jerb = job {
+                            jerb.backgroundColor
+                        } else {
+                            Color.white
+                        }
+                        Image(systemName: showJobPanel ? "xmark" : "hammer")
+                            .foregroundStyle(job != nil ? job!.backgroundColor.isBright() ? .black : .white : .black)
+                    }
+                }
+                .mask(Circle())
+                .frame(width: 40, height: 40)
+                .padding(.trailing)
+            }
+        }
+    }
+
+    struct Content: View {
+        @FetchRequest private var records: FetchedResults<LogRecord>
+        @FetchRequest private var jobs: FetchedResults<Job>
+        @Binding public var job: Job?
+        @Binding public var showJobPanel: Bool
+
+        var body: some View {
+            ScrollView {
+                VStack(spacing: 1) {
+                    if showJobPanel {
+                        if jobs.count > 0 {
+                            ListTitle(text: "Jobs", icon: "hammer")
+
+                            ForEach(jobs) { jerb in
+                                SingleJob(job: jerb, stateJob: $job)
+                            }
+                        } else {
+                            HStack {
+                                Text("No records found for \(Date().formatted(date: .abbreviated, time: .omitted)).\nAdd one below!")
+                                    .fontWeight(.bold)
+                                Spacer()
+                            }
+                            .padding(8)
+                            .background(.yellow)
+                            .foregroundStyle(.black.opacity(0.6))
+                        }
+                    } else {
+                        if records.count > 0 {
+                            ListTitle(text: "Records", icon: "tray")
+
                             ForEach(records) { record in
                                 SingleRecord(record: record)
                             }
+                        } else {
+                            HStack {
+                                Text("No records found for \(Date().formatted(date: .abbreviated, time: .omitted)).\nAdd one below!")
+                                    .fontWeight(.bold)
+                                Spacer()
+                            }
+                            .padding(8)
+                            .background(.yellow)
+                            .foregroundStyle(.black.opacity(0.6))
                         }
                     }
-                    .scrollIndicators(.hidden)
-                    
-                    Editor()
-                    Spacer()
                 }
-                
-            } else {
-                Text("No records found for \(Date().formatted())")
             }
+            .scrollContentBackground(.hidden)
+            .scrollIndicators(.hidden)
         }
-        .background(Theme.cPurple)
-    }
-    
-    init() {
-        _records = CoreDataRecords.fetchForDate(Date())
+
+        init(job: Binding<Job?>, showJobPanel: Binding<Bool>) {
+            _job = job
+            _showJobPanel = showJobPanel
+            _records = CoreDataRecords.fetchForDate(Date())
+            _jobs = CoreDataJob.fetchAll()
+        }
     }
 }
 
@@ -47,29 +134,104 @@ struct SingleRecord: View {
     public let record: LogRecord
     
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 5) {
-            Text(record.message!)
-                .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .white)
-                .padding(5)
-            Spacer()
-            Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
-                .foregroundStyle(.gray)
-                .padding(5)
+        NavigationLink {
+            RecordDetail(record: record)
+                .background(Theme.cPurple)
+                .scrollContentBackground(.hidden)
+        } label: {
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
+                Text(record.message!)
+                    .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .white)
+                Spacer()
+                Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
+                    .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
+
+            }
+            .padding(8)
+            .background(record.job!.backgroundColor)
+            .listRowBackground(record.job!.backgroundColor)
         }
-        .background(record.job!.backgroundColor)
+    }
+}
+
+struct SingleJob: View {
+    public let job: Job
+    @Binding public var stateJob: Job?
+
+    var body: some View {
+        Button {
+            stateJob = job
+        } label: {
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
+                Text(job.jid.string)
+                    .foregroundStyle(job.backgroundColor.isBright() ? .black : .white)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(job.backgroundColor.isBright() ? .black : .gray)
+            }
+            .padding(8)
+            .background(job.backgroundColor)
+            .listRowBackground(job.backgroundColor)
+            .onAppear(perform: actionOnAppear)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+extension SingleJob {
+    private func actionOnAppear() -> Void {
+
+    }
+}
+
+struct ListTitle: View {
+    public let text: String
+    public let icon: String
+
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+            Text(text)
+            Spacer()
+        }
+        .font(.footnote)
+        .foregroundStyle(.gray)
+        .padding()
+        .background(Theme.textBackground)
     }
 }
 
 struct Editor: View {
+    enum Field {
+        // Apparently you need to use an existing UITextContentType
+        case organizationName
+    }
+
+    @Environment(\.managedObjectContext) var moc
     @State private var text: String = ""
+    @FocusState public var focused: Field?
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 0) {
             TextField("What are you working on?", text: $text)
+                .focused($focused, equals: .organizationName)
+                .textContentType(.organizationName)
+                .submitLabel(.done)
                 .textSelection(.enabled)
                 .lineLimit(1)
                 .padding()
         }
-        .background(Theme.textBackground)
+//        .background(Theme.rowColour)
+//        .border(width: 2, edges: [.bottom], color: .accentColor)
+        .onSubmit {
+            if !text.isEmpty {
+                if let job = CoreDataJob(moc: moc).byId(33.0) {
+                    let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: Date(), text: text)
+                    text = ""
+                }
+            }
+        }
     }
 }
