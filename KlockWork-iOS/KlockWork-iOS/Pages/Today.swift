@@ -79,7 +79,7 @@ extension Today {
 
         var body: some View {
             ScrollView {
-                VStack(spacing: 1) {
+                VStack(alignment: .leading, spacing: 1) {
                     if showJobPanel {
                         if jobs.count > 0 {
                             ListTitle(text: "Jobs", icon: "hammer")
@@ -88,14 +88,7 @@ extension Today {
                                 SingleJob(job: jerb, stateJob: $job)
                             }
                         } else {
-                            HStack {
-                                Text("No records found for \(Date().formatted(date: .abbreviated, time: .omitted)).\nAdd one below!")
-                                    .fontWeight(.bold)
-                                Spacer()
-                            }
-                            .padding(8)
-                            .background(.yellow)
-                            .foregroundStyle(.black.opacity(0.6))
+                            StatusMessages.Warning(message: "No jobs found")
                         }
                     } else {
                         if records.count > 0 {
@@ -105,14 +98,7 @@ extension Today {
                                 SingleRecord(record: record)
                             }
                         } else {
-                            HStack {
-                                Text("No records found for \(Date().formatted(date: .abbreviated, time: .omitted)).\nAdd one below!")
-                                    .fontWeight(.bold)
-                                Spacer()
-                            }
-                            .padding(8)
-                            .background(.yellow)
-                            .foregroundStyle(.black.opacity(0.6))
+                            StatusMessages.Warning(message: "No records found for \(Date().formatted(date: .abbreviated, time: .omitted)).\nAdd one below!")
                         }
                     }
                 }
@@ -139,19 +125,22 @@ struct SingleRecord: View {
                 .background(Theme.cPurple)
                 .scrollContentBackground(.hidden)
         } label: {
-            HStack(alignment: .firstTextBaseline, spacing: 5) {
-                Text(record.message!)
-                    .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .white)
-                Spacer()
-                Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
-                    .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
+            VStack(alignment: .leading) {
+                HStack(alignment: .top, spacing: 5) {
+                    Text(record.message!)
+                        .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .white)
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                    Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
+                        .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
 
+                }
+                .padding(8)
+                .background(record.job!.backgroundColor)
+                .listRowBackground(record.job!.backgroundColor)
             }
-            .padding(8)
-            .background(record.job!.backgroundColor)
-            .listRowBackground(record.job!.backgroundColor)
         }
     }
 }
@@ -167,6 +156,7 @@ struct SingleJob: View {
             HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text(job.jid.string)
                     .foregroundStyle(job.backgroundColor.isBright() ? .black : .white)
+                    .multilineTextAlignment(.leading)
                 Spacer()
                 Image(systemName: "chevron.right")
                     .foregroundStyle(job.backgroundColor.isBright() ? .black : .gray)
@@ -174,15 +164,8 @@ struct SingleJob: View {
             .padding(8)
             .background(job.backgroundColor)
             .listRowBackground(job.backgroundColor)
-            .onAppear(perform: actionOnAppear)
         }
         .buttonStyle(.plain)
-    }
-}
-
-extension SingleJob {
-    private func actionOnAppear() -> Void {
-
     }
 }
 
@@ -200,6 +183,23 @@ struct ListTitle: View {
         .foregroundStyle(.gray)
         .padding()
         .background(Theme.textBackground)
+    }
+}
+
+struct StatusMessages {
+    struct Warning: View {
+        public let message: String
+
+        var body: some View {
+            HStack {
+                Text("No records found for \(Date().formatted(date: .abbreviated, time: .omitted)).\nAdd one below!")
+                    .fontWeight(.bold)
+                Spacer()
+            }
+            .padding(8)
+            .background(.yellow)
+            .foregroundStyle(.black.opacity(0.6))
+        }
     }
 }
 
