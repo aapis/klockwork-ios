@@ -13,11 +13,12 @@ struct Main: View {
 
     var body: some View {
         TabView {
-            Home()
-            .tabItem {
-                Image(systemName: "house")
-                Text("Home")
-            }
+            // @TODO: rebuild and uncomment
+//            Home()
+//            .tabItem {
+//                Image(systemName: "house")
+//                Text("Home")
+//            }
             Today()
             .tabItem {
                 Image(systemName: "tray")
