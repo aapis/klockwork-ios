@@ -36,12 +36,5 @@ struct Main: View {
             }
         }
         .tint(.red)
-        .onAppear(perform: actionOnAppear)
-    }
-}
-
-extension Main {
-    private func actionOnAppear() -> Void {
-        
     }
 }
