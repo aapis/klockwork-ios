@@ -83,10 +83,11 @@ extension Today {
                 TextField(
                     "",
                     text: $text,
-                    prompt: Text("What are you working on?")
-                        .foregroundStyle(job != nil ? job!.backgroundColor.isBright() ? Theme.cPurple : .white : .white)
+                    prompt: Text(job == nil ? "Select a job" : "What are you working on?")
+                        .foregroundStyle(job != nil ? job!.backgroundColor.isBright() ? Theme.cPurple : .white : .gray)
                 )
                     .focused($focused, equals: .organizationName)
+                    .disabled(job == nil)
                     .textContentType(.organizationName)
                     .submitLabel(.done)
                     .textSelection(.enabled)
