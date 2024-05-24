@@ -35,6 +35,6 @@ struct Main: View {
                 Text("Settings")
             }
         }
-        .tint(.cyan)
+        .tint(.yellow)
     }
 }

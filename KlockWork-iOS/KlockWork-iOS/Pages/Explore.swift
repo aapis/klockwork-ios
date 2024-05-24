@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct Explore: View {
-    private let fgColour: Color = .cyan
+    private let fgColour: Color = .yellow
     private var columns: [GridItem] {
         Array(repeating: .init(.flexible()), count: 2)
     }
