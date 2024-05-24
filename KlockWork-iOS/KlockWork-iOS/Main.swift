@@ -13,16 +13,15 @@ struct Main: View {
 
     var body: some View {
         TabView {
-            // @TODO: rebuild and uncomment
-//            Home()
-//            .tabItem {
-//                Image(systemName: "house")
-//                Text("Home")
-//            }
             Today()
             .tabItem {
                 Image(systemName: "tray")
                 Text("Today")
+            }
+            Explore()
+            .tabItem {
+                Image(systemName: "globe.desk")
+                Text("Explore")
             }
             Planning()
             .tabItem {
@@ -36,6 +35,6 @@ struct Main: View {
                 Text("Settings")
             }
         }
-        .tint(.red)
+        .tint(.cyan)
     }
 }

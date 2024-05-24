@@ -11,6 +11,7 @@ struct Tabs: View {
     @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
     @Binding public var selected: Page
+    static public let animationDuration: Double = 0.2
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -19,7 +20,7 @@ struct Tabs: View {
         }
         .background(.clear)
         .onChange(of: job) {
-            withAnimation(.easeIn) {
+            withAnimation(.easeIn(duration: Tabs.animationDuration)) {
                 selected = .records
             }
         }
@@ -59,7 +60,7 @@ extension Tabs {
             HStack(alignment: .center, spacing: 1) {
                 ForEach(Page.allCases, id: \.self) { page in
                     Button {
-                        withAnimation(.easeIn) {
+                        withAnimation(.easeIn(duration: Tabs.animationDuration)) {
                             selected = page
                         }
                     } label: {
