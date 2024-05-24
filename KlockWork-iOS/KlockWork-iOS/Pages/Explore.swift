@@ -8,8 +8,8 @@
 
 import SwiftUI
 
-struct Home: View {
-    private let fgColour: Color = .red
+struct Explore: View {
+    private let fgColour: Color = .yellow
     private var columns: [GridItem] {
         Array(repeating: .init(.flexible()), count: 2)
     }
@@ -81,7 +81,7 @@ struct Home: View {
                     }
                 }
             }
-            .navigationTitle("Home")
+            .navigationTitle("Explore")
             .toolbarBackground(Theme.cPurple, for: .navigationBar)
             .toolbar {
                 Image(systemName: "magnifyingglass")
@@ -113,7 +113,7 @@ struct Home: View {
     }
 }
 
-extension Home {
+extension Explore {
     private func actionOnAppear() -> Void {
         Task {
             entityCounts = (

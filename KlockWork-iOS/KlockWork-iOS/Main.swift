@@ -13,15 +13,15 @@ struct Main: View {
 
     var body: some View {
         TabView {
-            Home()
-            .tabItem {
-                Image(systemName: "house")
-                Text("Home")
-            }
             Today()
             .tabItem {
                 Image(systemName: "tray")
                 Text("Today")
+            }
+            Explore()
+            .tabItem {
+                Image(systemName: "globe.desk")
+                Text("Explore")
             }
             Planning()
             .tabItem {
@@ -35,13 +35,6 @@ struct Main: View {
                 Text("Settings")
             }
         }
-        .tint(.red)
-        .onAppear(perform: actionOnAppear)
-    }
-}
-
-extension Main {
-    private func actionOnAppear() -> Void {
-        
+        .tint(.yellow)
     }
 }
