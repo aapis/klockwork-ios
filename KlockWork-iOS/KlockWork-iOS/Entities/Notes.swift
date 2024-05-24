@@ -26,17 +26,21 @@ struct Notes: View {
                             }
                         }
                         .onDelete(perform: deleteItems)
+                        .listRowBackground(Theme.textBackground)
                     } else {
                         Button(action: addItem) {
                             Text("No notes found. Create one!")
                         }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
             }
             .onAppear(perform: {
                 items = CoreDataNotes(moc: moc).alive()
             })
-            .toolbarBackground(Theme.cPurple, for: .navigationBar)
+            .background(Theme.cGreen)
+            .scrollContentBackground(.hidden)
+            .toolbarBackground(Theme.cGreen, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()

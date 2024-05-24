@@ -36,6 +36,7 @@ struct Explore: View {
                             Text(String(entityCounts.0))
                         }
                     }
+                    .listRowBackground(Theme.textBackground)
 
                     NavigationLink {
                         Jobs()
@@ -50,7 +51,8 @@ struct Explore: View {
                             Text(String(entityCounts.1))
                         }
                     }
-                    
+                    .listRowBackground(Theme.textBackground)
+
                     
                     NavigationLink {
                         Notes()
@@ -65,7 +67,8 @@ struct Explore: View {
                             Text(String(entityCounts.2))
                         }
                     }
-                    
+                    .listRowBackground(Theme.textBackground)
+
                     NavigationLink {
                         Tasks()
                             .environment(\.managedObjectContext, moc)
@@ -79,36 +82,19 @@ struct Explore: View {
                             Text(String(entityCounts.3))
                         }
                     }
+                    .listRowBackground(Theme.textBackground)
                 }
             }
+            .background(Theme.cGreen)
+            .scrollContentBackground(.hidden)
             .navigationTitle("Explore")
-            .toolbarBackground(Theme.cPurple, for: .navigationBar)
+            .toolbarBackground(Theme.cGreen, for: .navigationBar)
             .toolbar {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(fgColour)
             }
-
-//            LazyVGrid(columns: columns) {
-//                HStack {
-//                    Image(systemName: "hexagon")
-//                        .font(.title)
-//                    Text("Planning")
-//                }
-//                .padding()
-//                .background(Theme.cPurple)
-//                .mask(RoundedRectangle(cornerRadius: 10.0))
-//
-//                HStack {
-//                    Image(systemName: "tray")
-//                        .font(.title)
-//                    Text("Today")
-//                }
-//                .padding()
-//                .background(Theme.cPurple)
-//                .mask(RoundedRectangle(cornerRadius: 10.0))
-//            }
         }
-        .accentColor(fgColour)
+        .tint(fgColour)
         .onAppear(perform: actionOnAppear)
     }
 }

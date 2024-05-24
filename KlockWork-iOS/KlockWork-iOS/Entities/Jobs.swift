@@ -26,17 +26,21 @@ struct Jobs: View {
                             }
                         }
                         .onDelete(perform: deleteItems)
+                        .listRowBackground(Theme.textBackground)
                     } else {
                         Button(action: addItem) {
                             Text("No jobs found. Create one!")
                         }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
             }
             .onAppear(perform: {
                 items = CoreDataJob(moc: moc).all(true)
             })
-            .toolbarBackground(Theme.cPurple, for: .navigationBar)
+            .background(Theme.cGreen)
+            .scrollContentBackground(.hidden)
+            .toolbarBackground(Theme.cGreen, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()

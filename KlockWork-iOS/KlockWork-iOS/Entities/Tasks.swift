@@ -26,17 +26,21 @@ struct Tasks: View {
                             }
                         }
                         .onDelete(perform: deleteItems)
+                        .listRowBackground(Theme.textBackground)
                     } else {
                         Button(action: addItem) {
                             Text("No tasks found. Create one!")
                         }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
             }
             .onAppear(perform: {
                 items = CoreDataTasks(moc: moc).all()
             })
-            .toolbarBackground(Theme.cPurple, for: .navigationBar)
+            .background(Theme.cGreen)
+            .scrollContentBackground(.hidden)
+            .toolbarBackground(Theme.cGreen, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()

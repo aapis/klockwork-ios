@@ -242,7 +242,6 @@ extension Tabs.Content {
                 .background(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
                 .listRowBackground(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
             }
-            .buttonStyle(.plain)
         }
     }
 
