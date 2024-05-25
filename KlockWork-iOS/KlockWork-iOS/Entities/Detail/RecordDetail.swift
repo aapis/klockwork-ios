@@ -10,14 +10,20 @@ import SwiftUI
 struct RecordDetail: View {
     public let record: LogRecord
 
-    @State private var isDefault: Bool = false
+    @State private var date = Date()
 
     var body: some View {
         VStack {
             List {
                 Section("Settings") {
-                    Toggle("Default company", isOn: $isDefault)
-                        .listRowBackground(Theme.textBackground)
+                    DatePicker(
+                        "Created on",
+                        selection: $date,
+                        displayedComponents: [.date]
+                    )
+                    .listRowBackground(Theme.textBackground)
+
+                    // @TODO: implement JobPicker as a sheet
                 }
             }
             .background(Theme.cPurple)
@@ -32,7 +38,9 @@ struct RecordDetail: View {
 
 extension RecordDetail {
     private func actionOnAppear() -> Void {
-
+        if let timestamp = record.timestamp {
+            date = timestamp
+        }
     }
 }
 
