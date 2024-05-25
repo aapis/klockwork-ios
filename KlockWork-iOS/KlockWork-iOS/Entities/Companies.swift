@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Companies: View {
+    private let entityType: EntityType = .companies
     @State public var items: [Company] = []
 
     @Environment(\.managedObjectContext) var moc
@@ -17,7 +18,7 @@ struct Companies: View {
         NavigationStack {
             List {
                 Section {
-                    SearchBar(items: items, type: Companies.self)
+                    SearchBar(items: items, type: entityType)
                         .listRowBackground(Theme.textBackground) // @TODO: SHOULD be unnecessary
                 }
 

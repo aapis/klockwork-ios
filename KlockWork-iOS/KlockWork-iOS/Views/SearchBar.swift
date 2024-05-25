@@ -15,7 +15,7 @@ struct SearchBar: View {
     }
 
     public let items: [NSManagedObject]
-    public let type: NSManagedObject.Type
+    public let type: EntityType
 
     @State private var text: String = ""
     @State private var sheetPresented: Bool = false
@@ -27,7 +27,7 @@ struct SearchBar: View {
                 Bar(text: $text, sheetPresented: $sheetPresented, focused: _focused)
             }
         }
-        .sheet(isPresented: $sheetPresented, onDismiss: actionOnDismiss, content: {Sheet(text: $text, items: items)})
+        .sheet(isPresented: $sheetPresented, onDismiss: actionOnDismiss, content: {Sheet(text: $text, items: items, type: type)})
     }
 }
 
@@ -71,12 +71,13 @@ extension SearchBar {
     struct Sheet: View {
         @Binding public var text: String
         public var items: [NSManagedObject]
+        public var type: EntityType
         @State public var sheetPresented: Bool = true
 
         var body: some View {
             VStack {
                 List {
-                    Section {
+                    Section("Searching: \(type.label)") {
                         Bar(text: $text, sheetPresented: $sheetPresented)
                     }
 
