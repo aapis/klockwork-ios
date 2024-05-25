@@ -271,57 +271,6 @@ extension Tabs.Content {
 
 extension Tabs.Content {
     struct Individual {
-        struct SingleNote: View {
-            public let note: Note
-
-            var body: some View {
-                NavigationLink {
-                    NoteDetail(note: note)
-                } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(note.title ?? "_NOTE_TITLE")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(note.mJob != nil ? note.mJob!.backgroundColor.isBright() ? .black : .gray : .gray)
-                    }
-                    .padding(8)
-                    .background(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
-                    .listRowBackground(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
-                }
-            }
-        }
-
-        struct SingleTask: View {
-            public let task: LogTask
-
-            var body: some View {
-                NavigationLink {
-                    TaskDetail(task: task)
-                } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(task.content ?? "_TASK_CONTENT")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(task.owner != nil ? task.owner!.backgroundColor.isBright() ? .black : .gray : .gray)
-                    }
-                    .padding(8)
-                    .background(task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour)
-                    .listRowBackground(task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-
         struct SingleRecord: View {
             public let record: LogRecord
 
@@ -375,6 +324,57 @@ extension Tabs.Content {
                     .listRowBackground(job.backgroundColor)
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleTask: View {
+            public let task: LogTask
+
+            var body: some View {
+                NavigationLink {
+                    TaskDetail(task: task)
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        Text(task.content ?? "_TASK_CONTENT")
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.leading)
+                            .padding(4)
+                            .background(.black.opacity(0.3))
+                            .cornerRadius(6.0)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(task.owner != nil ? task.owner!.backgroundColor.isBright() ? .black : .gray : .gray)
+                    }
+                    .padding(8)
+                    .background(task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour)
+                    .listRowBackground(task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleNote: View {
+            public let note: Note
+
+            var body: some View {
+                NavigationLink {
+                    NoteDetail(note: note)
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        Text(note.title ?? "_NOTE_TITLE")
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.leading)
+                            .padding(4)
+                            .background(.black.opacity(0.3))
+                            .cornerRadius(6.0)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(note.mJob != nil ? note.mJob!.backgroundColor.isBright() ? .black : .gray : .gray)
+                    }
+                    .padding(8)
+                    .background(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
+                    .listRowBackground(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
+                }
             }
         }
 
