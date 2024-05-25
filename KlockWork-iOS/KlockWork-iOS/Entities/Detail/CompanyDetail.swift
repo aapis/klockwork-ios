@@ -15,11 +15,36 @@ struct CompanyDetail: View {
     @State private var isDefault: Bool = false
     @State private var createdDate: Date = Date()
     @State private var lastUpdate: Date = Date()
+    @State private var name: String = ""
+    @State private var abbreviation: String = ""
+    @State private var hidden: Bool = false
+    @State private var colour: Color = .clear
 
     var body: some View {
         NavigationStack {
             VStack {
                 List {
+                    Section("Settings") {
+                        Toggle("Default company", isOn: $isDefault)
+                        Toggle("Hidden", isOn: $hidden)
+
+                        DatePicker(
+                            "Created on",
+                            selection: $createdDate,
+                            displayedComponents: [.date]
+                        )
+
+                        DatePicker(
+                            "Last updated",
+                            selection: $lastUpdate,
+                            displayedComponents: [.date]
+                        )
+                        ColorPicker(selection: $colour) {
+                            Text("Colour")
+                        }
+                    }
+                    .listRowBackground(Theme.textBackground)
+
                     Section("Projects") {
                         if projects.count > 0 {
                             ForEach(projects) { project in
@@ -36,28 +61,20 @@ struct CompanyDetail: View {
                     }
                     .listRowBackground(Theme.textBackground)
 
-                    Section("Settings") {
-                        Toggle("Default company", isOn: $isDefault)
+                    Section("Name") {
+                        TextField("Company name", text: $name, axis: .vertical)
+                    }
+                    .listRowBackground(Theme.textBackground)
 
-
-                        DatePicker(
-                            "Created on",
-                            selection: $createdDate,
-                            displayedComponents: [.date]
-                        )
-
-                        DatePicker(
-                            "Last updated",
-                            selection: $lastUpdate,
-                            displayedComponents: [.date]
-                        )
+                    Section("Abbreviation") {
+                        TextField("Company abbreviation", text: $abbreviation, axis: .vertical)
                     }
                     .listRowBackground(Theme.textBackground)
                 }
                 .listStyle(.grouped)
             }
             .onAppear(perform: actionOnAppear)
-            .navigationTitle(company.name!.capitalized)
+            .navigationTitle("Editing Company")
         }
     }
 }
@@ -66,12 +83,10 @@ extension CompanyDetail {
     private func actionOnAppear() -> Void {
         projects = company.projects?.allObjects as! [Project]
 
-        if let cDate = company.createdDate {
-            createdDate = cDate
-        }
-
-        if let uDate = company.lastUpdate {
-            lastUpdate = uDate
-        }
+        if let cDate = company.createdDate {createdDate = cDate}
+        if let uDate = company.lastUpdate {lastUpdate = uDate}
+        if let nm = company.name {name = nm}
+        if let ab = company.abbreviation {abbreviation = ab}
+        if let co = company.colour {colour = Color.fromStored(co)}
     }
 }
