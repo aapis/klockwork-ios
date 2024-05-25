@@ -10,12 +10,13 @@ import SwiftUI
 struct Tabs: View {
     @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
-    @Binding public var selected: Page
+    @Binding public var selected: EntityType
     static public let animationDuration: Double = 0.2
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Buttons(job: $job, selected: $selected)
+            TitleBar(selected: $selected)
             Content(job: $job, selected: $selected)
         }
         .background(.clear)
@@ -28,67 +29,39 @@ struct Tabs: View {
 }
 
 extension Tabs {
-    enum Page: CaseIterable {
-        case records, jobs, tasks, notes
-        
-        /// Interface-friendly representation
-        var label: String {
-            switch self {
-            case .records: "Records"
-            case .jobs: "Jobs"
-            case .tasks: "Tasks"
-            case .notes: "Notes"
-            }
-        }
-
-        /// Associated icon
-        var icon: Image {
-            switch self {
-            case .records: Image(systemName: "tray")
-            case .jobs: Image(systemName: "hammer")
-            case .tasks: Image(systemName: "checklist")
-            case .notes: Image(systemName: "note.text")
-            }
-        }
-    }
-
     struct Buttons: View {
         @Binding public var job: Job?
-        @Binding public var selected: Page
+        @Binding public var selected: EntityType
 
         var body: some View {
             HStack(alignment: .center, spacing: 1) {
-                ForEach(Page.allCases, id: \.self) { page in
-                    Button {
-                        withAnimation(.easeIn(duration: Tabs.animationDuration)) {
-                            selected = page
-                        }
-                    } label: {
-                        if page != .jobs {
-                            HStack(spacing: 5) {
-                                page.icon
-                                    .frame(maxHeight: 20)
-                                if page == selected {
-                                    Text(page.label)
-                                }
+                ForEach(EntityType.allCases, id: \.self) { page in
+                    VStack {
+                        Button {
+                            withAnimation(.easeIn(duration: Tabs.animationDuration)) {
+                                selected = page
                             }
-                            .padding()
-                            .background(page == selected ? .white : .clear)
-                            .foregroundStyle(page == selected ? Theme.cPurple : .gray)
-                        } else {
-                            HStack(spacing: 5) {
-                                page.icon
-                                    .frame(maxHeight: 20)
-                                if page == selected {
-                                    Text(page.label)
+                        } label: {
+                            if page != .jobs {
+                                HStack(spacing: 5) {
+                                    page.icon
+                                        .frame(maxHeight: 20)
                                 }
+                                .padding()
+                                .background(page == selected ? .white : .clear)
+                                .foregroundStyle(page == selected ? Theme.cPurple : .gray)
+                            } else {
+                                HStack(spacing: 5) {
+                                    page.icon
+                                        .frame(maxHeight: 20)
+                                }
+                                .padding()
+                                .background(job == nil ? .red : page == selected ? .white : .clear)
+                                .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? .white : .gray)
                             }
-                            .padding()
-                            .background(job == nil ? .red : page == selected ? .white : .clear)
-                            .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? .white : .gray)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
                 Spacer()
             }
@@ -98,7 +71,7 @@ extension Tabs {
 
     struct Content: View {
         @Binding public var job: Job?
-        @Binding public var selected: Page
+        @Binding public var selected: EntityType
 
         var body: some View {
             switch selected {
@@ -110,7 +83,24 @@ extension Tabs {
                 Tasks()
             case .notes:
                 Notes()
+            default:
+                Records(job: $job) // @TODO: implement the other views!
             }
+        }
+    }
+
+    struct TitleBar: View {
+        @Binding public var selected: EntityType
+
+        var body: some View {
+            HStack(alignment: .center, spacing: 0) {
+                Text(selected.label.uppercased())
+                    .font(.caption)
+                Spacer()
+            }
+            .padding(5)
+            .background(Theme.darkBtnColour)
+            .foregroundStyle(.gray)
         }
     }
 }
