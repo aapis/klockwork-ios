@@ -14,6 +14,7 @@ struct SearchBar: View {
         case organizationName
     }
 
+    public let placeholder: String
     public let items: [NSManagedObject]
     public let type: EntityType
 
@@ -24,10 +25,10 @@ struct SearchBar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 0) {
-                Bar(text: $text, sheetPresented: $sheetPresented, focused: _focused)
+                Bar(placeholder: placeholder, text: $text, sheetPresented: $sheetPresented, focused: _focused)
             }
         }
-        .sheet(isPresented: $sheetPresented, onDismiss: actionOnDismiss, content: {Sheet(text: $text, items: items, type: type)})
+        .sheet(isPresented: $sheetPresented, onDismiss: actionOnDismiss, content: {Sheet(placeholder: placeholder, text: $text, items: items, type: type)})
     }
 }
 
@@ -40,6 +41,7 @@ extension SearchBar {
 
 extension SearchBar {
     struct Bar: View {
+        public let placeholder: String
         @Binding public var text: String
         @Binding public var sheetPresented: Bool
         @FocusState public var focused: Field?
@@ -50,7 +52,7 @@ extension SearchBar {
                     TextField(
                         "",
                         text: $text,
-                        prompt: Text("ACME, Contoso, Initech...")
+                        prompt: Text(placeholder)
                     )
                     .focused($focused, equals: SearchBar.Field.organizationName)
                     .textContentType(.organizationName)
@@ -69,26 +71,99 @@ extension SearchBar {
     }
 
     struct Sheet: View {
+        public let placeholder: String
         @Binding public var text: String
         public var items: [NSManagedObject]
         public var type: EntityType
         @State public var sheetPresented: Bool = true
 
         var body: some View {
-            VStack {
-                List {
-                    Section("Searching: \(type.label)") {
-                        Bar(text: $text, sheetPresented: $sheetPresented)
-                    }
+            NavigationStack {
+                VStack {
+                    List {
+                        Section("Searching: \(type.label)") {
+                            Bar(placeholder: placeholder, text: $text, sheetPresented: $sheetPresented)
+                        }
 
-                    Section("Results") {
-                        Text("Search results not implemented")
-                            .listRowBackground(Theme.textBackground)
+                        Section {
+                            switch type {
+                            case .records:
+                                let group = items as! [LogRecord]
+                                ForEach(group.filter {
+                                    $0.message!.lowercased().contains(text.lowercased())
+                                }) { row in
+                                    NavigationLink {
+                                        RecordDetail(record: row)
+                                    } label: {
+                                        Text(row.message!)
+                                    }
+                                    .listRowBackground(Theme.textBackground)
+                                }
+                            case .jobs:
+                                let group = items as! [Job]
+                                ForEach(group.filter {
+                                    $0.jid.string.starts(with: text.lowercased()) || (($0.title?.lowercased().contains(text.lowercased())) != nil)
+                                }) { row in
+                                    NavigationLink {
+                                        JobDetail(job: row)
+                                    } label: {
+                                        Text(row.title ?? row.jid.string)
+                                    }
+                                    .listRowBackground(Theme.textBackground)
+                                }
+                            case .tasks:
+                                let group = items as! [LogTask]
+                                ForEach(group.filter {
+                                    $0.content!.lowercased().contains(text.lowercased())
+                                }) { row in
+                                    NavigationLink {
+                                        TaskDetail(task: row)
+                                    } label: {
+                                        Text(row.content!)
+                                    }
+                                    .listRowBackground(Theme.textBackground)
+                                }
+                            case .notes:
+                                let group = items as! [Note]
+                                ForEach(group.filter {
+                                    $0.title!.lowercased().contains(text.lowercased()) || $0.body!.lowercased().contains(text.lowercased())
+                                }) { row in
+                                    NavigationLink {
+                                        NoteDetail(note: row)
+                                    } label: {
+                                        Text(row.title!)
+                                    }
+                                    .listRowBackground(Theme.textBackground)
+                                }
+                            case .companies:
+                                let group = items as! [Company]
+                                ForEach(group.filter {$0.name!.lowercased().contains(text.lowercased())}) { row in
+                                    NavigationLink {
+                                        CompanyDetail(company: row)
+                                    } label: {
+                                        Text(row.name!)
+                                    }
+                                    .listRowBackground(Theme.textBackground)
+                                }
+                            case .people:
+                                let group = items as! [Person]
+                                ForEach(group.filter {
+                                    $0.name!.lowercased().contains(text.lowercased())
+                                }) { row in
+                                    NavigationLink {
+                                        // @TODO: implement People+Person views
+                                    } label: {
+                                        Text(row.name!)
+                                    }
+                                    .listRowBackground(Theme.textBackground)
+                                }
+                            }
+                        }
                     }
                 }
+                .background(Theme.cGreen)
+                .scrollContentBackground(.hidden)
             }
-            .background(Theme.cGreen)
-            .scrollContentBackground(.hidden)
         }
     }
 }

@@ -68,10 +68,6 @@ struct Explore: View {
             .scrollContentBackground(.hidden)
             .navigationTitle("Explore")
             .toolbarBackground(Theme.cGreen, for: .navigationBar)
-            .toolbar {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(fgColour)
-            }
         }
         .tint(fgColour)
         .onAppear(perform: actionOnAppear)
@@ -92,9 +88,9 @@ extension Explore {
                 case .notes:
                     count = CoreDataNotes(moc: moc).alive().count
                 case .people:
-                    count = 0
+                    count = CoreDataPerson(moc: moc).countAll()
                 case .records:
-                    count = 0
+                    count = CoreDataRecords(moc: moc).countAll()
                 case .tasks:
                     count = CoreDataTasks(moc: moc).countAllTime()
                 }

@@ -18,8 +18,8 @@ struct Companies: View {
         NavigationStack {
             List {
                 Section {
-                    SearchBar(items: items, type: entityType)
-                        .listRowBackground(Theme.textBackground) // @TODO: SHOULD be unnecessary
+                    SearchBar(placeholder: "ACME, Contoso, Initech", items: items, type: entityType)
+                        .listRowBackground(Theme.textBackground)
                 }
 
                 Section {

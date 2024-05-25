@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Notes: View {
+    private let entityType: EntityType = .notes
     @State public var items: [Note] = []
 
     @Environment(\.managedObjectContext) var moc
@@ -16,6 +17,11 @@ struct Notes: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    SearchBar(placeholder: "Note title or partial content", items: items, type: entityType)
+                        .listRowBackground(Theme.textBackground)
+                }
+
                 Section {
                     if items.count > 0 {
                         ForEach(items) { item in

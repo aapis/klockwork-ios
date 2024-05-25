@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Jobs: View {
+    private let entityType: EntityType = .jobs
     @State public var items: [Job] = []
 
     @Environment(\.managedObjectContext) var moc
@@ -16,6 +17,11 @@ struct Jobs: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    SearchBar(placeholder: "Job name or ID", items: items, type: entityType)
+                        .listRowBackground(Theme.textBackground)
+                }
+
                 Section {
                     if items.count > 0 {
                         ForEach(items) { item in
