@@ -10,7 +10,8 @@ import SwiftUI
 struct RecordDetail: View {
     public let record: LogRecord
 
-    @State private var date = Date()
+    @State private var timestamp = Date()
+    @State private var message: String = ""
 
     var body: some View {
         VStack {
@@ -18,14 +19,19 @@ struct RecordDetail: View {
                 Section("Settings") {
                     DatePicker(
                         "Created on",
-                        selection: $date,
+                        selection: $timestamp,
                         displayedComponents: [.date]
                     )
-                    .listRowBackground(Theme.textBackground)
-
                     // @TODO: implement JobPicker as a sheet
                 }
+                .listRowBackground(Theme.textBackground)
+
+                Section("Message") {
+                    TextField("Record content", text: $message, axis: .vertical)
+                }
+                .listRowBackground(Theme.textBackground)
             }
+            .listStyle(.grouped)
             .background(Theme.cPurple)
             Spacer()
         }
@@ -38,8 +44,12 @@ struct RecordDetail: View {
 
 extension RecordDetail {
     private func actionOnAppear() -> Void {
-        if let timestamp = record.timestamp {
-            date = timestamp
+        if let tmstmp = record.timestamp {
+            timestamp = tmstmp
+        }
+
+        if let msg = record.message {
+            message = msg
         }
     }
 }

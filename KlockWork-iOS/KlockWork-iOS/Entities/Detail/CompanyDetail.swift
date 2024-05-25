@@ -13,33 +13,65 @@ struct CompanyDetail: View {
     
     @State private var projects: [Project] = []
     @State private var isDefault: Bool = false
+    @State private var createdDate: Date = Date()
+    @State private var lastUpdate: Date = Date()
 
     var body: some View {
-        VStack {
-            List {
-                Section("Projects") {
-                    if projects.count > 0 {
-                        ForEach(projects) { project in
-                            Text(project.name!.capitalized)
+        NavigationStack {
+            VStack {
+                List {
+                    Section("Projects") {
+                        if projects.count > 0 {
+                            ForEach(projects) { project in
+                                NavigationLink {
+                                    ProjectDetail(project: project)
+                                } label: {
+                                    Text(project.name!.capitalized)
+                                }
+                            }
+                        } else {
+                            Text("No projects found")
+                                .foregroundStyle(.gray)
                         }
-                    } else {
-                        Text("No projects found")
-                            .foregroundStyle(.gray)
                     }
-                }
+                    .listRowBackground(Theme.textBackground)
 
-                Section("Settings") {
-                    Toggle("Default company", isOn: $isDefault)
+                    Section("Settings") {
+                        Toggle("Default company", isOn: $isDefault)
+
+
+                        DatePicker(
+                            "Created on",
+                            selection: $createdDate,
+                            displayedComponents: [.date]
+                        )
+
+                        DatePicker(
+                            "Last updated",
+                            selection: $lastUpdate,
+                            displayedComponents: [.date]
+                        )
+                    }
+                    .listRowBackground(Theme.textBackground)
                 }
+                .listStyle(.grouped)
             }
+            .onAppear(perform: actionOnAppear)
+            .navigationTitle(company.name!.capitalized)
         }
-        .onAppear(perform: actionOnAppear)
-        .navigationTitle(company.name!.capitalized)
     }
 }
 
 extension CompanyDetail {
     private func actionOnAppear() -> Void {
         projects = company.projects?.allObjects as! [Project]
+
+        if let cDate = company.createdDate {
+            createdDate = cDate
+        }
+
+        if let uDate = company.lastUpdate {
+            lastUpdate = uDate
+        }
     }
 }

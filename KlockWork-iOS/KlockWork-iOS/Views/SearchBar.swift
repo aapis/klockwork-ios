@@ -54,6 +54,7 @@ extension SearchBar {
                         text: $text,
                         prompt: Text(placeholder)
                     )
+                    .disableAutocorrection(false)
                     .focused($focused, equals: SearchBar.Field.organizationName)
                     .textContentType(.organizationName)
                     .submitLabel(.search)

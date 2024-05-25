@@ -86,6 +86,7 @@ extension Today {
                     prompt: Text(job == nil ? "Select a job" : "What are you working on?")
                         .foregroundStyle(job != nil ? job!.backgroundColor.isBright() ? Theme.cPurple : .white : .gray)
                 )
+                    .disableAutocorrection(false)
                     .focused($focused, equals: .organizationName)
                     .disabled(job == nil)
                     .textContentType(.organizationName)
