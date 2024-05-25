@@ -316,7 +316,7 @@ extension Tabs.Content {
                             .background(.black.opacity(0.3))
                             .cornerRadius(6.0)
                         Spacer()
-                        Image(systemName: "chevron.right")
+                        Text("Set")
                             .foregroundStyle(job.backgroundColor.isBright() ? .black : .gray)
                     }
                     .padding(8)
