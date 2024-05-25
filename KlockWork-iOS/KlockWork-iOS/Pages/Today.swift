@@ -11,7 +11,7 @@ import SwiftUI
 struct Today: View {
     @Environment(\.managedObjectContext) var moc
     @State private var job: Job? = nil
-    @State private var selected: Tabs.Page = .records
+    @State private var selected: EntityType = .records
 
     var body: some View {
         NavigationStack {
