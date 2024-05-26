@@ -350,20 +350,10 @@ extension Tabs.Content {
                 Button {
                     stateJob = job
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(job.title ?? job.jid.string)
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Text("Set")
-                            .foregroundStyle(job.backgroundColor.isBright() ? .black : .gray)
-                    }
-                    .padding(8)
-                    .background(job.backgroundColor)
-                    .listRowBackground(job.backgroundColor)
+                    ListRow(
+                        name: job.title ?? job.jid.string,
+                        colour: job.backgroundColor
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -378,20 +368,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(task.content ?? "_TASK_CONTENT")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(task.owner != nil ? task.owner!.backgroundColor.isBright() ? .black : .gray : .gray)
-                    }
-                    .padding(8)
-                    .background(task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour)
-                    .listRowBackground(task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour)
+                    ListRow(
+                        name: task.content ?? "_TASK_CONTENT",
+                        colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -406,20 +386,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(note.title ?? "_NOTE_TITLE")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(note.mJob != nil ? note.mJob!.backgroundColor.isBright() ? .black : .gray : .gray)
-                    }
-                    .padding(8)
-                    .background(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
-                    .listRowBackground(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
+                    ListRow(
+                        name: note.title ?? "_NOTE_TITLE",
+                        colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour
+                    )
                 }
             }
         }
@@ -433,20 +403,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(company.name ?? "_COMPANY_NAME")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
-                    }
-                    .padding(8)
-                    .background(Color.fromStored(company.colour ?? Theme.rowColourAsDouble))
-                    .listRowBackground(Color.fromStored(company.colour ?? Theme.rowColourAsDouble))
+                    ListRow(
+                        name: company.name ?? "_COMPANY_NAME",
+                        colour: Color.fromStored(company.colour ?? Theme.rowColourAsDouble)
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -461,20 +421,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(person.name ?? "_PERSON_NAME")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
-                    }
-                    .padding(8)
-                    .background(Theme.rowColour)
-                    .listRowBackground(Theme.rowColour)
+                    ListRow(
+                        name: person.name ?? "_PERSON_NAME",
+                        colour: Theme.rowColour
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -489,21 +439,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        // @TODO: replace all these Text instances with a new struct representing Row
-                        Text(project.name ?? "_PROJECT_NAME")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
-                    }
-                    .padding(8)
-                    .background(Color.fromStored(project.colour ?? Theme.rowColourAsDouble))
-                    .listRowBackground(Color.fromStored(project.colour ?? Theme.rowColourAsDouble))
+                    ListRow(
+                        name: project.name ?? "_PROJECT_NAME",
+                        colour: Color.fromStored(project.colour ?? Theme.rowColourAsDouble)
+                    )
                 }
                 .buttonStyle(.plain)
             }
