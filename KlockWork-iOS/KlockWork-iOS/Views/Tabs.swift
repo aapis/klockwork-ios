@@ -359,6 +359,8 @@ extension Tabs.Content {
             var body: some View {
                 NavigationLink {
                     TaskDetail(task: task)
+                        .background(Theme.cPurple)
+                        .scrollContentBackground(.hidden)
                 } label: {
                     HStack(alignment: .firstTextBaseline, spacing: 5) {
                         Text(task.content ?? "_TASK_CONTENT")
@@ -385,6 +387,8 @@ extension Tabs.Content {
             var body: some View {
                 NavigationLink {
                     NoteDetail(note: note)
+                        .background(Theme.cPurple)
+                        .scrollContentBackground(.hidden)
                 } label: {
                     HStack(alignment: .firstTextBaseline, spacing: 5) {
                         Text(note.title ?? "_NOTE_TITLE")
