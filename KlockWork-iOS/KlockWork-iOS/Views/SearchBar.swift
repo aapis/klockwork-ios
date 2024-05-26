@@ -91,7 +91,7 @@ extension SearchBar {
                             case .records:
                                 let group = items as! [LogRecord]
                                 ForEach(group.filter {
-                                    $0.message!.lowercased().contains(text.lowercased())
+                                    $0.alive == true && $0.message!.lowercased().contains(text.lowercased())
                                 }) { row in
                                     NavigationLink {
                                         RecordDetail(record: row)
@@ -103,7 +103,7 @@ extension SearchBar {
                             case .jobs:
                                 let group = items as! [Job]
                                 ForEach(group.filter {
-                                    $0.jid.string.starts(with: text.lowercased()) || (($0.title?.lowercased().contains(text.lowercased())) != nil)
+                                    $0.alive == true && ($0.jid.string.starts(with: text.lowercased()) || (($0.title?.lowercased().contains(text.lowercased())) != nil))
                                 }) { row in
                                     NavigationLink {
                                         JobDetail(job: row)
@@ -127,7 +127,7 @@ extension SearchBar {
                             case .notes:
                                 let group = items as! [Note]
                                 ForEach(group.filter {
-                                    $0.title!.lowercased().contains(text.lowercased()) || $0.body!.lowercased().contains(text.lowercased())
+                                    $0.alive == true && ($0.title!.lowercased().contains(text.lowercased()) || $0.body!.lowercased().contains(text.lowercased()))
                                 }) { row in
                                     NavigationLink {
                                         NoteDetail(note: row)
@@ -138,7 +138,7 @@ extension SearchBar {
                                 }
                             case .companies:
                                 let group = items as! [Company]
-                                ForEach(group.filter {$0.name!.lowercased().contains(text.lowercased())}) { row in
+                                ForEach(group.filter {$0.alive == true && $0.name!.lowercased().contains(text.lowercased())}) { row in
                                     NavigationLink {
                                         CompanyDetail(company: row)
                                     } label: {
@@ -152,7 +152,19 @@ extension SearchBar {
                                     $0.name!.lowercased().contains(text.lowercased())
                                 }) { row in
                                     NavigationLink {
-                                        // @TODO: implement People+Person views
+                                        PersonDetail(person: row)
+                                    } label: {
+                                        Text(row.name!)
+                                    }
+                                    .listRowBackground(Theme.textBackground)
+                                }
+                            case .projects:
+                                let group = items as! [Project]
+                                ForEach(group.filter {
+                                    $0.alive == true && $0.name!.lowercased().contains(text.lowercased())
+                                }) { row in
+                                    NavigationLink {
+                                        ProjectDetail(project: row)
                                     } label: {
                                         Text(row.name!)
                                     }

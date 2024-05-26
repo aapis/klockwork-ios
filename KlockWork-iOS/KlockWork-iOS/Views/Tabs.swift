@@ -65,19 +65,15 @@ extension Tabs {
                             }
                         } label: {
                             if page != .jobs {
-                                HStack(spacing: 5) {
-                                    page.icon
-                                        .frame(maxHeight: 20)
-                                }
-                                .padding()
+                                page.icon
+                                .frame(maxHeight: 20)
+                                .padding(14)
                                 .background(page == selected ? .white : .clear)
                                 .foregroundStyle(page == selected ? Theme.cPurple : .gray)
                             } else {
-                                HStack(spacing: 5) {
-                                    page.icon
-                                        .frame(maxHeight: 20)
-                                }
-                                .padding()
+                                page.icon
+                                    .frame(maxHeight: 20)
+                                .padding(14)
                                 .background(job == nil ? .red : page == selected ? .white : .clear)
                                 .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? .white : .gray)
                             }
@@ -110,6 +106,8 @@ extension Tabs {
                 List.Companies()
             case .people:
                 List.People()
+            case .projects:
+                List.Projects()
             }
         }
     }
@@ -288,8 +286,26 @@ extension Tabs.Content {
         }
 
         struct Projects: View {
+            @FetchRequest private var items: FetchedResults<Project>
+
             var body: some View {
-                Text("Projects")
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 1) {
+                        if items.count > 0 {
+                            ForEach(items) { item in
+                                Individual.SingleProject(project: item)
+                            }
+                        } else {
+                            StatusMessage.Warning(message: "No projects updated within the last 7 days")
+                        }
+                    }
+                }
+                .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
+            }
+
+            init() {
+                _items = CoreDataProjects.fetchProjects()
             }
         }
     }
@@ -459,6 +475,35 @@ extension Tabs.Content {
                     .padding(8)
                     .background(Theme.rowColour)
                     .listRowBackground(Theme.rowColour)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleProject: View {
+            public let project: Project
+
+            var body: some View {
+                NavigationLink {
+                    ProjectDetail(project: project)
+                        .background(Theme.cPurple)
+                        .scrollContentBackground(.hidden)
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        // @TODO: replace all these Text instances with a new struct representing Row
+                        Text(project.name ?? "_PROJECT_NAME")
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.leading)
+                            .padding(4)
+                            .background(.black.opacity(0.3))
+                            .cornerRadius(6.0)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.gray)
+                    }
+                    .padding(8)
+                    .background(Color.fromStored(project.colour ?? Theme.rowColourAsDouble))
+                    .listRowBackground(Color.fromStored(project.colour ?? Theme.rowColourAsDouble))
                 }
                 .buttonStyle(.plain)
             }
