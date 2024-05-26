@@ -15,7 +15,7 @@ struct Explore: View {
     }
 
     @State private var path = NavigationPath()
-    @State private var entityCounts: (Int, Int, Int, Int) = (0,0,0,0)
+    @State private var entityCounts: [EntityTypePair] = []
 
     @Environment(\.managedObjectContext) var moc
 
@@ -23,92 +23,57 @@ struct Explore: View {
         NavigationStack(path: $path) {
             List {
                 Section("Entities") {
-                    NavigationLink {
-                        Companies()
-                            .environment(\.managedObjectContext, moc)
-                            .navigationTitle("Companies")
-                    } label: {
-                        HStack {
-                            Image(systemName: "building.2")
-                                .foregroundStyle(fgColour)
-                            Text("Companies")
-                            Spacer()
-                            Text(String(entityCounts.0))
+                    ForEach(EntityType.allCases, id: \.self) { type in
+                        NavigationLink {
+                            switch type {
+                            case .companies:
+                                Companies()
+                                    .environment(\.managedObjectContext, moc)
+                                    .navigationTitle(type.label)
+                            case .jobs:
+                                Jobs()
+                                    .environment(\.managedObjectContext, moc)
+                                    .navigationTitle(type.label)
+                            case .notes:
+                                Notes()
+                                    .environment(\.managedObjectContext, moc)
+                                    .navigationTitle(type.label)
+                            case .people: // @TODO: implement people listing view
+                                Notes()
+                                    .environment(\.managedObjectContext, moc)
+                                    .navigationTitle(type.label)
+                            case .records: // @TODO: implement records listing view
+                                Notes()
+                                    .environment(\.managedObjectContext, moc)
+                                    .navigationTitle(type.label)
+                            case .tasks:
+                                Tasks()
+                                    .environment(\.managedObjectContext, moc)
+                                    .navigationTitle(type.label)
+                            case .projects:
+                                Projects()
+                                    .environment(\.managedObjectContext, moc)
+                                    .navigationTitle(type.label)
+                            }
+                        } label: {
+                            HStack {
+                                type.icon
+                                    .foregroundStyle(fgColour)
+                                Text(type.label)
+                                Spacer()
+                                Text(String(entityCounts.first(where: {$0.key == type})?.value ?? 0))
+                            }
                         }
-                    }
-
-                    NavigationLink {
-                        Jobs()
-                            .environment(\.managedObjectContext, moc)
-                            .navigationTitle("Jobs")
-                    } label: {
-                        HStack {
-                            Image(systemName: "hammer")
-                                .foregroundStyle(fgColour)
-                            Text("Jobs")
-                            Spacer()
-                            Text(String(entityCounts.1))
-                        }
-                    }
-                    
-                    
-                    NavigationLink {
-                        Notes()
-                            .environment(\.managedObjectContext, moc)
-                            .navigationTitle("Notes")
-                    } label: {
-                        HStack {
-                            Image(systemName: "note.text")
-                                .foregroundStyle(fgColour)
-                            Text("Notes")
-                            Spacer()
-                            Text(String(entityCounts.2))
-                        }
-                    }
-                    
-                    NavigationLink {
-                        Tasks()
-                            .environment(\.managedObjectContext, moc)
-                            .navigationTitle("Tasks")
-                    } label: {
-                        HStack {
-                            Image(systemName: "checklist")
-                                .foregroundStyle(fgColour)
-                            Text("Tasks")
-                            Spacer()
-                            Text(String(entityCounts.3))
-                        }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
             }
+            .background(Theme.cGreen)
+            .scrollContentBackground(.hidden)
             .navigationTitle("Explore")
-            .toolbarBackground(Theme.cPurple, for: .navigationBar)
-            .toolbar {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(fgColour)
-            }
-
-//            LazyVGrid(columns: columns) {
-//                HStack {
-//                    Image(systemName: "hexagon")
-//                        .font(.title)
-//                    Text("Planning")
-//                }
-//                .padding()
-//                .background(Theme.cPurple)
-//                .mask(RoundedRectangle(cornerRadius: 10.0))
-//
-//                HStack {
-//                    Image(systemName: "tray")
-//                        .font(.title)
-//                    Text("Today")
-//                }
-//                .padding()
-//                .background(Theme.cPurple)
-//                .mask(RoundedRectangle(cornerRadius: 10.0))
-//            }
+            .toolbarBackground(Theme.cGreen, for: .navigationBar)
         }
-        .accentColor(fgColour)
+        .tint(fgColour)
         .onAppear(perform: actionOnAppear)
     }
 }
@@ -116,12 +81,28 @@ struct Explore: View {
 extension Explore {
     private func actionOnAppear() -> Void {
         Task {
-            entityCounts = (
-                CoreDataCompanies(moc: moc).countAll(),
-                CoreDataJob(moc: moc).countAll(),
-                CoreDataNotes(moc: moc).alive().count,
-                CoreDataTasks(moc: moc).countAllTime()
-            )
+            for type in EntityType.allCases {
+                var count: Int = 0
+
+                switch type {
+                case .companies:
+                    count = CoreDataCompanies(moc: moc).countAll()
+                case .jobs:
+                    count = CoreDataJob(moc: moc).countAll()
+                case .notes:
+                    count = CoreDataNotes(moc: moc).alive().count
+                case .people:
+                    count = CoreDataPerson(moc: moc).countAll()
+                case .records:
+                    count = CoreDataRecords(moc: moc).countAll()
+                case .tasks:
+                    count = CoreDataTasks(moc: moc).countAllTime()
+                case .projects:
+                    count = CoreDataProjects(moc: moc).countAll()
+                }
+
+                entityCounts.append(EntityTypePair(key: type, value: count))
+            }
         }
     }
 }

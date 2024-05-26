@@ -1,16 +1,15 @@
 //
-//  Notes.swift
-//  KlockWorkiOS
+//  Projects.swift
+//  KlockWork-iOS
 //
-//  Created by Ryan Priebe on 2024-05-22.
-//  Copyright © 2024 YegCollective. All rights reserved.
+//  Created by Ryan Priebe on 2024-05-26.
 //
 
 import SwiftUI
 
-struct Notes: View {
-    private let entityType: EntityType = .notes
-    @State public var items: [Note] = []
+struct Projects: View {
+    private let entityType: EntityType = .projects
+    @State public var items: [Project] = []
 
     @Environment(\.managedObjectContext) var moc
 
@@ -18,41 +17,43 @@ struct Notes: View {
         NavigationStack {
             List {
                 Section {
-                    SearchBar(placeholder: "Note title or partial content", items: items, type: entityType)
+                    SearchBar(placeholder: "Momentum Matrix, Endeavour Explorer", items: items, type: entityType)
                         .listRowBackground(Theme.textBackground)
                 }
 
                 Section {
                     if items.count > 0 {
                         ForEach(items) { item in
-                            NavigationLink {
-                                NoteDetail(note: item)
-                            } label: {
-                                Text(item.title!.capitalized)
+                            if let company = item.company {
+                                NavigationLink {
+                                    CompanyDetail(company: company)
+                                        .background(Theme.cGreen)
+                                        .scrollContentBackground(.hidden)
+                                } label: {
+                                    Text(item.name!)
+                                }
                             }
                         }
                         .onDelete(perform: deleteItems)
                         .listRowBackground(Theme.textBackground)
                     } else {
                         Button(action: addItem) {
-                            Text("No notes found. Create one!")
+                            Text("No projects found. Create one!")
                         }
                         .listRowBackground(Theme.textBackground)
                     }
                 }
+
             }
             .onAppear(perform: {
-                items = CoreDataNotes(moc: moc).alive()
+                items = CoreDataProjects(moc: moc).alive()
             })
             .background(Theme.cGreen)
             .scrollContentBackground(.hidden)
             .toolbarBackground(Theme.cGreen, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
                 ToolbarItem {
-                    Button(action: addItem) {
+                    Button(action: {}/*addItem*/) {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
@@ -61,7 +62,7 @@ struct Notes: View {
     }
 }
 
-extension Notes {
+extension Projects {
     private func addItem() {
         withAnimation {
             let newItem = Item(timestamp: Date())

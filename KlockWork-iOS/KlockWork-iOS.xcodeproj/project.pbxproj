@@ -12,6 +12,13 @@
 		537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CD2BFFEB7500CB528C /* EdgeBorder.swift */; };
 		537582D52C0033B800CB528C /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D42C0033B800CB528C /* Tabs.swift */; };
 		537582D72C004A9600CB528C /* StatusMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D62C004A9600CB528C /* StatusMessage.swift */; };
+		5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5387AE882C0143D100EEC581 /* SearchBar.swift */; };
+		539134EA2C0269B600B48494 /* EntityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134E92C0269B600B48494 /* EntityType.swift */; };
+		539134EC2C02883000B48494 /* PersonDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EB2C02883000B48494 /* PersonDetail.swift */; };
+		539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134ED2C028F6900B48494 /* ProjectDetail.swift */; };
+		539134F02C02C44000B48494 /* Swipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EF2C02C44000B48494 /* Swipe.swift */; };
+		539134F22C03879E00B48494 /* Find.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134F12C03879E00B48494 /* Find.swift */; };
+		539134F42C0391F000B48494 /* Projects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134F32C0391F000B48494 /* Projects.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
 		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
@@ -65,6 +72,13 @@
 		537582D02C00332600CB528C /* FancyGenericToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FancyGenericToolbar.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/Fancy/FancyGenericToolbar.swift; sourceTree = "<group>"; };
 		537582D42C0033B800CB528C /* Tabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
 		537582D62C004A9600CB528C /* StatusMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMessage.swift; sourceTree = "<group>"; };
+		5387AE882C0143D100EEC581 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
+		539134E92C0269B600B48494 /* EntityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityType.swift; sourceTree = "<group>"; };
+		539134EB2C02883000B48494 /* PersonDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonDetail.swift; sourceTree = "<group>"; };
+		539134ED2C028F6900B48494 /* ProjectDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetail.swift; sourceTree = "<group>"; };
+		539134EF2C02C44000B48494 /* Swipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Swipe.swift; sourceTree = "<group>"; };
+		539134F12C03879E00B48494 /* Find.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Find.swift; sourceTree = "<group>"; };
+		539134F32C0391F000B48494 /* Projects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Projects.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
 		53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KlockWork_iOS.entitlements; sourceTree = "<group>"; };
@@ -129,8 +143,18 @@
 			children = (
 				537582D42C0033B800CB528C /* Tabs.swift */,
 				537582D62C004A9600CB528C /* StatusMessage.swift */,
+				5387AE882C0143D100EEC581 /* SearchBar.swift */,
+				539134EF2C02C44000B48494 /* Swipe.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		539134E82C0269A200B48494 /* SharedEnums */ = {
+			isa = PBXGroup;
+			children = (
+				539134E92C0269B600B48494 /* EntityType.swift */,
+			);
+			path = SharedEnums;
 			sourceTree = "<group>";
 		};
 		53D4CB4A2BFE930100AFEDEA = {
@@ -182,6 +206,7 @@
 		53D4CB552BFE930100AFEDEA /* KlockWork-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				539134E82C0269A200B48494 /* SharedEnums */,
 				537582D32C00338E00CB528C /* Views */,
 				537582CF2BFFFB7300CB528C /* Info.plist */,
 				53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */,
@@ -209,6 +234,7 @@
 				53D4CB6C2BFE93B000AFEDEA /* Explore.swift */,
 				53D4CB6D2BFE93B000AFEDEA /* Planning.swift */,
 				53D4CB6E2BFE93B000AFEDEA /* Today.swift */,
+				539134F12C03879E00B48494 /* Find.swift */,
 			);
 			path = Pages;
 			sourceTree = "<group>";
@@ -222,6 +248,8 @@
 				53D4CB732BFE93B000AFEDEA /* NoteDetail.swift */,
 				53D4CB742BFE93B000AFEDEA /* TaskDetail.swift */,
 				537582CB2BFFD70D00CB528C /* RecordDetail.swift */,
+				539134EB2C02883000B48494 /* PersonDetail.swift */,
+				539134ED2C028F6900B48494 /* ProjectDetail.swift */,
 			);
 			path = Detail;
 			sourceTree = "<group>";
@@ -234,6 +262,7 @@
 				53D4CB772BFE93B000AFEDEA /* Jobs.swift */,
 				53D4CB782BFE93B000AFEDEA /* Notes.swift */,
 				53D4CB792BFE93B000AFEDEA /* Tasks.swift */,
+				539134F32C0391F000B48494 /* Projects.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -320,6 +349,7 @@
 			files = (
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
 				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
+				539134EA2C0269B600B48494 /* EntityType.swift in Sources */,
 				53F926292BFEA00E00948076 /* Project.swift in Sources */,
 				53F9262A2BFEA00E00948076 /* Job.swift in Sources */,
 				53F9262B2BFEA00E00948076 /* EKEvent.swift in Sources */,
@@ -332,6 +362,7 @@
 				53F926322BFEA00E00948076 /* String.swift in Sources */,
 				53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */,
 				53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */,
+				539134EC2C02883000B48494 /* PersonDetail.swift in Sources */,
 				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
 				53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */,
 				53F9260A2BFE9BF300948076 /* CoreDataNoteVersions.swift in Sources */,
@@ -343,11 +374,14 @@
 				53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */,
 				537582D52C0033B800CB528C /* Tabs.swift in Sources */,
 				53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */,
+				539134F02C02C44000B48494 /* Swipe.swift in Sources */,
 				53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */,
 				53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */,
 				53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */,
+				5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */,
 				53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */,
 				53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */,
+				539134F22C03879E00B48494 /* Find.swift in Sources */,
 				53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */,
 				53D4CB7F2BFE93B000AFEDEA /* Today.swift in Sources */,
 				53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */,
@@ -359,7 +393,9 @@
 				53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */,
 				53D4CB812BFE93B000AFEDEA /* Item.swift in Sources */,
 				53D4CB7D2BFE93B000AFEDEA /* Explore.swift in Sources */,
+				539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */,
 				537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */,
+				539134F42C0391F000B48494 /* Projects.swift in Sources */,
 				53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */,
 				53D4CB802BFE93B000AFEDEA /* CompanyDetail.swift in Sources */,
 				53D4CB882BFE93B000AFEDEA /* Tasks.swift in Sources */,

@@ -19,10 +19,17 @@ struct JobDetail: View {
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
                 }
+                .listRowBackground(Theme.textBackground)
             }
+            .listStyle(.grouped)
         }
         .onAppear(perform: actionOnAppear)
         .navigationTitle(job.title != nil ? job.title!.capitalized : job.jid.string)
+        .toolbar {
+            Button("Save") {
+
+            }
+        }
     }
 }
 

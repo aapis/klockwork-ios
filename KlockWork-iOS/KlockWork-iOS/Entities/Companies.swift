@@ -9,13 +9,19 @@
 import SwiftUI
 
 struct Companies: View {
+    private let entityType: EntityType = .companies
     @State public var items: [Company] = []
-    
+
     @Environment(\.managedObjectContext) var moc
     
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    SearchBar(placeholder: "ACME, Contoso, Initech", items: items, type: entityType)
+                        .listRowBackground(Theme.textBackground)
+                }
+
                 Section {
                     if items.count > 0 {
                         ForEach(items) { item in
@@ -26,18 +32,22 @@ struct Companies: View {
                             }
                         }
                         .onDelete(perform: deleteItems)
+                        .listRowBackground(Theme.textBackground)
                     } else {
                         Button(action: addItem) {
                             Text("No companies found. Create one!")
                         }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
-                
+
             }
             .onAppear(perform: {
                 items = CoreDataCompanies(moc: moc).alive()
             })
-            .toolbarBackground(Theme.cPurple, for: .navigationBar)
+            .background(Theme.cGreen)
+            .scrollContentBackground(.hidden)
+            .toolbarBackground(Theme.cGreen, for: .navigationBar)
             .toolbar {
                 ToolbarItem {
                     Button(action: {}/*addItem*/) {

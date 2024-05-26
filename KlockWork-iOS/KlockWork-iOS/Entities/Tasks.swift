@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Tasks: View {
+    private let entityType: EntityType = .tasks
     @State public var items: [LogTask] = []
 
     @Environment(\.managedObjectContext) var moc
@@ -16,6 +17,11 @@ struct Tasks: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    SearchBar(placeholder: "Task content or job name/ID", items: items, type: entityType)
+                        .listRowBackground(Theme.textBackground)
+                }
+
                 Section {
                     if items.count > 0 {
                         ForEach(items) { item in
@@ -26,17 +32,21 @@ struct Tasks: View {
                             }
                         }
                         .onDelete(perform: deleteItems)
+                        .listRowBackground(Theme.textBackground)
                     } else {
                         Button(action: addItem) {
                             Text("No tasks found. Create one!")
                         }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
             }
             .onAppear(perform: {
                 items = CoreDataTasks(moc: moc).all()
             })
-            .toolbarBackground(Theme.cPurple, for: .navigationBar)
+            .background(Theme.cGreen)
+            .scrollContentBackground(.hidden)
+            .toolbarBackground(Theme.cGreen, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()

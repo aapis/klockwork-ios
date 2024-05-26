@@ -13,33 +13,87 @@ struct CompanyDetail: View {
     
     @State private var projects: [Project] = []
     @State private var isDefault: Bool = false
+    @State private var createdDate: Date = Date()
+    @State private var lastUpdate: Date = Date()
+    @State private var name: String = ""
+    @State private var abbreviation: String = ""
+    @State private var hidden: Bool = false
+    @State private var colour: Color = .clear
 
     var body: some View {
-        VStack {
-            List {
-                Section("Projects") {
-                    if projects.count > 0 {
-                        ForEach(projects) { project in
-                            Text(project.name!.capitalized)
-                        }
-                    } else {
-                        Text("No projects found")
-                            .foregroundStyle(.gray)
-                    }
-                }
+        NavigationStack {
+            VStack {
+                List {
+                    Section("Settings") {
+                        Toggle("Default", isOn: $isDefault)
+                        Toggle("Hidden", isOn: $hidden)
 
-                Section("Settings") {
-                    Toggle("Default company", isOn: $isDefault)
+                        DatePicker(
+                            "Created",
+                            selection: $createdDate,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+
+                        DatePicker(
+                            "Last updated",
+                            selection: $lastUpdate,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        ColorPicker(selection: $colour) {
+                            Text("Colour")
+                        }
+                    }
+                    .listRowBackground(Theme.textBackground)
+
+                    Section("Projects") {
+                        if projects.count > 0 {
+                            ForEach(projects) { project in
+                                NavigationLink {
+                                    ProjectDetail(project: project)
+                                        .background(Theme.cPurple)
+                                        .scrollContentBackground(.hidden)
+                                } label: {
+                                    Text(project.name!)
+                                }
+                            }
+                        } else {
+                            Text("No projects found")
+                                .foregroundStyle(.gray)
+                        }
+                    }
+                    .listRowBackground(Theme.textBackground)
+
+                    Section("Name") {
+                        TextField("Company name", text: $name, axis: .vertical)
+                    }
+                    .listRowBackground(Theme.textBackground)
+
+                    Section("Abbreviation") {
+                        TextField("Company abbreviation", text: $abbreviation, axis: .vertical)
+                    }
+                    .listRowBackground(Theme.textBackground)
+                }
+                .listStyle(.grouped)
+            }
+            .onAppear(perform: actionOnAppear)
+            .navigationTitle("Editing: Company")
+            .toolbar {
+                Button("Save") {
+                    
                 }
             }
         }
-        .onAppear(perform: actionOnAppear)
-        .navigationTitle(company.name!.capitalized)
     }
 }
 
 extension CompanyDetail {
     private func actionOnAppear() -> Void {
         projects = company.projects?.allObjects as! [Project]
+
+        if let cDate = company.createdDate {createdDate = cDate}
+        if let uDate = company.lastUpdate {lastUpdate = uDate}
+        if let nm = company.name {name = nm}
+        if let ab = company.abbreviation {abbreviation = ab}
+        if let co = company.colour {colour = Color.fromStored(co)}
     }
 }

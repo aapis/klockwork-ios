@@ -29,10 +29,10 @@ struct Main: View {
                 Text("Planning")
             }
             
-            AppSettings()
+            Find()
             .tabItem {
-                Image(systemName: "gear")
-                Text("Settings")
+                Image(systemName: "magnifyingglass")
+                Text("Find")
             }
         }
         .tint(.yellow)
