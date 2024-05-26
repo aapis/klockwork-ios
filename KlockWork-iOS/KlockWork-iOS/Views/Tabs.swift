@@ -21,14 +21,20 @@ struct Tabs: View {
             Content(job: $job, selected: $selected)
                 .swipe([.left, .right]) { swipe in
                     let tabs = EntityType.allCases
-                    if let selectedIndex = tabs.firstIndex(of: selected) {
+                    if var selectedIndex = tabs.firstIndex(of: selected) {
                         if swipe == .left {
-                            if selectedIndex >= 0 && selectedIndex <= tabs.count {
-                                selected = tabs[selectedIndex + 1]
+                            if selectedIndex <= tabs.count - 2 {
+                                selectedIndex += 1
+                                selected = tabs[selectedIndex]
+                            } else {
+                                selected = tabs[0]
                             }
                         } else if swipe == .right {
                             if selectedIndex > 0 && selectedIndex <= tabs.count {
-                                selected = tabs[selectedIndex - 1]
+                                selectedIndex -= 1
+                                selected = tabs[selectedIndex]
+                            } else {
+                                selected = tabs[tabs.count - 1]
                             }
                         }
                     }
