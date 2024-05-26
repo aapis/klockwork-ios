@@ -16,6 +16,7 @@
 		539134EA2C0269B600B48494 /* EntityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134E92C0269B600B48494 /* EntityType.swift */; };
 		539134EC2C02883000B48494 /* PersonDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EB2C02883000B48494 /* PersonDetail.swift */; };
 		539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134ED2C028F6900B48494 /* ProjectDetail.swift */; };
+		539134F02C02C44000B48494 /* Swipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EF2C02C44000B48494 /* Swipe.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
 		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
@@ -73,6 +74,7 @@
 		539134E92C0269B600B48494 /* EntityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityType.swift; sourceTree = "<group>"; };
 		539134EB2C02883000B48494 /* PersonDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonDetail.swift; sourceTree = "<group>"; };
 		539134ED2C028F6900B48494 /* ProjectDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetail.swift; sourceTree = "<group>"; };
+		539134EF2C02C44000B48494 /* Swipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Swipe.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
 		53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KlockWork_iOS.entitlements; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 				537582D42C0033B800CB528C /* Tabs.swift */,
 				537582D62C004A9600CB528C /* StatusMessage.swift */,
 				5387AE882C0143D100EEC581 /* SearchBar.swift */,
+				539134EF2C02C44000B48494 /* Swipe.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -365,6 +368,7 @@
 				53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */,
 				537582D52C0033B800CB528C /* Tabs.swift in Sources */,
 				53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */,
+				539134F02C02C44000B48494 /* Swipe.swift in Sources */,
 				53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */,
 				53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */,
 				53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */,

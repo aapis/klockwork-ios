@@ -17,7 +17,22 @@ struct Tabs: View {
         VStack(alignment: .leading, spacing: 0) {
             Buttons(job: $job, selected: $selected)
             TitleBar(selected: $selected)
+                .border(width: 1, edges: [.bottom], color: .yellow)
             Content(job: $job, selected: $selected)
+                .swipe([.left, .right]) { swipe in
+                    let tabs = EntityType.allCases
+                    if let selectedIndex = tabs.firstIndex(of: selected) {
+                        if swipe == .left {
+                            if selectedIndex >= 0 && selectedIndex <= tabs.count {
+                                selected = tabs[selectedIndex + 1]
+                            }
+                        } else if swipe == .right {
+                            if selectedIndex > 0 && selectedIndex <= tabs.count {
+                                selected = tabs[selectedIndex - 1]
+                            }
+                        }
+                    }
+                }
         }
         .background(.clear)
         .onChange(of: job) {

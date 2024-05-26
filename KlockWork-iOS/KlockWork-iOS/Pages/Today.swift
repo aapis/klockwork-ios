@@ -25,7 +25,7 @@ struct Today: View {
                 }
 
                 if selected == .records {
-                    Editor(job: $job)
+                    Editor(job: $job, entityType: $selected)
                 }
 
                 Spacer()
@@ -74,36 +74,68 @@ extension Today {
         }
 
         @Binding public var job: Job?
+        @Binding public var entityType: EntityType
         @Environment(\.managedObjectContext) var moc
         @State private var text: String = ""
         @FocusState public var focused: Field?
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                TextField(
-                    "",
-                    text: $text,
-                    prompt: Text(job == nil ? "Select a job" : "What are you working on?")
-                        .foregroundStyle(job != nil ? job!.backgroundColor.isBright() ? Theme.cPurple : .white : .gray)
-                )
-                    .disableAutocorrection(false)
-                    .focused($focused, equals: .organizationName)
-                    .disabled(job == nil)
-                    .textContentType(.organizationName)
-                    .submitLabel(.done)
-                    .textSelection(.enabled)
-                    .lineLimit(1)
-                    .padding()
-            }
-            .onSubmit {
-                if !text.isEmpty {
-                    if let job = CoreDataJob(moc: moc).byId(33.0) {
-                        let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: Date(), text: text)
-                        text = ""
+                HStack(spacing: 0) {
+                    if job == nil {
+                        HStack {
+                            Button("Select a job") {
+                                entityType = .jobs
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.yellow)
+                        }
+                        .padding()
+                    } else {
+                        TextField(
+                            "",
+                            text: $text,
+                            prompt: Text("What are you working on?")
+                            //                        .foregroundStyle(job != nil ? job!.backgroundColor.isBright() ? Theme.cPurple : .white : .gray)
+                                .foregroundStyle(.gray),
+                            axis: .horizontal // @TODO: we want .vertical but need to find a way to trigger .onSubmit if we do that
+                        )
+                        .disableAutocorrection(false)
+                        .focused($focused, equals: .organizationName)
+                        .disabled(job == nil)
+                        .textContentType(.organizationName)
+                        .submitLabel(.return)
+                        .textSelection(.enabled)
+                        .padding()
+
+                        Spacer()
+
+                        Button {
+                            if !text.isEmpty {
+                                self.actionOnSubmit()
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up")
+                                .foregroundStyle(text.isEmpty ? .gray : .yellow)
+                        }
+                        .padding(.trailing)
                     }
                 }
+                .border(width: 1, edges: [.top], color: job != nil && text.isEmpty ? .gray : .yellow)
             }
-            .background(job != nil ? job!.backgroundColor : .clear)
+            .onSubmit(self.actionOnSubmit)
+        }
+    }
+}
+
+extension Today.Editor {
+    private func actionOnSubmit() -> Void {
+        if !text.isEmpty {
+            if let job = CoreDataJob(moc: moc).byId(33.0) {
+                let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: Date(), text: text)
+                text = ""
+            }
         }
     }
 }
