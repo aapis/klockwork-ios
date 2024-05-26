@@ -17,6 +17,7 @@
 		539134EC2C02883000B48494 /* PersonDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EB2C02883000B48494 /* PersonDetail.swift */; };
 		539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134ED2C028F6900B48494 /* ProjectDetail.swift */; };
 		539134F02C02C44000B48494 /* Swipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EF2C02C44000B48494 /* Swipe.swift */; };
+		539134F22C03879E00B48494 /* Find.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134F12C03879E00B48494 /* Find.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
 		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
@@ -75,6 +76,7 @@
 		539134EB2C02883000B48494 /* PersonDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonDetail.swift; sourceTree = "<group>"; };
 		539134ED2C028F6900B48494 /* ProjectDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetail.swift; sourceTree = "<group>"; };
 		539134EF2C02C44000B48494 /* Swipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Swipe.swift; sourceTree = "<group>"; };
+		539134F12C03879E00B48494 /* Find.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Find.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
 		53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KlockWork_iOS.entitlements; sourceTree = "<group>"; };
@@ -230,6 +232,7 @@
 				53D4CB6C2BFE93B000AFEDEA /* Explore.swift */,
 				53D4CB6D2BFE93B000AFEDEA /* Planning.swift */,
 				53D4CB6E2BFE93B000AFEDEA /* Today.swift */,
+				539134F12C03879E00B48494 /* Find.swift */,
 			);
 			path = Pages;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 				5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */,
 				53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */,
 				53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */,
+				539134F22C03879E00B48494 /* Find.swift in Sources */,
 				53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */,
 				53D4CB7F2BFE93B000AFEDEA /* Today.swift in Sources */,
 				53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */,
