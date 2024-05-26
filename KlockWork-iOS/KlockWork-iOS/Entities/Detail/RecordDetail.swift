@@ -36,9 +36,14 @@ struct RecordDetail: View {
             Spacer()
         }
         .onAppear(perform: actionOnAppear)
-        .navigationTitle("Inspecting Record")
+        .navigationTitle("Editing: Record")
         .toolbarBackground(Theme.cPurple, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+        .toolbar {
+            Button("Save") {
+
+            }
+        }
     }
 }
 
@@ -53,4 +58,3 @@ extension RecordDetail {
         }
     }
 }
-

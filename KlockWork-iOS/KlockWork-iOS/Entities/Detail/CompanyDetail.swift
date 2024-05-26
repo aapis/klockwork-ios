@@ -50,6 +50,8 @@ struct CompanyDetail: View {
                             ForEach(projects) { project in
                                 NavigationLink {
                                     ProjectDetail(project: project)
+                                        .background(Theme.cPurple)
+                                        .scrollContentBackground(.hidden)
                                 } label: {
                                     Text(project.name!)
                                 }
@@ -74,7 +76,12 @@ struct CompanyDetail: View {
                 .listStyle(.grouped)
             }
             .onAppear(perform: actionOnAppear)
-            .navigationTitle("Editing Company")
+            .navigationTitle("Editing: Company")
+            .toolbar {
+                Button("Save") {
+                    
+                }
+            }
         }
     }
 }

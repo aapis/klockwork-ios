@@ -25,6 +25,11 @@ struct JobDetail: View {
         }
         .onAppear(perform: actionOnAppear)
         .navigationTitle(job.title != nil ? job.title!.capitalized : job.jid.string)
+        .toolbar {
+            Button("Save") {
+
+            }
+        }
     }
 }
 
