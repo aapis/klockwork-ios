@@ -106,12 +106,14 @@ extension Today {
                 HStack(spacing: 0) {
                     if job == nil {
                         HStack {
-                            Button("Select a job") {
+                            Button {
                                 entityType = .jobs
+                            } label: {
+                                Text("Select a job")
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(.yellow)
                             }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.yellow)
                         }
                         .padding()
                     } else {
