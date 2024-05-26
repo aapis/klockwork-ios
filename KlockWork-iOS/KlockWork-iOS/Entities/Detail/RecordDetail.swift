@@ -18,9 +18,9 @@ struct RecordDetail: View {
             List {
                 Section("Settings") {
                     DatePicker(
-                        "Created on",
+                        "Created",
                         selection: $timestamp,
-                        displayedComponents: [.date]
+                        displayedComponents: [.date, .hourAndMinute]
                     )
                     // @TODO: implement JobPicker as a sheet
                 }

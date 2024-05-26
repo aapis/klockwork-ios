@@ -29,15 +29,15 @@ struct CompanyDetail: View {
                         Toggle("Hidden", isOn: $hidden)
 
                         DatePicker(
-                            "Created on",
+                            "Created",
                             selection: $createdDate,
-                            displayedComponents: [.date]
+                            displayedComponents: [.date, .hourAndMinute]
                         )
 
                         DatePicker(
                             "Last updated",
                             selection: $lastUpdate,
-                            displayedComponents: [.date]
+                            displayedComponents: [.date, .hourAndMinute]
                         )
                         ColorPicker(selection: $colour) {
                             Text("Colour")
