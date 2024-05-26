@@ -90,64 +90,29 @@ extension Today {
     }
 
     struct Editor: View {
-        enum Field {
-            // Apparently you need to use an existing UITextContentType
-            case organizationName
-        }
+        @Environment(\.managedObjectContext) var moc
 
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
         @Binding public var date: Date
-        @Environment(\.managedObjectContext) var moc
         @State private var text: String = ""
-        @FocusState public var focused: Field?
-
+        
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 0) {
-                    if job == nil {
-                        HStack {
-                            Button {
-                                entityType = .jobs
-                            } label: {
-                                Text("Select a job")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundStyle(.yellow)
-                            }
-                        }
-                        .padding()
-                    } else {
-                        TextField(
-                            "",
-                            text: $text,
-                            prompt: Text("What are you working on?").foregroundStyle(.gray),
-                            axis: .horizontal
-                        )
-                        .disableAutocorrection(false)
-                        .focused($focused, equals: .organizationName)
-                        .disabled(job == nil)
-                        .textContentType(.organizationName)
-                        .submitLabel(.return)
-                        .textSelection(.enabled)
-                        .padding()
-
-                        Spacer()
-
-                        Button {
-                            if !text.isEmpty {
-                                self.actionOnSubmit()
-                            }
-                        } label: {
-                            Image(systemName: "arrow.up")
-                                .foregroundStyle(text.isEmpty ? .gray : .yellow)
-                        }
-                        .padding(.trailing)
-                    }
-                }
-                .border(width: 1, edges: [.top], color: job != nil && text.isEmpty ? .gray : .yellow)
+            if job == nil {
+                QueryFieldSelectJob(
+                    prompt: "What are you working on?",
+                    onSubmit: self.actionOnSubmit,
+                    text: $text,
+                    job: $job,
+                    entityType: $entityType
+                )
+            } else {
+                QueryField(
+                    prompt: "What are you working on?",
+                    onSubmit: self.actionOnSubmit,
+                    text: $text
+                )
             }
-            .onSubmit(self.actionOnSubmit)
         }
     }
 }

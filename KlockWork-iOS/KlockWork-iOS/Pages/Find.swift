@@ -23,7 +23,7 @@ struct Find: View {
                         .opacity(0.1)
                 }
 
-                Editor(text: $text)
+                QueryField(prompt: "What can I help you find?", onSubmit: self.actionOnSubmit, text: $text)
                 Spacer().frame(height: 1)
             }
             .background(Theme.cPurple)
@@ -34,7 +34,10 @@ struct Find: View {
 extension Find {
     struct Header: View {
         var body: some View {
-            Text("Header")
+            Text("Find")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .padding()
         }
     }
 
@@ -43,52 +46,11 @@ extension Find {
         @Binding public var text: String
 
         var body: some View {
-            Text("Content")
-                .onAppear(perform: actionOnAppear)
-        }
-    }
-
-    struct Editor: View {
-        enum Field {
-            // Apparently you need to use an existing UITextContentType
-            case organizationName
-        }
-
-        @Environment(\.managedObjectContext) var moc
-        @Binding public var text: String
-        @FocusState public var focused: Field?
-
-        var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 0) {
-                    TextField(
-                        "",
-                        text: $text,
-                        prompt: Text("What can I help you find?").foregroundStyle(.gray),
-                        axis: .horizontal
-                    )
-                    .disableAutocorrection(false)
-                    .focused($focused, equals: .organizationName)
-                    .textContentType(.organizationName)
-                    .submitLabel(.return)
-                    .textSelection(.enabled)
-                    .padding()
-                    
-                    Spacer()
-                    
-                    Button {
-                        if !text.isEmpty {
-                            self.actionOnSubmit()
-                        }
-                    } label: {
-                        Image(systemName: "arrow.up")
-                            .foregroundStyle(text.isEmpty ? .gray : .yellow)
-                    }
-                    .padding(.trailing)
-                }
-                .border(width: 1, edges: [.top], color: text.isEmpty ? .gray : .yellow)
+                Text("Content")
+                    .onAppear(perform: actionOnAppear)
+                Spacer()
             }
-            .onSubmit(self.actionOnSubmit)
         }
     }
 }
@@ -104,7 +66,7 @@ extension Find.Content {
     }
 }
 
-extension Find.Editor {
+extension Find {
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
         }
