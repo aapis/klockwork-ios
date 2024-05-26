@@ -87,6 +87,5 @@ extension ProjectDetail {
         if let co = project.colour {colour = Color.fromStored(co)}
         if let comp = project.company {company = comp}
         alive = project.alive
-        print("DERPO project=\(project)")
     }
 }
