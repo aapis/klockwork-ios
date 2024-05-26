@@ -26,7 +26,7 @@ struct Find: View {
                 QueryField(prompt: "What can I help you find?", onSubmit: self.actionOnSubmit, text: $text)
                 Spacer().frame(height: 1)
             }
-            .background(Theme.cPurple)
+            .background(Theme.cYellow)
         }
     }
 }
