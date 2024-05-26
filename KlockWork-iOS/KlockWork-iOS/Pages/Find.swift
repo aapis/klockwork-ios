@@ -21,8 +21,7 @@ struct Find: View {
                 }
 
                 Editor()
-                Spacer()
-                .frame(height: 1)
+                Spacer().frame(height: 1)
             }
             .background(Theme.cPurple)
         }

@@ -30,7 +30,7 @@ struct Today: View {
                 }
 
                 if selected == .records {
-                    Editor(job: $job, entityType: $selected)
+                    Editor(job: $job, entityType: $selected, date: $date)
                 }
 
                 Spacer()
@@ -97,6 +97,7 @@ extension Today {
 
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
+        @Binding public var date: Date
         @Environment(\.managedObjectContext) var moc
         @State private var text: String = ""
         @FocusState public var focused: Field?
@@ -174,7 +175,7 @@ extension Today.Editor {
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
             if let job = CoreDataJob(moc: moc).byId(33.0) {
-                let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: Date(), text: text)
+                let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: date, text: text)
                 text = ""
             }
         }

@@ -32,13 +32,10 @@ struct RecordDetail: View {
                 .listRowBackground(Theme.textBackground)
             }
             .listStyle(.grouped)
-            .background(Theme.cPurple)
             Spacer()
         }
         .onAppear(perform: actionOnAppear)
         .navigationTitle("Editing: Record")
-        .toolbarBackground(Theme.cPurple, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             Button("Save") {
 

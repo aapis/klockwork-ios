@@ -27,8 +27,10 @@ struct Companies: View {
                         ForEach(items) { item in
                             NavigationLink {
                                 CompanyDetail(company: item)
+                                    .background(Theme.cGreen)
+                                    .scrollContentBackground(.hidden)
                             } label: {
-                                Text(item.name!.capitalized)
+                                Text(item.name!)
                             }
                         }
                         .onDelete(perform: deleteItems)
