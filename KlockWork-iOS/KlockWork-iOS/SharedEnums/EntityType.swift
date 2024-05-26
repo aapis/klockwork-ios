@@ -8,7 +8,7 @@
 import SwiftUI
 
 public enum EntityType: CaseIterable {
-    case records, jobs, tasks, notes, companies, people
+    case records, jobs, tasks, notes, companies, people, projects
 
     /// Interface-friendly representation
     var label: String {
@@ -19,6 +19,7 @@ public enum EntityType: CaseIterable {
         case .notes: "Notes"
         case .companies: "Companies"
         case .people: "People"
+        case .projects: "Projects"
         }
     }
 
@@ -31,6 +32,7 @@ public enum EntityType: CaseIterable {
         case .notes: Image(systemName: "note.text")
         case .companies: Image(systemName: "building.2")
         case .people: Image(systemName: "person.2")
+        case .projects: Image(systemName: "folder")
         }
     }
 }

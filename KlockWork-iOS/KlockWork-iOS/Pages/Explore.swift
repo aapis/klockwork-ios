@@ -50,6 +50,10 @@ struct Explore: View {
                                 Tasks()
                                     .environment(\.managedObjectContext, moc)
                                     .navigationTitle(type.label)
+                            case .projects:
+                                Projects()
+                                    .environment(\.managedObjectContext, moc)
+                                    .navigationTitle(type.label)
                             }
                         } label: {
                             HStack {
@@ -93,6 +97,8 @@ extension Explore {
                     count = CoreDataRecords(moc: moc).countAll()
                 case .tasks:
                     count = CoreDataTasks(moc: moc).countAllTime()
+                case .projects:
+                    count = CoreDataProjects(moc: moc).countAll()
                 }
 
                 entityCounts.append(EntityTypePair(key: type, value: count))
