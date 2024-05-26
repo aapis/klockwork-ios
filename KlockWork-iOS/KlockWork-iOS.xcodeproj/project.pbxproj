@@ -21,6 +21,7 @@
 		539134F42C0391F000B48494 /* Projects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134F32C0391F000B48494 /* Projects.swift */; };
 		539134F62C039F2600B48494 /* People.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134F52C039F2600B48494 /* People.swift */; };
 		539134F82C039F3100B48494 /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134F72C039F3100B48494 /* Records.swift */; };
+		539134FA2C03A38500B48494 /* SearchLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134F92C03A38500B48494 /* SearchLanguage.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
 		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
@@ -83,6 +84,7 @@
 		539134F32C0391F000B48494 /* Projects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Projects.swift; sourceTree = "<group>"; };
 		539134F52C039F2600B48494 /* People.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = People.swift; sourceTree = "<group>"; };
 		539134F72C039F3100B48494 /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
+		539134F92C03A38500B48494 /* SearchLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SearchLanguage.swift; path = ../../DLPrototype/DLPrototype/Parsers/SearchLanguage.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
 		53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KlockWork_iOS.entitlements; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				539134F92C03A38500B48494 /* SearchLanguage.swift */,
 				537582D02C00332600CB528C /* FancyGenericToolbar.swift */,
 				537582CD2BFFEB7500CB528C /* EdgeBorder.swift */,
 				537582C52BFFB37900CB528C /* Data.xcdatamodeld */,
@@ -353,6 +356,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				539134FA2C03A38500B48494 /* SearchLanguage.swift in Sources */,
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
 				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
 				539134EA2C0269B600B48494 /* EntityType.swift in Sources */,
