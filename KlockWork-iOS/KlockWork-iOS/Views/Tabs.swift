@@ -11,6 +11,7 @@ struct Tabs: View {
     @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
     @Binding public var selected: EntityType
+    @Binding public var date: Date
     static public let animationDuration: Double = 0.2
 
     var body: some View {
@@ -18,7 +19,7 @@ struct Tabs: View {
             Buttons(job: $job, selected: $selected)
             TitleBar(selected: $selected)
                 .border(width: 1, edges: [.bottom], color: .yellow)
-            Content(job: $job, selected: $selected)
+            Content(job: $job, selected: $selected, date: $date)
                 .swipe([.left, .right]) { swipe in
                     let tabs = EntityType.allCases
                     if var selectedIndex = tabs.firstIndex(of: selected) {
@@ -93,11 +94,12 @@ extension Tabs {
     struct Content: View {
         @Binding public var job: Job?
         @Binding public var selected: EntityType
+        @Binding public var date: Date
 
         var body: some View {
             switch selected {
             case .records:
-                List.Records(job: $job)
+                List.Records(job: $job, date: date)
             case .jobs:
                 List.Jobs(job: $job)
             case .tasks:
@@ -132,7 +134,9 @@ extension Tabs.Content {
     struct List {
         struct Records: View {
             @FetchRequest private var items: FetchedResults<LogRecord>
+
             @Binding public var job: Job?
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -150,9 +154,10 @@ extension Tabs.Content {
                 .scrollIndicators(.hidden)
             }
 
-            init(job: Binding<Job?>) {
+            init(job: Binding<Job?>, date: Date) {
                 _job = job
-                _items = CoreDataRecords.fetchForDate(Date())
+                self.date = date
+                _items = CoreDataRecords.fetchForDate(self.date)
             }
         }
 

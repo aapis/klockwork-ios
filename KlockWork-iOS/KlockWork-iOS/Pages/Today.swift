@@ -23,7 +23,7 @@ struct Today: View {
             VStack(alignment: .leading, spacing: 0) {
                 Header(job: $job, date: $date, idate: idate)
                 ZStack(alignment: .bottomLeading) {
-                    Tabs(job: $job, selected: $selected)
+                    Tabs(job: $job, selected: $selected, date: $date)
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
                         .opacity(0.1)
@@ -48,22 +48,27 @@ extension Today {
         public var idate: IdentifiableDay
 
         var body: some View {
-            HStack(spacing: 0) {
-                Text(self.isCurrentDay(idate) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding()
-                    .overlay {
-                        DatePicker(
-                            "Date picker",
-                            selection: $date,
-                            displayedComponents: [.date]
-                        )
-                        .labelsHidden()
-                        .contentShape(Rectangle())
-                        .opacity(0.011)
-                    }
+            HStack(alignment: .center) {
+                HStack(alignment: .center, spacing: 8) {
+                    Text(self.isCurrentDay(idate) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding([.leading, .top, .bottom])
+                        .overlay {
+                            DatePicker(
+                                "Date picker",
+                                selection: $date,
+                                displayedComponents: [.date]
+                            )
+                            .labelsHidden()
+                            .contentShape(Rectangle())
+                            .opacity(0.011)
+                        }
+                    Image(systemName: "chevron.right")
+                }
+
                 Spacer()
+
                 Button {
                     job = nil
                 } label: {
