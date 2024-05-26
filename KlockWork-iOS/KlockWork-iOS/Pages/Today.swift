@@ -12,11 +12,16 @@ struct Today: View {
     @Environment(\.managedObjectContext) var moc
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
+    @State private var date: Date = Date()
+
+    private var idate: IdentifiableDay {
+        DateHelper.identifiedDate(for: date, moc: moc)
+    }
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                Header(job: $job)
+                Header(job: $job, date: $date, idate: idate)
                 ZStack(alignment: .bottomLeading) {
                     Tabs(job: $job, selected: $selected)
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
@@ -39,13 +44,25 @@ struct Today: View {
 extension Today {
     struct Header: View {
         @Binding public var job: Job?
+        @Binding public var date: Date
+        public var idate: IdentifiableDay
 
         var body: some View {
             HStack(spacing: 0) {
-                Text("Today")
+                Text(self.isCurrentDay(idate) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding()
+                    .overlay {
+                        DatePicker(
+                            "Date picker",
+                            selection: $date,
+                            displayedComponents: [.date]
+                        )
+                        .labelsHidden()
+                        .contentShape(Rectangle())
+                        .opacity(0.011)
+                    }
                 Spacer()
                 Button {
                     job = nil
@@ -96,10 +113,8 @@ extension Today {
                         TextField(
                             "",
                             text: $text,
-                            prompt: Text("What are you working on?")
-                            //                        .foregroundStyle(job != nil ? job!.backgroundColor.isBright() ? Theme.cPurple : .white : .gray)
-                                .foregroundStyle(.gray),
-                            axis: .horizontal // @TODO: we want .vertical but need to find a way to trigger .onSubmit if we do that
+                            prompt: Text("What are you working on?").foregroundStyle(.gray),
+                            axis: .horizontal
                         )
                         .disableAutocorrection(false)
                         .focused($focused, equals: .organizationName)
@@ -129,7 +144,26 @@ extension Today {
     }
 }
 
+extension Today.Header {
+    /// Checks to see if the selected date is the current day
+    /// - Parameter day: IdentifiableDay
+    /// - Returns: Bool
+    private func isCurrentDay(_ day: IdentifiableDay) -> Bool {
+        let currentDay = Date.now.timeIntervalSince1970
+        if let date = day.date {
+            let rowDay = date.timeIntervalSince1970
+            let window = (currentDay - 86400, currentDay + 84600)
+
+            return rowDay > window.0 && rowDay <= window.1
+        }
+
+        return false
+    }
+}
+
 extension Today.Editor {
+    /// Form action
+    /// - Returns: Void
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
             if let job = CoreDataJob(moc: moc).byId(33.0) {

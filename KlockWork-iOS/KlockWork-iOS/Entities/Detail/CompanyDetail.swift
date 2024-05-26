@@ -25,7 +25,7 @@ struct CompanyDetail: View {
             VStack {
                 List {
                     Section("Settings") {
-                        Toggle("Default company", isOn: $isDefault)
+                        Toggle("Default", isOn: $isDefault)
                         Toggle("Hidden", isOn: $hidden)
 
                         DatePicker(
@@ -51,7 +51,7 @@ struct CompanyDetail: View {
                                 NavigationLink {
                                     ProjectDetail(project: project)
                                 } label: {
-                                    Text(project.name!.capitalized)
+                                    Text(project.name!)
                                 }
                             }
                         } else {
