@@ -46,6 +46,7 @@ struct QueryField: View {
                 Button {
                     if action == .search {
                         text = ""
+                        self.onSubmit()
                     } else {
                         if !text.isEmpty {
                             self.onSubmit()

@@ -16,12 +16,11 @@ struct Find: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                Header(text: $text, recentSearchTerms: $recentSearchTerms)
+                Header(text: $text, recentSearchTerms: $recentSearchTerms, onSubmit: self.actionOnSubmit)
                 ZStack(alignment: .bottomLeading) {
                     Rows(
                         text: $text,
                         results: $results,
-                        recentSearchTerms: $recentSearchTerms,
                         onSubmit: self.actionOnSubmit
                     )
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
@@ -51,6 +50,8 @@ extension Find {
     struct Header: View {
         @Binding public var text: String
         @Binding public var recentSearchTerms: [String]
+        @State private var isPresented: Bool = false
+        public var onSubmit: () -> Void
 
         var body: some View {
             HStack(alignment: .center, spacing: 0) {
@@ -69,10 +70,10 @@ extension Find {
                             .fontWeight(.bold)
                     }
                 }
-                
+
+                Spacer()
+
                 if !recentSearchTerms.isEmpty {
-                    Spacer()
-                    
                     Button {
                         recentSearchTerms = []
                         text = ""
@@ -83,6 +84,18 @@ extension Find {
                     .background(Theme.rowColour)
                     .mask(Circle())
                 }
+
+                Button {
+                    isPresented.toggle()
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease")
+                }
+                .padding(10)
+                .background(Theme.rowColour)
+                .mask(Circle())
+                .sheet(isPresented: $isPresented) {
+                    Find.FilterPanel(text: $text, recentSearchTerms: $recentSearchTerms, isPresented: $isPresented, onSubmit: self.onSubmit)
+                }
             }
             .padding()
         }
@@ -92,51 +105,83 @@ extension Find {
         @Environment(\.managedObjectContext) var moc
         @Binding public var text: String
         @Binding public var results: SearchLibrary.SearchResults?
-        @Binding public var recentSearchTerms: [String]
         public var onSubmit: () -> Void
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                if text.isEmpty || results == nil {
-                    List {
-                        Section("Recent searches") {
-                            if !recentSearchTerms.isEmpty {
-                                ForEach(recentSearchTerms, id: \.self ) { term in
-                                    Button {
-                                        text = term
-                                        self.onSubmit()
-                                    } label: {
-                                        HStack(alignment: .center, spacing: 0) {
-                                            Text(term)
-                                            Spacer()
-                                            Image(systemName: "chevron.right")
-                                        }
+                if results != nil {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 1) {
+                            if !text.isEmpty {
+                                if let searchResults = results {
+                                    ForEach(searchResults.children) { row in
+                                        row.view
                                     }
                                 }
-                                .listRowBackground(Theme.textBackground)
-                            } else {
-                                Text("None found")
-                                    .listRowBackground(Theme.textBackground)
-                                    .foregroundStyle(.gray)
                             }
                         }
                     }
-                    .background(.clear)
-                    .scrollContentBackground(.hidden)
                 }
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if !text.isEmpty {
-                            if let searchResults = results {
-                                ForEach(searchResults.children) { row in
-                                    row.view
+                Spacer()
+            }
+        }
+    }
+
+    struct FilterPanel: View {
+        @Binding public var text: String
+        @Binding public var recentSearchTerms: [String]
+        @Binding public var isPresented: Bool
+        public var onSubmit: () -> Void
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text("Filters")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+
+                    if !recentSearchTerms.isEmpty {
+                        Button {
+                            recentSearchTerms = []
+                            text = ""
+                        } label: {
+                            Text("Clear recent searches")
+                        }
+                        .padding(10)
+                        .background(Theme.rowColour)
+                    }
+                }
+                .padding()
+
+                List {
+                    Section("Recent searches") {
+                        if !recentSearchTerms.isEmpty {
+                            ForEach(recentSearchTerms, id: \.self ) { term in
+                                Button {
+                                    text = term
+                                    isPresented.toggle()
+                                    self.onSubmit()
+                                } label: {
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Text(term)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                    }
                                 }
                             }
+                            .listRowBackground(Theme.textBackground)
+                        } else {
+                            Text("None found")
+                                .listRowBackground(Theme.textBackground)
+                                .foregroundStyle(.gray)
                         }
                     }
                 }
+                .background(.clear)
+                .scrollContentBackground(.hidden)
             }
+            .background(Theme.cYellow)
         }
     }
 }
