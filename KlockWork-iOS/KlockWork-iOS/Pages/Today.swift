@@ -33,8 +33,7 @@ struct Today: View {
                     Editor(job: $job, entityType: $selected, date: $date)
                 }
 
-                Spacer()
-                .frame(height: 1)
+                Spacer().frame(height: 1)
             }
             .background(Theme.cPurple)
         }

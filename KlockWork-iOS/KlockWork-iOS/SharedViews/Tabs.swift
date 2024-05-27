@@ -17,7 +17,7 @@ struct Tabs: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Buttons(job: $job, selected: $selected)
-            TitleBar(selected: $selected)
+            MiniTitleBar(selected: $selected)
                 .border(width: 1, edges: [.bottom], color: .yellow)
             Content(job: $job, selected: $selected, date: $date)
                 .swipe([.left, .right]) { swipe in
@@ -109,21 +109,6 @@ extension Tabs {
             case .projects:
                 List.Projects()
             }
-        }
-    }
-
-    struct TitleBar: View {
-        @Binding public var selected: EntityType
-
-        var body: some View {
-            HStack(alignment: .center, spacing: 0) {
-                Text(selected.label.uppercased())
-                    .font(.caption)
-                Spacer()
-            }
-            .padding(5)
-            .background(Theme.darkBtnColour)
-            .foregroundStyle(.gray)
         }
     }
 }
@@ -322,22 +307,15 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    VStack(alignment: .leading) {
-                        HStack(alignment: .top, spacing: 5) {
-                            Text(record.message!)
-                                .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .white)
-                                .multilineTextAlignment(.leading)
-                            Spacer()
+                    ListRow(
+                        name: record.message ?? "_RECORD_CONTENT",
+                        colour: record.job != nil ? record.job!.backgroundColor : Theme.rowColour,
+                        extraColumn: AnyView(
                             Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
                                 .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
-
-                        }
-                        .padding(8)
-                        .background(record.job!.backgroundColor)
-                        .listRowBackground(record.job!.backgroundColor)
-                    }
+                        ),
+                        highlight: false
+                    )
                 }
             }
         }
@@ -349,6 +327,24 @@ extension Tabs.Content {
             var body: some View {
                 Button {
                     stateJob = job
+                } label: {
+                    ListRow(
+                        name: job.title ?? job.jid.string,
+                        colour: job.backgroundColor
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleJobLink: View {
+            public let job: Job
+
+            var body: some View {
+                NavigationLink {
+                    JobDetail(job: job)
+                        .background(Theme.cPurple)
+                        .scrollContentBackground(.hidden)
                 } label: {
                     ListRow(
                         name: job.title ?? job.jid.string,
@@ -423,7 +419,7 @@ extension Tabs.Content {
                 } label: {
                     ListRow(
                         name: person.name ?? "_PERSON_NAME",
-                        colour: Theme.rowColour
+                        colour: Theme.textBackground
                     )
                 }
                 .buttonStyle(.plain)

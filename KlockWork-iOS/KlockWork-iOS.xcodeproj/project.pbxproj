@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		532441662C04428700659F14 /* Titlebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441652C04428700659F14 /* Titlebar.swift */; };
 		537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 537582C52BFFB37900CB528C /* Data.xcdatamodeld */; };
 		537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CB2BFFD70D00CB528C /* RecordDetail.swift */; };
 		537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CD2BFFEB7500CB528C /* EdgeBorder.swift */; };
@@ -25,6 +26,8 @@
 		539134FC2C03A8EC00B48494 /* QueryField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134FB2C03A8EC00B48494 /* QueryField.swift */; };
 		539134FE2C03AA4F00B48494 /* QueryFieldSelectJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134FD2C03AA4F00B48494 /* QueryFieldSelectJob.swift */; };
 		539135002C03AD9A00B48494 /* ListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134FF2C03AD9A00B48494 /* ListRow.swift */; };
+		539135032C03EF6E00B48494 /* SearchLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539135022C03EF6E00B48494 /* SearchLibrary.swift */; };
+		539135052C040D7500B48494 /* MiniTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539135042C040D7500B48494 /* MiniTitleBar.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
 		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
@@ -71,6 +74,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		532441652C04428700659F14 /* Titlebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Titlebar.swift; sourceTree = "<group>"; };
 		537582C62BFFB37900CB528C /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
 		537582CB2BFFD70D00CB528C /* RecordDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDetail.swift; sourceTree = "<group>"; };
 		537582CD2BFFEB7500CB528C /* EdgeBorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EdgeBorder.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/EdgeBorder.swift; sourceTree = "<group>"; };
@@ -91,6 +95,8 @@
 		539134FB2C03A8EC00B48494 /* QueryField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryField.swift; sourceTree = "<group>"; };
 		539134FD2C03AA4F00B48494 /* QueryFieldSelectJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryFieldSelectJob.swift; sourceTree = "<group>"; };
 		539134FF2C03AD9A00B48494 /* ListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListRow.swift; sourceTree = "<group>"; };
+		539135022C03EF6E00B48494 /* SearchLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLibrary.swift; sourceTree = "<group>"; };
+		539135042C040D7500B48494 /* MiniTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniTitleBar.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
 		53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KlockWork_iOS.entitlements; sourceTree = "<group>"; };
@@ -150,7 +156,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		537582D32C00338E00CB528C /* Views */ = {
+		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
 				537582D42C0033B800CB528C /* Tabs.swift */,
@@ -160,8 +166,10 @@
 				539134FB2C03A8EC00B48494 /* QueryField.swift */,
 				539134FD2C03AA4F00B48494 /* QueryFieldSelectJob.swift */,
 				539134FF2C03AD9A00B48494 /* ListRow.swift */,
+				539135042C040D7500B48494 /* MiniTitleBar.swift */,
+				532441652C04428700659F14 /* Titlebar.swift */,
 			);
-			path = Views;
+			path = SharedViews;
 			sourceTree = "<group>";
 		};
 		539134E82C0269A200B48494 /* SharedEnums */ = {
@@ -170,6 +178,14 @@
 				539134E92C0269B600B48494 /* EntityType.swift */,
 			);
 			path = SharedEnums;
+			sourceTree = "<group>";
+		};
+		539135012C03EF0300B48494 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				539135022C03EF6E00B48494 /* SearchLibrary.swift */,
+			);
+			path = Libraries;
 			sourceTree = "<group>";
 		};
 		53D4CB4A2BFE930100AFEDEA = {
@@ -222,8 +238,9 @@
 		53D4CB552BFE930100AFEDEA /* KlockWork-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				539135012C03EF0300B48494 /* Libraries */,
 				539134E82C0269A200B48494 /* SharedEnums */,
-				537582D32C00338E00CB528C /* Views */,
+				537582D32C00338E00CB528C /* SharedViews */,
 				537582CF2BFFFB7300CB528C /* Info.plist */,
 				53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */,
 				53D4CB7A2BFE93B000AFEDEA /* Entities */,
@@ -383,6 +400,7 @@
 				53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */,
 				539134EC2C02883000B48494 /* PersonDetail.swift in Sources */,
 				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
+				532441662C04428700659F14 /* Titlebar.swift in Sources */,
 				53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */,
 				53F9260A2BFE9BF300948076 /* CoreDataNoteVersions.swift in Sources */,
 				53F9260B2BFE9BF300948076 /* CoreDataPerson.swift in Sources */,
@@ -399,6 +417,7 @@
 				539134FE2C03AA4F00B48494 /* QueryFieldSelectJob.swift in Sources */,
 				53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */,
 				5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */,
+				539135052C040D7500B48494 /* MiniTitleBar.swift in Sources */,
 				53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */,
 				539134FC2C03A8EC00B48494 /* QueryField.swift in Sources */,
 				53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */,
@@ -422,6 +441,7 @@
 				539134F42C0391F000B48494 /* Projects.swift in Sources */,
 				53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */,
 				53D4CB802BFE93B000AFEDEA /* CompanyDetail.swift in Sources */,
+				539135032C03EF6E00B48494 /* SearchLibrary.swift in Sources */,
 				53D4CB882BFE93B000AFEDEA /* Tasks.swift in Sources */,
 				53D4CB822BFE93B000AFEDEA /* JobDetail.swift in Sources */,
 			);

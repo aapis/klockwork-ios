@@ -13,8 +13,13 @@ struct QueryField: View {
         case organizationName
     }
 
+    public enum Action {
+        case submit, search
+    }
+
     public let prompt: String
     public var onSubmit: () -> Void
+    public var action: Action = .submit
     @Environment(\.managedObjectContext) var moc
     @Binding public var text: String
     @FocusState public var focused: Field?
@@ -31,7 +36,7 @@ struct QueryField: View {
                 .disableAutocorrection(false)
                 .focused($focused, equals: .organizationName)
                 .textContentType(.organizationName)
-                .submitLabel(.return)
+                .submitLabel(action == .search ? .search : .return)
                 .textSelection(.enabled)
                 .padding()
                 .foregroundStyle(.yellow)
@@ -39,12 +44,21 @@ struct QueryField: View {
                 Spacer()
 
                 Button {
-                    if !text.isEmpty {
-                        self.onSubmit()
+                    if action == .search {
+                        text = ""
+                    } else {
+                        if !text.isEmpty {
+                            self.onSubmit()
+                        }
                     }
                 } label: {
-                    Image(systemName: "arrow.up")
-                        .foregroundStyle(text.isEmpty ? .gray : .yellow)
+                    if action == .search {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(text.isEmpty ? .gray : .yellow)
+                    } else {
+                        Image(systemName: "arrow.up")
+                            .foregroundStyle(text.isEmpty ? .gray : .yellow)
+                    }
                 }
                 .padding(.trailing)
             }

@@ -10,65 +10,157 @@ import SwiftUI
 struct Find: View {
     @Environment(\.managedObjectContext) var moc
     @State private var text: String = ""
+    @State private var results: SearchLibrary.SearchResults?
+    @State private var recentSearchTerms: [String] = []
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                Header()
+                Header(text: $text, recentSearchTerms: $recentSearchTerms)
                 ZStack(alignment: .bottomLeading) {
-//                        Tabs(job: $job, selected: $selected, date: $date)
-                    Content(text: $text)
+                    Rows(
+                        text: $text,
+                        results: $results,
+                        recentSearchTerms: $recentSearchTerms,
+                        onSubmit: self.actionOnSubmit
+                    )
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
                         .opacity(0.1)
                 }
 
-                QueryField(prompt: "What can I help you find?", onSubmit: self.actionOnSubmit, text: $text)
+                QueryField(
+                    prompt: "What can I help you find?",
+                    onSubmit: self.actionOnSubmit,
+                    action: .search,
+                    text: $text
+                )
                 Spacer().frame(height: 1)
             }
             .background(Theme.cYellow)
+            .onChange(of: text) {
+                if text.isEmpty {
+                    results?.reset()
+                }
+            }
         }
     }
 }
 
 extension Find {
     struct Header: View {
+        @Binding public var text: String
+        @Binding public var recentSearchTerms: [String]
+
         var body: some View {
-            Text("Find")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding()
+            HStack(alignment: .center, spacing: 0) {
+                if text.isEmpty {
+                    Text("Find")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                } else {
+                    if text.count < 10 {
+                        Text("Find: \(text.prefix(10))")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                    } else {
+                        Text("Find: \(text.prefix(10))...")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                    }
+                }
+                
+                if !recentSearchTerms.isEmpty {
+                    Spacer()
+                    
+                    Button {
+                        recentSearchTerms = []
+                        text = ""
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .padding(10)
+                    .background(Theme.rowColour)
+                    .mask(Circle())
+                }
+            }
+            .padding()
         }
     }
 
-    struct Content: View {
+    struct Rows: View {
         @Environment(\.managedObjectContext) var moc
         @Binding public var text: String
+        @Binding public var results: SearchLibrary.SearchResults?
+        @Binding public var recentSearchTerms: [String]
+        public var onSubmit: () -> Void
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text("Content")
-                    .onAppear(perform: actionOnAppear)
-                Spacer()
+                if text.isEmpty || results == nil {
+                    List {
+                        Section("Recent searches") {
+                            if !recentSearchTerms.isEmpty {
+                                ForEach(recentSearchTerms, id: \.self ) { term in
+                                    Button {
+                                        text = term
+                                        self.onSubmit()
+                                    } label: {
+                                        HStack(alignment: .center, spacing: 0) {
+                                            Text(term)
+                                            Spacer()
+                                            Image(systemName: "chevron.right")
+                                        }
+                                    }
+                                }
+                                .listRowBackground(Theme.textBackground)
+                            } else {
+                                Text("None found")
+                                    .listRowBackground(Theme.textBackground)
+                                    .foregroundStyle(.gray)
+                            }
+                        }
+                    }
+                    .background(.clear)
+                    .scrollContentBackground(.hidden)
+                }
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 1) {
+                        if !text.isEmpty {
+                            if let searchResults = results {
+                                ForEach(searchResults.children) { row in
+                                    row.view
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-extension Find.Content {
+extension Find.Rows {
     private func actionOnAppear() -> Void {
-        let parser = SearchLanguage.Parser(with: text).parse()
 
-        if !parser.components.isEmpty {
-            let results = SearchLanguage.Results(components: parser.components, moc: moc).find()
-            print("DERPO results=\(results)")
-        }
     }
 }
 
 extension Find {
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
+            Task {
+                self.results = await SearchLibrary(term: text).query()
+
+                if self.recentSearchTerms.count > 10 {
+                    let _ = self.recentSearchTerms.popLast()
+                }
+
+                if !self.recentSearchTerms.contains(where: {$0 == text}) {
+                    self.recentSearchTerms.append(text)
+                }
+            }
         }
     }
 }
