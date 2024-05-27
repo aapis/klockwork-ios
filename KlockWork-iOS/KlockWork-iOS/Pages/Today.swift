@@ -14,8 +14,14 @@ struct Today: View {
     @State private var selected: EntityType = .records
     @State private var date: Date = Date()
 
+    @AppStorage("activeDate") public var ad: Double = Date.now.timeIntervalSinceReferenceDate
+    private var activeDate: Date {
+        set {ad = newValue.timeIntervalSinceReferenceDate}
+        get {return Date(timeIntervalSinceReferenceDate: ad)}
+    }
+
     private var idate: IdentifiableDay {
-        DateHelper.identifiedDate(for: date, moc: moc)
+        return DateHelper.identifiedDate(for: activeDate, moc: moc)
     }
 
     var body: some View {

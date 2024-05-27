@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		532441662C04428700659F14 /* Titlebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441652C04428700659F14 /* Titlebar.swift */; };
+		532441682C0531C800659F14 /* Rollups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441672C0531C800659F14 /* Rollups.swift */; };
 		537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 537582C52BFFB37900CB528C /* Data.xcdatamodeld */; };
 		537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CB2BFFD70D00CB528C /* RecordDetail.swift */; };
 		537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CD2BFFEB7500CB528C /* EdgeBorder.swift */; };
@@ -75,6 +76,7 @@
 
 /* Begin PBXFileReference section */
 		532441652C04428700659F14 /* Titlebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Titlebar.swift; sourceTree = "<group>"; };
+		532441672C0531C800659F14 /* Rollups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rollups.swift; sourceTree = "<group>"; };
 		537582C62BFFB37900CB528C /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
 		537582CB2BFFD70D00CB528C /* RecordDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDetail.swift; sourceTree = "<group>"; };
 		537582CD2BFFEB7500CB528C /* EdgeBorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EdgeBorder.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/EdgeBorder.swift; sourceTree = "<group>"; };
@@ -156,6 +158,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		532441692C05354A00659F14 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +177,7 @@
 				539134FF2C03AD9A00B48494 /* ListRow.swift */,
 				539135042C040D7500B48494 /* MiniTitleBar.swift */,
 				532441652C04428700659F14 /* Titlebar.swift */,
+				532441672C0531C800659F14 /* Rollups.swift */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -238,6 +248,7 @@
 		53D4CB552BFE930100AFEDEA /* KlockWork-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				532441692C05354A00659F14 /* Extensions */,
 				539135012C03EF0300B48494 /* Libraries */,
 				539134E82C0269A200B48494 /* SharedEnums */,
 				537582D32C00338E00CB528C /* SharedViews */,
@@ -427,6 +438,7 @@
 				53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */,
 				537582D72C004A9600CB528C /* StatusMessage.swift in Sources */,
 				53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */,
+				532441682C0531C800659F14 /* Rollups.swift in Sources */,
 				539134F62C039F2600B48494 /* People.swift in Sources */,
 				539135002C03AD9A00B48494 /* ListRow.swift in Sources */,
 				53D4CB832BFE93B000AFEDEA /* NoteDetail.swift in Sources */,

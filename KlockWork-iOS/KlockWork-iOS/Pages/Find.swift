@@ -18,11 +18,15 @@ struct Find: View {
             VStack(alignment: .leading, spacing: 0) {
                 Header(text: $text, recentSearchTerms: $recentSearchTerms, onSubmit: self.actionOnSubmit)
                 ZStack(alignment: .bottomLeading) {
-                    Rows(
-                        text: $text,
-                        results: $results,
-                        onSubmit: self.actionOnSubmit
-                    )
+                    if !text.isEmpty {
+                        Rows(
+                            text: $text,
+                            results: $results,
+                            onSubmit: self.actionOnSubmit
+                        )
+                    } else {
+                        Rollups()
+                    }
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
                         .opacity(0.1)
