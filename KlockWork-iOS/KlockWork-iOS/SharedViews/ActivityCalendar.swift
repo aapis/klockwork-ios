@@ -69,7 +69,8 @@ struct ActivityCalendar: View {
                                 .font(.caption)
                             }
                         }
-                        .padding()
+                        .padding([.leading, .trailing, .top])
+                        .padding(.bottom, 5)
                         .border(width: 1, edges: [.bottom], color: Theme.rowColour)
 
                         // Days
@@ -140,7 +141,7 @@ extension ActivityCalendar {
                                         day: idx,
                                         isToday: dayComponent == idx,
                                         isWeekend: weekday > 5 && weekday <= 7,
-                                        assessment: CoreDataAggregate(moc: moc).assess(date: date)
+                                        assessment: ActivityAssessment(for: date, moc: moc)
                                     )
                                 )
                             }
@@ -160,18 +161,12 @@ extension ActivityCalendar {
         public var isWeekend: Bool? = false
         public var assessment: ActivityAssessment?
         @State private var bgColour: Color = .clear
+        @State private var isPresented: Bool = false
         private let gridSize: CGFloat = 40
 
         var body: some View {
-            NavigationLink {
-                VStack {
-                    if assessment != nil {
-                        Text("Score \(assessment!.score)")
-                        Text("Date \(assessment!.date)")
-                    } else {
-                        Text("Unable to assess")
-                    }
-                }
+            Button {
+                isPresented.toggle()
             } label: {
                 if self.day > 0 {
                     Text(String(self.day))
@@ -180,12 +175,40 @@ extension ActivityCalendar {
             .frame(minWidth: self.gridSize, minHeight: self.gridSize)
             .background(self.bgColour)
             .onAppear(perform: actionOnAppear)
+            .sheet(isPresented: $isPresented) {DayAssessmentPanel(assessment: assessment)}
         }
     }
 
     struct DayOfWeek: Identifiable {
         let id: UUID = UUID()
         let symbol: String
+    }
+
+    struct DayAssessmentPanel: View {
+        public let assessment: ActivityAssessment?
+
+        var body: some View {
+            if let ass = assessment {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        if ass.score == 0 {
+                            Text("No activity recorded for \(ass.date.formatted(date: .abbreviated, time: .omitted))")
+                        } else {
+                            Text(String(ass.score))
+                                .font(.system(size: 50))
+
+                            VStack(alignment: .leading, spacing: 5) {
+                                ForEach(ass.factors) { factor in
+                                    Text(factor.description)
+                                }
+                            }
+                        }
+                    }
+                    Spacer()
+                }
+                .presentationDetents([.height(250), .height(400)])
+            }
+        }
     }
 }
 
@@ -196,7 +219,7 @@ extension ActivityCalendar.Day {
                 bgColour = .blue
             } else {
                 if isWeekend! {
-                    // IF we did find that you worked on the weekend, highlight the tile in red
+                    // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
                     if assessment!.weight != .light {
                         bgColour = .red
                     } else {
