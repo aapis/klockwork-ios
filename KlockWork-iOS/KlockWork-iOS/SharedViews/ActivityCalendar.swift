@@ -7,12 +7,14 @@
 
 import SwiftUI
 
+// MARK: Definition
 struct ActivityCalendar: View {
     @Environment(\.managedObjectContext) var moc
     @State private var month: String = "_DEFAULT_MONTH"
     @State private var week: Int = 0
     @State private var days: [Day] = []
     @State private var open: Bool = true
+    @State private var cumulativeScore: Int = 0
     private var weekdays: [DayOfWeek] = [
         DayOfWeek(symbol: "Sun"),
         DayOfWeek(symbol: "Mon"),
@@ -56,7 +58,16 @@ struct ActivityCalendar: View {
                     if open {
                         // Month row
                         GridRow {
-                            Text(self.month)
+                            HStack {
+                                // @TODO: make selectable
+                                Text(self.month)
+                                Spacer()
+                                Text("Score: \(self.cumulativeScore)")
+                                    .padding([.leading, .trailing])
+                                    .padding([.top, .bottom], 8)
+                                    .background(Theme.rowColour)
+                                    .mask(Capsule(style: .continuous))
+                            }
                         }
                         .padding([.top, .leading, .trailing])
 
@@ -93,7 +104,10 @@ struct ActivityCalendar: View {
     }
 }
 
+// MARK: Method definitions
 extension ActivityCalendar {
+    /// Onload handler
+    /// - Returns: Void
     private func actionOnAppear() -> Void {
         // Don't regenerate the calendar if there is data
         if days.count > 0 {
@@ -121,12 +135,7 @@ extension ActivityCalendar {
 
                 if let ordinal = firstDayComponents.weekdayOrdinal {
                     for _ in 0...(ordinal - 1) {
-                        days.append(
-                            Day(
-                                day: 0,
-                                isToday: false
-                            )
-                        )
+                        days.append(Day(day: 0, isToday: false))
                     }
                 }
 
@@ -150,10 +159,44 @@ extension ActivityCalendar {
                 }
             }
         }
+
+        if days.count > 0 {
+            for day in days {
+                if let ass = day.assessment {
+                    cumulativeScore += ass.score
+                }
+            }
+        }
     }
 }
 
+extension ActivityCalendar.Day {
+    /// Onload handler
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        if assessment != nil {
+            if isToday {
+                bgColour = .blue
+            } else {
+                if isWeekend! {
+                    // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
+                    if assessment!.weight != .light {
+                        bgColour = .red
+                    } else {
+                        bgColour = .clear
+                    }
+                } else {
+                    bgColour = assessment!.weight.colour
+                }
+
+            }
+        }
+    }
+}
+
+// MARK: Data structures
 extension ActivityCalendar {
+    /// An individual calendar day "tile"
     struct Day: View, Identifiable {
         public let id: UUID = UUID()
         public let day: Int
@@ -204,31 +247,9 @@ extension ActivityCalendar {
                             }
                         }
                     }
-                    Spacer()
                 }
-                .presentationDetents([.height(250), .height(400)])
-            }
-        }
-    }
-}
-
-extension ActivityCalendar.Day {
-    private func actionOnAppear() -> Void {
-        if assessment != nil {
-            if isToday {
-                bgColour = .blue
-            } else {
-                if isWeekend! {
-                    // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
-                    if assessment!.weight != .light {
-                        bgColour = .red
-                    } else {
-                        bgColour = .clear
-                    }
-                } else {
-                    bgColour = assessment!.weight.colour
-                }
-
+                .padding()
+                .presentationDetents([.height(200), .height(400)])
             }
         }
     }
