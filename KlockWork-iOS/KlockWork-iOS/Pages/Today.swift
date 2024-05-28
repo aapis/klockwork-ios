@@ -55,7 +55,7 @@ extension Today {
         var body: some View {
             HStack(alignment: .center) {
                 HStack(alignment: .center, spacing: 8) {
-                    Text(self.isCurrentDay(idate) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
+                    Text(DateHelper.isCurrentDay(idate) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .padding([.leading, .top, .bottom])
@@ -119,23 +119,6 @@ extension Today {
                 )
             }
         }
-    }
-}
-
-extension Today.Header {
-    /// Checks to see if the selected date is the current day
-    /// - Parameter day: IdentifiableDay
-    /// - Returns: Bool
-    private func isCurrentDay(_ day: IdentifiableDay) -> Bool {
-        let currentDay = Date.now.timeIntervalSince1970
-        if let date = day.date {
-            let rowDay = date.timeIntervalSince1970
-            let window = (currentDay - 86400, currentDay + 84600)
-
-            return rowDay > window.0 && rowDay <= window.1
-        }
-
-        return false
     }
 }
 

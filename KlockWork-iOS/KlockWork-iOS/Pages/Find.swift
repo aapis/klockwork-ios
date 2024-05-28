@@ -25,7 +25,7 @@ struct Find: View {
                             onSubmit: self.actionOnSubmit
                         )
                     } else {
-                        Rollups()
+                        Widgets()
                     }
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
@@ -40,7 +40,7 @@ struct Find: View {
                 )
                 Spacer().frame(height: 1)
             }
-            .background(Theme.cYellow)
+            .background(Theme.cGreen)
             .onChange(of: text) {
                 if text.isEmpty {
                     results?.reset()
@@ -76,19 +76,6 @@ extension Find {
                 }
 
                 Spacer()
-
-                if !recentSearchTerms.isEmpty {
-                    Button {
-                        recentSearchTerms = []
-                        text = ""
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    .padding(10)
-                    .background(Theme.rowColour)
-                    .mask(Circle())
-                }
-
                 Button {
                     isPresented.toggle()
                 } label: {
@@ -144,17 +131,6 @@ extension Find {
                     Text("Filters")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-
-                    if !recentSearchTerms.isEmpty {
-                        Button {
-                            recentSearchTerms = []
-                            text = ""
-                        } label: {
-                            Text("Clear recent searches")
-                        }
-                        .padding(10)
-                        .background(Theme.rowColour)
-                    }
                 }
                 .padding()
 
@@ -175,6 +151,20 @@ extension Find {
                                 }
                             }
                             .listRowBackground(Theme.textBackground)
+
+                            Button {
+                                recentSearchTerms = []
+                                text = ""
+                                isPresented.toggle()
+                            } label: {
+                                HStack {
+                                    Text("Clear list")
+                                    Spacer()
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                            .listRowBackground(Theme.rowColour)
+                            .foregroundStyle(.red)
                         } else {
                             Text("None found")
                                 .listRowBackground(Theme.textBackground)
@@ -185,7 +175,14 @@ extension Find {
                 .background(.clear)
                 .scrollContentBackground(.hidden)
             }
-            .background(Theme.cYellow)
+            .background(Theme.cGreen)
+        }
+    }
+
+    struct Widgets: View {
+        var body: some View {
+            // Rollups()
+            ActivityCalendar()
         }
     }
 }

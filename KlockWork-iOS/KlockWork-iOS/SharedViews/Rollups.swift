@@ -57,8 +57,7 @@ struct Rollups: View {
             } label: {
                 HStack {
                     VStack(alignment: .leading, spacing: 1) {
-                        Text("5 records")
-                        Text("3 jobs")
+                        Text("Jobs: XXX")
                     }
 
                     VStack(alignment: .center, spacing: 5) {
