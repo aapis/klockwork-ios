@@ -133,7 +133,7 @@ extension ActivityAssessment.ViewFactory.Month {
                                     Day(
                                         day: idx,
                                         isToday: dayComponent == idx && selectorComponents.month == month,
-                                        isWeekend: selectorComponents.weekday! > 5 && selectorComponents.weekday! <= 7,
+                                        isWeekend: selectorComponents.weekday == 1 || selectorComponents.weekday! == 7,
                                         assessment: ActivityAssessment(for: date, moc: moc)
                                     )
                                 )
@@ -196,7 +196,7 @@ extension ActivityAssessment.ViewFactory.MonthData {
                                     Day(
                                         day: idx,
                                         isToday: dayComponent == idx && selectorComponents.month == month,
-                                        isWeekend: selectorComponents.weekday! > 5 && selectorComponents.weekday! <= 7,
+                                        isWeekend: selectorComponents.weekday == 1 || selectorComponents.weekday! == 7,
                                         assessment: ActivityAssessment(for: date, moc: self.moc)
                                     )
                                 )
