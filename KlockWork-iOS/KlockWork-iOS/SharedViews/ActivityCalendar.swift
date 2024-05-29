@@ -118,7 +118,8 @@ struct ActivityCalendar: View {
                 .border(width: 1, edges: [.bottom], color: Theme.rowColour)
 
                 // Days
-                ActivityAssessment.ViewFactory.Month(moc: moc, date: $date, cumulativeScore: $cumulativeScore)
+                ActivityAssessment.ViewFactory.Month(date: $date, cumulativeScore: $cumulativeScore)
+                    .environment(\.managedObjectContext, moc)
 
                 // Legend
                 Legend()

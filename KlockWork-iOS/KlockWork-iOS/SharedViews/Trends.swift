@@ -6,9 +6,14 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct Trends: View {
+    typealias MData = ActivityAssessment.ViewFactory.MonthData
+    @Environment(\.managedObjectContext) var moc
+    @State private var date: Date = Date()
     @State private var open: Bool = false
+    @State private var data: MData?
 
     var body: some View {
         Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
@@ -37,5 +42,9 @@ struct Trends: View {
         }
         .background(Theme.rowColour)
         .border(width: 1, edges: [.bottom, .trailing], color: .black.opacity(0.2))
+    }
+
+    init() {
+//        self.data = MData(date: Date())
     }
 }

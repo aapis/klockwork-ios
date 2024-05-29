@@ -13,7 +13,7 @@ public class ActivityAssessment {
     public var date: Date
     public var moc: NSManagedObjectContext?
     public var weight: ActivityWeightAssessment = .light
-    public var score: Int
+    public var score: Int = 0
     public var factors: [AssessmentFactor] = []
     private var jobsCreated: Int {CoreDataJob(moc: self.moc).countByDate(self.date)}
     private var records: Int {CoreDataRecords(moc: self.moc).countRecords(for: self.date)}
@@ -22,7 +22,6 @@ public class ActivityAssessment {
     init(for date: Date, moc: NSManagedObjectContext?) {
         self.date = date
         self.moc = moc
-        self.score = 0
         self.perform()
     }
 }
@@ -69,6 +68,7 @@ extension ActivityAssessment {
     }
 }
 
+// @TODO: move these functions to ViewFactory.MonthData an remove this entirely
 extension ActivityAssessment.ViewFactory.Month {
     /// Onload handler
     /// - Returns: Void
@@ -131,6 +131,69 @@ extension ActivityAssessment.ViewFactory.Month {
                                         day: idx,
                                         isToday: dayComponent == idx && selectorComponents.month == month,
                                         isWeekend: selectorComponents.weekday! > 5 && selectorComponents.weekday! <= 7,
+                                        assessment: ActivityAssessment(for: date, moc: moc)
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+extension ActivityAssessment.ViewFactory.MonthData {
+    /// Calculates the cumulative score for the month
+    /// - Returns: Void
+    private func calculateCumulativeScore() -> Void {
+        for day in self.days {
+            if let ass = day.assessment {
+                cumulativeScore += ass.score
+            }
+        }
+    }
+
+    /// Easiest way to make it look like a calendar is to bump the first row of Day's over by the first day of the month's weekdayOrdinal value
+    /// - Returns: Void
+    private func padStartOfMonth() -> Void {
+        let firstDayComponents = Calendar.autoupdatingCurrent.dateComponents(
+            [.weekdayOrdinal],
+            from: DateHelper.startAndEndOf(self.date).0
+        )
+
+        if let ordinal = firstDayComponents.weekdayOrdinal {
+            for _ in 0...(ordinal - 1) {
+                self.days.append(Day(day: 0, isToday: false))
+            }
+        }
+    }
+
+    /// Creates the required number of tile objects for a given month
+    /// - Returns: Void
+    private func createTiles() -> Void {
+        let calendar = Calendar.autoupdatingCurrent
+        if let interval = calendar.dateInterval(of: .month, for: self.date) {
+            let numDaysInMonth = calendar.dateComponents([.day], from: interval.start, to: interval.end)
+            let adComponents = calendar.dateComponents([.day, .month, .year], from: self.date)
+
+            if numDaysInMonth.day != nil {
+                self.padStartOfMonth()
+
+                // Append the real Day objects
+                for idx in 1...numDaysInMonth.day! {
+                    if let dayComponent = adComponents.day {
+                        let month = adComponents.month
+                        let components = DateComponents(year: adComponents.year, month: adComponents.month, day: idx)
+                        if let date = Calendar.autoupdatingCurrent.date(from: components) {
+                            let selectorComponents = Calendar.autoupdatingCurrent.dateComponents([.weekday, .month], from: date)
+
+                            if selectorComponents.weekday != nil && selectorComponents.month != nil {
+                                self.days.append(
+                                    Day(
+                                        day: idx,
+                                        isToday: dayComponent == idx && selectorComponents.month == month,
+                                        isWeekend: selectorComponents.weekday! > 5 && selectorComponents.weekday! <= 7,
                                         assessment: ActivityAssessment(for: date, moc: self.moc)
                                     )
                                 )
@@ -143,9 +206,9 @@ extension ActivityAssessment.ViewFactory.Month {
     }
 }
 
-
 // MARK: Data structures
 extension ActivityAssessment {
+    /// Levels representing an amount of work
     public enum ActivityWeightAssessment: CaseIterable {
         case empty, light, medium, heavy, significant
 
@@ -169,7 +232,9 @@ extension ActivityAssessment {
             }
         }
     }
-
+    
+    /// Define assessment factors to customize how you generate score
+    /// @TODO: would be cool if this were user customizable
     public struct AssessmentFactor: Identifiable {
         public var id: UUID = UUID()
         var count: Int
@@ -177,18 +242,20 @@ extension ActivityAssessment {
         var date: Date
         var description: String
     }
-
+    
+    /// Create prebuilt views
     struct ViewFactory {
         struct Month: View {
             typealias Day = ActivityCalendar.Day // @TODO: move out of ActivityCalendar
-
-            public let moc: NSManagedObjectContext
+            
+            @Environment(\.managedObjectContext) var moc
             @Binding public var date: Date
             @Binding public var cumulativeScore: Int
             @State private var days: [Day] = []
             private var columns: [GridItem] {
                 return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
             }
+//            @State private var data: ViewFactory.MonthData?
 
             var body: some View {
                 GridRow {
@@ -197,11 +264,34 @@ extension ActivityAssessment {
                     }
                 }
                 .padding([.leading, .trailing, .bottom])
-                .onAppear(perform: actionOnAppear)
-                .onChange(of: date) {
+                .onAppear(perform: {self.actionOnAppear()})
+                .onChange(of: self.date) {
                     self.days = []
                     self.actionOnAppear()
                 }
+            }
+        }
+
+        class MonthData {
+            typealias Day = ActivityCalendar.Day // @TODO: move out of ActivityCalendar
+
+            @Environment(\.managedObjectContext) var moc
+            public var date: Date
+            public var cumulativeScore: Int = 0
+            public var days: [Day] = []
+
+            init(date: Date, cumulativeScore: Int = 0) {
+                self.date = date
+                self.cumulativeScore = cumulativeScore
+
+                if self.days.isEmpty {
+                    Task {
+                        self.createTiles()
+                        self.calculateCumulativeScore()
+                    }
+                }
+
+                print("DERPO days=\(self.days)")
             }
         }
     }
