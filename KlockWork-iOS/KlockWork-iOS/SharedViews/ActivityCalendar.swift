@@ -118,12 +118,7 @@ struct ActivityCalendar: View {
                 .border(width: 1, edges: [.bottom], color: Theme.rowColour)
 
                 // Days
-                GridRow {
-                    LazyVGrid(columns: self.columns, alignment: .leading) {
-                        ForEach(days) {view in view}
-                    }
-                }
-                .padding([.leading, .trailing, .bottom])
+                ActivityAssessment.ViewFactory.Month(moc: moc, date: $date, cumulativeScore: $cumulativeScore)
 
                 // Legend
                 Legend()
@@ -132,10 +127,6 @@ struct ActivityCalendar: View {
         .background(Theme.rowColour)
         .border(width: 1, edges: [.bottom, .trailing], color: .black.opacity(0.2))
         .onAppear(perform: actionOnAppear)
-        .onChange(of: date) {
-            days = []
-            self.actionOnAppear()
-        }
         // @TODO: swipe between months
 //                .swipe([.left, .right]) { swipe in
 //                    if swipe == .left {
@@ -152,70 +143,10 @@ extension ActivityCalendar {
     /// Onload handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        // Don't regenerate the calendar if there is data
-        if days.count > 0 {
-            return
-        }
-
-        self.cumulativeScore = 0
-
         // Get month string from date
         let df = DateFormatter()
         df.dateFormat = "MMM"
         self.month = df.string(from: date)
-
-        // Create array of days which will render as buttons in the calendar
-        let calendar = Calendar.autoupdatingCurrent
-        if let interval = calendar.dateInterval(of: .month, for: date) {
-            let numDaysInMonth = calendar.dateComponents([.day], from: interval.start, to: interval.end)
-            let adComponents = calendar.dateComponents([.day, .month, .year], from: date)
-
-            if numDaysInMonth.day != nil {
-                // Easiest way to make it look like a calendar is to bump the first row of Day's over by the first day
-                // of the month's weekdayOrdinal value
-                let firstDayComponents = calendar.dateComponents(
-                    [.weekdayOrdinal],
-                    from: DateHelper.startAndEndOf(date).0
-                )
-
-                if let ordinal = firstDayComponents.weekdayOrdinal {
-                    for _ in 0...(ordinal - 1) {
-                        days.append(Day(day: 0, isToday: false))
-                    }
-                }
-
-                // Append the real Day objects
-                for idx in 1...numDaysInMonth.day! {
-                    if let dayComponent = adComponents.day {
-                        let month = adComponents.month
-                        let components = DateComponents(year: adComponents.year, month: adComponents.month, day: idx)
-                        if let date = Calendar.autoupdatingCurrent.date(from: components) {
-                            let selectorComponents = Calendar.autoupdatingCurrent.dateComponents([.weekday, .month], from: date)
-
-                            if selectorComponents.weekday != nil && selectorComponents.month != nil {
-                                days.append(
-                                    Day(
-                                        day: idx,
-                                        isToday: dayComponent == idx && selectorComponents.month == month,
-                                        isWeekend: selectorComponents.weekday! > 5 && selectorComponents.weekday! <= 7,
-                                        assessment: ActivityAssessment(for: date, moc: moc)
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Calculate cumulative score
-        if days.count > 0 {
-            for day in days {
-                if let ass = day.assessment {
-                    cumulativeScore += ass.score
-                }
-            }
-        }
     }
 }
 
@@ -246,7 +177,7 @@ extension ActivityCalendar.Day {
 // MARK: Data structures
 extension ActivityCalendar {
     /// An individual calendar day "tile"
-    struct Day: View, Identifiable {
+    public struct Day: View, Identifiable {
         public let id: UUID = UUID()
         public let day: Int
         public let isToday: Bool
