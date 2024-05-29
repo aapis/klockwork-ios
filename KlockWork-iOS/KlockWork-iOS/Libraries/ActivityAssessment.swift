@@ -18,6 +18,8 @@ public class ActivityAssessment {
     private var jobsCreated: Int {CoreDataJob(moc: self.moc).countByDate(self.date)}
     private var records: Int {CoreDataRecords(moc: self.moc).countRecords(for: self.date)}
     private var jobsReferenced: Int {CoreDataRecords(moc: self.moc).countJobs(for: self.date)}
+    private var notesReferenced: Int {CoreDataNotes(moc: self.moc).countByDate(for: self.date)}
+    private var tasksReferenced: Int {CoreDataTasks(moc: self.moc).countByDate(for: self.date)}
 
     init(for date: Date, moc: NSManagedObjectContext) {
         self.date = date
@@ -32,9 +34,11 @@ extension ActivityAssessment {
     /// - Returns: Void
     private func perform() -> Void {
         let assessables: [AssessmentFactor] = [
-            AssessmentFactor(count: self.jobsCreated, date: self.date, description: "\(jobsCreated) job(s)"),
+            AssessmentFactor(count: self.jobsCreated, date: self.date, description: "\(jobsCreated) new job(s)"),
             AssessmentFactor(count: self.records, date: self.date, description: "\(records) new record(s)"),
-            AssessmentFactor(count: self.jobsReferenced, weight: 2, date: self.date, description: "\(jobsReferenced) job(s) interacted with")
+            AssessmentFactor(count: self.jobsReferenced, weight: 2, date: self.date, description: "\(jobsReferenced) job interaction(s)"),
+            AssessmentFactor(count: self.notesReferenced, date: self.date, description: "\(notesReferenced) note interaction(s)"),
+            AssessmentFactor(count: self.tasksReferenced, date: self.date, description: "\(tasksReferenced) task interaction(s)"),
         ]
 
         assessables.forEach { factor in

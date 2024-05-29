@@ -10,6 +10,7 @@ import CoreData
 
 struct Trends: View {
     typealias MData = ActivityAssessment.ViewFactory.MonthData
+
     @Environment(\.managedObjectContext) var moc
     @State private var date: Date = Date()
     @State private var open: Bool = false

@@ -214,24 +214,56 @@ extension ActivityCalendar {
 
         var body: some View {
             if let ass = assessment {
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack {
+                VStack {
+                    Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
                         if ass.score == 0 {
                             Text("No activity recorded for \(ass.date.formatted(date: .abbreviated, time: .omitted))")
                         } else {
-                            Text(String(ass.score))
-                                .font(.system(size: 50))
+                            GridRow(alignment: .top) {
+                                Text("Score")
+                                Text("Factors")
+                            }
+                            .foregroundStyle(.gray)
 
-                            VStack(alignment: .leading, spacing: 5) {
-                                ForEach(ass.factors) { factor in
-                                    Text(factor.description)
+                            Divider()
+                                .background(.gray)
+
+                            GridRow(alignment: .top) {
+                                VStack(alignment: .center) {
+                                    Text(String(ass.score))
+                                        .font(.system(size: 50))
+                                        .padding()
+                                        .background(ass.weight.colour)
+                                        .mask(Circle())
+
+                                    Text(ass.weight.label)
+                                        .foregroundStyle(.gray)
                                 }
+                                .padding([.leading, .trailing, .top])
+
+                                VStack(alignment: .leading) {
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            ForEach(ass.factors) { factor in
+                                                Text(factor.description.uppercased())
+                                                    .font(.caption)
+                                            }
+                                        }
+                                        Spacer()
+                                    }
+                                }
+                                .padding([.trailing])
                             }
                         }
                     }
+                    .padding()
+                    .background(Theme.textBackground)
+                    .clipShape(.rect(cornerRadius: 16))
                 }
                 .padding()
-                .presentationDetents([.height(200), .height(400)])
+                .presentationDetents([.height(250), .large])
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Theme.cGreen)
             }
         }
     }
