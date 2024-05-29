@@ -13,6 +13,7 @@ extension Calendar {
 
 struct Rollups: View {
     @State private var rollups: [Rollup] = []
+    @State private var open: Bool = false
 
     @AppStorage("activeDate") public var ad: Double = Date.now.timeIntervalSinceReferenceDate
     private var activeDate: Date {
@@ -27,18 +28,43 @@ struct Rollups: View {
     static private let daysPrior: Int = 5
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            LazyVGrid(columns: columns, spacing: 10) {
-                ForEach(rollups) { rollup in
-                    rollup
+        Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
+            GridRow(alignment: .center) {
+                Button {
+                    open.toggle()
+                } label: {
+                    HStack {
+                        Text("Recent")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        Spacer()
+                        Image(systemName: open ? "chevron.up" : "chevron.down")
+                    }
+                    .padding()
+                    .background(Theme.rowColour)
+                    .border(width: 1, edges: [.bottom], color: Theme.rowColour)
                 }
             }
-            Spacer()
+
+            if open {
+                GridRow {
+                    VStack(alignment: .leading, spacing: 0) {
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(rollups) { rollup in
+                                rollup
+                            }
+                        }
+                        Spacer()
+                    }
+                    .onAppear(perform: self.actionOnDateChange)
+                    .onChange(of: activeDate) {
+                        self.actionOnDateChange()
+                    }
+                }
+            }
         }
-        .onAppear(perform: self.actionOnDateChange)
-        .onChange(of: activeDate) {
-            self.actionOnDateChange()
-        }
+        .background(Theme.rowColour)
+        .border(width: 1, edges: [.bottom, .trailing], color: .black.opacity(0.2))
     }
 
     struct Rollup: View, Identifiable {

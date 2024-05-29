@@ -15,6 +15,7 @@ struct ActivityCalendar: View {
     @State private var days: [Day] = []
     @State private var open: Bool = true
     @State private var cumulativeScore: Int = 0
+    @State private var date: Date = Date()
     private var weekdays: [DayOfWeek] = [
         DayOfWeek(symbol: "Sun"),
         DayOfWeek(symbol: "Mon"),
@@ -24,83 +25,122 @@ struct ActivityCalendar: View {
         DayOfWeek(symbol: "Fri"),
         DayOfWeek(symbol: "Sat")
     ]
-
-    @AppStorage("activeDate") public var ad: Double = Date.now.timeIntervalSinceReferenceDate
-    private var activeDate: Date {
-        set {ad = newValue.timeIntervalSinceReferenceDate}
-        get {return Date(timeIntervalSinceReferenceDate: ad)}
-    }
-
+    private var months: [Month] = [
+        Month(name: "Jan"),
+        Month(name: "Feb"),
+        Month(name: "Mar"),
+        Month(name: "Apr"),
+        Month(name: "May"),
+        Month(name: "Jun"),
+        Month(name: "Jul"),
+        Month(name: "Aug"),
+        Month(name: "Sep"),
+        Month(name: "Oct"),
+        Month(name: "Nov"),
+        Month(name: "Dec")
+    ]
     private var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
-                    GridRow(alignment: .center) {
-                        Button {
-                            open.toggle()
-                        } label: {
-                            HStack {
-                                Text("Activity Calendar")
-                                    .font(.title)
-                                    .fontWeight(.bold)
-                                Spacer()
-                                Image(systemName: open ? "chevron.up" : "chevron.down")
-                            }
-                            .padding()
-                            .background(Theme.rowColour)
-                        }
+        Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
+            GridRow(alignment: .center) {
+                Button {
+                    open.toggle()
+                } label: {
+                    HStack {
+                        Text("Activity Calendar")
+                            .font(.title)
+                            .fontWeight(.bold)
+                        Spacer()
+                        Image(systemName: open ? "chevron.up" : "chevron.down")
                     }
+                    .padding()
+                    .background(Theme.rowColour)
+                    .border(width: 1, edges: [.bottom], color: Theme.rowColour)
+                }
+            }
 
-                    if open {
-                        // Month row
-                        GridRow {
-                            HStack {
-                                // @TODO: make selectable
-                                Text(self.month)
-                                Spacer()
-                                Text("Score: \(self.cumulativeScore)")
-                                    .padding([.leading, .trailing])
-                                    .padding([.top, .bottom], 8)
-                                    .background(Theme.rowColour)
-                                    .mask(Capsule(style: .continuous))
-                            }
+            if open {
+                // Month row
+                GridRow {
+                    HStack {
+                        HStack {
+                            Text(self.month)
+                            Image(systemName: "chevron.right")
                         }
-                        .padding([.top, .leading, .trailing])
+                        .foregroundStyle(.yellow)
+                        .padding([.leading, .trailing])
+                        .padding([.top, .bottom], 8)
+                        .background(Theme.rowColour)
+                        .mask(Capsule(style: .continuous))
+                        .overlay {
+                            DatePicker(
+                                "Date picker",
+                                selection: $date,
+                                displayedComponents: [.date]
+                            )
+                            .labelsHidden()
+                            .contentShape(Rectangle())
+                            .opacity(0.011)
+                        }
 
-                        // Day of week
-                        GridRow {
-                            LazyVGrid(columns: self.columns, alignment: .center) {
-                                ForEach(weekdays) {sym in
-                                    Text(sym.symbol)
-                                }
-                                .font(.caption)
-                            }
+                        Button {
+                            date = Date()
+                        } label: {
+                            Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
+                                .font(.title2)
                         }
-                        .padding([.leading, .trailing, .top])
-                        .padding(.bottom, 5)
-                        .border(width: 1, edges: [.bottom], color: Theme.rowColour)
 
-                        // Days
-                        GridRow {
-                            LazyVGrid(columns: self.columns, alignment: .leading) {
-                                ForEach(days) {view in view}
-                            }
-                        }
-                        .padding([.leading, .trailing, .bottom])
+                        Spacer()
+
+                        Text("Score: \(self.cumulativeScore)")
+                            .padding([.leading, .trailing])
+                            .padding([.top, .bottom], 8)
+                            .background(Theme.rowColour)
+                            .mask(Capsule(style: .continuous))
                     }
                 }
-                .background(Theme.rowColour)
+                .padding([.top, .leading, .trailing])
 
-                Spacer()
+                // Day of week
+                GridRow {
+                    LazyVGrid(columns: self.columns, alignment: .center) {
+                        ForEach(weekdays) {sym in
+                            Text(sym.symbol)
+                        }
+                        .font(.caption)
+                    }
+                }
+                .padding([.leading, .trailing, .top])
+                .padding(.bottom, 5)
+                .border(width: 1, edges: [.bottom], color: Theme.rowColour)
+
+                // Days
+                GridRow {
+                    LazyVGrid(columns: self.columns, alignment: .leading) {
+                        ForEach(days) {view in view}
+                    }
+                }
+                .padding([.leading, .trailing, .bottom])
             }
-            .scrollContentBackground(.hidden)
         }
-        .padding()
+        .background(Theme.rowColour)
+        .border(width: 1, edges: [.bottom, .trailing], color: .black.opacity(0.2))
         .onAppear(perform: actionOnAppear)
+        .onChange(of: date) {
+            days = []
+            self.actionOnAppear()
+        }
+        // @TODO: swipe between months
+//                .swipe([.left, .right]) { swipe in
+//                    if swipe == .left {
+//
+//                    } else if swipe == .right {
+//
+//                    }
+//                }
     }
 }
 
@@ -114,23 +154,25 @@ extension ActivityCalendar {
             return
         }
 
+        self.cumulativeScore = 0
+
         // Get month string from date
         let df = DateFormatter()
         df.dateFormat = "MMM"
-        self.month = df.string(from: activeDate)
+        self.month = df.string(from: date)
 
         // Create array of days which will render as buttons in the calendar
         let calendar = Calendar.autoupdatingCurrent
-        if let interval = calendar.dateInterval(of: .month, for: activeDate) {
+        if let interval = calendar.dateInterval(of: .month, for: date) {
             let numDaysInMonth = calendar.dateComponents([.day], from: interval.start, to: interval.end)
-            let adComponents = calendar.dateComponents([.day, .month, .year], from: activeDate)
+            let adComponents = calendar.dateComponents([.day, .month, .year], from: date)
 
             if numDaysInMonth.day != nil {
                 // Easiest way to make it look like a calendar is to bump the first row of Day's over by the first day
                 // of the month's weekdayOrdinal value
                 let firstDayComponents = calendar.dateComponents(
                     [.weekdayOrdinal],
-                    from: DateHelper.startAndEndOf(activeDate).0
+                    from: DateHelper.startAndEndOf(date).0
                 )
 
                 if let ordinal = firstDayComponents.weekdayOrdinal {
@@ -142,14 +184,17 @@ extension ActivityCalendar {
                 // Append the real Day objects
                 for idx in 1...numDaysInMonth.day! {
                     if let dayComponent = adComponents.day {
+                        let month = adComponents.month
                         let components = DateComponents(year: adComponents.year, month: adComponents.month, day: idx)
                         if let date = Calendar.autoupdatingCurrent.date(from: components) {
-                            if let weekday = Calendar.autoupdatingCurrent.dateComponents([.weekday], from: date).weekday {
+                            let selectorComponents = Calendar.autoupdatingCurrent.dateComponents([.weekday, .month], from: date)
+
+                            if selectorComponents.weekday != nil && selectorComponents.month != nil {
                                 days.append(
                                     Day(
                                         day: idx,
-                                        isToday: dayComponent == idx,
-                                        isWeekend: weekday > 5 && weekday <= 7,
+                                        isToday: dayComponent == idx && selectorComponents.month == month,
+                                        isWeekend: selectorComponents.weekday! > 5 && selectorComponents.weekday! <= 7,
                                         assessment: ActivityAssessment(for: date, moc: moc)
                                     )
                                 )
@@ -160,6 +205,7 @@ extension ActivityCalendar {
             }
         }
 
+        // Calculate cumulative score
         if days.count > 0 {
             for day in days {
                 if let ass = day.assessment {
@@ -180,7 +226,7 @@ extension ActivityCalendar.Day {
             } else {
                 if isWeekend! {
                     // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
-                    if assessment!.weight != .light {
+                    if ![.light, .empty].contains(assessment!.weight) {
                         bgColour = .red
                     } else {
                         bgColour = .clear
@@ -252,5 +298,10 @@ extension ActivityCalendar {
                 .presentationDetents([.height(200), .height(400)])
             }
         }
+    }
+
+    struct Month: Identifiable {
+        var id: UUID = UUID()
+        var name: String
     }
 }

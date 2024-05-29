@@ -51,6 +51,7 @@
 		53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC32BFE94C900AFEDEA /* DateHelper.swift */; };
 		53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */; };
 		53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC92BFE955000AFEDEA /* SaveSource.swift */; };
+		53E3A2672C06B4DA004A85C3 /* Trends.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3A2662C06B4DA004A85C3 /* Trends.swift */; };
 		53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */; };
 		53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
 		53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
@@ -138,6 +139,7 @@
 		53D4CBC92BFE955000AFEDEA /* SaveSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SaveSource.swift; path = ../../DLPrototype/DLPrototype/Enums/SaveSource.swift; sourceTree = "<group>"; };
 		53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		53D4CBCE2BFE97CC00AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
+		53E3A2662C06B4DA004A85C3 /* Trends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trends.swift; sourceTree = "<group>"; };
 		53F9261F2BFEA00E00948076 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Project.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Project.swift; sourceTree = "<group>"; };
 		53F926202BFEA00E00948076 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Job.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Job.swift; sourceTree = "<group>"; };
 		53F926212BFEA00E00948076 /* EKEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EKEvent.swift; path = ../../DLPrototype/DLPrototype/Extensions/EKEvent.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 				532441652C04428700659F14 /* Titlebar.swift */,
 				532441672C0531C800659F14 /* Rollups.swift */,
 				5324416C2C06485800659F14 /* ActivityCalendar.swift */,
+				53E3A2662C06B4DA004A85C3 /* Trends.swift */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -462,6 +465,7 @@
 				53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */,
 				53D4CB802BFE93B000AFEDEA /* CompanyDetail.swift in Sources */,
 				539135032C03EF6E00B48494 /* SearchLibrary.swift in Sources */,
+				53E3A2672C06B4DA004A85C3 /* Trends.swift in Sources */,
 				53D4CB882BFE93B000AFEDEA /* Tasks.swift in Sources */,
 				53D4CB822BFE93B000AFEDEA /* JobDetail.swift in Sources */,
 			);

@@ -86,6 +86,7 @@ extension Find {
                 .mask(Circle())
                 .sheet(isPresented: $isPresented) {
                     Find.FilterPanel(text: $text, recentSearchTerms: $recentSearchTerms, isPresented: $isPresented, onSubmit: self.onSubmit)
+                        .presentationDetents([.height(200), .height(400)])
                 }
             }
             .padding()
@@ -105,15 +106,12 @@ extension Find {
                         VStack(alignment: .leading, spacing: 1) {
                             if !text.isEmpty {
                                 if let searchResults = results {
-                                    ForEach(searchResults.children) { row in
-                                        row.view
-                                    }
+                                    ForEach(searchResults.children) { row in row.view}
                                 }
                             }
                         }
                     }
                 }
-
                 Spacer()
             }
         }
@@ -123,18 +121,21 @@ extension Find {
         @Binding public var text: String
         @Binding public var recentSearchTerms: [String]
         @Binding public var isPresented: Bool
+        @AppStorage("find.widget.activityCalendar") private var showActivityCalendar: Bool = true
+        @AppStorage("find.widget.recent") private var showRecent: Bool = false
+        @AppStorage("find.widget.trends") private var showTrends: Bool = false
         public var onSubmit: () -> Void
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Text("Filters")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                }
-                .padding()
-
                 List {
+                    Section("Widgets") {
+                        Toggle("Activity Calendar", isOn: $showActivityCalendar)
+                        Toggle("Recent", isOn: $showRecent)
+                        Toggle("Trends", isOn: $showTrends)
+                    }
+                    .listRowBackground(Theme.textBackground)
+
                     Section("Recent searches") {
                         if !recentSearchTerms.isEmpty {
                             ForEach(recentSearchTerms, id: \.self ) { term in
@@ -180,9 +181,20 @@ extension Find {
     }
 
     struct Widgets: View {
+        @AppStorage("find.widget.activityCalendar") private var showActivityCalendar: Bool = true
+        @AppStorage("find.widget.recent") private var showRecent: Bool = false
+        @AppStorage("find.widget.trends") private var showTrends: Bool = false
+
         var body: some View {
-            // Rollups()
-            ActivityCalendar()
+            NavigationStack {
+                ScrollView {
+                    if showActivityCalendar {ActivityCalendar()}
+                    if showRecent {Rollups()}
+                    if showTrends {Trends()}
+                }
+                .scrollContentBackground(.hidden)
+            }
+            .padding()
         }
     }
 }

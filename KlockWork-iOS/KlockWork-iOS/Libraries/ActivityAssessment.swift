@@ -55,16 +55,16 @@ extension ActivityAssessment {
     /// Determines the weight property
     /// - Returns: Void
     private func determineWeight() -> Void {
-        if self.score > 0 {
-            if self.score > 0 && self.score < 5 {
-                self.weight = .light
-            } else if self.score >= 5 && self.score < 10 {
-                self.weight = .medium
-            } else if self.score > 10 && self.score <= 13 {
-                self.weight = .heavy
-            } else {
-                self.weight = .significant
-            }
+        if self.score == 0 {
+            self.weight = .empty
+        } else if self.score > 0 && self.score < 5 {
+            self.weight = .light
+        } else if self.score >= 5 && self.score < 10 {
+            self.weight = .medium
+        } else if self.score > 10 && self.score <= 13 {
+            self.weight = .heavy
+        } else {
+            self.weight = .significant
         }
     }
 }
@@ -72,7 +72,7 @@ extension ActivityAssessment {
 // MARK: Data structures
 extension ActivityAssessment {
     public enum ActivityWeightAssessment {
-        case light, medium, heavy, significant
+        case light, medium, heavy, significant, empty
 
         var colour: Color {
             switch self {
@@ -80,6 +80,7 @@ extension ActivityAssessment {
             case .medium: Theme.cYellow
             case .heavy: Theme.cRed
             case .significant: .black
+            case .empty: .clear
             }
         }
     }
