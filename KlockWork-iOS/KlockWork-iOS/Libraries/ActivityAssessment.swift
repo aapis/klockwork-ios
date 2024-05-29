@@ -11,7 +11,7 @@ import CoreData
 // MARK: Definition
 public class ActivityAssessment {
     public var date: Date
-    public var moc: NSManagedObjectContext?
+    public var moc: NSManagedObjectContext
     public var weight: ActivityWeightAssessment = .light
     public var score: Int = 0
     public var factors: [AssessmentFactor] = []
@@ -19,7 +19,7 @@ public class ActivityAssessment {
     private var records: Int {CoreDataRecords(moc: self.moc).countRecords(for: self.date)}
     private var jobsReferenced: Int {CoreDataRecords(moc: self.moc).countJobs(for: self.date)}
 
-    init(for date: Date, moc: NSManagedObjectContext?) {
+    init(for date: Date, moc: NSManagedObjectContext) {
         self.date = date
         self.moc = moc
         self.perform()
@@ -79,6 +79,9 @@ extension ActivityAssessment.ViewFactory.Month {
             self.createTiles()
             self.calculateCumulativeScore()
         }
+
+//        self.data = ActivityAssessment.ViewFactory.MonthData(moc: self.moc, date: self.date, cumulativeScore: self.cumulativeScore)
+//        print("DERPO month.data=\(self.data!.days)")
     }
 
     /// Calculates the cumulative score for the month
@@ -95,12 +98,12 @@ extension ActivityAssessment.ViewFactory.Month {
     /// - Returns: Void
     private func padStartOfMonth() -> Void {
         let firstDayComponents = Calendar.autoupdatingCurrent.dateComponents(
-            [.weekdayOrdinal],
-            from: DateHelper.startAndEndOf(self.date).0
+            [.weekday],
+            from: DateHelper.datesAtStartAndEndOfMonth(for: self.date)!.0
         )
 
-        if let ordinal = firstDayComponents.weekdayOrdinal {
-            for _ in 0...(ordinal - 1) {
+        if let ordinal = firstDayComponents.weekday {
+            for _ in 0...(ordinal - 2) { // @TODO: not sure why this is -2, should be -1?
                 self.days.append(Day(day: 0, isToday: false))
             }
         }
@@ -158,12 +161,12 @@ extension ActivityAssessment.ViewFactory.MonthData {
     /// - Returns: Void
     private func padStartOfMonth() -> Void {
         let firstDayComponents = Calendar.autoupdatingCurrent.dateComponents(
-            [.weekdayOrdinal],
-            from: DateHelper.startAndEndOf(self.date).0
+            [.weekday],
+            from: DateHelper.datesAtStartAndEndOfMonth(for: self.date)!.0
         )
 
-        if let ordinal = firstDayComponents.weekdayOrdinal {
-            for _ in 0...(ordinal - 1) {
+        if let ordinal = firstDayComponents.weekday {
+            for _ in 0...(ordinal - 2) { // @TODO: not sure why this is -2, should be -1?
                 self.days.append(Day(day: 0, isToday: false))
             }
         }
@@ -255,16 +258,30 @@ extension ActivityAssessment {
             private var columns: [GridItem] {
                 return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
             }
-//            @State private var data: ViewFactory.MonthData?
+            @State private var data: ViewFactory.MonthData?
 
             var body: some View {
                 GridRow {
+                    // @TODO: playing with self.data, not functional yet
+//                    Text("JKLISD")
+//                    if let data = self.data {
+//                        LazyVGrid(columns: self.columns, alignment: .leading) {
+//                            ForEach(data.days) {view in view}
+//                        }
+//                    }
+
                     LazyVGrid(columns: self.columns, alignment: .leading) {
                         ForEach(self.days) {view in view}
                     }
                 }
                 .padding([.leading, .trailing, .bottom])
-                .onAppear(perform: {self.actionOnAppear()})
+                .onAppear(perform: self.actionOnAppear)
+//                .onChange(of: self.data) {
+//                    if let data = self.data {
+//                        data.days = []
+//                        self.actionOnAppear()
+//                    }
+//                }
                 .onChange(of: self.date) {
                     self.days = []
                     self.actionOnAppear()
@@ -272,15 +289,20 @@ extension ActivityAssessment {
             }
         }
 
-        class MonthData {
+        class MonthData: Equatable {
             typealias Day = ActivityCalendar.Day // @TODO: move out of ActivityCalendar
 
-            @Environment(\.managedObjectContext) var moc
+            public var moc: NSManagedObjectContext
             public var date: Date
             public var cumulativeScore: Int = 0
             public var days: [Day] = []
 
-            init(date: Date, cumulativeScore: Int = 0) {
+            static func == (lhs: ActivityAssessment.ViewFactory.MonthData, rhs: ActivityAssessment.ViewFactory.MonthData) -> Bool {
+                return lhs.date == rhs.date
+            }
+
+            init(moc: NSManagedObjectContext, date: Date, cumulativeScore: Int = 0) {
+                self.moc = moc
                 self.date = date
                 self.cumulativeScore = cumulativeScore
 

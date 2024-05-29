@@ -47,14 +47,14 @@ struct ActivityCalendar: View {
         Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
             GridRow(alignment: .center) {
                 Button {
-                    open.toggle()
+                    self.open.toggle()
                 } label: {
                     HStack {
                         Text("Activity Calendar")
                             .font(.title)
                             .fontWeight(.bold)
                         Spacer()
-                        Image(systemName: open ? "chevron.up" : "chevron.down")
+                        Image(systemName: self.open ? "chevron.up" : "chevron.down")
                     }
                     .padding()
                     .background(Theme.rowColour)
@@ -62,7 +62,7 @@ struct ActivityCalendar: View {
                 }
             }
 
-            if open {
+            if self.open {
                 // Month row
                 GridRow {
                     HStack {
@@ -87,7 +87,7 @@ struct ActivityCalendar: View {
                         }
 
                         Button {
-                            date = Date()
+                            self.date = Date()
                         } label: {
                             Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
                                 .font(.title2)
@@ -128,6 +128,7 @@ struct ActivityCalendar: View {
         .background(Theme.rowColour)
         .border(width: 1, edges: [.bottom, .trailing], color: .black.opacity(0.2))
         .onAppear(perform: actionOnAppear)
+        .onChange(of: self.date) { self.actionOnAppear()}
         // @TODO: swipe between months
 //                .swipe([.left, .right]) { swipe in
 //                    if swipe == .left {
@@ -147,7 +148,7 @@ extension ActivityCalendar {
         // Get month string from date
         let df = DateFormatter()
         df.dateFormat = "MMM"
-        self.month = df.string(from: date)
+        self.month = df.string(from: self.date)
     }
 }
 
