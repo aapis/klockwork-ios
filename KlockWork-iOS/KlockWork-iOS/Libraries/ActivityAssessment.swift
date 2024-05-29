@@ -71,16 +71,26 @@ extension ActivityAssessment {
 
 // MARK: Data structures
 extension ActivityAssessment {
-    public enum ActivityWeightAssessment {
-        case light, medium, heavy, significant, empty
+    public enum ActivityWeightAssessment: CaseIterable {
+        case empty, light, medium, heavy, significant
 
         var colour: Color {
             switch self {
+            case .empty: .clear
             case .light: Theme.rowColour
             case .medium: Theme.cYellow
             case .heavy: Theme.cRed
             case .significant: .black
-            case .empty: .clear
+            }
+        }
+
+        var label: String {
+            switch self {
+            case .empty: "Clear"
+            case .light: "Light"
+            case .medium: "Busy"
+            case .heavy: "At Capacity"
+            case .significant: "Overloaded"
             }
         }
     }

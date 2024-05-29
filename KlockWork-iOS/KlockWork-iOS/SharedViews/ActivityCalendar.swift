@@ -124,6 +124,9 @@ struct ActivityCalendar: View {
                     }
                 }
                 .padding([.leading, .trailing, .bottom])
+
+                // Legend
+                Legend()
             }
         }
         .background(Theme.rowColour)
@@ -303,5 +306,51 @@ extension ActivityCalendar {
     struct Month: Identifiable {
         var id: UUID = UUID()
         var name: String
+    }
+
+    struct Legend: View {
+        private var columns: [GridItem] {
+            return Array(repeating: GridItem(.flexible(), spacing: 1), count: 3)
+        }
+
+        var body: some View {
+            GridRow {
+                VStack(alignment: .leading) {
+                    GridRow {
+                        Text("Legend")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.gray)
+                    }
+                    LazyVGrid(columns: columns, alignment: .leading) {
+                        ForEach(ActivityAssessment.ActivityWeightAssessment.allCases, id: \.self) { assessment in
+                            Legend.Row(assessment: assessment)
+                        }
+                    }
+                }
+            }
+            .padding()
+            .background(Theme.textBackground)
+        }
+    }
+}
+
+extension ActivityCalendar.Legend {
+    struct Row: View {
+        public let assessment: ActivityAssessment.ActivityWeightAssessment
+
+        var body: some View {
+            VStack {
+                HStack(alignment: .center, spacing: 5) {
+                    Rectangle()
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(assessment.colour)
+                        .border(width: 1, edges: [.top, .bottom, .leading, .trailing], color: .gray)
+
+                    Text(assessment.label)
+                        .font(.caption)
+                }
+            }
+        }
     }
 }
