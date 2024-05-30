@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Explore: View {
+    @Binding public var date: Date
     private let fgColour: Color = .yellow
     private var columns: [GridItem] {
         Array(repeating: .init(.flexible()), count: 2)

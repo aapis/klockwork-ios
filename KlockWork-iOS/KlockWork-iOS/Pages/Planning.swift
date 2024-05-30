@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Planning: View {
+    @Binding public var date: Date
     @Environment(\.managedObjectContext) var moc
     @State private var text: String = ""
 

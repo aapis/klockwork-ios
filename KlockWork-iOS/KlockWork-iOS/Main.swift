@@ -10,26 +10,27 @@ import SwiftUI
 
 struct Main: View {
     @Environment(\.managedObjectContext) var moc
+    @State public var date: Date = Date()
 
     var body: some View {
         TabView {
-            Today()
+            Today(date: $date)
             .tabItem {
                 Image(systemName: "tray")
                 Text("Today")
             }
-            Explore()
+            Explore(date: $date)
             .tabItem {
                 Image(systemName: "globe.desk")
                 Text("Explore")
             }
-            Planning()
+            Planning(date: $date)
             .tabItem {
                 Image(systemName: "hexagon")
                 Text("Planning")
             }
             
-            Find()
+            Find(date: $date)
             .tabItem {
                 Image(systemName: "magnifyingglass")
                 Text("Find")

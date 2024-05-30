@@ -97,17 +97,17 @@ extension Tabs {
             case .records:
                 List.Records(job: $job, date: date)
             case .jobs:
-                List.Jobs(job: $job)
+                List.Jobs(job: $job, date: date)
             case .tasks:
-                List.Tasks()
+                List.Tasks(date: date)
             case .notes:
-                List.Notes()
+                List.Notes(date: date)
             case .companies:
-                List.Companies()
+                List.Companies(date: date)
             case .people:
-                List.People()
+                List.People(date: date)
             case .projects:
-                List.Projects()
+                List.Projects(date: date)
             }
         }
     }
@@ -117,7 +117,6 @@ extension Tabs.Content {
     struct List {
         struct Records: View {
             @FetchRequest private var items: FetchedResults<LogRecord>
-
             @Binding public var job: Job?
             public var date: Date
 
@@ -140,13 +139,14 @@ extension Tabs.Content {
             init(job: Binding<Job?>, date: Date) {
                 _job = job
                 self.date = date
-                _items = CoreDataRecords.fetchForDate(self.date)
+                _items = CoreDataRecords.fetch(for: self.date)
             }
         }
 
         struct Jobs: View {
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var job: Job?
+            public var date: Date
 
             private var columns: [GridItem] {
                 return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
@@ -168,14 +168,16 @@ extension Tabs.Content {
                 .scrollIndicators(.hidden)
             }
 
-            init(job: Binding<Job?>) {
+            init(job: Binding<Job?>, date: Date) {
                 _job = job
-                _items = CoreDataJob.fetchRecent()
+                self.date = date
+                _items = CoreDataJob.fetchRecent(from: date)
             }
         }
 
         struct Tasks: View {
             @FetchRequest private var items: FetchedResults<LogTask>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -193,13 +195,15 @@ extension Tabs.Content {
                 .scrollIndicators(.hidden)
             }
 
-            init() {
-                _items = CoreDataTasks.fetchRecent()
+            init(date: Date) {
+                self.date = date
+                _items = CoreDataTasks.fetch(for: self.date)
             }
         }
 
         struct Notes: View {
             @FetchRequest private var items: FetchedResults<Note>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -217,13 +221,15 @@ extension Tabs.Content {
                 .scrollIndicators(.hidden)
             }
 
-            init() {
-                _items = CoreDataNotes.fetchRecentNotes()
+            init(date: Date) {
+                self.date = date
+                _items = CoreDataNotes.fetch(for: self.date)
             }
         }
 
         struct Companies: View {
             @FetchRequest private var items: FetchedResults<Company>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -241,13 +247,15 @@ extension Tabs.Content {
                 .scrollIndicators(.hidden)
             }
 
-            init() {
-                _items = CoreDataCompanies.fetchRecent()
+            init(date: Date) {
+                self.date = date
+                _items = CoreDataCompanies.fetch(for: self.date)
             }
         }
 
         struct People: View {
             @FetchRequest private var items: FetchedResults<Person>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -265,13 +273,15 @@ extension Tabs.Content {
                 .scrollIndicators(.hidden)
             }
 
-            init() {
-                _items = CoreDataPerson.fetchRecent()
+            init(date: Date) {
+                self.date = date
+                _items = CoreDataPerson.fetch(for: self.date)
             }
         }
 
         struct Projects: View {
             @FetchRequest private var items: FetchedResults<Project>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -289,8 +299,9 @@ extension Tabs.Content {
                 .scrollIndicators(.hidden)
             }
 
-            init() {
-                _items = CoreDataProjects.fetchProjects()
+            init(date: Date) {
+                self.date = date
+                _items = CoreDataProjects.fetch(for: self.date)
             }
         }
     }
