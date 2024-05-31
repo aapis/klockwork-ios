@@ -9,14 +9,14 @@ import SwiftUI
 
 // MARK: Definition
 struct ActivityCalendar: View {
+    @Binding public var date: Date
     @Environment(\.managedObjectContext) var moc
-    @State private var month: String = "_DEFAULT_MONTH"
-    @State private var week: Int = 0
-    @State private var days: [Day] = []
-    @State private var open: Bool = true
-    @State private var cumulativeScore: Int = 0
-    @State private var date: Date = Date()
-    private var weekdays: [DayOfWeek] = [
+    @State public var month: String = "_DEFAULT_MONTH"
+    @State public var week: Int = 0
+    @State public var days: [Day] = []
+    @State public var open: Bool = true
+    @State public var cumulativeScore: Int = 0
+    public var weekdays: [DayOfWeek] = [
         DayOfWeek(symbol: "Sun"),
         DayOfWeek(symbol: "Mon"),
         DayOfWeek(symbol: "Tues"),
@@ -25,7 +25,7 @@ struct ActivityCalendar: View {
         DayOfWeek(symbol: "Fri"),
         DayOfWeek(symbol: "Sat")
     ]
-    private var months: [Month] = [
+    public var months: [Month] = [
         Month(name: "Jan"),
         Month(name: "Feb"),
         Month(name: "Mar"),
@@ -39,7 +39,7 @@ struct ActivityCalendar: View {
         Month(name: "Nov"),
         Month(name: "Dec")
     ]
-    private var columns: [GridItem] {
+    public var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
     }
 
@@ -176,6 +176,16 @@ extension ActivityCalendar.Day {
     }
 }
 
+extension ActivityCalendar.AssessmentsPanel {
+    /// Onload handler
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        if let ass = self.assessment {
+            assessmentDate = ass.date
+        }
+    }
+}
+
 // MARK: Data structures
 extension ActivityCalendar {
     /// An individual calendar day "tile"
@@ -200,7 +210,9 @@ extension ActivityCalendar {
             .frame(minWidth: self.gridSize, minHeight: self.gridSize)
             .background(self.bgColour)
             .onAppear(perform: actionOnAppear)
-            .sheet(isPresented: $isPresented) {DayAssessmentPanel(assessment: assessment)}
+            .sheet(isPresented: $isPresented) {
+                AssessmentsPanel(assessment: assessment)
+            }
         }
     }
 
@@ -209,68 +221,129 @@ extension ActivityCalendar {
         let symbol: String
     }
 
-    struct DayAssessmentPanel: View {
-        public let assessment: ActivityAssessment?
-
-        var body: some View {
-            if let ass = assessment {
-                VStack {
-                    Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
-                        if ass.score == 0 {
-                            Text("No activity recorded for \(ass.date.formatted(date: .abbreviated, time: .omitted))")
-                        } else {
-                            GridRow(alignment: .top) {
-                                Text("Score")
-                                Text("Factors")
-                            }
-                            .foregroundStyle(.gray)
-
-                            Divider()
-                                .background(.gray)
-
-                            GridRow(alignment: .top) {
-                                VStack(alignment: .center) {
-                                    Text(String(ass.score))
-                                        .font(.system(size: 50))
-                                        .padding()
-                                        .background(ass.weight.colour)
-                                        .mask(Circle())
-
-                                    Text(ass.weight.label)
-                                        .foregroundStyle(.gray)
-                                }
-                                .padding([.leading, .trailing, .top])
-
-                                VStack(alignment: .leading) {
-                                    HStack {
-                                        VStack(alignment: .leading) {
-                                            ForEach(ass.factors) { factor in
-                                                Text(factor.description.uppercased())
-                                                    .font(.caption)
-                                            }
-                                        }
-                                        Spacer()
-                                    }
-                                }
-                                .padding([.trailing])
-                            }
-                        }
-                    }
-                    .padding()
-                    .background(Theme.textBackground)
-                    .clipShape(.rect(cornerRadius: 16))
-                }
-                .padding()
-                .presentationDetents([.height(250), .large])
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Theme.cGreen)
-            }
-        }
-    }
-
     struct Month: Identifiable {
         var id: UUID = UUID()
         var name: String
+    }
+
+    public struct AssessmentsPanel: View {
+        public let assessment: ActivityAssessment?
+        @State private var assessmentDate: Date = Date()
+
+        var body: some View {
+            NavigationStack {
+                VStack(alignment: .leading, spacing: 20) {
+                    if let ass = assessment {
+                        HStack(alignment: .top) {
+                            Spacer()
+                            NavigationLink {
+                                Today(inSheet: true, date: $assessmentDate)
+                            } label: {
+                                HStack(spacing: 5) {
+                                    Image(systemName: "tray")
+                                    Text("Show")
+                                }
+                            }
+                            .foregroundStyle(.yellow)
+                            .padding([.leading, .trailing])
+                            .padding([.top, .bottom], 8)
+                            .background(Theme.rowColour)
+                            .mask(Capsule(style: .continuous))
+                        }
+                        Divider().background(.gray)
+
+                        VStack(alignment: .leading, spacing: 0) {
+                            AssessmentOverviewWidget(assessment: ass)
+                                .navigationTitle(ass.date.formatted(date: .abbreviated, time: .omitted))
+                        }
+
+                    }
+                }
+                .padding([.leading, .trailing])
+            }
+            .onAppear(perform: self.actionOnAppear)
+            .presentationDetents([.medium])
+            .presentationBackground(Theme.cGreen)
+        }
+    }
+
+    struct AssessmentOverviewWidget: View {
+        public let assessment: ActivityAssessment
+
+        var body: some View {
+            VStack {
+                Grid(alignment: .topLeading, horizontalSpacing: 0, verticalSpacing: 0) {
+                    GridRow(alignment: .top) {
+                        HStack {
+                            Text("Assessment")
+                                .foregroundStyle(.yellow)
+                            Spacer()
+
+                            NavigationLink {
+                                AppSettings()
+                            } label: {
+                                HStack {
+                                    Spacer()
+                                    Image(systemName: "gear")
+                                }
+                            }
+                            .foregroundStyle(.yellow)
+                            .help("Customize assessment factors")
+                        }
+                        .padding([.leading, .trailing])
+                    }
+                }
+                Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
+                    if assessment.score == 0 {
+                        VStack(alignment: .leading) {
+                            HStack(alignment: .center) {
+                                Text("No activity recorded")
+                                Spacer()
+                            }
+                        }
+                    } else {
+                        GridRow(alignment: .top) {
+                            Text("Score")
+                            Text("Factors")
+                        }
+                        .foregroundStyle(.gray)
+
+                        Divider()
+                            .background(.gray)
+
+                        GridRow(alignment: .top) {
+                            VStack(alignment: .center) {
+                                Text(String(assessment.score))
+                                    .font(.system(size: 50))
+                                    .padding()
+                                    .background(assessment.weight.colour)
+                                    .mask(Circle())
+
+                                Text(assessment.weight.label)
+                                    .foregroundStyle(.gray)
+                            }
+                            .padding([.leading, .trailing, .top])
+
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        ForEach(assessment.factors) { factor in
+                                            Text(factor.description.uppercased())
+                                                .font(.caption)
+                                        }
+                                    }
+                                    Spacer()
+                                }
+                            }
+                            .padding([.trailing])
+                        }
+                    }
+                }
+                .padding()
+                .background(Theme.textBackground)
+                .clipShape(.rect(cornerRadius: 16))
+            }
+        }
     }
 
     struct Legend: View {

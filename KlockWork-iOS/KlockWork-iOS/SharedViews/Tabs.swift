@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct Tabs: View {
+    public var inSheet: Bool
     @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
     @Binding public var selected: EntityType
@@ -16,7 +17,7 @@ struct Tabs: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Buttons(job: $job, selected: $selected)
+            Buttons(inSheet: inSheet, job: $job, selected: $selected)
             MiniTitleBar(selected: $selected)
                 .border(width: 1, edges: [.bottom], color: .yellow)
             Content(job: $job, selected: $selected, date: $date)
@@ -52,6 +53,7 @@ struct Tabs: View {
 
 extension Tabs {
     struct Buttons: View {
+        public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
 
@@ -74,8 +76,8 @@ extension Tabs {
                                 page.icon
                                     .frame(maxHeight: 20)
                                 .padding(14)
-                                .background(job == nil ? .red : page == selected ? .white : .clear)
-                                .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? .white : .gray)
+                                .background(job == nil && !inSheet ? .red : page == selected ? .white : .clear) // sorry
+                                .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? (inSheet ? .gray : .white) : .gray) // sorry
                             }
                         }
                         .buttonStyle(.plain)
@@ -84,6 +86,7 @@ extension Tabs {
                 Spacer()
             }
             .background(Theme.textBackground)
+            .frame(height: 50)
         }
     }
 
@@ -134,6 +137,7 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Records")
             }
 
             init(job: Binding<Job?>, date: Date) {
@@ -166,6 +170,7 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Jobs")
             }
 
             init(job: Binding<Job?>, date: Date) {
@@ -193,6 +198,7 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Tasks")
             }
 
             init(date: Date) {
@@ -219,6 +225,7 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Notes")
             }
 
             init(date: Date) {
@@ -245,6 +252,7 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Companies")
             }
 
             init(date: Date) {
@@ -271,6 +279,7 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("People")
             }
 
             init(date: Date) {
@@ -297,6 +306,7 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Projects")
             }
 
             init(date: Date) {

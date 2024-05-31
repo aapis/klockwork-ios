@@ -26,7 +26,7 @@ struct Find: View {
                             onSubmit: self.actionOnSubmit
                         )
                     } else {
-                        Widgets()
+                        Widgets(date: $date)
                     }
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
@@ -182,6 +182,7 @@ extension Find {
     }
 
     struct Widgets: View {
+        @Binding public var date: Date
         @AppStorage("find.widget.activityCalendar") private var showActivityCalendar: Bool = true
         @AppStorage("find.widget.recent") private var showRecent: Bool = false
         @AppStorage("find.widget.trends") private var showTrends: Bool = false
@@ -189,7 +190,7 @@ extension Find {
         var body: some View {
             NavigationStack {
                 ScrollView {
-                    if showActivityCalendar {ActivityCalendar()}
+                    if showActivityCalendar {ActivityCalendar(date: $date)}
                     if showRecent {Rollups()}
                     if showTrends {Trends()}
                 }

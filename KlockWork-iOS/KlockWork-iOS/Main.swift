@@ -14,7 +14,7 @@ struct Main: View {
 
     var body: some View {
         TabView {
-            Today(date: $date)
+            Today(inSheet: false, date: $date)
             .tabItem {
                 Image(systemName: "tray")
                 Text("Today")

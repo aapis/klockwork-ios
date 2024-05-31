@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Today: View {
+    public var inSheet: Bool
     @Binding public var date: Date
     @Environment(\.managedObjectContext) var moc
     @State private var job: Job? = nil
@@ -21,21 +22,30 @@ struct Today: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                Header(job: $job, date: $date, idate: idate)
+                if !inSheet {
+                    Header(job: $job, date: $date, idate: idate)
+                }
+
                 ZStack(alignment: .bottomLeading) {
-                    Tabs(job: $job, selected: $selected, date: $date)
-                    LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
-                        .frame(height: 50)
-                        .opacity(0.1)
+                    Tabs(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                    if !inSheet {
+                        LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
+                            .frame(height: 50)
+                            .opacity(0.1)
+                    }
                 }
 
-                if selected == .records {
-                    Editor(job: $job, entityType: $selected, date: $date)
-                }
+                if !inSheet {
+                    if selected == .records {
+                        Editor(job: $job, entityType: $selected, date: $date)
+                    }
 
-                Spacer().frame(height: 1)
+                    Spacer().frame(height: 1)
+                }
             }
             .background(Theme.cPurple)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(inSheet ? .visible : .hidden)
         }
     }
 }
@@ -90,7 +100,6 @@ extension Today {
 
     struct Editor: View {
         @Environment(\.managedObjectContext) var moc
-
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
         @Binding public var date: Date
