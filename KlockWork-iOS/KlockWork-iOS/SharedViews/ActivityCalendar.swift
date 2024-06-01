@@ -10,6 +10,7 @@ import SwiftUI
 // MARK: Definition
 struct ActivityCalendar: View {
     @Binding public var date: Date
+    @Binding public var searchTerm: String
     @Environment(\.managedObjectContext) var moc
     @State public var month: String = "_DEFAULT_MONTH"
     @State public var week: Int = 0
@@ -134,7 +135,7 @@ struct ActivityCalendar: View {
 
 
                 // Days
-                ActivityAssessment.ViewFactory.Month(date: $date, cumulativeScore: $cumulativeScore)
+                ActivityAssessment.ViewFactory.Month(date: $date, cumulativeScore: $cumulativeScore, searchTerm: searchTerm)
                     .environment(\.managedObjectContext, moc)
                     .background(Theme.rowColour)
 
@@ -226,6 +227,7 @@ extension ActivityCalendar {
             }
             .frame(minWidth: self.gridSize, minHeight: self.gridSize)
             .background(self.bgColour)
+            .clipShape(.rect(cornerRadius: 6))
             .onAppear(perform: actionOnAppear)
             .sheet(isPresented: $isPresented) {
                 AssessmentsPanel(assessment: assessment)
@@ -282,11 +284,13 @@ extension ActivityCalendar {
             .onAppear(perform: self.actionOnAppear)
             .presentationDetents([.medium, .large])
             .presentationBackground(Theme.cGreen)
+            .scrollDismissesKeyboard(.immediately)
         }
     }
 
     struct AssessmentOverviewWidget: View {
         public let assessment: ActivityAssessment
+        private let scoreDiameter: CGFloat = 100
 
         var body: some View {
             VStack {
@@ -324,6 +328,7 @@ extension ActivityCalendar {
                         GridRow(alignment: .top) {
                             Text("Score")
                             Text("Factors")
+                            Image(systemName: "plusminus")
                         }
                         .foregroundStyle(.gray)
 
@@ -332,33 +337,33 @@ extension ActivityCalendar {
 
                         GridRow(alignment: .top) {
                             VStack(alignment: .center) {
-                                Text(String(assessment.score))
-                                    .font(.system(size: 50))
-                                    .padding()
-                                    .background(assessment.weight.colour)
-                                    .mask(Circle())
+                                ZStack {
+                                    assessment.weight.colour
+                                    Text(String(assessment.score))
+                                        .font(.system(size: 50))
+                                        .fontWeight(.bold)
+                                }
+                                .frame(width: self.scoreDiameter, height: self.scoreDiameter)
+                                .mask(Circle())
 
                                 Text(assessment.weight.label)
                                     .foregroundStyle(.gray)
                             }
-                            .padding([.leading, .trailing, .top])
-
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        ForEach(assessment.factors) { factor in
-                                            if let desc = factor.desc { // @TODO: make this work with AssessmentFactor again...
-//                                                Text(factor.description.uppercased())
-//                                                    .font(.caption)
-                                                Text(desc.uppercased())
-                                                    .font(.caption)
-                                            }
-                                        }
-                                    }
-                                    Spacer()
+                            .padding([.leading, .trailing, .top], 10)
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                ForEach(assessment.factors) { factor in
+                                    FactorDescription(factor: factor)
                                 }
                             }
-                            .padding([.trailing])
+                            .padding([.top], 10)
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                ForEach(assessment.factors) { factor in
+                                    FactorCalculation(factor: factor)
+                                }
+                            }
+                            .padding([.top], 10)
                         }
                     }
                 }
@@ -416,3 +421,31 @@ extension ActivityCalendar.Legend {
         }
     }
 }
+
+extension ActivityCalendar.AssessmentOverviewWidget {
+    struct FactorDescription: View {
+        public let factor: AssessmentFactor
+
+        var body: some View {
+            HStack(alignment: .center, spacing: 5) {
+                Text(factor.desc!.uppercased())
+                Spacer()
+
+            }
+            .font(.caption)
+        }
+    }
+
+    struct FactorCalculation: View {
+        public let factor: AssessmentFactor
+
+        var body: some View {
+            HStack(spacing: 2) {
+                Image(systemName: "plus")
+                Text("\(factor.count * factor.weight)")
+            }
+            .font(.caption)
+        }
+    }
+}
+

@@ -15,16 +15,18 @@ public class ActivityAssessment {
     public var weight: ActivityWeightAssessment = .light
     public var score: Int = 0
     public var factors: [AssessmentFactor] = []
-    private var jobsCreated: Int {CoreDataJob(moc: self.moc).countByDate(self.date)}
+    public var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
+    private var jobsCreated: Int {CoreDataJob(moc: self.moc).countByDate(for: self.date)}
     private var records: Int {CoreDataRecords(moc: self.moc).countRecords(for: self.date)}
     private var jobsReferenced: Int {CoreDataRecords(moc: self.moc).countJobs(for: self.date)}
     private var notesReferenced: Int {CoreDataNotes(moc: self.moc).countByDate(for: self.date)}
     private var tasksReferenced: Int {CoreDataTasks(moc: self.moc).countByDate(for: self.date)}
     private var assessables: [AssessmentFactor] = []
 
-    init(for date: Date, moc: NSManagedObjectContext) {
+    init(for date: Date, moc: NSManagedObjectContext, searchTerm: String = "") {
         self.date = date
         self.moc = moc
+        self.searchTerm = searchTerm
 
         // @TODO: REMOVE ME! DELETES ALL AF'S!
 //        for ass in CDAssessmentFactor(moc: self.moc).all() {
@@ -127,8 +129,9 @@ extension ActivityAssessment.ViewFactory.Month {
 
         if self.days.isEmpty {
             self.createTiles()
-            self.calculateCumulativeScore()
         }
+        
+        self.calculateCumulativeScore()
 
 //        self.data = ActivityAssessment.ViewFactory.MonthData(moc: self.moc, date: self.date, cumulativeScore: self.cumulativeScore)
 //        print("DERPO month.data=\(self.data!.days)")
@@ -153,8 +156,10 @@ extension ActivityAssessment.ViewFactory.Month {
         )
 
         if let ordinal = firstDayComponents.weekday {
-            for _ in 0...(ordinal - 2) { // @TODO: not sure why this is -2, should be -1?
-                self.days.append(Day(day: 0, isToday: false))
+            if (ordinal - 2) > 0 {
+                for _ in 0...(ordinal - 2) { // @TODO: not sure why this is -2, should be -1?
+                    self.days.append(Day(day: 0, isToday: false))
+                }
             }
         }
     }
@@ -184,7 +189,7 @@ extension ActivityAssessment.ViewFactory.Month {
                                         day: idx,
                                         isToday: dayComponent == idx && selectorComponents.month == month,
                                         isWeekend: selectorComponents.weekday == 1 || selectorComponents.weekday! == 7,
-                                        assessment: ActivityAssessment(for: date, moc: moc)
+                                        assessment: ActivityAssessment(for: date, moc: moc, searchTerm: searchTerm)
                                     )
                                 )
                             }
@@ -294,6 +299,7 @@ extension ActivityAssessment {
             @Environment(\.managedObjectContext) var moc
             @Binding public var date: Date
             @Binding public var cumulativeScore: Int
+            public var searchTerm: String
             @State private var days: [Day] = []
             @State private var data: ViewFactory.MonthData?
             private var columns: [GridItem] {
