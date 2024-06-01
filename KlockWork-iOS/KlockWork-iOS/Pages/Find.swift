@@ -26,7 +26,7 @@ struct Find: View {
                             onSubmit: self.actionOnSubmit
                         )
                     } else {
-                        Widgets(date: $date)
+                        Widgets(date: $date, text: $text)
                     }
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
@@ -34,7 +34,7 @@ struct Find: View {
                 }
 
                 QueryField(
-                    prompt: "What can I help you find?",
+                    prompt: "Search for keywords or phrases",
                     onSubmit: self.actionOnSubmit,
                     action: .search,
                     text: $text
@@ -47,6 +47,7 @@ struct Find: View {
                     results?.reset()
                 }
             }
+            .scrollDismissesKeyboard(.immediately)
         }
     }
 }
@@ -182,6 +183,7 @@ extension Find {
 
     struct Widgets: View {
         @Binding public var date: Date
+        @Binding public var text: String
         @AppStorage("find.widget.activityCalendar") private var showActivityCalendar: Bool = true
         @AppStorage("find.widget.recent") private var showRecent: Bool = false
         @AppStorage("find.widget.trends") private var showTrends: Bool = false
@@ -189,7 +191,7 @@ extension Find {
         var body: some View {
             NavigationStack {
                 ScrollView {
-                    if showActivityCalendar {ActivityCalendar(date: $date)}
+                    if showActivityCalendar {ActivityCalendar(date: $date, searchTerm: $text)}
                     if showRecent {Rollups()}
                     if showTrends {Trends()}
                 }

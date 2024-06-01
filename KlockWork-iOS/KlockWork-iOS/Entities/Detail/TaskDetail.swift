@@ -82,7 +82,9 @@ struct TaskDetail: View {
                 .listStyle(.grouped)
             }
             .onAppear(perform: actionOnAppear)
-            .navigationTitle("Editing: Task")
+            .navigationTitle("Task")
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 Button("Save") {
 

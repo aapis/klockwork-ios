@@ -29,8 +29,7 @@ struct NoteDetail: View {
         }
         .onAppear(perform: actionOnAppear)
         .navigationTitle(title.capitalized)
-//        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Theme.cPurple, for: .navigationBar)
+        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .background(Theme.cPurple)
         .toolbar {

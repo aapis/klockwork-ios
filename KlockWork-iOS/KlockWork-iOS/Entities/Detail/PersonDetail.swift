@@ -61,7 +61,9 @@ struct PersonDetail: View {
                 .listStyle(.grouped)
             }
             .onAppear(perform: actionOnAppear)
-            .navigationTitle("Editing: Person")
+            .navigationTitle(person.name != nil ? person.name! : "_PERSON")
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 Button("Save") {
 

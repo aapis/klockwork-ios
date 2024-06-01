@@ -23,7 +23,7 @@ struct Tabs: View {
                 }
             MiniTitleBar(selected: $selected)
                 .border(width: 1, edges: [.bottom], color: .yellow)
-            Content(job: $job, selected: $selected, date: $date)
+            Content(inSheet: inSheet, job: $job, selected: $selected, date: $date)
                 .swipe([.left, .right]) { swipe in
                     self.actionOnSwipe(swipe)
                 }
@@ -100,6 +100,7 @@ extension Tabs {
     }
 
     struct Content: View {
+        public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
         @Binding public var date: Date
@@ -107,19 +108,19 @@ extension Tabs {
         var body: some View {
             switch selected {
             case .records:
-                List.Records(job: $job, date: date)
+                List.Records(job: $job, date: date, inSheet: inSheet)
             case .jobs:
-                List.Jobs(job: $job, date: date)
+                List.Jobs(job: $job, date: date, inSheet: inSheet)
             case .tasks:
-                List.Tasks(date: date)
+                List.Tasks(date: date, inSheet: inSheet)
             case .notes:
-                List.Notes(date: date)
+                List.Notes(date: date, inSheet: inSheet)
             case .companies:
-                List.Companies(date: date)
+                List.Companies(date: date, inSheet: inSheet)
             case .people:
-                List.People(date: date)
+                List.People(date: date, inSheet: inSheet)
             case .projects:
-                List.Projects(date: date)
+                List.Projects(date: date, inSheet: inSheet)
             }
         }
     }
@@ -128,6 +129,7 @@ extension Tabs {
 extension Tabs.Content {
     struct List {
         struct Records: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<LogRecord>
             @Binding public var job: Job?
             public var date: Date
@@ -140,7 +142,7 @@ extension Tabs.Content {
                                 Individual.SingleRecord(record: record)
                             }
                         } else {
-                            StatusMessage.Warning(message: "No records found for \(Date().formatted(date: .abbreviated, time: .omitted)).\nAdd one below!")
+                            StatusMessage.Warning(message: "No records found for \(Date().formatted(date: .abbreviated, time: .omitted))")
                         }
                     }
                 }
@@ -149,14 +151,16 @@ extension Tabs.Content {
                 .navigationTitle("Records")
             }
 
-            init(job: Binding<Job?>, date: Date) {
+            init(job: Binding<Job?>, date: Date, inSheet: Bool) {
                 _job = job
                 self.date = date
+                self.inSheet = inSheet
                 _items = CoreDataRecords.fetch(for: self.date)
             }
         }
 
         struct Jobs: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var job: Job?
             public var date: Date
@@ -170,7 +174,11 @@ extension Tabs.Content {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         if items.count > 0 {
                             ForEach(items) { jerb in
-                                Individual.SingleJob(job: jerb, stateJob: $job)
+                                if self.inSheet {
+                                    Individual.SingleJobLink(job: jerb)
+                                } else {
+                                    Individual.SingleJob(job: jerb, stateJob: $job)
+                                }
                             }
                         } else {
                             StatusMessage.Warning(message: "No jobs modified within the last 7 days")
@@ -182,14 +190,16 @@ extension Tabs.Content {
                 .navigationTitle("Jobs")
             }
 
-            init(job: Binding<Job?>, date: Date) {
+            init(job: Binding<Job?>, date: Date, inSheet: Bool) {
                 _job = job
                 self.date = date
+                self.inSheet = inSheet
                 _items = CoreDataJob.fetchRecent(from: date)
             }
         }
 
         struct Tasks: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<LogTask>
             public var date: Date
 
@@ -210,13 +220,15 @@ extension Tabs.Content {
                 .navigationTitle("Tasks")
             }
 
-            init(date: Date) {
+            init(date: Date, inSheet: Bool) {
                 self.date = date
+                self.inSheet = inSheet
                 _items = CoreDataTasks.fetch(for: self.date)
             }
         }
 
         struct Notes: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Note>
             public var date: Date
 
@@ -237,13 +249,15 @@ extension Tabs.Content {
                 .navigationTitle("Notes")
             }
 
-            init(date: Date) {
+            init(date: Date, inSheet: Bool) {
                 self.date = date
+                self.inSheet = inSheet
                 _items = CoreDataNotes.fetch(for: self.date)
             }
         }
 
         struct Companies: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Company>
             public var date: Date
 
@@ -264,13 +278,15 @@ extension Tabs.Content {
                 .navigationTitle("Companies")
             }
 
-            init(date: Date) {
+            init(date: Date, inSheet: Bool) {
                 self.date = date
+                self.inSheet = inSheet
                 _items = CoreDataCompanies.fetch(for: self.date)
             }
         }
 
         struct People: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Person>
             public var date: Date
 
@@ -291,13 +307,15 @@ extension Tabs.Content {
                 .navigationTitle("People")
             }
 
-            init(date: Date) {
+            init(date: Date, inSheet: Bool) {
                 self.date = date
+                self.inSheet = inSheet
                 _items = CoreDataPerson.fetch(for: self.date)
             }
         }
 
         struct Projects: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Project>
             public var date: Date
 
@@ -318,8 +336,9 @@ extension Tabs.Content {
                 .navigationTitle("Projects")
             }
 
-            init(date: Date) {
+            init(date: Date, inSheet: Bool) {
                 self.date = date
+                self.inSheet = inSheet
                 _items = CoreDataProjects.fetch(for: self.date)
             }
         }

@@ -54,10 +54,12 @@ struct QueryField: View {
                     }
                 } label: {
                     if action == .search {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(text.isEmpty ? .gray : .yellow)
+                        if !text.isEmpty {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.yellow)
+                        }
                     } else {
-                        Image(systemName: "arrow.up")
+                        Image(systemName: "arrow.up.circle.fill")
                             .foregroundStyle(text.isEmpty ? .gray : .yellow)
                     }
                 }
