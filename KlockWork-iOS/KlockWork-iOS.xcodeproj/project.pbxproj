@@ -52,6 +52,8 @@
 		53D4CBC62BFE94C900AFEDEA /* CustomPickerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC42BFE94C900AFEDEA /* CustomPickerItem.swift */; };
 		53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBC92BFE955000AFEDEA /* SaveSource.swift */; };
 		53E3A2672C06B4DA004A85C3 /* Trends.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3A2662C06B4DA004A85C3 /* Trends.swift */; };
+		53E3A26B2C098A50004A85C3 /* CDAssessmentFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3A26A2C098A50004A85C3 /* CDAssessmentFactor.swift */; };
+		53E3A26E2C098DA8004A85C3 /* AssessmentFactorForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3A26D2C098DA8004A85C3 /* AssessmentFactorForm.swift */; };
 		53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */; };
 		53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
 		53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
@@ -140,6 +142,8 @@
 		53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		53D4CBCE2BFE97CC00AFEDEA /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
 		53E3A2662C06B4DA004A85C3 /* Trends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trends.swift; sourceTree = "<group>"; };
+		53E3A26A2C098A50004A85C3 /* CDAssessmentFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CDAssessmentFactor.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CDAssessmentFactor.swift; sourceTree = "<group>"; };
+		53E3A26D2C098DA8004A85C3 /* AssessmentFactorForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentFactorForm.swift; sourceTree = "<group>"; };
 		53F9261F2BFEA00E00948076 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Project.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Project.swift; sourceTree = "<group>"; };
 		53F926202BFEA00E00948076 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Job.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Job.swift; sourceTree = "<group>"; };
 		53F926212BFEA00E00948076 /* EKEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EKEvent.swift; path = ../../DLPrototype/DLPrototype/Extensions/EKEvent.swift; sourceTree = "<group>"; };
@@ -210,6 +214,7 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				53E3A26A2C098A50004A85C3 /* CDAssessmentFactor.swift */,
 				539134F92C03A38500B48494 /* SearchLanguage.swift */,
 				537582D02C00332600CB528C /* FancyGenericToolbar.swift */,
 				537582CD2BFFEB7500CB528C /* EdgeBorder.swift */,
@@ -257,6 +262,7 @@
 		53D4CB552BFE930100AFEDEA /* KlockWork-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				53E3A26F2C098DEE004A85C3 /* Forms */,
 				532441692C05354A00659F14 /* Extensions */,
 				539135012C03EF0300B48494 /* Libraries */,
 				539134E82C0269A200B48494 /* SharedEnums */,
@@ -332,6 +338,14 @@
 			path = ../../DLPrototype/DLPrototype/CoreData;
 			sourceTree = "<group>";
 		};
+		53E3A26F2C098DEE004A85C3 /* Forms */ = {
+			isa = PBXGroup;
+			children = (
+				53E3A26D2C098DA8004A85C3 /* AssessmentFactorForm.swift */,
+			);
+			path = Forms;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -402,6 +416,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53E3A26B2C098A50004A85C3 /* CDAssessmentFactor.swift in Sources */,
 				539134FA2C03A38500B48494 /* SearchLanguage.swift in Sources */,
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
 				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
@@ -431,6 +446,7 @@
 				53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */,
 				53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */,
 				53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */,
+				53E3A26E2C098DA8004A85C3 /* AssessmentFactorForm.swift in Sources */,
 				537582D52C0033B800CB528C /* Tabs.swift in Sources */,
 				53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */,
 				539134F02C02C44000B48494 /* Swipe.swift in Sources */,

@@ -20,10 +20,22 @@ public class ActivityAssessment {
     private var jobsReferenced: Int {CoreDataRecords(moc: self.moc).countJobs(for: self.date)}
     private var notesReferenced: Int {CoreDataNotes(moc: self.moc).countByDate(for: self.date)}
     private var tasksReferenced: Int {CoreDataTasks(moc: self.moc).countByDate(for: self.date)}
+    private var assessables: [AssessmentFactor] = []
 
     init(for date: Date, moc: NSManagedObjectContext) {
         self.date = date
         self.moc = moc
+
+        // @TODO: REMOVE ME! DELETES ALL AF'S!
+//        for ass in CDAssessmentFactor(moc: self.moc).all() {
+//            self.moc.delete(ass)
+//        }
+        self.assessables = CDAssessmentFactor(moc: self.moc).all(for: self.date)
+
+        if self.assessables.isEmpty {
+            self.createDefaultAssessments()
+        }
+
         self.perform()
     }
 }
@@ -33,22 +45,14 @@ extension ActivityAssessment {
     /// Perform the assessment by iterating over all the things and calculating the score
     /// - Returns: Void
     private func perform() -> Void {
-        let assessables: [AssessmentFactor] = [
-            AssessmentFactor(count: self.jobsCreated, date: self.date, description: "\(jobsCreated) new job(s)"),
-            AssessmentFactor(count: self.records, date: self.date, description: "\(records) new record(s)"),
-            AssessmentFactor(count: self.jobsReferenced, weight: 2, date: self.date, description: "\(jobsReferenced) job interaction(s)"),
-            AssessmentFactor(count: self.notesReferenced, date: self.date, description: "\(notesReferenced) note interaction(s)"),
-            AssessmentFactor(count: self.tasksReferenced, date: self.date, description: "\(tasksReferenced) task interaction(s)"),
-        ]
-
-        assessables.forEach { factor in
-            let weighted = (factor.count * factor.weight)
+        for factor in self.assessables {
+            let weighted = Int64(factor.count * factor.weight)
 
             if weighted > 0 {
                 // record the reason for this score increase
                 self.factors.append(factor)
                 // calculate score
-                self.score += weighted
+                self.score += Int(weighted)
             }
         }
 
@@ -60,7 +64,7 @@ extension ActivityAssessment {
     private func determineWeight() -> Void {
         if self.score == 0 {
             self.weight = .empty
-        } else if self.score > 0 && self.score < 5 {
+        } else if self.score > 1 && self.score < 5 {
             self.weight = .light
         } else if self.score >= 5 && self.score < 10 {
             self.weight = .medium
@@ -69,6 +73,48 @@ extension ActivityAssessment {
         } else {
             self.weight = .significant
         }
+    }
+
+    /// Creates new AssessmentFactor objects
+    /// - Returns: Void
+    private func createDefaultAssessments() -> Void {
+        let defaultAssesssments: [AssessmentFactor] = [
+            self.createAssessment(count: Int64(self.jobsCreated), date: self.date, desc: "\(jobsCreated) new job(s)"),
+            self.createAssessment(count: Int64(self.records), date: self.date, desc: "\(records) new record(s)"),
+            self.createAssessment(count: Int64(self.jobsReferenced), weight: 2, date: self.date, desc: "\(jobsReferenced) job interaction(s)"),
+            self.createAssessment(count: Int64(self.notesReferenced), date: self.date, desc: "\(notesReferenced) note interaction(s)"),
+            self.createAssessment(count: Int64(self.tasksReferenced), date: self.date, desc: "\(tasksReferenced) task interaction(s)")
+        ]
+
+        for ass in defaultAssesssments {
+            do {
+                try ass.validateForInsert()
+
+                PersistenceController.shared.save()
+            } catch {
+                print("[error] ActivityAssessment Failed to create default assessments due to \(error) saving \(ass)")
+            }
+        }
+    }
+
+    /// Creates a new AssessmentFactor object
+    /// - Parameters:
+    ///   - count: Int64
+    ///   - date: Date
+    ///   - desc: String
+    /// - Returns: AssessmentFactor
+    fileprivate func createAssessment(count: Int64, weight: Int = 1, date: Date, desc: String) -> AssessmentFactor {
+        let factor = AssessmentFactor(context: self.moc)
+        factor.id = UUID()
+        factor.alive = true
+        factor.count = count
+        factor.desc = desc
+        factor.date = date
+        factor.created = Date()
+        factor.lastUpdate = Date()
+        factor.weight = Int64(weight)
+
+        return factor
     }
 }
 
@@ -79,7 +125,7 @@ extension ActivityAssessment.ViewFactory.Month {
     private func actionOnAppear() -> Void {
         self.cumulativeScore = 0
 
-        if days.isEmpty {
+        if self.days.isEmpty {
             self.createTiles()
             self.calculateCumulativeScore()
         }
@@ -239,17 +285,7 @@ extension ActivityAssessment {
             }
         }
     }
-    
-    /// Define assessment factors to customize how you generate score
-    /// @TODO: would be cool if this were user customizable
-    public struct AssessmentFactor: Identifiable {
-        public var id: UUID = UUID()
-        var count: Int
-        var weight: Int = 1
-        var date: Date
-        var description: String
-    }
-    
+
     /// Create prebuilt views
     struct ViewFactory {
         struct Month: View {
@@ -259,10 +295,10 @@ extension ActivityAssessment {
             @Binding public var date: Date
             @Binding public var cumulativeScore: Int
             @State private var days: [Day] = []
+            @State private var data: ViewFactory.MonthData?
             private var columns: [GridItem] {
                 return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
             }
-            @State private var data: ViewFactory.MonthData?
 
             var body: some View {
                 GridRow {

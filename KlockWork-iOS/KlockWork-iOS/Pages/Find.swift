@@ -87,7 +87,6 @@ extension Find {
                 .mask(Circle())
                 .sheet(isPresented: $isPresented) {
                     Find.FilterPanel(text: $text, recentSearchTerms: $recentSearchTerms, isPresented: $isPresented, onSubmit: self.onSubmit)
-                        .presentationDetents([.height(200), .height(400)])
                 }
             }
             .padding()

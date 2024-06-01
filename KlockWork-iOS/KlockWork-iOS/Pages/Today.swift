@@ -46,6 +46,8 @@ struct Today: View {
             .background(Theme.cPurple)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(inSheet ? .visible : .hidden)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
     }
 }

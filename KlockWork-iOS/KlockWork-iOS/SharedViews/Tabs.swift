@@ -18,34 +18,43 @@ struct Tabs: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Buttons(inSheet: inSheet, job: $job, selected: $selected)
+                .swipe([.left, .right]) { swipe in
+                    self.actionOnSwipe(swipe)
+                }
             MiniTitleBar(selected: $selected)
                 .border(width: 1, edges: [.bottom], color: .yellow)
             Content(job: $job, selected: $selected, date: $date)
                 .swipe([.left, .right]) { swipe in
-                    let tabs = EntityType.allCases
-                    if var selectedIndex = tabs.firstIndex(of: selected) {
-                        if swipe == .left {
-                            if selectedIndex <= tabs.count - 2 {
-                                selectedIndex += 1
-                                selected = tabs[selectedIndex]
-                            } else {
-                                selected = tabs[0]
-                            }
-                        } else if swipe == .right {
-                            if selectedIndex > 0 && selectedIndex <= tabs.count {
-                                selectedIndex -= 1
-                                selected = tabs[selectedIndex]
-                            } else {
-                                selected = tabs[tabs.count - 1]
-                            }
-                        }
-                    }
+                    self.actionOnSwipe(swipe)
                 }
         }
         .background(.clear)
         .onChange(of: job) {
             withAnimation(.easeIn(duration: Tabs.animationDuration)) {
                 selected = .records
+            }
+        }
+    }
+}
+
+extension Tabs {
+    public func actionOnSwipe(_ swipe: Swipe) -> Void {
+        let tabs = EntityType.allCases
+        if var selectedIndex = tabs.firstIndex(of: selected) {
+            if swipe == .left {
+                if selectedIndex <= tabs.count - 2 {
+                    selectedIndex += 1
+                    self.selected = tabs[selectedIndex]
+                } else {
+                    self.selected = tabs[0]
+                }
+            } else if swipe == .right {
+                if selectedIndex > 0 && selectedIndex <= tabs.count {
+                    selectedIndex -= 1
+                    self.selected = tabs[selectedIndex]
+                } else {
+                    self.selected = tabs[tabs.count - 1]
+                }
             }
         }
     }

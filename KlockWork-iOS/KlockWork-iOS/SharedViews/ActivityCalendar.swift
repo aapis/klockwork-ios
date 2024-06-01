@@ -44,7 +44,7 @@ struct ActivityCalendar: View {
     }
 
     var body: some View {
-        Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
+        Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 0) {
             GridRow(alignment: .center) {
                 Button {
                     self.open.toggle()
@@ -54,13 +54,21 @@ struct ActivityCalendar: View {
                             .font(.title)
                             .fontWeight(.bold)
                         Spacer()
-                        Image(systemName: self.open ? "chevron.up" : "chevron.down")
+                        Image(systemName: self.open ? "minus" : "plus")
                     }
                     .padding()
                     .background(Theme.rowColour)
-                    .border(width: 1, edges: [.bottom], color: Theme.rowColour)
                 }
             }
+//            .border(width: 1, edges: [.bottom], color: .gray)
+            .clipShape(
+                .rect(
+                    topLeadingRadius: 16,
+                    bottomLeadingRadius: self.open ? 0 : 16,
+                    bottomTrailingRadius: self.open ? 0 : 16,
+                    topTrailingRadius: 16
+                )
+            )
 
             if self.open {
                 // Month row
@@ -101,32 +109,41 @@ struct ActivityCalendar: View {
                             .background(Theme.rowColour)
                             .mask(Capsule(style: .continuous))
                     }
+                    .padding()
                 }
-                .padding([.top, .leading, .trailing])
+                .border(width: 1, edges: [.bottom], color: Theme.cGreen)
+                .background(Theme.rowColour)
 
                 // Day of week
                 GridRow {
-                    LazyVGrid(columns: self.columns, alignment: .center) {
-                        ForEach(weekdays) {sym in
-                            Text(sym.symbol)
+                    ZStack(alignment: .bottomLeading) {
+                        LinearGradient(colors: [.white, .clear], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 50)
+                            .opacity(0.05)
+                        LazyVGrid(columns: self.columns, alignment: .center) {
+                            ForEach(weekdays) {sym in
+                                Text(sym.symbol)
+                            }
+                            .font(.caption)
                         }
-                        .font(.caption)
+                        .padding([.leading, .trailing, .top])
+                        .padding(.bottom, 5)
                     }
                 }
-                .padding([.leading, .trailing, .top])
-                .padding(.bottom, 5)
-                .border(width: 1, edges: [.bottom], color: Theme.rowColour)
+                .background(Theme.rowColour)
+
 
                 // Days
                 ActivityAssessment.ViewFactory.Month(date: $date, cumulativeScore: $cumulativeScore)
                     .environment(\.managedObjectContext, moc)
+                    .background(Theme.rowColour)
 
                 // Legend
                 Legend()
+                    .border(width: 1, edges: [.top], color: .gray.opacity(0.7))
             }
         }
-        .background(Theme.rowColour)
-        .border(width: 1, edges: [.bottom, .trailing], color: .black.opacity(0.2))
+        .background(Theme.cGreen)
         .onAppear(perform: actionOnAppear)
         .onChange(of: self.date) { self.actionOnAppear()}
         // @TODO: swipe between months
@@ -162,7 +179,7 @@ extension ActivityCalendar.Day {
             } else {
                 if isWeekend! {
                     // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
-                    if ![.light, .empty].contains(assessment!.weight) {
+                    if ![.empty].contains(assessment!.weight) {
                         bgColour = .red
                     } else {
                         bgColour = .clear
@@ -234,35 +251,36 @@ extension ActivityCalendar {
             NavigationStack {
                 VStack(alignment: .leading, spacing: 20) {
                     if let ass = assessment {
-                        HStack(alignment: .top) {
-                            Spacer()
-                            NavigationLink {
-                                Today(inSheet: true, date: $assessmentDate)
-                            } label: {
-                                HStack(spacing: 5) {
-                                    Image(systemName: "tray")
-                                    Text("Show")
-                                }
-                            }
-                            .foregroundStyle(.yellow)
-                            .padding([.leading, .trailing])
-                            .padding([.top, .bottom], 8)
-                            .background(Theme.rowColour)
-                            .mask(Capsule(style: .continuous))
-                        }
-                        Divider().background(.gray)
-
                         VStack(alignment: .leading, spacing: 0) {
-                            AssessmentOverviewWidget(assessment: ass)
-                                .navigationTitle(ass.date.formatted(date: .abbreviated, time: .omitted))
-                        }
+                            Divider().background(.gray).frame(height: 1)
+                            ZStack(alignment: .topLeading) {
+                                AssessmentOverviewWidget(assessment: ass)
+                                    .navigationTitle(ass.date.formatted(date: .abbreviated, time: .omitted))
+                                    .toolbarTitleDisplayMode(.inline)
+                                    .toolbar {
+                                        NavigationLink {
+                                            Today(inSheet: true, date: $assessmentDate)
+                                        } label: {
+                                            HStack(alignment: .top, spacing: 5) {
+                                                Text("Details")
+                                                Image(systemName: "chevron.right")
+                                            }
+                                        }
+                                    }
+                                    .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                                    .toolbarBackground(.visible, for: .navigationBar)
 
+                                LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                                    .frame(height: 50)
+                                    .opacity(0.1)
+                            }
+                        }
                     }
+                    Spacer()
                 }
-                .padding([.leading, .trailing])
             }
             .onAppear(perform: self.actionOnAppear)
-            .presentationDetents([.medium])
+            .presentationDetents([.medium, .large])
             .presentationBackground(Theme.cGreen)
         }
     }
@@ -280,7 +298,8 @@ extension ActivityCalendar {
                             Spacer()
 
                             NavigationLink {
-                                AppSettings()
+                                AssessmentFactorForm(assessment: self.assessment)
+                                    .toolbarTitleDisplayMode(.inline)
                             } label: {
                                 HStack {
                                     Spacer()
@@ -328,8 +347,12 @@ extension ActivityCalendar {
                                 HStack {
                                     VStack(alignment: .leading) {
                                         ForEach(assessment.factors) { factor in
-                                            Text(factor.description.uppercased())
-                                                .font(.caption)
+                                            if let desc = factor.desc { // @TODO: make this work with AssessmentFactor again...
+//                                                Text(factor.description.uppercased())
+//                                                    .font(.caption)
+                                                Text(desc.uppercased())
+                                                    .font(.caption)
+                                            }
                                         }
                                     }
                                     Spacer()
@@ -343,6 +366,7 @@ extension ActivityCalendar {
                 .background(Theme.textBackground)
                 .clipShape(.rect(cornerRadius: 16))
             }
+            .padding()
         }
     }
 
