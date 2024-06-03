@@ -9,34 +9,45 @@
 import SwiftUI
 
 struct Today: View {
+    public var inSheet: Bool
+    @Binding public var date: Date
     @Environment(\.managedObjectContext) var moc
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
-    @State private var date: Date = Date()
 
     private var idate: IdentifiableDay {
-        DateHelper.identifiedDate(for: date, moc: moc)
+        return DateHelper.identifiedDate(for: date, moc: moc)
     }
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                Header(job: $job, date: $date, idate: idate)
+                if !inSheet {
+                    Header(job: $job, date: $date, idate: idate)
+                }
+
                 ZStack(alignment: .bottomLeading) {
-                    Tabs(job: $job, selected: $selected, date: $date)
-                    LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
-                        .frame(height: 50)
-                        .opacity(0.1)
+                    Tabs(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                    if !inSheet {
+                        LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
+                            .frame(height: 50)
+                            .opacity(0.1)
+                    }
                 }
 
-                if selected == .records {
-                    Editor(job: $job, entityType: $selected)
-                }
+                if !inSheet {
+                    if selected == .records {
+                        Editor(job: $job, entityType: $selected, date: $date)
+                    }
 
-                Spacer()
-                .frame(height: 1)
+                    Spacer().frame(height: 1)
+                }
             }
             .background(Theme.cPurple)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(inSheet ? .visible : .hidden)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
     }
 }
@@ -50,7 +61,7 @@ extension Today {
         var body: some View {
             HStack(alignment: .center) {
                 HStack(alignment: .center, spacing: 8) {
-                    Text(self.isCurrentDay(idate) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
+                    Text(DateHelper.isCurrentDay(idate) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .padding([.leading, .top, .bottom])
@@ -90,81 +101,29 @@ extension Today {
     }
 
     struct Editor: View {
-        enum Field {
-            // Apparently you need to use an existing UITextContentType
-            case organizationName
-        }
-
+        @Environment(\.managedObjectContext) var moc
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
-        @Environment(\.managedObjectContext) var moc
+        @Binding public var date: Date
         @State private var text: String = ""
-        @FocusState public var focused: Field?
-
+        
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 0) {
-                    if job == nil {
-                        HStack {
-                            Button {
-                                entityType = .jobs
-                            } label: {
-                                Text("Select a job")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundStyle(.yellow)
-                            }
-                        }
-                        .padding()
-                    } else {
-                        TextField(
-                            "",
-                            text: $text,
-                            prompt: Text("What are you working on?").foregroundStyle(.gray),
-                            axis: .horizontal
-                        )
-                        .disableAutocorrection(false)
-                        .focused($focused, equals: .organizationName)
-                        .disabled(job == nil)
-                        .textContentType(.organizationName)
-                        .submitLabel(.return)
-                        .textSelection(.enabled)
-                        .padding()
-
-                        Spacer()
-
-                        Button {
-                            if !text.isEmpty {
-                                self.actionOnSubmit()
-                            }
-                        } label: {
-                            Image(systemName: "arrow.up")
-                                .foregroundStyle(text.isEmpty ? .gray : .yellow)
-                        }
-                        .padding(.trailing)
-                    }
-                }
-                .border(width: 1, edges: [.top], color: job != nil && text.isEmpty ? .gray : .yellow)
+            if job == nil {
+                QueryFieldSelectJob(
+                    prompt: "What are you working on?",
+                    onSubmit: self.actionOnSubmit,
+                    text: $text,
+                    job: $job,
+                    entityType: $entityType
+                )
+            } else {
+                QueryField(
+                    prompt: "What are you working on?",
+                    onSubmit: self.actionOnSubmit,
+                    text: $text
+                )
             }
-            .onSubmit(self.actionOnSubmit)
         }
-    }
-}
-
-extension Today.Header {
-    /// Checks to see if the selected date is the current day
-    /// - Parameter day: IdentifiableDay
-    /// - Returns: Bool
-    private func isCurrentDay(_ day: IdentifiableDay) -> Bool {
-        let currentDay = Date.now.timeIntervalSince1970
-        if let date = day.date {
-            let rowDay = date.timeIntervalSince1970
-            let window = (currentDay - 86400, currentDay + 84600)
-
-            return rowDay > window.0 && rowDay <= window.1
-        }
-
-        return false
     }
 }
 
@@ -173,8 +132,8 @@ extension Today.Editor {
     /// - Returns: Void
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
-            if let job = CoreDataJob(moc: moc).byId(33.0) {
-                let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: Date(), text: text)
+            if let job = self.job {
+                let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: date, text: text)
                 text = ""
             }
         }

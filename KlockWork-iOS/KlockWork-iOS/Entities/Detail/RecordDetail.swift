@@ -32,12 +32,11 @@ struct RecordDetail: View {
                 .listRowBackground(Theme.textBackground)
             }
             .listStyle(.grouped)
-            .background(Theme.cPurple)
             Spacer()
         }
         .onAppear(perform: actionOnAppear)
-        .navigationTitle("Editing: Record")
-        .toolbarBackground(Theme.cPurple, for: .navigationBar)
+        .navigationTitle(message.count >= 10 ? "\(message.prefix(10).capitalized)..." : message.capitalized)
+        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             Button("Save") {

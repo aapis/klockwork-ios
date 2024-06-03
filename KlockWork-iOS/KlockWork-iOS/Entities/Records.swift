@@ -1,16 +1,15 @@
 //
-//  Jobs.swift
-//  KlockWorkiOS
+//  Records.swift
+//  KlockWork-iOS
 //
-//  Created by Ryan Priebe on 2024-05-22.
-//  Copyright © 2024 YegCollective. All rights reserved.
+//  Created by Ryan Priebe on 2024-05-26.
 //
 
 import SwiftUI
 
-struct Jobs: View {
-    private let entityType: EntityType = .jobs
-    @State public var items: [Job] = []
+struct Records: View {
+    private let entityType: EntityType = .records
+    @State public var items: [LogRecord] = []
 
     @Environment(\.managedObjectContext) var moc
 
@@ -18,7 +17,7 @@ struct Jobs: View {
         NavigationStack {
             List {
                 Section {
-                    SearchBar(placeholder: "Job name or ID", items: items, type: entityType)
+                    SearchBar(placeholder: "Today I...", items: items, type: entityType)
                         .listRowBackground(Theme.textBackground)
                 }
 
@@ -26,35 +25,33 @@ struct Jobs: View {
                     if items.count > 0 {
                         ForEach(items) { item in
                             NavigationLink {
-                                JobDetail(job: item)
+                                RecordDetail(record: item)
                                     .background(Theme.cGreen)
                                     .scrollContentBackground(.hidden)
                             } label: {
-                                Text(item.title != nil ? item.title!.isEmpty ? item.jid.string : item.title!.capitalized : item.jid.string)
+                                Text(item.message!)
                             }
                         }
                         .onDelete(perform: deleteItems)
                         .listRowBackground(Theme.textBackground)
                     } else {
                         Button(action: addItem) {
-                            Text("No jobs found. Create one!")
+                            Text("No people found. Create one!")
                         }
                         .listRowBackground(Theme.textBackground)
                     }
                 }
+
             }
             .onAppear(perform: {
-                items = CoreDataJob(moc: moc).all(true)
+                items = CoreDataRecords(moc: moc).recent(3)
             })
             .background(Theme.cGreen)
             .scrollContentBackground(.hidden)
             .toolbarBackground(Theme.cGreen, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
                 ToolbarItem {
-                    Button(action: addItem) {
+                    Button(action: {}/*addItem*/) {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
@@ -63,7 +60,7 @@ struct Jobs: View {
     }
 }
 
-extension Jobs {
+extension Records {
     private func addItem() {
         withAnimation {
             let newItem = Item(timestamp: Date())
@@ -79,4 +76,3 @@ extension Jobs {
         }
     }
 }
-

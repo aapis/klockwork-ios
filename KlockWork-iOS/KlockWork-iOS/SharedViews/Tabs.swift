@@ -8,38 +8,31 @@
 import SwiftUI
 
 struct Tabs: View {
+    public var inSheet: Bool
     @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
     @Binding public var selected: EntityType
     @Binding public var date: Date
+    public var content: AnyView? = nil
     static public let animationDuration: Double = 0.2
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Buttons(job: $job, selected: $selected)
-            TitleBar(selected: $selected)
-                .border(width: 1, edges: [.bottom], color: .yellow)
-            Content(job: $job, selected: $selected, date: $date)
+            Buttons(inSheet: inSheet, job: $job, selected: $selected)
                 .swipe([.left, .right]) { swipe in
-                    let tabs = EntityType.allCases
-                    if var selectedIndex = tabs.firstIndex(of: selected) {
-                        if swipe == .left {
-                            if selectedIndex <= tabs.count - 2 {
-                                selectedIndex += 1
-                                selected = tabs[selectedIndex]
-                            } else {
-                                selected = tabs[0]
-                            }
-                        } else if swipe == .right {
-                            if selectedIndex > 0 && selectedIndex <= tabs.count {
-                                selectedIndex -= 1
-                                selected = tabs[selectedIndex]
-                            } else {
-                                selected = tabs[tabs.count - 1]
-                            }
-                        }
-                    }
+                    self.actionOnSwipe(swipe)
                 }
+            MiniTitleBar(selected: $selected)
+                .border(width: 1, edges: [.bottom], color: .yellow)
+            
+            if content == nil {
+                Content(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                    .swipe([.left, .right]) { swipe in
+                        self.actionOnSwipe(swipe)
+                    }
+            } else {
+                content
+            }
         }
         .background(.clear)
         .onChange(of: job) {
@@ -51,7 +44,31 @@ struct Tabs: View {
 }
 
 extension Tabs {
+    public func actionOnSwipe(_ swipe: Swipe) -> Void {
+        let tabs = EntityType.allCases
+        if var selectedIndex = tabs.firstIndex(of: selected) {
+            if swipe == .left {
+                if selectedIndex <= tabs.count - 2 {
+                    selectedIndex += 1
+                    self.selected = tabs[selectedIndex]
+                } else {
+                    self.selected = tabs[0]
+                }
+            } else if swipe == .right {
+                if selectedIndex > 0 && selectedIndex <= tabs.count {
+                    selectedIndex -= 1
+                    self.selected = tabs[selectedIndex]
+                } else {
+                    self.selected = tabs[tabs.count - 1]
+                }
+            }
+        }
+    }
+}
+
+extension Tabs {
     struct Buttons: View {
+        public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
 
@@ -74,8 +91,8 @@ extension Tabs {
                                 page.icon
                                     .frame(maxHeight: 20)
                                 .padding(14)
-                                .background(job == nil ? .red : page == selected ? .white : .clear)
-                                .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? .white : .gray)
+                                .background(job == nil && !inSheet ? .red : page == selected ? .white : .clear) // sorry
+                                .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? (inSheet ? .gray : .white) : .gray) // sorry
                             }
                         }
                         .buttonStyle(.plain)
@@ -84,10 +101,12 @@ extension Tabs {
                 Spacer()
             }
             .background(Theme.textBackground)
+            .frame(height: 50)
         }
     }
 
     struct Content: View {
+        public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
         @Binding public var date: Date
@@ -95,35 +114,20 @@ extension Tabs {
         var body: some View {
             switch selected {
             case .records:
-                List.Records(job: $job, date: date)
+                List.Records(job: $job, date: date, inSheet: inSheet)
             case .jobs:
-                List.Jobs(job: $job)
+                List.Jobs(job: $job, date: date, inSheet: inSheet)
             case .tasks:
-                List.Tasks()
+                List.Tasks(date: date, inSheet: inSheet)
             case .notes:
-                List.Notes()
+                List.Notes(date: date, inSheet: inSheet)
             case .companies:
-                List.Companies()
+                List.Companies(date: date, inSheet: inSheet)
             case .people:
-                List.People()
+                List.People(date: date, inSheet: inSheet)
             case .projects:
-                List.Projects()
+                List.Projects(date: date, inSheet: inSheet)
             }
-        }
-    }
-
-    struct TitleBar: View {
-        @Binding public var selected: EntityType
-
-        var body: some View {
-            HStack(alignment: .center, spacing: 0) {
-                Text(selected.label.uppercased())
-                    .font(.caption)
-                Spacer()
-            }
-            .padding(5)
-            .background(Theme.darkBtnColour)
-            .foregroundStyle(.gray)
         }
     }
 }
@@ -131,8 +135,8 @@ extension Tabs {
 extension Tabs.Content {
     struct List {
         struct Records: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<LogRecord>
-
             @Binding public var job: Job?
             public var date: Date
 
@@ -144,24 +148,28 @@ extension Tabs.Content {
                                 Individual.SingleRecord(record: record)
                             }
                         } else {
-                            StatusMessage.Warning(message: "No records found for \(Date().formatted(date: .abbreviated, time: .omitted)).\nAdd one below!")
+                            StatusMessage.Warning(message: "No records found for \(date.formatted(date: .abbreviated, time: .omitted))")
                         }
                     }
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Records")
             }
 
-            init(job: Binding<Job?>, date: Date) {
+            init(job: Binding<Job?>, date: Date, inSheet: Bool) {
                 _job = job
                 self.date = date
-                _items = CoreDataRecords.fetchForDate(self.date)
+                self.inSheet = inSheet
+                _items = CoreDataRecords.fetch(for: self.date)
             }
         }
 
         struct Jobs: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var job: Job?
+            public var date: Date
 
             private var columns: [GridItem] {
                 return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
@@ -172,7 +180,11 @@ extension Tabs.Content {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         if items.count > 0 {
                             ForEach(items) { jerb in
-                                Individual.SingleJob(job: jerb, stateJob: $job)
+                                if self.inSheet {
+                                    Individual.SingleJobLink(job: jerb)
+                                } else {
+                                    Individual.SingleJob(job: jerb, stateJob: $job)
+                                }
                             }
                         } else {
                             StatusMessage.Warning(message: "No jobs modified within the last 7 days")
@@ -181,16 +193,21 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Jobs")
             }
 
-            init(job: Binding<Job?>) {
+            init(job: Binding<Job?>, date: Date, inSheet: Bool) {
                 _job = job
-                _items = CoreDataJob.fetchRecent()
+                self.date = date
+                self.inSheet = inSheet
+                _items = CoreDataJob.fetchRecent(from: date)
             }
         }
 
         struct Tasks: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<LogTask>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -206,15 +223,20 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Tasks")
             }
 
-            init() {
-                _items = CoreDataTasks.fetchRecent()
+            init(date: Date, inSheet: Bool) {
+                self.date = date
+                self.inSheet = inSheet
+                _items = CoreDataTasks.fetch(for: self.date)
             }
         }
 
         struct Notes: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Note>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -230,15 +252,20 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Notes")
             }
 
-            init() {
-                _items = CoreDataNotes.fetchRecentNotes()
+            init(date: Date, inSheet: Bool) {
+                self.date = date
+                self.inSheet = inSheet
+                _items = CoreDataNotes.fetch(for: self.date)
             }
         }
 
         struct Companies: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Company>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -254,15 +281,20 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Companies")
             }
 
-            init() {
-                _items = CoreDataCompanies.fetchRecent()
+            init(date: Date, inSheet: Bool) {
+                self.date = date
+                self.inSheet = inSheet
+                _items = CoreDataCompanies.fetch(for: self.date)
             }
         }
 
         struct People: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Person>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -278,15 +310,20 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("People")
             }
 
-            init() {
-                _items = CoreDataPerson.fetchRecent()
+            init(date: Date, inSheet: Bool) {
+                self.date = date
+                self.inSheet = inSheet
+                _items = CoreDataPerson.fetch(for: self.date)
             }
         }
 
         struct Projects: View {
+            public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Project>
+            public var date: Date
 
             var body: some View {
                 ScrollView {
@@ -302,10 +339,13 @@ extension Tabs.Content {
                 }
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+                .navigationTitle("Projects")
             }
 
-            init() {
-                _items = CoreDataProjects.fetchProjects()
+            init(date: Date, inSheet: Bool) {
+                self.date = date
+                self.inSheet = inSheet
+                _items = CoreDataProjects.fetch(for: self.date)
             }
         }
     }
@@ -322,22 +362,15 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    VStack(alignment: .leading) {
-                        HStack(alignment: .top, spacing: 5) {
-                            Text(record.message!)
-                                .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .white)
-                                .multilineTextAlignment(.leading)
-                            Spacer()
+                    ListRow(
+                        name: record.message ?? "_RECORD_CONTENT",
+                        colour: record.job != nil ? record.job!.backgroundColor : Theme.rowColour,
+                        extraColumn: AnyView(
                             Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
                                 .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
-
-                        }
-                        .padding(8)
-                        .background(record.job!.backgroundColor)
-                        .listRowBackground(record.job!.backgroundColor)
-                    }
+                        ),
+                        highlight: false
+                    )
                 }
             }
         }
@@ -350,20 +383,28 @@ extension Tabs.Content {
                 Button {
                     stateJob = job
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(job.title ?? job.jid.string)
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Text("Set")
-                            .foregroundStyle(job.backgroundColor.isBright() ? .black : .gray)
-                    }
-                    .padding(8)
-                    .background(job.backgroundColor)
-                    .listRowBackground(job.backgroundColor)
+                    ListRow(
+                        name: job.title ?? job.jid.string,
+                        colour: job.backgroundColor
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleJobLink: View {
+            public let job: Job
+
+            var body: some View {
+                NavigationLink {
+                    JobDetail(job: job)
+                        .background(Theme.cPurple)
+                        .scrollContentBackground(.hidden)
+                } label: {
+                    ListRow(
+                        name: job.title ?? job.jid.string,
+                        colour: job.backgroundColor
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -378,20 +419,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(task.content ?? "_TASK_CONTENT")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(task.owner != nil ? task.owner!.backgroundColor.isBright() ? .black : .gray : .gray)
-                    }
-                    .padding(8)
-                    .background(task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour)
-                    .listRowBackground(task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour)
+                    ListRow(
+                        name: task.content ?? "_TASK_CONTENT",
+                        colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -406,20 +437,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(note.title ?? "_NOTE_TITLE")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(note.mJob != nil ? note.mJob!.backgroundColor.isBright() ? .black : .gray : .gray)
-                    }
-                    .padding(8)
-                    .background(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
-                    .listRowBackground(note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour)
+                    ListRow(
+                        name: note.title ?? "_NOTE_TITLE",
+                        colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour
+                    )
                 }
             }
         }
@@ -433,20 +454,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(company.name ?? "_COMPANY_NAME")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
-                    }
-                    .padding(8)
-                    .background(Color.fromStored(company.colour ?? Theme.rowColourAsDouble))
-                    .listRowBackground(Color.fromStored(company.colour ?? Theme.rowColourAsDouble))
+                    ListRow(
+                        name: company.name ?? "_COMPANY_NAME",
+                        colour: Color.fromStored(company.colour ?? Theme.rowColourAsDouble)
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -461,20 +472,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        Text(person.name ?? "_PERSON_NAME")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
-                    }
-                    .padding(8)
-                    .background(Theme.rowColour)
-                    .listRowBackground(Theme.rowColour)
+                    ListRow(
+                        name: person.name ?? "_PERSON_NAME",
+                        colour: Theme.textBackground
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -489,21 +490,10 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 5) {
-                        // @TODO: replace all these Text instances with a new struct representing Row
-                        Text(project.name ?? "_PROJECT_NAME")
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .padding(4)
-                            .background(.black.opacity(0.3))
-                            .cornerRadius(6.0)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundStyle(.gray)
-                    }
-                    .padding(8)
-                    .background(Color.fromStored(project.colour ?? Theme.rowColourAsDouble))
-                    .listRowBackground(Color.fromStored(project.colour ?? Theme.rowColourAsDouble))
+                    ListRow(
+                        name: project.name ?? "_PROJECT_NAME",
+                        colour: Color.fromStored(project.colour ?? Theme.rowColourAsDouble)
+                    )
                 }
                 .buttonStyle(.plain)
             }

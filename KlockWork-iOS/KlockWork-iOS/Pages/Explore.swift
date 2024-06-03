@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct Explore: View {
+    @Binding public var date: Date
     private let fgColour: Color = .yellow
     private var columns: [GridItem] {
         Array(repeating: .init(.flexible()), count: 2)
@@ -39,11 +40,11 @@ struct Explore: View {
                                     .environment(\.managedObjectContext, moc)
                                     .navigationTitle(type.label)
                             case .people: // @TODO: implement people listing view
-                                Notes()
+                                People()
                                     .environment(\.managedObjectContext, moc)
                                     .navigationTitle(type.label)
                             case .records: // @TODO: implement records listing view
-                                Notes()
+                                Records()
                                     .environment(\.managedObjectContext, moc)
                                     .navigationTitle(type.label)
                             case .tasks:

@@ -76,7 +76,9 @@ struct CompanyDetail: View {
                 .listStyle(.grouped)
             }
             .onAppear(perform: actionOnAppear)
-            .navigationTitle("Editing: Company")
+            .navigationTitle("\(self.name) (\(self.abbreviation))")
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 Button("Save") {
                     

@@ -27,6 +27,8 @@ struct Tasks: View {
                         ForEach(items) { item in
                             NavigationLink {
                                 TaskDetail(task: item)
+                                    .background(Theme.cGreen)
+                                    .scrollContentBackground(.hidden)
                             } label: {
                                 Text(item.content!)
                             }

@@ -24,7 +24,9 @@ struct JobDetail: View {
             .listStyle(.grouped)
         }
         .onAppear(perform: actionOnAppear)
-        .navigationTitle(job.title != nil ? job.title!.capitalized : job.jid.string)
+        .navigationTitle(job.title != nil ? job.title!.capitalized : "Job #\(job.jid.string)")
+        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             Button("Save") {
 

@@ -22,6 +22,19 @@ public enum EntityType: CaseIterable {
         case .projects: "Projects"
         }
     }
+    
+    // @TODO: localize somehow?
+    var enSingular: String {
+        switch self {
+        case .records: "Record"
+        case .jobs: "Job"
+        case .tasks: "Task"
+        case .notes: "Note"
+        case .companies: "Company"
+        case .people: "Person"
+        case .projects: "Project"
+        }
+    }
 
     /// Associated icon
     var icon: Image {
