@@ -8,7 +8,6 @@
 import SwiftUI
 import CoreData
 
-// MARK: Definition
 public class ActivityAssessment {
     public var date: Date
     public var moc: NSManagedObjectContext
@@ -53,112 +52,5 @@ public class ActivityAssessment {
         // Perform the assessment by iterating over all the things and calculating the score
         self.score = self.assessables.score
         self.weight = self.assessables.weight
-    }
-}
-
-// MARK: Data structures
-extension ActivityAssessment {
-    /// Create prebuilt views
-    struct ViewFactory {
-        
-
-        struct Factors: View {
-            public var assessables: Assessables
-            @Binding public var type: EntityType
-            @State private var factors: [AssessmentFactor] = []
-
-            var body: some View {
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 10) {
-                        if factors.isEmpty {
-                            HStack {
-                                Text("\(type.label) provide no factors")
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Theme.rowColour)
-                            .clipShape(.rect(cornerRadius: 16))
-                        } else {
-                            ForEach(factors) { factor in
-                                Factor(factor: factor, assessables: self.assessables)
-                            }
-                        }
-                    }
-                    .onAppear(perform: self.actionOnAppear)
-                    .onChange(of: self.type) {
-                        self.actionOnAppear()
-                    }
-                }
-                .padding([.top, .leading, .trailing])
-            }
-
-            private func actionOnAppear() -> Void {
-                self.factors = assessables.byType(type)
-            }
-        }
-
-        struct Factor: View {
-            @Environment(\.managedObjectContext) var moc
-            public let factor: AssessmentFactor
-            public let assessables: Assessables
-            @State private var weight: Int = 0
-            @State private var description: String = ""
-            @State private var count: Int = 0
-            @State private var threshold: Int = 1
-
-            var body: some View {
-                HStack(alignment: .center, spacing: 10) {
-                    Grid(alignment: .topLeading, horizontalSpacing: 0, verticalSpacing: 10) {
-                        GridRow(alignment: .top) {
-                            HStack {
-                                Text("Description")
-                                Spacer()
-                                Text("Threshold")
-                                Text("Weight")
-                            }
-                        }
-                        .foregroundStyle(.gray)
-                        .padding([.top, .leading, .trailing])
-
-                        Divider()
-                            .background(.gray)
-
-                        GridRow {
-                            HStack {
-                                Text(description)
-                                Spacer()
-                                Picker("Threshold", selection: $threshold) {
-                                    ForEach(0..<10) { Text($0.string)}
-                                }
-                                Picker("Weight", selection: $weight) {
-                                    ForEach(0..<6) { Text($0.string)}
-                                }
-                            }
-
-                        }
-                        .padding([.leading, .trailing])
-                    }
-                    .background(count < threshold ? Theme.base : Theme.textBackground)
-                    .clipShape(.rect(cornerRadius: 16))
-                }
-                .onAppear(perform: self.actionOnAppear)
-                .onChange(of: self.threshold) {self.assessables.threshold(factor: self.factor, threshold: self.threshold)}
-                .onChange(of: self.weight) {self.assessables.weight(factor: self.factor, weight: self.weight)}
-            }
-
-            private func smartDisableFactor() -> Void {
-                self.threshold = count < threshold ? count == 0 ? 0 : 1 : count + 1
-            }
-
-            private func actionOnAppear() -> Void {
-                weight = Int(self.factor.weight)
-                threshold = Int(self.factor.threshold)
-                count = Int(self.factor.count)
-
-                if let desc = self.factor.desc {
-                    description = desc
-                }
-            }
-        }
     }
 }

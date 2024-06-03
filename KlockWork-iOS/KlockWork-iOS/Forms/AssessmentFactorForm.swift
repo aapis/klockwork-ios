@@ -24,7 +24,7 @@ struct AssessmentFactorForm: View {
                 selected: $selected,
                 date: $date,
                 content: AnyView(
-                    ActivityAssessment.ViewFactory.Factors(
+                    Factors(
                         assessables: assessment.assessables,
                         type: $selected
                     )

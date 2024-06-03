@@ -20,6 +20,7 @@ struct Legend: View {
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundStyle(.gray)
+                        .padding(.bottom, 10)
                 }
                 LazyVGrid(columns: columns, alignment: .leading) {
                     ForEach(ActivityWeight.allCases, id: \.self) { assessment in
