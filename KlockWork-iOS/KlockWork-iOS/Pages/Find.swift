@@ -190,7 +190,7 @@ extension Find {
 
         var body: some View {
             NavigationStack {
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     if showActivityCalendar {ActivityCalendar(date: $date, searchTerm: $text)}
                     if showRecent {Rollups()}
                     if showTrends {Trends()}

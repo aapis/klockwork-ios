@@ -61,7 +61,6 @@ struct ActivityCalendar: View {
                     .background(Theme.rowColour)
                 }
             }
-//            .border(width: 1, edges: [.bottom], color: .gray)
             .clipShape(
                 .rect(
                     topLeadingRadius: 16,
@@ -96,6 +95,7 @@ struct ActivityCalendar: View {
                         }
 
                         Button {
+                            CDAssessmentFactor(moc: self.moc).delete()
                             self.date = Date()
                         } label: {
                             Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
@@ -311,7 +311,7 @@ extension ActivityCalendar {
                                 }
                             }
                             .foregroundStyle(.yellow)
-                            .help("Customize assessment factors")
+                            .help("Modify assessment factors")
                         }
                         .padding([.leading, .trailing])
                     }
@@ -352,14 +352,14 @@ extension ActivityCalendar {
                             .padding([.leading, .trailing, .top], 10)
                             
                             VStack(alignment: .leading, spacing: 8) {
-                                ForEach(assessment.factors) { factor in
+                                ForEach(assessment.assessables.active()) { factor in
                                     FactorDescription(factor: factor)
                                 }
                             }
                             .padding([.top], 10)
 
                             VStack(alignment: .leading, spacing: 8) {
-                                ForEach(assessment.factors) { factor in
+                                ForEach(assessment.assessables.active()) { factor in
                                     FactorCalculation(factor: factor)
                                 }
                             }

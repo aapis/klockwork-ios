@@ -13,6 +13,7 @@ struct Tabs: View {
     @Binding public var job: Job?
     @Binding public var selected: EntityType
     @Binding public var date: Date
+    public var content: AnyView? = nil
     static public let animationDuration: Double = 0.2
 
     var body: some View {
@@ -23,10 +24,15 @@ struct Tabs: View {
                 }
             MiniTitleBar(selected: $selected)
                 .border(width: 1, edges: [.bottom], color: .yellow)
-            Content(inSheet: inSheet, job: $job, selected: $selected, date: $date)
-                .swipe([.left, .right]) { swipe in
-                    self.actionOnSwipe(swipe)
-                }
+            
+            if content == nil {
+                Content(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                    .swipe([.left, .right]) { swipe in
+                        self.actionOnSwipe(swipe)
+                    }
+            } else {
+                content
+            }
         }
         .background(.clear)
         .onChange(of: job) {
@@ -142,7 +148,7 @@ extension Tabs.Content {
                                 Individual.SingleRecord(record: record)
                             }
                         } else {
-                            StatusMessage.Warning(message: "No records found for \(Date().formatted(date: .abbreviated, time: .omitted))")
+                            StatusMessage.Warning(message: "No records found for \(date.formatted(date: .abbreviated, time: .omitted))")
                         }
                     }
                 }

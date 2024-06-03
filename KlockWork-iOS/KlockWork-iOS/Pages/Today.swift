@@ -132,7 +132,7 @@ extension Today.Editor {
     /// - Returns: Void
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
-            if let job = CoreDataJob(moc: moc).byId(33.0) {
+            if let job = self.job {
                 let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: date, text: text)
                 text = ""
             }

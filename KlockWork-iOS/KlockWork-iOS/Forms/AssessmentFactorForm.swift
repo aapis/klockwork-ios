@@ -7,36 +7,55 @@
 
 import SwiftUI
 
+// @TODO: move to ActivityAssessment.ViewFactory
 struct AssessmentFactorForm: View {
+    @Environment(\.managedObjectContext) var moc
     public let assessment: ActivityAssessment
-    @FetchRequest private var assessables: FetchedResults<AssessmentFactor>
+    @FetchRequest private var factors: FetchedResults<AssessmentFactor>
+    @State private var assessables: ActivityAssessment.Assessables = ActivityAssessment.Assessables()
+    @State private var job: Job?
+    @State private var selected: EntityType = .records
+    @State private var date: Date = Date()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Divider().background(.gray).frame(height: 1)
-            ZStack(alignment: .topLeading) {
-                VStack(alignment: .leading) {
-                    ForEach(self.assessables) { ass in
-                        Text(ass.desc!)
-                    }
-                }
-                .padding()
-
-                LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                    .frame(height: 50)
-                    .opacity(0.1)
-            }
+            Tabs(
+                inSheet: true,
+                job: $job,
+                selected: $selected,
+                date: $date,
+                content: AnyView(
+                    ActivityAssessment.ViewFactory.EntitySelect(
+                        inSheet: true,
+                        selected: $selected,
+                        assessables: self.assessables
+                    )
+                    .environment(\.managedObjectContext, moc)
+                )
+            )
             Spacer()
         }
+        .onAppear(perform: self.actionOnAppear)
         .background(Theme.cGreen)
         .scrollContentBackground(.hidden)
-        .navigationTitle("\(assessables.count) Factors")
+        .navigationTitle("Modify Assessment Factors")
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
     }
 
     init(assessment: ActivityAssessment) {
         self.assessment = assessment
-        _assessables = CDAssessmentFactor.fetchAll(for: self.assessment.date)
+        _factors = CDAssessmentFactor.fetchAll(for: self.assessment.date)
+    }
+}
+
+extension AssessmentFactorForm {
+    private func actionOnAppear() -> Void {
+        assessables.clear()
+
+        for factor in factors {
+            assessables.factors.append(factor)
+        }
     }
 }
