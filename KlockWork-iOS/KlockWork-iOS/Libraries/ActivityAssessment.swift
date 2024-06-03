@@ -63,22 +63,6 @@ extension ActivityAssessment {
         self.score = self.assessables.score
         self.weight = self.assessables.weight
     }
-    
-    /// Determines the weight property
-    /// - Returns: Void
-    private func determineWeight() -> Void {
-        if self.score == 0 {
-            self.weight = .empty
-        } else if self.score > 1 && self.score < 5 {
-            self.weight = .light
-        } else if self.score >= 5 && self.score < 10 {
-            self.weight = .medium
-        } else if self.score > 10 && self.score <= 13 {
-            self.weight = .heavy
-        } else {
-            self.weight = .significant
-        }
-    }
 
     /// Creates new AssessmentFactor objects
     /// - Returns: Void
@@ -175,6 +159,7 @@ extension ActivityAssessment.ViewFactory.Month {
 extension ActivityAssessment.ViewFactory.Factor {
     private func actionOnAppear() -> Void {
         weight = Int(self.factor.weight)
+        threshold = Int(self.factor.threshold)
 
         if let desc = self.factor.desc {
             description = desc
@@ -282,6 +267,7 @@ extension ActivityAssessment {
         var date: Date = Date()
         var created: Date = Date()
         var lastUpdate: Date = Date()
+        var threshold: Int64 = 1
         var weight: Int64
         var type: EntityType
         var action: ActionType
@@ -295,6 +281,7 @@ extension ActivityAssessment {
             af.date = self.date
             af.created = self.created
             af.lastUpdate = self.lastUpdate
+            af.threshold = self.threshold
             af.weight = self.weight
             af.type = self.type.label
             af.action = self.action.label
@@ -508,13 +495,15 @@ extension ActivityAssessment {
             @State private var weight: Int = 0
             @State private var description: String = ""
             @State private var count: Int = 0
+            @State private var threshold: Int = 1
 
             var body: some View {
                 HStack(alignment: .center, spacing: 10) {
                     Button {
-                        self.callback(factor)
+//                        self.callback(factor)
+                        self.threshold = count < threshold ? count == 0 ? 0 : 1 : count + 1
                     } label: {
-                        Image(systemName: count == 0 ? "plus" : "xmark")
+                        Image(systemName: count < threshold ? "plus" : "xmark")
                     }
                     .font(.title3)
                     .fontWeight(.bold)
@@ -524,6 +513,7 @@ extension ActivityAssessment {
                     Grid(alignment: .topLeading, horizontalSpacing: 0, verticalSpacing: 10) {
                         GridRow(alignment: .top) {
                             Text("Description")
+                            Text("Threshold")
                             Text("Weight")
                         }
                         .foregroundStyle(.gray)
@@ -537,13 +527,16 @@ extension ActivityAssessment {
                                 Text(description)
                                 Spacer()
                             }
+                            Picker("Threshold", selection: $threshold) {
+                                ForEach(0..<6) { Text($0.string)}
+                            }
                             Picker("Weight", selection: $weight) {
                                 ForEach(0..<6) { Text($0.string)}
                             }
                         }
                         .padding([.leading, .trailing])
                     }
-                    .background(count == 0 ? Theme.base : Theme.textBackground)
+                    .background(count < threshold ? Theme.base : Theme.textBackground)
                     .clipShape(.rect(cornerRadius: 16))
                 }
                 .onAppear(perform: self.actionOnAppear)
