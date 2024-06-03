@@ -19,11 +19,6 @@ struct DayOfWeek: Identifiable {
     }
 }
 
-struct IdentifiableMonth: Identifiable {
-    var id: UUID = UUID()
-    var name: String
-}
-
 struct ActivityCalendar: View {
     @Binding public var date: Date
     @Binding public var searchTerm: String
@@ -41,20 +36,6 @@ struct ActivityCalendar: View {
         DayOfWeek(symbol: "Thurs"),
         DayOfWeek(symbol: "Fri"),
         DayOfWeek(symbol: "Sat")
-    ]
-    public var months: [IdentifiableMonth] = [
-        IdentifiableMonth(name: "Jan"),
-        IdentifiableMonth(name: "Feb"),
-        IdentifiableMonth(name: "Mar"),
-        IdentifiableMonth(name: "Apr"),
-        IdentifiableMonth(name: "May"),
-        IdentifiableMonth(name: "Jun"),
-        IdentifiableMonth(name: "Jul"),
-        IdentifiableMonth(name: "Aug"),
-        IdentifiableMonth(name: "Sep"),
-        IdentifiableMonth(name: "Oct"),
-        IdentifiableMonth(name: "Nov"),
-        IdentifiableMonth(name: "Dec")
     ]
     public var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
@@ -153,7 +134,7 @@ struct ActivityCalendar: View {
 
 
                 // List of days representing 1 month
-                Month(date: $date, cumulativeScore: $cumulativeScore, searchTerm: searchTerm)
+                Month(date: $date, cumulativeScore: $cumulativeScore, month: $month, searchTerm: searchTerm)
                     .environment(\.managedObjectContext, moc)
                     .background(Theme.rowColour)
 
@@ -163,8 +144,8 @@ struct ActivityCalendar: View {
             }
         }
         .background(Theme.cGreen)
-        .onAppear(perform: actionOnAppear)
-        .onChange(of: self.date) { self.actionOnAppear()}
+        .onAppear(perform: changeDate)
+        .onChange(of: self.date) { self.changeDate()}
         // @TODO: swipe between months
 //                .swipe([.left, .right]) { swipe in
 //                    if swipe == .left {
@@ -177,15 +158,11 @@ struct ActivityCalendar: View {
 }
 
 extension ActivityCalendar {
-    /// Onload handler
+    /// Get month string from date
     /// - Returns: Void
-    private func actionOnAppear() -> Void {
-        // Get month string from date
+    private func changeDate() -> Void {
         let df = DateFormatter()
         df.dateFormat = "MMM"
         self.month = df.string(from: self.date)
-        print("DERPO date changed to \(self.date)")
-        // @TODO: create assessment for the day here
-        
     }
 }

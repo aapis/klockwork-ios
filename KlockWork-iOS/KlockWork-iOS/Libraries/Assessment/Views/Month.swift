@@ -11,9 +11,9 @@ struct Month: View {
     @Environment(\.managedObjectContext) var moc
     @Binding public var date: Date
     @Binding public var cumulativeScore: Int
+    @Binding public var month: String
     public var searchTerm: String
     @State private var days: [Day] = []
-//            @State private var data: ViewFactory.MonthData?
     private var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
     }
@@ -26,7 +26,7 @@ struct Month: View {
         }
         .padding([.leading, .trailing, .bottom])
         .onAppear(perform: self.actionOnAppear)
-        .onChange(of: self.date) {
+        .onChange(of: self.month) {
             self.days = []
             self.actionOnAppear()
         }

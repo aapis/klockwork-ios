@@ -26,6 +26,8 @@ struct Legend: View {
                     ForEach(ActivityWeight.allCases, id: \.self) { assessment in
                         Row(assessment: assessment)
                     }
+                    RowBasic(colour: .yellow, label: "Today")
+//                    RowBasic(colour: .blue, label: "Selected")
                 }
             }
         }
@@ -39,14 +41,23 @@ extension Legend {
         public let assessment: ActivityWeight
 
         var body: some View {
+            RowBasic(colour: assessment.colour, label: assessment.label)
+        }
+    }
+
+    struct RowBasic: View {
+        public let colour: Color
+        public let label: String
+
+        var body: some View {
             VStack {
                 HStack(alignment: .center, spacing: 5) {
                     Rectangle()
                         .frame(width: 20, height: 20)
-                        .foregroundStyle(assessment.colour)
+                        .foregroundStyle(colour)
                         .border(width: 1, edges: [.top, .bottom, .leading, .trailing], color: .gray)
 
-                    Text(assessment.label)
+                    Text(label)
                         .font(.caption)
                 }
             }

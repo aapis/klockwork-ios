@@ -66,6 +66,7 @@
 		53E50C1B2C0E635A00A85FDC /* Factors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C1A2C0E635A00A85FDC /* Factors.swift */; };
 		53E50C1D2C0E638100A85FDC /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C1C2C0E638100A85FDC /* Factor.swift */; };
 		53E50C1F2C0E6ABE00A85FDC /* Rainbow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C1E2C0E6ABE00A85FDC /* Rainbow.swift */; };
+		53E50C212C0E728E00A85FDC /* AssessmentFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C202C0E728E00A85FDC /* AssessmentFactor.swift */; };
 		53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */; };
 		53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
 		53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
@@ -168,6 +169,7 @@
 		53E50C1A2C0E635A00A85FDC /* Factors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Factors.swift; sourceTree = "<group>"; };
 		53E50C1C2C0E638100A85FDC /* Factor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Factor.swift; sourceTree = "<group>"; };
 		53E50C1E2C0E6ABE00A85FDC /* Rainbow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rainbow.swift; sourceTree = "<group>"; };
+		53E50C202C0E728E00A85FDC /* AssessmentFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentFactor.swift; sourceTree = "<group>"; };
 		53F9261F2BFEA00E00948076 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Project.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Project.swift; sourceTree = "<group>"; };
 		53F926202BFEA00E00948076 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Job.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Job.swift; sourceTree = "<group>"; };
 		53F926212BFEA00E00948076 /* EKEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EKEvent.swift; path = ../../DLPrototype/DLPrototype/Extensions/EKEvent.swift; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 		532441692C05354A00659F14 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				53E50C202C0E728E00A85FDC /* AssessmentFactor.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -541,6 +544,7 @@
 				53D4CB832BFE93B000AFEDEA /* NoteDetail.swift in Sources */,
 				53D4CB852BFE93B000AFEDEA /* Companies.swift in Sources */,
 				53D4CB842BFE93B000AFEDEA /* TaskDetail.swift in Sources */,
+				53E50C212C0E728E00A85FDC /* AssessmentFactor.swift in Sources */,
 				53E50C172C0E619C00A85FDC /* OverviewWidget.swift in Sources */,
 				53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */,
 				53D4CB812BFE93B000AFEDEA /* Item.swift in Sources */,

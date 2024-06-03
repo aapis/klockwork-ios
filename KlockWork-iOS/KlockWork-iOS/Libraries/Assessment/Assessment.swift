@@ -14,7 +14,7 @@ public class Assessment {
     public var weight: ActivityWeight = .empty
     public var score: Int = 0
     public var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
-    @Published public var assessables: Assessables
+    /*@Published*/ public var assessables: Assessables
     private var defaultFactors: [FactorProxy] {
         return [
             FactorProxy(date: self.date, weight: 1, type: .records, action: .create),

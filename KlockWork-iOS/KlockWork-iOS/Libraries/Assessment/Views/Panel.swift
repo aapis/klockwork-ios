@@ -9,6 +9,7 @@ import SwiftUI
 
 struct Panel: View {
     public var assessment: Assessment
+    @Binding public var calendarDate: Date
     @State private var date: Date = Date()
 
     var body: some View {
@@ -42,7 +43,7 @@ struct Panel: View {
             }
         }
         .onAppear(perform: {
-            date = assessment.date
+            calendarDate = assessment.date
         })
         .presentationDetents([.medium, .large])
         .presentationBackground(Theme.cGreen)
