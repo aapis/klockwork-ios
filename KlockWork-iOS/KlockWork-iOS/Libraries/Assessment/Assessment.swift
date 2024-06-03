@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-public class ActivityAssessment {
+public class Assessment {
     public var date: Date
     public var moc: NSManagedObjectContext
     public var weight: ActivityWeight = .empty

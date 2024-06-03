@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Panel: View {
-    public var assessment: ActivityAssessment
+    public var assessment: Assessment
     @State private var date: Date = Date()
 
     var body: some View {

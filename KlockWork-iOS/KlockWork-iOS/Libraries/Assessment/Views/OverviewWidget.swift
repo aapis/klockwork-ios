@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OverviewWidget: View {
-    public var assessment: ActivityAssessment
+    public var assessment: Assessment
     @State private var active: [AssessmentFactor] = []
     @State private var score: Int = 0
     @State private var weight: ActivityWeight = .empty

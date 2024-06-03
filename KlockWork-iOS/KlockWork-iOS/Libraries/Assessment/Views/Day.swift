@@ -13,7 +13,7 @@ struct Day: View, Identifiable {
     public let day: Int
     public let isToday: Bool
     public var isWeekend: Bool? = false
-    public var assessment: ActivityAssessment
+    public var assessment: Assessment
     @Binding public var calendarDate: Date
     @State private var bgColour: Color = .clear
     @State private var isPresented: Bool = false

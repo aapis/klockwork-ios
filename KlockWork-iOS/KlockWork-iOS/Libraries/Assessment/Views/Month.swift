@@ -63,7 +63,7 @@ struct Month: View {
         if let ordinal = firstDayComponents.weekday {
             if (ordinal - 2) > 0 {
                 for _ in 0...(ordinal - 2) { // @TODO: not sure why this is -2, should be -1?
-                    self.days.append(Day(day: 0, isToday: false, assessment: ActivityAssessment(for: Date(), moc: moc), calendarDate: $date))
+                    self.days.append(Day(day: 0, isToday: false, assessment: Assessment(for: Date(), moc: moc), calendarDate: $date))
                 }
             }
         }
@@ -94,7 +94,7 @@ struct Month: View {
                                         day: idx,
                                         isToday: dayComponent == idx && selectorComponents.month == month,
                                         isWeekend: selectorComponents.weekday == 1 || selectorComponents.weekday! == 7,
-                                        assessment: ActivityAssessment(for: date, moc: moc, searchTerm: searchTerm),
+                                        assessment: Assessment(for: date, moc: moc, searchTerm: searchTerm),
                                         calendarDate: $date
                                     )
                                 )

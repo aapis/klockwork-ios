@@ -10,7 +10,7 @@
 		532441662C04428700659F14 /* Titlebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441652C04428700659F14 /* Titlebar.swift */; };
 		532441682C0531C800659F14 /* Rollups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441672C0531C800659F14 /* Rollups.swift */; };
 		5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416C2C06485800659F14 /* ActivityCalendar.swift */; };
-		5324416F2C067F5D00659F14 /* ActivityAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416E2C067F5D00659F14 /* ActivityAssessment.swift */; };
+		5324416F2C067F5D00659F14 /* Assessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416E2C067F5D00659F14 /* Assessment.swift */; };
 		536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536E4F682C0D77A600FDC1F4 /* ActionType.swift */; };
 		537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 537582C52BFFB37900CB528C /* Data.xcdatamodeld */; };
 		537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CB2BFFD70D00CB528C /* RecordDetail.swift */; };
@@ -94,7 +94,7 @@
 		532441652C04428700659F14 /* Titlebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Titlebar.swift; sourceTree = "<group>"; };
 		532441672C0531C800659F14 /* Rollups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rollups.swift; sourceTree = "<group>"; };
 		5324416C2C06485800659F14 /* ActivityCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCalendar.swift; sourceTree = "<group>"; };
-		5324416E2C067F5D00659F14 /* ActivityAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityAssessment.swift; sourceTree = "<group>"; };
+		5324416E2C067F5D00659F14 /* Assessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assessment.swift; sourceTree = "<group>"; };
 		536E4F682C0D77A600FDC1F4 /* ActionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionType.swift; sourceTree = "<group>"; };
 		537582C62BFFB37900CB528C /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
 		537582CB2BFFD70D00CB528C /* RecordDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDetail.swift; sourceTree = "<group>"; };
@@ -375,7 +375,7 @@
 			children = (
 				53E50C0D2C0E602F00A85FDC /* Views */,
 				53E50C0C2C0E600800A85FDC /* Factors */,
-				5324416E2C067F5D00659F14 /* ActivityAssessment.swift */,
+				5324416E2C067F5D00659F14 /* Assessment.swift */,
 				53E50C082C0E5F5800A85FDC /* Assessables.swift */,
 			);
 			path = Assessment;
@@ -505,7 +505,7 @@
 				53F9260B2BFE9BF300948076 /* CoreDataPerson.swift in Sources */,
 				53F9260C2BFE9BF300948076 /* CoreDataPlan.swift in Sources */,
 				53F9260D2BFE9BF300948076 /* CoreDataProjectConfiguration.swift in Sources */,
-				5324416F2C067F5D00659F14 /* ActivityAssessment.swift in Sources */,
+				5324416F2C067F5D00659F14 /* Assessment.swift in Sources */,
 				5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */,
 				53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */,
 				53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */,
