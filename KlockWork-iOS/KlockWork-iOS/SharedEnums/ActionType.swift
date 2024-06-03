@@ -10,6 +10,7 @@ import SwiftUI
 public enum ActionType {
     case create, interaction
 
+    // @TODO: localize, somehow?
     var label: String {
         switch self {
         case .create: "Create"
@@ -29,6 +30,14 @@ public enum ActionType {
     var enSingular: String {
         switch self {
         case .create: "created"
+        case .interaction: "interaction"
+        }
+    }
+
+    // @TODO: localize, somehow?
+    var enModifyLabel: String {
+        switch self {
+        case .create: "creation"
         case .interaction: "interaction"
         }
     }

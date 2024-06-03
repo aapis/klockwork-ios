@@ -55,6 +55,14 @@
 		53E3A2672C06B4DA004A85C3 /* Trends.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3A2662C06B4DA004A85C3 /* Trends.swift */; };
 		53E3A26B2C098A50004A85C3 /* CDAssessmentFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3A26A2C098A50004A85C3 /* CDAssessmentFactor.swift */; };
 		53E3A26E2C098DA8004A85C3 /* AssessmentFactorForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3A26D2C098DA8004A85C3 /* AssessmentFactorForm.swift */; };
+		53E50C092C0E5F5800A85FDC /* Assessables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C082C0E5F5800A85FDC /* Assessables.swift */; };
+		53E50C0B2C0E5FA400A85FDC /* FactorProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C0A2C0E5FA400A85FDC /* FactorProxy.swift */; };
+		53E50C0F2C0E607600A85FDC /* ActivityWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C0E2C0E607600A85FDC /* ActivityWeight.swift */; };
+		53E50C112C0E60A800A85FDC /* Month.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C102C0E60A800A85FDC /* Month.swift */; };
+		53E50C132C0E60ED00A85FDC /* Day.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C122C0E60ED00A85FDC /* Day.swift */; };
+		53E50C152C0E617100A85FDC /* Panel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C142C0E617100A85FDC /* Panel.swift */; };
+		53E50C172C0E619C00A85FDC /* OverviewWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C162C0E619C00A85FDC /* OverviewWidget.swift */; };
+		53E50C192C0E61DB00A85FDC /* Legend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C182C0E61DB00A85FDC /* Legend.swift */; };
 		53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */; };
 		53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
 		53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
@@ -146,6 +154,14 @@
 		53E3A2662C06B4DA004A85C3 /* Trends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trends.swift; sourceTree = "<group>"; };
 		53E3A26A2C098A50004A85C3 /* CDAssessmentFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CDAssessmentFactor.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CDAssessmentFactor.swift; sourceTree = "<group>"; };
 		53E3A26D2C098DA8004A85C3 /* AssessmentFactorForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentFactorForm.swift; sourceTree = "<group>"; };
+		53E50C082C0E5F5800A85FDC /* Assessables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assessables.swift; sourceTree = "<group>"; };
+		53E50C0A2C0E5FA400A85FDC /* FactorProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorProxy.swift; sourceTree = "<group>"; };
+		53E50C0E2C0E607600A85FDC /* ActivityWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWeight.swift; sourceTree = "<group>"; };
+		53E50C102C0E60A800A85FDC /* Month.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Month.swift; sourceTree = "<group>"; };
+		53E50C122C0E60ED00A85FDC /* Day.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Day.swift; sourceTree = "<group>"; };
+		53E50C142C0E617100A85FDC /* Panel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Panel.swift; sourceTree = "<group>"; };
+		53E50C162C0E619C00A85FDC /* OverviewWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewWidget.swift; sourceTree = "<group>"; };
+		53E50C182C0E61DB00A85FDC /* Legend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Legend.swift; sourceTree = "<group>"; };
 		53F9261F2BFEA00E00948076 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Project.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Project.swift; sourceTree = "<group>"; };
 		53F926202BFEA00E00948076 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Job.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Job.swift; sourceTree = "<group>"; };
 		53F926212BFEA00E00948076 /* EKEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EKEvent.swift; path = ../../DLPrototype/DLPrototype/Extensions/EKEvent.swift; sourceTree = "<group>"; };
@@ -201,6 +217,7 @@
 			children = (
 				539134E92C0269B600B48494 /* EntityType.swift */,
 				536E4F682C0D77A600FDC1F4 /* ActionType.swift */,
+				53E50C0E2C0E607600A85FDC /* ActivityWeight.swift */,
 			);
 			path = SharedEnums;
 			sourceTree = "<group>";
@@ -208,8 +225,8 @@
 		539135012C03EF0300B48494 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				53E50C072C0E5F4800A85FDC /* Assessment */,
 				539135022C03EF6E00B48494 /* SearchLibrary.swift */,
-				5324416E2C067F5D00659F14 /* ActivityAssessment.swift */,
 			);
 			path = Libraries;
 			sourceTree = "<group>";
@@ -349,6 +366,37 @@
 			path = Forms;
 			sourceTree = "<group>";
 		};
+		53E50C072C0E5F4800A85FDC /* Assessment */ = {
+			isa = PBXGroup;
+			children = (
+				53E50C0D2C0E602F00A85FDC /* Views */,
+				53E50C0C2C0E600800A85FDC /* Factors */,
+				5324416E2C067F5D00659F14 /* ActivityAssessment.swift */,
+				53E50C082C0E5F5800A85FDC /* Assessables.swift */,
+			);
+			path = Assessment;
+			sourceTree = "<group>";
+		};
+		53E50C0C2C0E600800A85FDC /* Factors */ = {
+			isa = PBXGroup;
+			children = (
+				53E50C0A2C0E5FA400A85FDC /* FactorProxy.swift */,
+			);
+			path = Factors;
+			sourceTree = "<group>";
+		};
+		53E50C0D2C0E602F00A85FDC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				53E50C102C0E60A800A85FDC /* Month.swift */,
+				53E50C122C0E60ED00A85FDC /* Day.swift */,
+				53E50C142C0E617100A85FDC /* Panel.swift */,
+				53E50C162C0E619C00A85FDC /* OverviewWidget.swift */,
+				53E50C182C0E61DB00A85FDC /* Legend.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -423,11 +471,15 @@
 				539134FA2C03A38500B48494 /* SearchLanguage.swift in Sources */,
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
 				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
+				53E50C0F2C0E607600A85FDC /* ActivityWeight.swift in Sources */,
 				539134EA2C0269B600B48494 /* EntityType.swift in Sources */,
 				53F926292BFEA00E00948076 /* Project.swift in Sources */,
 				53F9262A2BFEA00E00948076 /* Job.swift in Sources */,
+				53E50C112C0E60A800A85FDC /* Month.swift in Sources */,
 				53F9262B2BFEA00E00948076 /* EKEvent.swift in Sources */,
 				53F9262C2BFEA00E00948076 /* LosslessStringConvertible.swift in Sources */,
+				53E50C152C0E617100A85FDC /* Panel.swift in Sources */,
+				53E50C132C0E60ED00A85FDC /* Day.swift in Sources */,
 				53F9262D2BFEA00E00948076 /* Plan.swift in Sources */,
 				53F9262E2BFEA00E00948076 /* Color.swift in Sources */,
 				53F9262F2BFEA00E00948076 /* DispatchQueue.swift in Sources */,
@@ -440,6 +492,7 @@
 				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
 				532441662C04428700659F14 /* Titlebar.swift in Sources */,
 				53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */,
+				53E50C092C0E5F5800A85FDC /* Assessables.swift in Sources */,
 				53F9260A2BFE9BF300948076 /* CoreDataNoteVersions.swift in Sources */,
 				53F9260B2BFE9BF300948076 /* CoreDataPerson.swift in Sources */,
 				53F9260C2BFE9BF300948076 /* CoreDataPlan.swift in Sources */,
@@ -462,6 +515,7 @@
 				53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */,
 				539134FC2C03A8EC00B48494 /* QueryField.swift in Sources */,
 				53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */,
+				53E50C0B2C0E5FA400A85FDC /* FactorProxy.swift in Sources */,
 				536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */,
 				539134F22C03879E00B48494 /* Find.swift in Sources */,
 				53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */,
@@ -475,9 +529,11 @@
 				53D4CB832BFE93B000AFEDEA /* NoteDetail.swift in Sources */,
 				53D4CB852BFE93B000AFEDEA /* Companies.swift in Sources */,
 				53D4CB842BFE93B000AFEDEA /* TaskDetail.swift in Sources */,
+				53E50C172C0E619C00A85FDC /* OverviewWidget.swift in Sources */,
 				53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */,
 				53D4CB812BFE93B000AFEDEA /* Item.swift in Sources */,
 				53D4CB7D2BFE93B000AFEDEA /* Explore.swift in Sources */,
+				53E50C192C0E61DB00A85FDC /* Legend.swift in Sources */,
 				539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */,
 				539134F82C039F3100B48494 /* Records.swift in Sources */,
 				537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */,

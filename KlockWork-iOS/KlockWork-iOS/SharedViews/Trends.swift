@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct Trends: View {
-    typealias MData = ActivityAssessment.ViewFactory.Month
+    typealias MData = Month
 
     @Environment(\.managedObjectContext) var moc
     @State private var date: Date = Date()

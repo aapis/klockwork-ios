@@ -7,7 +7,16 @@
 
 import SwiftUI
 
-// MARK: Definition
+struct DayOfWeek: Identifiable {
+    let id: UUID = UUID()
+    let symbol: String
+}
+
+struct IdentifiableMonth: Identifiable {
+    var id: UUID = UUID()
+    var name: String
+}
+
 struct ActivityCalendar: View {
     @Binding public var date: Date
     @Binding public var searchTerm: String
@@ -26,19 +35,19 @@ struct ActivityCalendar: View {
         DayOfWeek(symbol: "Fri"),
         DayOfWeek(symbol: "Sat")
     ]
-    public var months: [Month] = [
-        Month(name: "Jan"),
-        Month(name: "Feb"),
-        Month(name: "Mar"),
-        Month(name: "Apr"),
-        Month(name: "May"),
-        Month(name: "Jun"),
-        Month(name: "Jul"),
-        Month(name: "Aug"),
-        Month(name: "Sep"),
-        Month(name: "Oct"),
-        Month(name: "Nov"),
-        Month(name: "Dec")
+    public var months: [IdentifiableMonth] = [
+        IdentifiableMonth(name: "Jan"),
+        IdentifiableMonth(name: "Feb"),
+        IdentifiableMonth(name: "Mar"),
+        IdentifiableMonth(name: "Apr"),
+        IdentifiableMonth(name: "May"),
+        IdentifiableMonth(name: "Jun"),
+        IdentifiableMonth(name: "Jul"),
+        IdentifiableMonth(name: "Aug"),
+        IdentifiableMonth(name: "Sep"),
+        IdentifiableMonth(name: "Oct"),
+        IdentifiableMonth(name: "Nov"),
+        IdentifiableMonth(name: "Dec")
     ]
     public var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
@@ -135,7 +144,7 @@ struct ActivityCalendar: View {
 
 
                 // Days
-                ActivityAssessment.ViewFactory.Month(date: $date, cumulativeScore: $cumulativeScore, searchTerm: searchTerm)
+                Month(date: $date, cumulativeScore: $cumulativeScore, searchTerm: searchTerm)
                     .environment(\.managedObjectContext, moc)
                     .background(Theme.rowColour)
 
@@ -158,7 +167,6 @@ struct ActivityCalendar: View {
     }
 }
 
-// MARK: Method definitions
 extension ActivityCalendar {
     /// Onload handler
     /// - Returns: Void
@@ -167,284 +175,8 @@ extension ActivityCalendar {
         let df = DateFormatter()
         df.dateFormat = "MMM"
         self.month = df.string(from: self.date)
+        print("DERPO date changed to \(self.date)")
+        // @TODO: create assessment for the day here
+        
     }
 }
-
-extension ActivityCalendar.Day {
-    /// Onload handler
-    /// - Returns: Void
-    private func actionOnAppear() -> Void {
-        if isToday {
-            bgColour = .blue
-        } else {
-            if isWeekend! {
-                // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
-                if assessment.weight != .empty {
-                    bgColour = .red
-                } else {
-                    bgColour = .clear
-                }
-            } else {
-                bgColour = assessment.weight.colour
-            }
-        }
-    }
-}
-
-// MARK: Data structures
-extension ActivityCalendar {
-    /// An individual calendar day "tile"
-    public struct Day: View, Identifiable {
-        public let id: UUID = UUID()
-        public let day: Int
-        public let isToday: Bool
-        public var isWeekend: Bool? = false
-        public var assessment: ActivityAssessment
-        @State private var bgColour: Color = .clear
-        @State private var isPresented: Bool = false
-        private let gridSize: CGFloat = 40
-
-        var body: some View {
-            Button {
-                isPresented.toggle()
-            } label: {
-                if self.day > 0 {
-                    Text(String(self.day))
-                }
-            }
-            .frame(minWidth: self.gridSize, minHeight: self.gridSize)
-            .background(self.day > 0 ? self.bgColour : .clear)
-            .clipShape(.rect(cornerRadius: 6))
-            .onAppear(perform: actionOnAppear)
-            .sheet(isPresented: $isPresented) {
-                AssessmentsPanel(assessment: assessment)
-            }
-        }
-    }
-
-    struct DayOfWeek: Identifiable {
-        let id: UUID = UUID()
-        let symbol: String
-    }
-
-    struct Month: Identifiable {
-        var id: UUID = UUID()
-        var name: String
-    }
-
-    public struct AssessmentsPanel: View {
-        public var assessment: ActivityAssessment
-        @State private var date: Date = Date()
-
-        var body: some View {
-            NavigationStack {
-                VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Divider().background(.gray).frame(height: 1)
-                        ZStack(alignment: .topLeading) {
-                            AssessmentOverviewWidget(assessment: assessment)
-                                .navigationTitle(assessment.date.formatted(date: .abbreviated, time: .omitted))
-                                .toolbarTitleDisplayMode(.inline)
-                                .toolbar {
-                                    NavigationLink {
-                                        Today(inSheet: true, date: $date)
-                                    } label: {
-                                        HStack(alignment: .top, spacing: 5) {
-                                            Text("Details")
-                                            Image(systemName: "chevron.right")
-                                        }
-                                    }
-                                }
-                                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-                                .toolbarBackground(.visible, for: .navigationBar)
-
-                            LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                                .frame(height: 50)
-                                .opacity(0.1)
-                        }
-                    }
-                    Spacer()
-                }
-            }
-            .onAppear(perform: {
-                date = assessment.date
-            })
-            .presentationDetents([.medium, .large])
-            .presentationBackground(Theme.cGreen)
-            .scrollDismissesKeyboard(.immediately)
-        }
-    }
-
-    struct AssessmentOverviewWidget: View {
-        public var assessment: ActivityAssessment
-        @State private var active: [AssessmentFactor] = []
-        @State private var score: Int = 0
-        @State private var weight: ActivityAssessment.ActivityWeightAssessment = .empty
-        private let scoreDiameter: CGFloat = 100
-
-        var body: some View {
-            VStack {
-                Grid(alignment: .topLeading, horizontalSpacing: 0, verticalSpacing: 0) {
-                    GridRow(alignment: .top) {
-                        HStack {
-                            Text("Assessment")
-                                .foregroundStyle(.yellow)
-                            Spacer()
-
-                            NavigationLink {
-                                AssessmentFactorForm(assessment: assessment)
-                                    .toolbarTitleDisplayMode(.inline)
-                            } label: {
-                                HStack {
-                                    Spacer()
-                                    Image(systemName: "gear")
-                                }
-                            }
-                            .foregroundStyle(.yellow)
-                            .help("Modify assessment factors")
-                        }
-                        .padding([.leading, .trailing])
-                    }
-                }
-                Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
-                    if score == 0 {
-                        VStack(alignment: .leading) {
-                            HStack(alignment: .center) {
-                                Text("No activity recorded")
-                                Spacer()
-                            }
-                        }
-                    } else {
-                        GridRow(alignment: .top) {
-                            Text("Score")
-                            Text("Factors")
-                            Image(systemName: "plusminus")
-                        }
-                        .foregroundStyle(.gray)
-
-                        Divider()
-                            .background(.gray)
-
-                        GridRow(alignment: .top) {
-                            VStack(alignment: .center) {
-                                ZStack {
-                                    weight.colour
-                                    Text(String(score))
-                                        .font(.system(size: 50))
-                                        .fontWeight(.bold)
-                                }
-                                .frame(width: self.scoreDiameter, height: self.scoreDiameter)
-                                .mask(Circle())
-
-                                Text(weight.label)
-                                    .foregroundStyle(.gray)
-                            }
-                            .padding([.leading, .trailing, .top], 10)
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                ForEach(active) { factor in
-                                    FactorDescription(factor: factor)
-                                }
-                            }
-                            .padding([.top], 10)
-
-                            VStack(alignment: .leading, spacing: 8) {
-                                ForEach(active) { factor in
-                                    FactorCalculation(factor: factor)
-                                }
-                            }
-                            .padding([.top], 10)
-                        }
-                    }
-                }
-                .padding()
-                .background(Theme.textBackground)
-                .clipShape(.rect(cornerRadius: 16))
-            }
-            .padding()
-            .onAppear(perform: {
-                active = assessment.assessables.active()
-                score = assessment.assessables.score
-                weight = assessment.assessables.weight
-            })
-        }
-    }
-
-    struct Legend: View {
-        private var columns: [GridItem] {
-            return Array(repeating: GridItem(.flexible(), spacing: 1), count: 3)
-        }
-
-        var body: some View {
-            GridRow {
-                VStack(alignment: .leading) {
-                    GridRow {
-                        Text("Legend")
-                            .font(.caption)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.gray)
-                    }
-                    LazyVGrid(columns: columns, alignment: .leading) {
-                        ForEach(ActivityAssessment.ActivityWeightAssessment.allCases, id: \.self) { assessment in
-                            Legend.Row(assessment: assessment)
-                        }
-                    }
-                }
-            }
-            .padding()
-            .background(Theme.textBackground)
-        }
-    }
-}
-
-extension ActivityCalendar.Legend {
-    struct Row: View {
-        public let assessment: ActivityAssessment.ActivityWeightAssessment
-
-        var body: some View {
-            VStack {
-                HStack(alignment: .center, spacing: 5) {
-                    Rectangle()
-                        .frame(width: 20, height: 20)
-                        .foregroundStyle(assessment.colour)
-                        .border(width: 1, edges: [.top, .bottom, .leading, .trailing], color: .gray)
-
-                    Text(assessment.label)
-                        .font(.caption)
-                }
-            }
-        }
-    }
-}
-
-extension ActivityCalendar.AssessmentOverviewWidget {
-    struct FactorDescription: View {
-        @State public var factor: AssessmentFactor
-
-        var body: some View {
-            HStack(alignment: .center, spacing: 5) {
-                Text(factor.desc!.uppercased())
-                Spacer()
-
-            }
-            .font(.caption)
-        }
-    }
-
-    struct FactorCalculation: View {
-        public var factor: AssessmentFactor
-        @State private var weighting: Int64 = 0
-
-        var body: some View {
-            HStack(spacing: 2) {
-                Image(systemName: "plus")
-                Text(String(weighting))
-            }
-            .font(.caption)
-            .onAppear(perform: {
-                weighting = factor.count * factor.weight
-            })
-        }
-    }
-}
-
