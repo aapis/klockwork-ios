@@ -11,8 +11,6 @@ import SwiftUI
 struct AssessmentFactorForm: View {
     @Environment(\.managedObjectContext) var moc
     public let assessment: ActivityAssessment
-    @FetchRequest private var factors: FetchedResults<AssessmentFactor>
-    @State private var assessables: ActivityAssessment.Assessables = ActivityAssessment.Assessables()
     @State private var job: Job?
     @State private var selected: EntityType = .records
     @State private var date: Date = Date()
@@ -26,36 +24,19 @@ struct AssessmentFactorForm: View {
                 selected: $selected,
                 date: $date,
                 content: AnyView(
-                    ActivityAssessment.ViewFactory.EntitySelect(
-                        inSheet: true,
-                        selected: $selected,
-                        assessables: self.assessables
+                    ActivityAssessment.ViewFactory.Factors(
+                        assessables: self.assessment.assessables,
+                        type: $selected
                     )
                     .environment(\.managedObjectContext, moc)
                 )
             )
             Spacer()
         }
-        .onAppear(perform: self.actionOnAppear)
         .background(Theme.cGreen)
         .scrollContentBackground(.hidden)
         .navigationTitle("Modify Assessment Factors")
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-    }
-
-    init(assessment: ActivityAssessment) {
-        self.assessment = assessment
-        _factors = CDAssessmentFactor.fetchAll(for: self.assessment.date)
-    }
-}
-
-extension AssessmentFactorForm {
-    private func actionOnAppear() -> Void {
-        assessables.clear()
-
-        for factor in factors {
-            assessables.factors.append(factor)
-        }
     }
 }

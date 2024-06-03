@@ -14,38 +14,40 @@ public class ActivityAssessment {
     public var moc: NSManagedObjectContext
     public var weight: ActivityWeightAssessment = .light
     public var score: Int = 0
-    public var factors: [AssessmentFactor] = []
+    private var factors: [AssessmentFactor] = []
     public var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
     public var assessables: Assessables
-    private var jobsCreated: Int {CoreDataJob(moc: self.moc).countByDate(for: self.date)}
-    private var records: Int {CoreDataRecords(moc: self.moc).countRecords(for: self.date)}
-    private var jobsReferenced: Int {CoreDataRecords(moc: self.moc).countJobs(for: self.date)}
-    private var notesReferenced: Int {CoreDataNotes(moc: self.moc).countByDate(for: self.date)}
-    private var tasksReferenced: Int {CoreDataTasks(moc: self.moc).countByDate(for: self.date)}
+    private var defaultFactors: [DefaultAssessmentFactor] {
+        return [
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .records, action: .create),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .jobs, action: .create),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .jobs, action: .interaction),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .tasks, action: .create),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .tasks, action: .interaction),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .notes, action: .create),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .notes, action: .interaction),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .companies, action: .create),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .companies, action: .interaction),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .people, action: .create),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .people, action: .interaction),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .projects, action: .create),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .projects, action: .interaction),
+        ]
+    }
 
     init(for date: Date, moc: NSManagedObjectContext, searchTerm: String = "") {
         self.date = date
         self.moc = moc
         self.searchTerm = searchTerm
         self.factors = CDAssessmentFactor(moc: self.moc).all(for: self.date)
-        self.assessables = Assessables(factors: self.factors)
+        self.assessables = Assessables(factors: self.factors, moc: self.moc)
 
         if self.assessables.isEmpty {
-            self.createDefaultAssessments()
+            self.createFactorsFromDefaults()
         }
 
         self.perform()
     }
-
-//    func update() -> Void {
-//        self.assessables = CDAssessmentFactor(moc: self.moc).all(for: self.date)
-//
-//        if self.assessables.isEmpty {
-//            self.createDefaultAssessments()
-//        }
-//
-//        self.perform()
-//    }
 }
 
 // MARK: method definitions
@@ -53,8 +55,6 @@ extension ActivityAssessment {
     /// Perform the assessment by iterating over all the things and calculating the score
     /// - Returns: Void
     private func perform() -> Void {
-//        self.assessables.factors = CDAssessmentFactor(moc: self.moc).all(for: self.date)
-
         for factor in self.assessables.active() {
             let weighted = Int64(factor.count * factor.weight)
 
@@ -87,49 +87,12 @@ extension ActivityAssessment {
 
     /// Creates new AssessmentFactor objects
     /// - Returns: Void
-    private func createDefaultAssessments() -> Void {
-        let defaultAssesssments: [AssessmentFactor] = [
-            self.createAssessment(count: Int64(self.records), date: self.date, desc: "\(records) new record(s)", type: .records),
-            self.createAssessment(count: Int64(self.jobsCreated), date: self.date, desc: "\(jobsCreated) new job(s)", type: .jobs),
-            self.createAssessment(count: Int64(self.jobsReferenced), weight: 2, date: self.date, desc: "\(jobsReferenced) job interaction(s)", type: .jobs),
-            self.createAssessment(count: Int64(self.notesReferenced), date: self.date, desc: "\(notesReferenced) note interaction(s)", type: .notes),
-            self.createAssessment(count: Int64(self.tasksReferenced), date: self.date, desc: "\(tasksReferenced) task interaction(s)", type: .tasks),
-            self.createAssessment(count: Int64(0), date: self.date, desc: "some kind of interaction(s)", type: .records)
-        ]
-
-        for ass in defaultAssesssments {
-            do {
-                try ass.validateForInsert()
-
-                PersistenceController.shared.save()
-
-                self.assessables.factors.append(ass)
-            } catch {
-                print("[error] ActivityAssessment Failed to create default assessments due to \(error) saving \(ass)")
-            }
+    private func createFactorsFromDefaults() -> Void {
+        for factor in self.defaultFactors {
+            self.assessables.factors.append(factor.create(using: self.moc))
         }
-    }
 
-    /// Creates a new AssessmentFactor object
-    /// - Parameters:
-    ///   - count: Int64
-    ///   - date: Date
-    ///   - desc: String
-    ///   - type: EntityType
-    /// - Returns: AssessmentFactor
-    fileprivate func createAssessment(count: Int64, weight: Int = 1, date: Date, desc: String, type: EntityType) -> AssessmentFactor {
-        let factor = AssessmentFactor(context: self.moc)
-        factor.id = UUID()
-        factor.alive = true
-        factor.count = count
-        factor.desc = desc
-        factor.date = date
-        factor.created = Date()
-        factor.lastUpdate = Date()
-        factor.weight = Int64(weight)
-        factor.type = type.label
-
-        return factor
+        PersistenceController.shared.save()
     }
 }
 
@@ -141,9 +104,7 @@ extension ActivityAssessment.ViewFactory.Month {
         self.cumulativeScore = 0
         print("DERPO redrawing tiles")
         if self.days.isEmpty {
-            Task {
-                self.createTiles()
-            }
+            self.createTiles()
         }
 
         self.calculateCumulativeScore()
@@ -217,7 +178,7 @@ extension ActivityAssessment.ViewFactory.Month {
     }
 }
 
-extension ActivityAssessment.ViewFactory.AFView {
+extension ActivityAssessment.ViewFactory.Factor {
     private func actionOnAppear() -> Void {
         weight = Int(self.factor.weight)
 
@@ -228,22 +189,6 @@ extension ActivityAssessment.ViewFactory.AFView {
         count = Int(self.factor.count)
         
         print("DERPO onLoad OR factor changed \(self.factor)")
-    }
-
-    private func action() -> Void {
-        factor.alive.toggle()
-        Task {
-            PersistenceController.shared.save()
-            print("DERPO saved \(factor)")
-        }
-    }
-}
-
-extension ActivityAssessment.ViewFactory.EntitySelect {
-    private func actionOnAppear() -> Void {
-        factors = assessables.byType(selected)
-//        activeFactors = assessables.filter({$0.alive == true && $0.count > 0 && $0.type == selected.label})
-        print("DERPO factors.count=\(factors.count) assessables.isEmpty=\(assessables.isEmpty) selected=\(self.selected)")
     }
 }
 
@@ -337,19 +282,85 @@ extension ActivityAssessment {
         }
     }
 
+    public struct DefaultAssessmentFactor {
+        var id = UUID()
+        var alive: Bool = true
+        var count: Int64 = 0
+        var desc: String = "Sample description"
+        var date: Date = Date()
+        var created: Date = Date()
+        var lastUpdate: Date = Date()
+        var weight: Int64
+        var type: EntityType
+        var action: ActionType
+
+        func create(using moc: NSManagedObjectContext) -> AssessmentFactor {
+            let af = AssessmentFactor(context: moc)
+            af.id = self.id
+            af.alive = self.alive
+            af.count = self.count(moc: moc)
+            af.desc = "\(af.count) \(af.count > 1 ? self.type.label : self.type.enSingular) \(af.count > 1 ? self.action.enPlural : self.action.enSingular)"
+            af.date = self.date
+            af.created = self.created
+            af.lastUpdate = self.lastUpdate
+            af.weight = self.weight
+            af.type = self.type.label
+            af.action = self.action.label
+            return af
+        }
+
+        func count(moc: NSManagedObjectContext) -> Int64 {
+            switch self.type {
+            case .records:
+                switch self.action {
+                case .create:
+                    return Int64(CoreDataRecords(moc: moc).countRecords(for: self.date))
+                case .interaction:
+                    return Int64(CoreDataRecords(moc: moc).countRecords(for: self.date))
+                }
+            case .jobs:
+                switch self.action {
+                case .create:
+                    return Int64(CoreDataJob(moc: moc).countByDate(for: self.date))
+                case .interaction:
+                    return Int64(CoreDataRecords(moc: moc).countJobs(for: self.date))
+                }
+            case .tasks:
+                switch self.action {
+                case .create:
+                    return Int64(CoreDataTasks(moc: moc).countByDate(for: self.date))
+                case .interaction:
+                    return Int64(CoreDataTasks(moc: moc).countByDate(for: self.date))
+                }
+            case .notes:
+                switch self.action {
+                case .create:
+                    return Int64(CoreDataNotes(moc: moc).countByDate(for: self.date))
+                case .interaction:
+                    return Int64(CoreDataNotes(moc: moc).countByDate(for: self.date))
+                }
+//            case .companies:
+//            case .people:
+//            case .projects:
+            default:
+                return Int64(0)
+            }
+        }
+    }
+
     public class Assessables: Identifiable, Equatable {
         public var id: UUID = UUID()
         var factors: [AssessmentFactor] = []
-        var isEmpty: Bool {
-            self.factors.isEmpty
-        }
+        var moc: NSManagedObjectContext
+        var isEmpty: Bool {self.factors.isEmpty}
 
         static public func == (lhs: ActivityAssessment.Assessables, rhs: ActivityAssessment.Assessables) -> Bool {
             return lhs.id == rhs.id
         }
 
-        init(factors: [AssessmentFactor]? = nil) {
+        init(factors: [AssessmentFactor]? = nil, moc: NSManagedObjectContext) {
             self.id = UUID()
+            self.moc = moc
 
             if factors != nil {
                 self.factors = factors!
@@ -375,6 +386,24 @@ extension ActivityAssessment {
         func clear() -> Void {
             self.factors = []
         }
+
+        func activeToggle(factor: AssessmentFactor) -> Void {
+            factor.alive.toggle()
+            PersistenceController.shared.save()
+        }
+
+        func refresh(date: Date) -> Void {
+            self.factors = CDAssessmentFactor(moc: self.moc).all(for: date)
+        }
+
+//        func rebuild(date: Date) -> Void {
+//            let factors = self.active().filter {$0.date == date}
+//            
+//            print("DERPO factors.count=\(factors.count)")
+//            for factor in factors {
+//                
+//            }
+//        }
     }
 
     /// Create prebuilt views
@@ -421,10 +450,51 @@ extension ActivityAssessment {
             }
         }
 
-        struct AFView: View {
+        struct Factors: View {
+            public var assessables: Assessables
+            @Binding public var type: EntityType
+            @State private var factors: [AssessmentFactor] = []
+
+            var body: some View {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 10) {
+                        if factors.isEmpty {
+                            HStack {
+                                Text("\(type.label) provide no factors")
+                                Spacer()
+                            }
+                            .padding()
+                            .background(Theme.rowColour)
+                            .clipShape(.rect(cornerRadius: 16))
+                        } else {
+                            ForEach(factors) { factor in
+                                Factor(factor: factor, callback: self.callback)
+                            }
+                        }
+                    }
+                    .onAppear(perform: self.actionOnAppear)
+                    .onChange(of: self.type) {
+                        self.actionOnAppear()
+                    }
+                }
+                .padding([.top, .leading, .trailing])
+            }
+
+            private func callback(factor: AssessmentFactor) -> Void {
+                assessables.activeToggle(factor: factor)
+//                assessables.refresh(date: factor.date!)
+                print("DERPO assessables=\(assessables.factors.count) active=\(assessables.active().count)")
+            }
+
+            private func actionOnAppear() -> Void {
+                self.factors = assessables.byType(type)
+            }
+        }
+
+        struct Factor: View {
             @Environment(\.managedObjectContext) var moc
             public let factor: AssessmentFactor
-            public let callback: () -> Void
+            public let callback: (AssessmentFactor) -> Void
             @State private var weight: Int = 0
             @State private var description: String = ""
             @State private var count: Int = 0
@@ -432,10 +502,9 @@ extension ActivityAssessment {
             var body: some View {
                 HStack(alignment: .center, spacing: 10) {
                     Button {
-                        self.action()
-                        self.callback()
+                        self.callback(factor)
                     } label: {
-                        Image(systemName: "xmark")
+                        Image(systemName: count == 0 ? "plus" : "xmark")
                     }
                     .font(.title3)
                     .fontWeight(.bold)
@@ -468,43 +537,6 @@ extension ActivityAssessment {
                     .clipShape(.rect(cornerRadius: 16))
                 }
                 .onAppear(perform: self.actionOnAppear)
-            }
-        }
-
-        struct EntitySelect: View {
-            @Environment(\.managedObjectContext) var moc
-            public var inSheet: Bool
-            @Binding public var selected: EntityType
-            public var assessables: Assessables
-            @State private var factors: [AssessmentFactor] = []
-
-            var body: some View {
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 10) {
-                        ForEach(factors) { factor in
-                            ActivityAssessment.ViewFactory.AFView(factor: factor, callback: self.actionOnAppear)
-                        }
-                    }
-
-                    if self.factors.count == 0 {
-                        HStack {
-                            Text("\(selected.label) provide no factors")
-                            Spacer()
-                        }
-                        .padding()
-                        .background(Theme.rowColour)
-                        .clipShape(.rect(cornerRadius: 16))
-                    }
-                }
-                .onAppear(perform: self.actionOnAppear)
-                .onChange(of: selected) {self.actionOnAppear()}
-                .padding([.top, .leading, .trailing])
-            }
-
-            init(inSheet: Bool, selected: Binding<EntityType>, assessables: Assessables) {
-                self.inSheet = inSheet
-                _selected = selected
-                self.assessables = assessables
             }
         }
 
