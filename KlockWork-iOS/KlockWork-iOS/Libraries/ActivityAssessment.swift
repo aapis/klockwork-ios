@@ -31,7 +31,7 @@ public class ActivityAssessment {
             DefaultAssessmentFactor(date: self.date, weight: 1, type: .people, action: .create),
             DefaultAssessmentFactor(date: self.date, weight: 1, type: .people, action: .interaction),
             DefaultAssessmentFactor(date: self.date, weight: 1, type: .projects, action: .create),
-            DefaultAssessmentFactor(date: self.date, weight: 1, type: .projects, action: .interaction),
+            DefaultAssessmentFactor(date: self.date, weight: 1, type: .projects, action: .interaction)
         ]
     }
 
@@ -55,18 +55,13 @@ extension ActivityAssessment {
     /// Perform the assessment by iterating over all the things and calculating the score
     /// - Returns: Void
     private func perform() -> Void {
+        // record the reason for this score increase
         for factor in self.assessables.active() {
-            let weighted = Int64(factor.count * factor.weight)
-
-            if weighted > 0 {
-                // record the reason for this score increase
-                self.factors.append(factor)
-                // calculate score
-                self.score += Int(weighted)
-            }
+            self.factors.append(factor)
         }
 
-        self.determineWeight()
+        self.score = self.assessables.score
+        self.weight = self.assessables.weight
     }
     
     /// Determines the weight property
@@ -102,7 +97,7 @@ extension ActivityAssessment.ViewFactory.Month {
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.cumulativeScore = 0
-        print("DERPO redrawing tiles")
+
         if self.days.isEmpty {
             self.createTiles()
         }
@@ -174,7 +169,6 @@ extension ActivityAssessment.ViewFactory.Month {
                 }
             }
         }
-        print("DERPO days.count=\(self.days.count)")
     }
 }
 
@@ -187,8 +181,6 @@ extension ActivityAssessment.ViewFactory.Factor {
         }
 
         count = Int(self.factor.count)
-        
-        print("DERPO onLoad OR factor changed \(self.factor)")
     }
 }
 
@@ -353,6 +345,8 @@ extension ActivityAssessment {
         var factors: [AssessmentFactor] = []
         var moc: NSManagedObjectContext
         var isEmpty: Bool {self.factors.isEmpty}
+        var score: Int = 0
+        var weight: ActivityWeightAssessment = .empty
 
         static public func == (lhs: ActivityAssessment.Assessables, rhs: ActivityAssessment.Assessables) -> Bool {
             return lhs.id == rhs.id
@@ -365,6 +359,9 @@ extension ActivityAssessment {
             if factors != nil {
                 self.factors = factors!
             }
+
+            self.calculateScore()
+            self.weigh()
         }
 
         func byType(_ type: EntityType) -> [AssessmentFactor] {
@@ -396,14 +393,29 @@ extension ActivityAssessment {
             self.factors = CDAssessmentFactor(moc: self.moc).all(for: date)
         }
 
-//        func rebuild(date: Date) -> Void {
-//            let factors = self.active().filter {$0.date == date}
-//            
-//            print("DERPO factors.count=\(factors.count)")
-//            for factor in factors {
-//                
-//            }
-//        }
+        func calculateScore() -> Void {
+            for factor in self.active() {
+                let weighted = Int64(factor.count * factor.weight)
+
+                if weighted > 0 {
+                    self.score += Int(weighted)
+                }
+            }
+        }
+
+        func weigh() -> Void {
+            if self.score == 0 {
+                self.weight = .empty
+            } else if self.score > 1 && self.score < 5 {
+                self.weight = .light
+            } else if self.score >= 5 && self.score < 10 {
+                self.weight = .medium
+            } else if self.score > 10 && self.score <= 13 {
+                self.weight = .heavy
+            } else {
+                self.weight = .significant
+            }
+        }
     }
 
     /// Create prebuilt views
@@ -482,8 +494,6 @@ extension ActivityAssessment {
 
             private func callback(factor: AssessmentFactor) -> Void {
                 assessables.activeToggle(factor: factor)
-//                assessables.refresh(date: factor.date!)
-                print("DERPO assessables=\(assessables.factors.count) active=\(assessables.active().count)")
             }
 
             private func actionOnAppear() -> Void {
