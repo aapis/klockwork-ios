@@ -10,6 +10,13 @@ import SwiftUI
 struct DayOfWeek: Identifiable {
     let id: UUID = UUID()
     let symbol: String
+    var current: Bool {
+        let df = DateFormatter()
+        df.dateFormat = "EEE"
+        let symbol = df.string(from: Date())
+
+        return self.symbol == symbol
+    }
 }
 
 struct IdentifiableMonth: Identifiable {
@@ -117,6 +124,7 @@ struct ActivityCalendar: View {
                             .padding([.leading, .trailing])
                             .padding([.top, .bottom], 8)
                             .background(Theme.rowColour)
+                            .foregroundStyle(.gray)
                             .mask(Capsule(style: .continuous))
                     }
                     .padding()
@@ -133,6 +141,7 @@ struct ActivityCalendar: View {
                         LazyVGrid(columns: self.columns, alignment: .center) {
                             ForEach(weekdays) {sym in
                                 Text(sym.symbol)
+                                    .foregroundStyle(sym.current ? .yellow : .white)
                             }
                             .font(.caption)
                         }
@@ -143,7 +152,7 @@ struct ActivityCalendar: View {
                 .background(Theme.rowColour)
 
 
-                // Days
+                // List of days representing 1 month
                 Month(date: $date, cumulativeScore: $cumulativeScore, searchTerm: searchTerm)
                     .environment(\.managedObjectContext, moc)
                     .background(Theme.rowColour)

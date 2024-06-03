@@ -63,7 +63,14 @@ struct Month: View {
         if let ordinal = firstDayComponents.weekday {
             if (ordinal - 2) > 0 {
                 for _ in 0...(ordinal - 2) { // @TODO: not sure why this is -2, should be -1?
-                    self.days.append(Day(day: 0, isToday: false, assessment: Assessment(for: Date(), moc: moc), calendarDate: $date))
+                    self.days.append(
+                        Day(
+                            day: 0,
+                            isSelected: false,
+                            assessment: Assessment(for: Date(), moc: moc),
+                            calendarDate: $date
+                        )
+                    )
                 }
             }
         }
@@ -85,14 +92,14 @@ struct Month: View {
                     if let dayComponent = adComponents.day {
                         let month = adComponents.month
                         let components = DateComponents(year: adComponents.year, month: adComponents.month, day: idx)
-                        if let date = Calendar.autoupdatingCurrent.date(from: components) {
-                            let selectorComponents = Calendar.autoupdatingCurrent.dateComponents([.weekday, .month], from: date)
+                        if let date = calendar.date(from: components) {
+                            let selectorComponents = calendar.dateComponents([.weekday, .month], from: date)
 
                             if selectorComponents.weekday != nil && selectorComponents.month != nil {
                                 self.days.append(
                                     Day(
                                         day: idx,
-                                        isToday: dayComponent == idx && selectorComponents.month == month,
+                                        isSelected: dayComponent == idx && selectorComponents.month == month,
                                         isWeekend: selectorComponents.weekday == 1 || selectorComponents.weekday! == 7,
                                         assessment: Assessment(for: date, moc: moc, searchTerm: searchTerm),
                                         calendarDate: $date

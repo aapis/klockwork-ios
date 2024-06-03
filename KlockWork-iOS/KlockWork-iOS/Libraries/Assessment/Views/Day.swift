@@ -11,13 +11,16 @@ import SwiftUI
 struct Day: View, Identifiable {
     public let id: UUID = UUID()
     public let day: Int
-    public let isToday: Bool
+    public let isSelected: Bool
     public var isWeekend: Bool? = false
     public var assessment: Assessment
     @Binding public var calendarDate: Date
     @State private var bgColour: Color = .clear
     @State private var isPresented: Bool = false
     private let gridSize: CGFloat = 40
+    private var isToday: Bool {
+        Calendar.autoupdatingCurrent.isDateInToday(self.assessment.date)
+    }
 
     var body: some View {
         Button {
@@ -30,6 +33,7 @@ struct Day: View, Identifiable {
         }
         .frame(minWidth: self.gridSize, minHeight: self.gridSize)
         .background(self.day > 0 ? self.bgColour : .clear)
+        .foregroundColor(self.isToday && !self.isSelected ? .black : .white)
         .clipShape(.rect(cornerRadius: 6))
         .onAppear(perform: actionOnAppear)
         .sheet(isPresented: $isPresented) {
@@ -40,8 +44,10 @@ struct Day: View, Identifiable {
     /// Onload handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        if isToday {
+        if isSelected {
             bgColour = .blue
+        } else if isToday {
+            bgColour = .yellow
         } else {
             if isWeekend! {
                 // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
