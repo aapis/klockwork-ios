@@ -174,32 +174,19 @@ extension ActivityCalendar.Day {
     /// Onload handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        if assessment != nil {
-            if isToday {
-                bgColour = .blue
-            } else {
-                if isWeekend! {
-                    // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
-                    if ![.empty].contains(assessment!.weight) {
-                        bgColour = .red
-                    } else {
-                        bgColour = .clear
-                    }
+        if isToday {
+            bgColour = .blue
+        } else {
+            if isWeekend! {
+                // IF we worked on the weekend, highlight the tile in red (this is bad and should be highlighted)
+                if assessment.weight != .empty {
+                    bgColour = .red
                 } else {
-                    bgColour = assessment!.weight.colour
+                    bgColour = .clear
                 }
-
+            } else {
+                bgColour = assessment.weight.colour
             }
-        }
-    }
-}
-
-extension ActivityCalendar.AssessmentsPanel {
-    /// Onload handler
-    /// - Returns: Void
-    private func actionOnAppear() -> Void {
-        if let ass = self.assessment {
-            assessmentDate = ass.date
         }
     }
 }
@@ -212,7 +199,7 @@ extension ActivityCalendar {
         public let day: Int
         public let isToday: Bool
         public var isWeekend: Bool? = false
-        public var assessment: ActivityAssessment?
+        public var assessment: ActivityAssessment
         @State private var bgColour: Color = .clear
         @State private var isPresented: Bool = false
         private let gridSize: CGFloat = 40
@@ -226,7 +213,7 @@ extension ActivityCalendar {
                 }
             }
             .frame(minWidth: self.gridSize, minHeight: self.gridSize)
-            .background(self.bgColour)
+            .background(self.day > 0 ? self.bgColour : .clear)
             .clipShape(.rect(cornerRadius: 6))
             .onAppear(perform: actionOnAppear)
             .sheet(isPresented: $isPresented) {
@@ -246,42 +233,42 @@ extension ActivityCalendar {
     }
 
     public struct AssessmentsPanel: View {
-        public let assessment: ActivityAssessment?
-        @State private var assessmentDate: Date = Date()
+        public var assessment: ActivityAssessment
+        @State private var date: Date = Date()
 
         var body: some View {
             NavigationStack {
                 VStack(alignment: .leading, spacing: 20) {
-                    if let ass = assessment {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Divider().background(.gray).frame(height: 1)
-                            ZStack(alignment: .topLeading) {
-                                AssessmentOverviewWidget(assessment: ass)
-                                    .navigationTitle(ass.date.formatted(date: .abbreviated, time: .omitted))
-                                    .toolbarTitleDisplayMode(.inline)
-                                    .toolbar {
-                                        NavigationLink {
-                                            Today(inSheet: true, date: $assessmentDate)
-                                        } label: {
-                                            HStack(alignment: .top, spacing: 5) {
-                                                Text("Details")
-                                                Image(systemName: "chevron.right")
-                                            }
+                    VStack(alignment: .leading, spacing: 0) {
+                        Divider().background(.gray).frame(height: 1)
+                        ZStack(alignment: .topLeading) {
+                            AssessmentOverviewWidget(assessment: assessment)
+                                .navigationTitle(assessment.date.formatted(date: .abbreviated, time: .omitted))
+                                .toolbarTitleDisplayMode(.inline)
+                                .toolbar {
+                                    NavigationLink {
+                                        Today(inSheet: true, date: $date)
+                                    } label: {
+                                        HStack(alignment: .top, spacing: 5) {
+                                            Text("Details")
+                                            Image(systemName: "chevron.right")
                                         }
                                     }
-                                    .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-                                    .toolbarBackground(.visible, for: .navigationBar)
+                                }
+                                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                                .toolbarBackground(.visible, for: .navigationBar)
 
-                                LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                                    .frame(height: 50)
-                                    .opacity(0.1)
-                            }
+                            LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                                .frame(height: 50)
+                                .opacity(0.1)
                         }
                     }
                     Spacer()
                 }
             }
-            .onAppear(perform: self.actionOnAppear)
+            .onAppear(perform: {
+                date = assessment.date
+            })
             .presentationDetents([.medium, .large])
             .presentationBackground(Theme.cGreen)
             .scrollDismissesKeyboard(.immediately)
@@ -289,7 +276,10 @@ extension ActivityCalendar {
     }
 
     struct AssessmentOverviewWidget: View {
-        public let assessment: ActivityAssessment
+        public var assessment: ActivityAssessment
+        @State private var active: [AssessmentFactor] = []
+        @State private var score: Int = 0
+        @State private var weight: ActivityAssessment.ActivityWeightAssessment = .empty
         private let scoreDiameter: CGFloat = 100
 
         var body: some View {
@@ -302,7 +292,7 @@ extension ActivityCalendar {
                             Spacer()
 
                             NavigationLink {
-                                AssessmentFactorForm(assessment: self.assessment)
+                                AssessmentFactorForm(assessment: assessment)
                                     .toolbarTitleDisplayMode(.inline)
                             } label: {
                                 HStack {
@@ -317,7 +307,7 @@ extension ActivityCalendar {
                     }
                 }
                 Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 5) {
-                    if assessment.score == 0 {
+                    if score == 0 {
                         VStack(alignment: .leading) {
                             HStack(alignment: .center) {
                                 Text("No activity recorded")
@@ -338,28 +328,28 @@ extension ActivityCalendar {
                         GridRow(alignment: .top) {
                             VStack(alignment: .center) {
                                 ZStack {
-                                    assessment.weight.colour
-                                    Text(String(assessment.score))
+                                    weight.colour
+                                    Text(String(score))
                                         .font(.system(size: 50))
                                         .fontWeight(.bold)
                                 }
                                 .frame(width: self.scoreDiameter, height: self.scoreDiameter)
                                 .mask(Circle())
 
-                                Text(assessment.weight.label)
+                                Text(weight.label)
                                     .foregroundStyle(.gray)
                             }
                             .padding([.leading, .trailing, .top], 10)
                             
                             VStack(alignment: .leading, spacing: 8) {
-                                ForEach(assessment.assessables.active()) { factor in
+                                ForEach(active) { factor in
                                     FactorDescription(factor: factor)
                                 }
                             }
                             .padding([.top], 10)
 
                             VStack(alignment: .leading, spacing: 8) {
-                                ForEach(assessment.assessables.active()) { factor in
+                                ForEach(active) { factor in
                                     FactorCalculation(factor: factor)
                                 }
                             }
@@ -372,6 +362,11 @@ extension ActivityCalendar {
                 .clipShape(.rect(cornerRadius: 16))
             }
             .padding()
+            .onAppear(perform: {
+                active = assessment.assessables.active()
+                score = assessment.assessables.score
+                weight = assessment.assessables.weight
+            })
         }
     }
 
@@ -424,7 +419,7 @@ extension ActivityCalendar.Legend {
 
 extension ActivityCalendar.AssessmentOverviewWidget {
     struct FactorDescription: View {
-        public let factor: AssessmentFactor
+        @State public var factor: AssessmentFactor
 
         var body: some View {
             HStack(alignment: .center, spacing: 5) {
@@ -437,14 +432,18 @@ extension ActivityCalendar.AssessmentOverviewWidget {
     }
 
     struct FactorCalculation: View {
-        public let factor: AssessmentFactor
+        public var factor: AssessmentFactor
+        @State private var weighting: Int64 = 0
 
         var body: some View {
             HStack(spacing: 2) {
                 Image(systemName: "plus")
-                Text("\(factor.count * factor.weight)")
+                Text(String(weighting))
             }
             .font(.caption)
+            .onAppear(perform: {
+                weighting = factor.count * factor.weight
+            })
         }
     }
 }

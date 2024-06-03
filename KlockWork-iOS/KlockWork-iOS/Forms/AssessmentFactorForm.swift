@@ -10,7 +10,7 @@ import SwiftUI
 // @TODO: move to ActivityAssessment.ViewFactory
 struct AssessmentFactorForm: View {
     @Environment(\.managedObjectContext) var moc
-    public let assessment: ActivityAssessment
+    public var assessment: ActivityAssessment
     @State private var job: Job?
     @State private var selected: EntityType = .records
     @State private var date: Date = Date()
@@ -25,7 +25,7 @@ struct AssessmentFactorForm: View {
                 date: $date,
                 content: AnyView(
                     ActivityAssessment.ViewFactory.Factors(
-                        assessables: self.assessment.assessables,
+                        assessables: assessment.assessables,
                         type: $selected
                     )
                     .environment(\.managedObjectContext, moc)

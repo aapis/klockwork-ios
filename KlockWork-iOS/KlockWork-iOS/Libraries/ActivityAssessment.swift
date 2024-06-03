@@ -12,11 +12,10 @@ import CoreData
 public class ActivityAssessment {
     public var date: Date
     public var moc: NSManagedObjectContext
-    public var weight: ActivityWeightAssessment = .light
+    public var weight: ActivityWeightAssessment = .empty
     public var score: Int = 0
-    private var factors: [AssessmentFactor] = []
     public var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
-    public var assessables: Assessables
+    @Published public var assessables: Assessables
     private var defaultFactors: [DefaultAssessmentFactor] {
         return [
             DefaultAssessmentFactor(date: self.date, weight: 1, type: .records, action: .create),
@@ -39,43 +38,25 @@ public class ActivityAssessment {
         self.date = date
         self.moc = moc
         self.searchTerm = searchTerm
-        self.factors = CDAssessmentFactor(moc: self.moc).all(for: self.date)
-        self.assessables = Assessables(factors: self.factors, moc: self.moc)
+        self.assessables = Assessables(
+            factors: CDAssessmentFactor(moc: self.moc).all(for: self.date),
+            moc: self.moc
+        )
 
+        // Create all the AssessmentFactor objects
         if self.assessables.isEmpty {
-            self.createFactorsFromDefaults()
+            for factor in self.defaultFactors {
+                self.assessables.factors.append(factor.create(using: self.moc))
+            }
         }
 
-        self.perform()
+        // Perform the assessment by iterating over all the things and calculating the score
+        self.score = self.assessables.score
+        self.weight = self.assessables.weight
     }
 }
 
 // MARK: method definitions
-extension ActivityAssessment {
-    /// Perform the assessment by iterating over all the things and calculating the score
-    /// - Returns: Void
-    private func perform() -> Void {
-        // record the reason for this score increase
-        for factor in self.assessables.active() {
-            self.factors.append(factor)
-        }
-
-        self.score = self.assessables.score
-        self.weight = self.assessables.weight
-    }
-
-    /// Creates new AssessmentFactor objects
-    /// - Returns: Void
-    private func createFactorsFromDefaults() -> Void {
-        for factor in self.defaultFactors {
-            self.assessables.factors.append(factor.create(using: self.moc))
-        }
-
-        PersistenceController.shared.save()
-    }
-}
-
-// @TODO: move these functions to ViewFactory.MonthData an remove this entirely
 extension ActivityAssessment.ViewFactory.Month {
     /// Onload handler
     /// - Returns: Void
@@ -87,18 +68,13 @@ extension ActivityAssessment.ViewFactory.Month {
         }
 
         self.calculateCumulativeScore()
-
-//        self.data = ActivityAssessment.ViewFactory.MonthData(moc: self.moc, date: self.date, cumulativeScore: self.cumulativeScore)
-//        print("DERPO month.data=\(self.data!.days)")
     }
 
     /// Calculates the cumulative score for the month
     /// - Returns: Void
     private func calculateCumulativeScore() -> Void {
         for day in self.days {
-            if let ass = day.assessment {
-                cumulativeScore += ass.score
-            }
+            cumulativeScore += day.assessment.score
         }
     }
 
@@ -113,7 +89,7 @@ extension ActivityAssessment.ViewFactory.Month {
         if let ordinal = firstDayComponents.weekday {
             if (ordinal - 2) > 0 {
                 for _ in 0...(ordinal - 2) { // @TODO: not sure why this is -2, should be -1?
-                    self.days.append(Day(day: 0, isToday: false))
+                    self.days.append(Day(day: 0, isToday: false, assessment: ActivityAssessment(for: Date(), moc: moc)))
                 }
             }
         }
@@ -160,74 +136,10 @@ extension ActivityAssessment.ViewFactory.Factor {
     private func actionOnAppear() -> Void {
         weight = Int(self.factor.weight)
         threshold = Int(self.factor.threshold)
+        count = Int(self.factor.count)
 
         if let desc = self.factor.desc {
             description = desc
-        }
-
-        count = Int(self.factor.count)
-    }
-}
-
-extension ActivityAssessment.ViewFactory.MonthData {
-    /// Calculates the cumulative score for the month
-    /// - Returns: Void
-    private func calculateCumulativeScore() -> Void {
-        for day in self.days {
-            if let ass = day.assessment {
-                cumulativeScore += ass.score
-            }
-        }
-    }
-
-    /// Easiest way to make it look like a calendar is to bump the first row of Day's over by the first day of the month's weekdayOrdinal value
-    /// - Returns: Void
-    private func padStartOfMonth() -> Void {
-        let firstDayComponents = Calendar.autoupdatingCurrent.dateComponents(
-            [.weekday],
-            from: DateHelper.datesAtStartAndEndOfMonth(for: self.date)!.0
-        )
-
-        if let ordinal = firstDayComponents.weekday {
-            for _ in 0...(ordinal - 2) { // @TODO: not sure why this is -2, should be -1?
-                self.days.append(Day(day: 0, isToday: false))
-            }
-        }
-    }
-
-    /// Creates the required number of tile objects for a given month
-    /// - Returns: Void
-    private func createTiles() -> Void {
-        let calendar = Calendar.autoupdatingCurrent
-        if let interval = calendar.dateInterval(of: .month, for: self.date) {
-            let numDaysInMonth = calendar.dateComponents([.day], from: interval.start, to: interval.end)
-            let adComponents = calendar.dateComponents([.day, .month, .year], from: self.date)
-
-            if numDaysInMonth.day != nil {
-                self.padStartOfMonth()
-
-                // Append the real Day objects
-                for idx in 1...numDaysInMonth.day! {
-                    if let dayComponent = adComponents.day {
-                        let month = adComponents.month
-                        let components = DateComponents(year: adComponents.year, month: adComponents.month, day: idx)
-                        if let date = Calendar.autoupdatingCurrent.date(from: components) {
-                            let selectorComponents = Calendar.autoupdatingCurrent.dateComponents([.weekday, .month], from: date)
-
-                            if selectorComponents.weekday != nil && selectorComponents.month != nil {
-                                self.days.append(
-                                    Day(
-                                        day: idx,
-                                        isToday: dayComponent == idx && selectorComponents.month == month,
-                                        isWeekend: selectorComponents.weekday == 1 || selectorComponents.weekday! == 7,
-                                        assessment: ActivityAssessment(for: date, moc: self.moc)
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -292,9 +204,7 @@ extension ActivityAssessment {
             switch self.type {
             case .records:
                 switch self.action {
-                case .create:
-                    return Int64(CoreDataRecords(moc: moc).countRecords(for: self.date))
-                case .interaction:
+                case .create, .interaction:
                     return Int64(CoreDataRecords(moc: moc).countRecords(for: self.date))
                 }
             case .jobs:
@@ -309,14 +219,14 @@ extension ActivityAssessment {
                 case .create:
                     return Int64(CoreDataTasks(moc: moc).countByDate(for: self.date))
                 case .interaction:
-                    return Int64(CoreDataTasks(moc: moc).countByDate(for: self.date))
+                    return Int64(CoreDataTasks(moc: moc).countByDate(for: self.date)) // @TODO: change query
                 }
             case .notes:
                 switch self.action {
                 case .create:
                     return Int64(CoreDataNotes(moc: moc).countByDate(for: self.date))
                 case .interaction:
-                    return Int64(CoreDataNotes(moc: moc).countByDate(for: self.date))
+                    return Int64(CoreDataNotes(moc: moc).countByDate(for: self.date)) // @TODO: change query
                 }
 //            case .companies:
 //            case .people:
@@ -327,7 +237,7 @@ extension ActivityAssessment {
         }
     }
 
-    public class Assessables: Identifiable, Equatable {
+    public class Assessables: Identifiable, Equatable, ObservableObject {
         public var id: UUID = UUID()
         var factors: [AssessmentFactor] = []
         var moc: NSManagedObjectContext
@@ -347,8 +257,7 @@ extension ActivityAssessment {
                 self.factors = factors!
             }
 
-            self.calculateScore()
-            self.weigh()
+            self.evaluate()
         }
 
         func byType(_ type: EntityType) -> [AssessmentFactor] {
@@ -360,20 +269,15 @@ extension ActivityAssessment {
         }
 
         func active() -> [AssessmentFactor] {
-            return self.sorted().filter({$0.count > 0})
+            return self.sorted().filter({$0.alive == true && $0.count >= $0.threshold})
         }
 
         func inactive() -> [AssessmentFactor] {
-            return self.sorted().filter({$0.count == 0})
+            return self.sorted().filter({$0.alive == false || $0.count <= $0.threshold})
         }
 
         func clear() -> Void {
             self.factors = []
-        }
-
-        func activeToggle(factor: AssessmentFactor) -> Void {
-            factor.alive.toggle()
-            PersistenceController.shared.save()
         }
 
         func refresh(date: Date) -> Void {
@@ -381,19 +285,22 @@ extension ActivityAssessment {
         }
 
         func calculateScore() -> Void {
+            self.score = 0
+
             for factor in self.active() {
                 let weighted = Int64(factor.count * factor.weight)
 
-                if weighted > 0 {
+                if weighted >= factor.threshold {
                     self.score += Int(weighted)
                 }
             }
         }
 
+        // @TODO: move to ActivityWeightAssessment
         func weigh() -> Void {
             if self.score == 0 {
                 self.weight = .empty
-            } else if self.score > 1 && self.score < 5 {
+            } else if self.score > 0 && self.score < 5 {
                 self.weight = .light
             } else if self.score >= 5 && self.score < 10 {
                 self.weight = .medium
@@ -402,6 +309,29 @@ extension ActivityAssessment {
             } else {
                 self.weight = .significant
             }
+        }
+
+        private func evaluate() -> Void {
+            self.calculateScore()
+            self.weigh()
+        }
+
+        func activeToggle(factor: AssessmentFactor) -> Void {
+            factor.alive.toggle()
+            PersistenceController.shared.save()
+            self.evaluate()
+        }
+
+        func threshold(factor: AssessmentFactor, threshold: Int) -> Void {
+            factor.threshold = Int64(threshold)
+            PersistenceController.shared.save()
+            self.evaluate()
+        }
+
+        func weight(factor: AssessmentFactor, weight: Int) -> Void {
+            factor.weight = Int64(weight)
+            PersistenceController.shared.save()
+            self.evaluate()
         }
     }
 
@@ -415,33 +345,19 @@ extension ActivityAssessment {
             @Binding public var cumulativeScore: Int
             public var searchTerm: String
             @State private var days: [Day] = []
-            @State private var data: ViewFactory.MonthData?
+//            @State private var data: ViewFactory.MonthData?
             private var columns: [GridItem] {
                 return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
             }
 
             var body: some View {
                 GridRow {
-                    // @TODO: playing with self.data, not functional yet
-//                    Text("JKLISD")
-//                    if let data = self.data {
-//                        LazyVGrid(columns: self.columns, alignment: .leading) {
-//                            ForEach(data.days) {view in view}
-//                        }
-//                    }
-
                     LazyVGrid(columns: self.columns, alignment: .leading) {
                         ForEach(self.days) {view in view}
                     }
                 }
                 .padding([.leading, .trailing, .bottom])
                 .onAppear(perform: self.actionOnAppear)
-//                .onChange(of: self.data) {
-//                    if let data = self.data {
-//                        data.days = []
-//                        self.actionOnAppear()
-//                    }
-//                }
                 .onChange(of: self.date) {
                     self.days = []
                     self.actionOnAppear()
@@ -467,7 +383,7 @@ extension ActivityAssessment {
                             .clipShape(.rect(cornerRadius: 16))
                         } else {
                             ForEach(factors) { factor in
-                                Factor(factor: factor, callback: self.callback)
+                                Factor(factor: factor, assessables: self.assessables)
                             }
                         }
                     }
@@ -479,10 +395,6 @@ extension ActivityAssessment {
                 .padding([.top, .leading, .trailing])
             }
 
-            private func callback(factor: AssessmentFactor) -> Void {
-                assessables.activeToggle(factor: factor)
-            }
-
             private func actionOnAppear() -> Void {
                 self.factors = assessables.byType(type)
             }
@@ -491,7 +403,7 @@ extension ActivityAssessment {
         struct Factor: View {
             @Environment(\.managedObjectContext) var moc
             public let factor: AssessmentFactor
-            public let callback: (AssessmentFactor) -> Void
+            public let assessables: Assessables
             @State private var weight: Int = 0
             @State private var description: String = ""
             @State private var count: Int = 0
@@ -499,22 +411,14 @@ extension ActivityAssessment {
 
             var body: some View {
                 HStack(alignment: .center, spacing: 10) {
-                    Button {
-//                        self.callback(factor)
-                        self.threshold = count < threshold ? count == 0 ? 0 : 1 : count + 1
-                    } label: {
-                        Image(systemName: count < threshold ? "plus" : "xmark")
-                    }
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.yellow)
-                    .help("Disable this assessment factor")
-
                     Grid(alignment: .topLeading, horizontalSpacing: 0, verticalSpacing: 10) {
                         GridRow(alignment: .top) {
-                            Text("Description")
-                            Text("Threshold")
-                            Text("Weight")
+                            HStack {
+                                Text("Description")
+                                Spacer()
+                                Text("Threshold")
+                                Text("Weight")
+                            }
                         }
                         .foregroundStyle(.gray)
                         .padding([.top, .leading, .trailing])
@@ -526,13 +430,14 @@ extension ActivityAssessment {
                             HStack {
                                 Text(description)
                                 Spacer()
+                                Picker("Threshold", selection: $threshold) {
+                                    ForEach(0..<10) { Text($0.string)}
+                                }
+                                Picker("Weight", selection: $weight) {
+                                    ForEach(0..<6) { Text($0.string)}
+                                }
                             }
-                            Picker("Threshold", selection: $threshold) {
-                                ForEach(0..<6) { Text($0.string)}
-                            }
-                            Picker("Weight", selection: $weight) {
-                                ForEach(0..<6) { Text($0.string)}
-                            }
+
                         }
                         .padding([.leading, .trailing])
                     }
@@ -540,34 +445,12 @@ extension ActivityAssessment {
                     .clipShape(.rect(cornerRadius: 16))
                 }
                 .onAppear(perform: self.actionOnAppear)
-            }
-        }
-
-        class MonthData: Equatable {
-            typealias Day = ActivityCalendar.Day // @TODO: move out of ActivityCalendar
-
-            public var moc: NSManagedObjectContext
-            public var date: Date
-            public var cumulativeScore: Int = 0
-            public var days: [Day] = []
-
-            static func == (lhs: ActivityAssessment.ViewFactory.MonthData, rhs: ActivityAssessment.ViewFactory.MonthData) -> Bool {
-                return lhs.date == rhs.date
+                .onChange(of: self.threshold) {self.assessables.threshold(factor: self.factor, threshold: self.threshold)}
+                .onChange(of: self.weight) {self.assessables.weight(factor: self.factor, weight: self.weight)}
             }
 
-            init(moc: NSManagedObjectContext, date: Date, cumulativeScore: Int = 0) {
-                self.moc = moc
-                self.date = date
-                self.cumulativeScore = cumulativeScore
-
-                if self.days.isEmpty {
-                    Task {
-                        self.createTiles()
-                        self.calculateCumulativeScore()
-                    }
-                }
-
-                print("DERPO days=\(self.days)")
+            private func smartDisableFactor() -> Void {
+                self.threshold = count < threshold ? count == 0 ? 0 : 1 : count + 1
             }
         }
     }
