@@ -8,11 +8,10 @@
 import SwiftUI
 import CoreData
 
-public class Assessables: Identifiable, Equatable, ObservableObject {
+public class Assessables: Identifiable, Equatable {
     public var id: UUID = UUID()
     var factors: [AssessmentFactor] = []
-    var moc: NSManagedObjectContext
-    var isEmpty: Bool {self.factors.isEmpty}
+    var moc: NSManagedObjectContext?
     var score: Int = 0
     var weight: ActivityWeight = .empty
 
@@ -20,15 +19,23 @@ public class Assessables: Identifiable, Equatable, ObservableObject {
         return lhs.id == rhs.id
     }
 
-    init(factors: [AssessmentFactor]? = nil, moc: NSManagedObjectContext) {
+    init(factors: [AssessmentFactor]? = nil, moc: NSManagedObjectContext? = nil) {
         self.id = UUID()
-        self.moc = moc
+
+        if moc != nil {
+            self.moc = moc!
+        }
 
         if factors != nil {
             self.factors = factors!
         }
+        
 
         self.evaluate()
+    }
+
+    func isEmpty() -> Bool {
+        return factors.isEmpty
     }
 
     func byType(_ type: EntityType) -> [AssessmentFactor] {
@@ -40,19 +47,15 @@ public class Assessables: Identifiable, Equatable, ObservableObject {
     }
 
     func active() -> [AssessmentFactor] {
-        return self.sorted().filter({$0.alive == true && $0.count >= $0.threshold})
+        return self.sorted().filter({$0.count >= $0.threshold})
     }
 
     func inactive() -> [AssessmentFactor] {
-        return self.sorted().filter({$0.alive == false || $0.count <= $0.threshold})
+        return self.sorted().filter({$0.count <= $0.threshold})
     }
 
     func clear() -> Void {
         self.factors = []
-    }
-
-    func refresh(date: Date) -> Void {
-        self.factors = CDAssessmentFactor(moc: self.moc).all(for: date)
     }
 
     func calculateScore() -> Void {
@@ -82,7 +85,7 @@ public class Assessables: Identifiable, Equatable, ObservableObject {
         }
     }
 
-    private func evaluate() -> Void {
+    func evaluate() -> Void {
         self.calculateScore()
         self.weigh()
     }

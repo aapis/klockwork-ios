@@ -27,7 +27,7 @@ struct Legend: View {
                         Row(assessment: assessment)
                     }
                     RowBasic(colour: .yellow, label: "Today")
-//                    RowBasic(colour: .blue, label: "Selected")
+                    RowBasic(colour: .blue, label: "Selected")
                 }
             }
         }

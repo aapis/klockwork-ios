@@ -67,7 +67,7 @@ struct Month: View {
                         Day(
                             day: 0,
                             isSelected: false,
-                            assessment: Assessment(for: Date(), moc: moc),
+                            assessment: Assessment(moc: moc),
                             calendarDate: $date
                         )
                     )

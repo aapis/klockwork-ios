@@ -19,7 +19,7 @@ struct Day: View, Identifiable {
     @State private var isPresented: Bool = false
     private let gridSize: CGFloat = 40
     private var isToday: Bool {
-        Calendar.autoupdatingCurrent.isDateInToday(self.assessment.date)
+        Calendar.autoupdatingCurrent.isDateInToday(self.assessment.date ?? Date())
     }
 
     var body: some View {
