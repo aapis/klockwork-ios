@@ -38,7 +38,7 @@ struct Factors: View {
     }
     
     /// Onload handler
-    /// - Returns: <#description#>
+    /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.factors = assessables.byType(type)
     }

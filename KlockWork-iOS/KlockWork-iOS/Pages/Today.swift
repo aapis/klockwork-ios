@@ -15,15 +15,11 @@ struct Today: View {
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
 
-    private var idate: IdentifiableDay {
-        return DateHelper.identifiedDate(for: date, moc: moc)
-    }
-
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 if !inSheet {
-                    Header(job: $job, date: $date, idate: idate)
+                    Header(job: $job, date: $date)
                 }
 
                 ZStack(alignment: .bottomLeading) {
@@ -56,12 +52,11 @@ extension Today {
     struct Header: View {
         @Binding public var job: Job?
         @Binding public var date: Date
-        public var idate: IdentifiableDay
 
         var body: some View {
             HStack(alignment: .center) {
                 HStack(alignment: .center, spacing: 8) {
-                    Text(DateHelper.isCurrentDay(idate) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
+                    Text(Calendar.autoupdatingCurrent.isDateInToday(date) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .padding([.leading, .top, .bottom])
@@ -133,7 +128,11 @@ extension Today.Editor {
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
             if let job = self.job {
-                let _ = CoreDataRecords(moc: moc).createWithJob(job: job, date: date, text: text)
+                CoreDataRecords(moc: moc).createWithJob(
+                    job: job,
+                    date: Date(), // LogRecord.createdDate == CURRENT DATE
+                    text: text
+                )
                 text = ""
             }
         }

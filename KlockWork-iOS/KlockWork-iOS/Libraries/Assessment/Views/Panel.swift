@@ -19,7 +19,7 @@ struct Panel: View {
                     Divider().background(.gray).frame(height: 1)
                     ZStack(alignment: .topLeading) {
                         OverviewWidget(assessment: assessment)
-                            .navigationTitle(assessment.date.formatted(date: .abbreviated, time: .omitted))
+                            .navigationTitle(date.formatted(date: .abbreviated, time: .omitted))
                             .toolbarTitleDisplayMode(.inline)
                             .toolbar {
                                 NavigationLink {
@@ -43,7 +43,10 @@ struct Panel: View {
             }
         }
         .onAppear(perform: {
-            calendarDate = assessment.date
+//            calendarDate = assessment.date!
+            if let date = assessment.date {
+                self.date = date
+            }
         })
         .presentationDetents([.medium, .large])
         .presentationBackground(Theme.cGreen)

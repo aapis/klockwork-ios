@@ -90,7 +90,7 @@ struct ActivityCalendar: View {
                             .contentShape(Rectangle())
                             .opacity(0.011)
                         }
-
+                        
                         Button {
                             CDAssessmentFactor(moc: self.moc).delete()
                             self.date = Date()
@@ -131,7 +131,6 @@ struct ActivityCalendar: View {
                     }
                 }
                 .background(Theme.rowColour)
-
 
                 // List of days representing 1 month
                 Month(date: $date, cumulativeScore: $cumulativeScore, month: $month, searchTerm: searchTerm)
