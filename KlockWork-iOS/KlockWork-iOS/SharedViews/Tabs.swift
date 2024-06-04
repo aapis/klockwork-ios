@@ -8,23 +8,36 @@
 import SwiftUI
 
 struct Tabs: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     public var inSheet: Bool
     @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
     @Binding public var selected: EntityType
     @Binding public var date: Date
     public var content: AnyView? = nil
+    public var buttons: AnyView? = nil
+    public var title: AnyView? = nil
     static public let animationDuration: Double = 0.2
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Buttons(inSheet: inSheet, job: $job, selected: $selected)
-                .swipe([.left, .right]) { swipe in
-                    self.actionOnSwipe(swipe)
-                }
-            MiniTitleBar(selected: $selected)
-                .border(width: 1, edges: [.bottom], color: .yellow)
-            
+            if buttons == nil {
+                Buttons(inSheet: inSheet, job: $job, selected: $selected)
+                    .swipe([.left, .right]) { swipe in
+                        self.actionOnSwipe(swipe)
+                    }
+            } else {
+                buttons
+            }
+
+            if title == nil {
+                MiniTitleBar(selected: $selected)
+                    .border(width: 1, edges: [.bottom], color: .yellow)
+            } else {
+                title
+            }
+
             if content == nil {
                 Content(inSheet: inSheet, job: $job, selected: $selected, date: $date)
                     .swipe([.left, .right]) { swipe in

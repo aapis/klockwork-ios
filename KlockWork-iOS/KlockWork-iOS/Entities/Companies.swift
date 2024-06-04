@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct Companies: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     private let entityType: EntityType = .companies
     @State public var items: [Company] = []
 

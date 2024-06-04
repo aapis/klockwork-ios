@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct Jobs: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     private let entityType: EntityType = .jobs
     @State public var items: [Job] = []
 

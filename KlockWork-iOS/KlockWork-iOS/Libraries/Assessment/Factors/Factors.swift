@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct Factors: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     public var assessables: Assessables
     @Binding public var type: EntityType
     @State private var factors: [AssessmentFactor] = []

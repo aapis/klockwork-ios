@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct Today: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     public var inSheet: Bool
     @Binding public var date: Date
     @Environment(\.managedObjectContext) var moc

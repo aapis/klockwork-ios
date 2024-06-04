@@ -9,6 +9,8 @@ import SwiftUI
 import CoreData
 
 struct FactorProxy {
+    typealias EntityType = PageConfiguration.EntityType
+
     var id = UUID()
     var alive: Bool = true
     var count: Int64 = 0

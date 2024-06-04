@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MiniTitleBar: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     @Binding public var selected: EntityType
 
     var body: some View {

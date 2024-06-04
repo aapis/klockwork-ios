@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct Records: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     private let entityType: EntityType = .records
     @State public var items: [LogRecord] = []
 

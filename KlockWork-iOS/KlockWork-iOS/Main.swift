@@ -24,7 +24,7 @@ struct Main: View {
                 Image(systemName: "globe.desk")
                 Text("Explore")
             }
-            Planning(date: $date)
+            Planning(inSheet: false, date: $date)
             .tabItem {
                 Image(systemName: "hexagon")
                 Text("Planning")
