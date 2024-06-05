@@ -115,11 +115,12 @@ extension PlanTabs {
         @Binding public var job: Job?
         @Binding public var selected: PlanType
         @Binding public var date: Date
+        @State private var selectedJobs: [Job] = []
 
         var body: some View {
             switch selected {
             case .daily:
-                Daily()
+                Daily(date: $date, selectedJobs: $selectedJobs)
             case .feature:
                 Feature()
             }
@@ -129,23 +130,27 @@ extension PlanTabs {
 
 extension PlanTabs {
     struct Daily: View {
+        typealias Row = Tabs.Content.Individual.SingleJobLink
+
+        @Binding public var date: Date
+        @Binding public var selectedJobs: [Job]
         @State private var isJobSelectorPresent: Bool = false
+
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                SelectedItems()
-
-                ScrollView(showsIndicators: false) {
-                    VStack {
-                        Text("Something")
-                        Text("Something")
-                        Text("Something")
-                        Text("Something")
-
+                SelectedItems(selectedJobs: $selectedJobs)
+                ZStack(alignment: .bottomLeading) {
+                    ZStack(alignment: .topLeading){
+                        ScrollView(showsIndicators: false) {
+                            VStack(spacing: 1) {
+                                ForEach(selectedJobs) { job in
+                                    Row(job: job)
+                                }
+                            }
+                        }
                     }
+                    ActionBar
                 }
-
-                Spacer()
-                ActionBar
             }
         }
 
@@ -156,13 +161,14 @@ extension PlanTabs {
                     Spacer()
                     ActionBarResetButton
                 }
-                .padding(5)
-                .background(Theme.rowColour)
+                .background(Theme.cOrange.opacity(0.5))
+
             }
             .clipShape(.rect(cornerRadius: 28))
+            .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)
             .padding()
             .sheet(isPresented: $isJobSelectorPresent) {
-                JobSelector(showing: $isJobSelectorPresent)
+                JobSelector(showing: $isJobSelectorPresent, selectedJobs: $selectedJobs)
             }
         }
 
@@ -170,54 +176,125 @@ extension PlanTabs {
             Button {
                 self.isJobSelectorPresent.toggle()
             } label: {
-                Image(systemName: "plus")
+                Image(systemName: "plus.circle.fill")
                     .fontWeight(.bold)
                     .font(.largeTitle)
-                    .foregroundStyle(Theme.cOrange)
-                    .padding(5)
             }
-            .background(.yellow)
             .clipShape(.circle)
+            .padding([.leading], 8)
         }
 
         @ViewBuilder var ActionBarResetButton: some View {
             Button {
-
+                selectedJobs = []
             } label: {
                 Image(systemName: "arrow.clockwise.circle.fill")
-                    .symbolRenderingMode(.multicolor)
                     .fontWeight(.bold)
                     .font(.largeTitle)
-                    .foregroundStyle(0 > 1 ? .yellow : .gray)
+                    .foregroundStyle(selectedJobs.count > 0 ? .yellow : .gray)
                     .padding(5)
             }
-            .background(0 > 1 ? .yellow : .gray)
-            .clipShape(.circle)
-            .disabled(0 > 1)
         }
 
         struct JobSelector: View {
+            typealias Row = Tabs.Content.Individual.SingleJobCustomButton
+
+            @FetchRequest private var items: FetchedResults<Job>
             @Binding public var showing: Bool
+            @Binding private var selectedJobs: [Job]
+
+            private var columns: [GridItem] {
+                return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
+            }
 
             var body: some View {
-                Text("Job selector")
+                ScrollView {
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
+                        HStack(alignment: .center, spacing: 0) {
+                            Text("What are you working on today?")
+                                .fontWeight(.bold)
+                                .font(.title2)
+                            Spacer()
+                            Button {
+                                showing.toggle()
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                        .padding()
+
+                        HStack(alignment: .center, spacing: 5) {
+                            Spacer()
+                            Text("Selected")
+                            Text(String(selectedJobs.count))
+                        }
+                        .padding()
+
+                        if items.count > 0 {
+                            ForEach(items) { jerb in
+                                Row(job: jerb, alreadySelected: self.jobIsSelected(jerb), callback: { job, action in
+                                    if action == .add {
+                                        selectedJobs.append(job)
+                                    } else if action == .remove {
+                                        if let index = selectedJobs.firstIndex(where: {$0 == job}) {
+                                            selectedJobs.remove(at: index)
+                                        }
+                                    }
+                                })
+                            }
+                        } else {
+                            StatusMessage.Warning(message: "No jobs modified within the last 7 days")
+                        }
+                    }
+                }
+                .scrollContentBackground(.hidden)
+                .presentationBackground(Theme.cOrange)
+                .navigationTitle("Jobs")
+            }
+
+            init(showing: Binding<Bool>, selectedJobs: Binding<[Job]>) {
+                _showing = showing
+                _selectedJobs = selectedJobs
+                _items = CoreDataJob.fetchAll()
+            }
+            
+            /// Determine if a given job is already within the selectedJobs list
+            /// - Parameter job: Job
+            /// - Returns: Bool
+            private func jobIsSelected(_ job: Job) -> Bool {
+                return selectedJobs.firstIndex(where: {$0 == job}) != nil
             }
         }
 
         struct SelectedItems: View {
+            @Binding public var selectedJobs: [Job]
+            @State private var taskCount: Int = 0
+            @State private var jobCount: Int = 0
+            @State private var noteCount: Int = 0
+            @State private var projectCount: Int = 0
+            @State private var companyCount: Int = 0
+
             var body: some View {
                 VStack {
                     HStack(alignment: .center, spacing: 0) {
-                        MenuItem(count: 0, icon: "checklist", description: "task(s) selected")
-                        MenuItem(count: 0, icon: "hammer", description: "job(s) selected")
-                        MenuItem(count: 0, icon: "note.text", description: "note(s) selected")
-                        MenuItem(count: 0, icon: "folder", description: "jobs selected")
-                        MenuItem(count: 0, icon: "building.2", description: "jobs selected")
+                        MenuItem(count: taskCount, icon: "checklist", description: "task(s) selected")
+                        MenuItem(count: selectedJobs.count, icon: "hammer", description: "job(s) selected")
+                        MenuItem(count: noteCount, icon: "note.text", description: "note(s) selected")
+                        MenuItem(count: projectCount, icon: "folder", description: "jobs selected")
+                        MenuItem(count: companyCount, icon: "building.2", description: "jobs selected")
                         Spacer()
                     }
                     .padding([.top, .bottom])
                     .background(Theme.textBackground)
+                    .onAppear(perform: self.actionOnAppear)
+                    .onChange(of: selectedJobs) {self.actionOnAppear()}
                 }
+            }
+            
+            /// Onload handler
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+                taskCount = selectedJobs.count * 2
             }
         }
 
@@ -235,6 +312,12 @@ extension PlanTabs {
                         .help("\(count) \(description)")
                 }
                 .padding([.leading, .trailing], 8)
+            }
+        }
+
+        struct PlanRow: View {
+            var body: some View {
+                Text("Hi")
             }
         }
     }

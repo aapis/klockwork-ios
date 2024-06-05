@@ -32,3 +32,41 @@ struct ListRow: View {
         .listRowBackground(colour)
     }
 }
+
+struct ToggleableListRow: View {
+    public let name: String
+    public var colour: Color? = .clear
+    public var iconOff: String = "chevron.right"
+    public var iconOn: String = "chevron.left"
+    public var extraColumn: AnyView?
+    public var highlight: Bool = true
+    @Binding public var selected: Bool
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 5) {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text(name)
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.leading)
+                    .padding(6)
+                    .background(highlight ? .black.opacity(0.2) : .clear)
+                    .cornerRadius(5)
+                Spacer()
+                extraColumn
+            }
+
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Image(systemName: selected ? iconOn : iconOff)
+                    .foregroundStyle(.yellow)
+                    .font(.title3)
+                    .padding(1)
+            }
+            .background(selected ? .yellow : .clear)
+            .listRowBackground(selected ? Color.yellow : Color.clear)
+            .cornerRadius(5)
+        }
+        .padding(8)
+        .background(selected ? colour.opacity(1) : colour.opacity(0.3))
+        .listRowBackground(selected ? colour.opacity(1) : colour.opacity(0.3))
+    }
+}
