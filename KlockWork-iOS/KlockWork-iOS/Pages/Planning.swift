@@ -19,29 +19,6 @@ struct Planning: View {
     @State private var job: Job? = nil
     @State private var selected: PlanType = .daily
 
-//    var original: some View {
-//        NavigationStack {
-//            VStack(alignment: .leading, spacing: 0) {
-//                Header(date: $date)
-//                ZStack(alignment: .bottomLeading) {
-////                        Tabs(job: $job, selected: $selected, date: $date)
-//                    Content(text: $text)
-//                    LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
-//                        .frame(height: 50)
-//                        .opacity(0.1)
-//                }
-//
-////                QueryField(prompt: "What can I help you find?", onSubmit: self.actionOnSubmit, text: $text)
-//                Spacer().frame(height: 1)
-//            }
-//            .background(Theme.cOrange)
-//            .navigationBarTitleDisplayMode(.inline)
-//            .toolbar(inSheet ? .visible : .hidden)
-//            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-//            .toolbarBackground(.visible, for: .navigationBar)
-//        }
-//    }
-
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
@@ -51,12 +28,9 @@ struct Planning: View {
                     inSheet: true,
                     job: $job,
                     selected: $selected,
-                    date: $date,
-                    content: AnyView(
-                        Text("Hello")
-                        .environment(\.managedObjectContext, moc)
-                    )
+                    date: $date
                 )
+                
                 Spacer()
             }
             .background(Theme.cOrange)

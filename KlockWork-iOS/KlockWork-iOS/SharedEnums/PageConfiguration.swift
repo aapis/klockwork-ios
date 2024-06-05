@@ -39,8 +39,8 @@ extension PageConfiguration {
         /// Associated icon
         var icon: Image {
             switch self {
-            case .daily: Image(systemName: "tray")
-            case .feature: Image(systemName: "tray")
+            case .daily: Image(systemName: "calendar")
+            case .feature: Image(systemName: "list.bullet.below.rectangle")
             }
         }
     }

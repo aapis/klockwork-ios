@@ -32,8 +32,8 @@ struct PlanTabs: View {
             }
 
             if title == nil {
-//                MiniTitleBar(selected: $selected)
-//                    .border(width: 1, edges: [.bottom], color: .yellow)
+                MiniTitleBarPlan(selected: $selected)
+                    .border(width: 1, edges: [.bottom], color: .yellow)
             } else {
                 title
             }
@@ -129,14 +129,128 @@ extension PlanTabs {
 
 extension PlanTabs {
     struct Daily: View {
+        @State private var isJobSelectorPresent: Bool = false
         var body: some View {
-            Text("Daily")
+            VStack(alignment: .leading, spacing: 0) {
+                SelectedItems()
+
+                ScrollView(showsIndicators: false) {
+                    VStack {
+                        Text("Something")
+                        Text("Something")
+                        Text("Something")
+                        Text("Something")
+
+                    }
+                }
+
+                Spacer()
+                ActionBar
+            }
+        }
+
+        @ViewBuilder var ActionBar: some View {
+            VStack(alignment: .leading) {
+                HStack(alignment: .center, spacing: 10) {
+                    ActionBarAddButton
+                    Spacer()
+                    ActionBarResetButton
+                }
+                .padding(5)
+                .background(Theme.rowColour)
+            }
+            .clipShape(.rect(cornerRadius: 28))
+            .padding()
+            .sheet(isPresented: $isJobSelectorPresent) {
+                JobSelector(showing: $isJobSelectorPresent)
+            }
+        }
+
+        @ViewBuilder var ActionBarAddButton: some View {
+            Button {
+                self.isJobSelectorPresent.toggle()
+            } label: {
+                Image(systemName: "plus")
+                    .fontWeight(.bold)
+                    .font(.largeTitle)
+                    .foregroundStyle(Theme.cOrange)
+                    .padding(5)
+            }
+            .background(.yellow)
+            .clipShape(.circle)
+        }
+
+        @ViewBuilder var ActionBarResetButton: some View {
+            Button {
+
+            } label: {
+                Image(systemName: "arrow.clockwise.circle.fill")
+                    .symbolRenderingMode(.multicolor)
+                    .fontWeight(.bold)
+                    .font(.largeTitle)
+                    .foregroundStyle(0 > 1 ? .yellow : .gray)
+                    .padding(5)
+            }
+            .background(0 > 1 ? .yellow : .gray)
+            .clipShape(.circle)
+            .disabled(0 > 1)
+        }
+
+        struct JobSelector: View {
+            @Binding public var showing: Bool
+
+            var body: some View {
+                Text("Job selector")
+            }
+        }
+
+        struct SelectedItems: View {
+            var body: some View {
+                VStack {
+                    HStack(alignment: .center, spacing: 0) {
+                        MenuItem(count: 0, icon: "checklist", description: "task(s) selected")
+                        MenuItem(count: 0, icon: "hammer", description: "job(s) selected")
+                        MenuItem(count: 0, icon: "note.text", description: "note(s) selected")
+                        MenuItem(count: 0, icon: "folder", description: "jobs selected")
+                        MenuItem(count: 0, icon: "building.2", description: "jobs selected")
+                        Spacer()
+                    }
+                    .padding([.top, .bottom])
+                    .background(Theme.textBackground)
+                }
+            }
+        }
+
+        struct MenuItem: View {
+            var count: Int
+            var icon: String
+            var description: String
+
+            var body: some View {
+                HStack {
+                    Text("\(count)")
+                        .foregroundStyle(count > 0 ? .yellow : .gray)
+                    Image(systemName: icon)
+                        .foregroundStyle(count > 0 ? .yellow : .gray)
+                        .help("\(count) \(description)")
+                }
+                .padding([.leading, .trailing], 8)
+            }
         }
     }
 
     struct Feature: View  {
         var body: some View {
-            Text("Feature")
+            VStack {
+                HStack {
+                    Text("Feature planning is coming soon")
+                    Spacer()
+                }
+                .padding()
+                .background(Theme.textBackground)
+                .clipShape(.rect(cornerRadius: 16))
+            }
+            .padding()
         }
     }
 }
