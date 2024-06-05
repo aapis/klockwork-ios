@@ -10,6 +10,7 @@ import SwiftUI
 
 struct Today: View {
     typealias EntityType = PageConfiguration.EntityType
+    typealias PlanType = PageConfiguration.PlanType
 
     public var inSheet: Bool
     @Binding public var date: Date

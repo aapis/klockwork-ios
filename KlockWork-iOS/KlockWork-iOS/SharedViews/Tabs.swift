@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// @TODO: refactor into one that supports any PageConfiguration enum
 struct Tabs: View {
     typealias EntityType = PageConfiguration.EntityType
 
@@ -59,7 +60,7 @@ struct Tabs: View {
 extension Tabs {
     public func actionOnSwipe(_ swipe: Swipe) -> Void {
         let tabs = EntityType.allCases
-        if var selectedIndex = tabs.firstIndex(of: selected) {
+        if var selectedIndex = (tabs.firstIndex(of: self.selected)) {
             if swipe == .left {
                 if selectedIndex <= tabs.count - 2 {
                     selectedIndex += 1

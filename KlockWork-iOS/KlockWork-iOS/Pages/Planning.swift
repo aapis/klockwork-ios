@@ -10,13 +10,14 @@ import SwiftUI
 
 struct Planning: View {
     typealias EntityType = PageConfiguration.EntityType
+    typealias PlanType = PageConfiguration.PlanType
 
     public var inSheet: Bool
     @Binding public var date: Date
     @Environment(\.managedObjectContext) var moc
     @State private var text: String = ""
     @State private var job: Job? = nil
-    @State private var selected: EntityType = .records // @TODO: not records
+    @State private var selected: PlanType = .daily
 
 //    var original: some View {
 //        NavigationStack {
@@ -46,7 +47,7 @@ struct Planning: View {
             VStack(alignment: .leading, spacing: 0) {
                 Header(date: $date)
                 Divider().background(.gray).frame(height: 1)
-                Tabs(
+                PlanTabs(
                     inSheet: true,
                     job: $job,
                     selected: $selected,

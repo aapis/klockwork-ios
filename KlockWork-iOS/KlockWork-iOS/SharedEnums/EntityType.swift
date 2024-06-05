@@ -8,9 +8,48 @@
 import SwiftUI
 
 struct PageConfiguration {
-    enum EntityType: CaseIterable {
+    let entityType: EntityType
+    let planType: PlanType
+
+    var description: String {
+        return "Entity"
+    }
+}
+
+extension PageConfiguration {
+    enum PlanType: CaseIterable, Equatable {
+        case daily, feature
+
+        /// Interface-friendly representation
+        var label: String {
+            switch self {
+            case .daily: "Daily"
+            case .feature: "Feature"
+            }
+        }
+
+        // @TODO: localize somehow?
+        var enSingular: String {
+            switch self {
+            case .daily: "Day"
+            case .feature: "Feature"
+            }
+        }
+
+        /// Associated icon
+        var icon: Image {
+            switch self {
+            case .daily: Image(systemName: "tray")
+            case .feature: Image(systemName: "tray")
+            }
+        }
+    }
+}
+
+extension PageConfiguration {
+    enum EntityType: CaseIterable, Equatable {
         case records, jobs, tasks, notes, companies, people, projects
-        
+
         /// Interface-friendly representation
         var label: String {
             switch self {
@@ -23,7 +62,7 @@ struct PageConfiguration {
             case .projects: "Projects"
             }
         }
-        
+
         // @TODO: localize somehow?
         var enSingular: String {
             switch self {
@@ -36,7 +75,7 @@ struct PageConfiguration {
             case .projects: "Project"
             }
         }
-        
+
         /// Associated icon
         var icon: Image {
             switch self {
@@ -50,8 +89,10 @@ struct PageConfiguration {
             }
         }
     }
-    
-    public struct EntityTypePair {
+}
+
+extension PageConfiguration {
+    struct EntityTypePair {
         var key: EntityType
         var value: Int
     }
