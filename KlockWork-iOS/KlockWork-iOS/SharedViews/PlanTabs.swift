@@ -115,12 +115,11 @@ extension PlanTabs {
         @Binding public var job: Job?
         @Binding public var selected: PlanType
         @Binding public var date: Date
-        @State private var selectedJobs: [Job] = []
 
         var body: some View {
             switch selected {
             case .daily:
-                Daily(date: $date, selectedJobs: $selectedJobs)
+                Daily(date: $date)
             case .feature:
                 Feature()
             }
@@ -131,16 +130,56 @@ extension PlanTabs {
 extension PlanTabs {
     struct Daily: View {
         typealias Row = PlanRow
-
+        
+        @Environment(\.managedObjectContext) var moc
         @Binding public var date: Date
-        @Binding public var selectedJobs: [Job]
+        @State private var selectedJobs: [Job] = []
+        @State private var selectedTasks: [LogTask] = []
+        @State private var selectedNotes: [Note] = []
+        @State private var selectedProjects: [Project] = []
+        @State private var selectedCompanies: [Company] = []
         @State private var isJobSelectorPresent: Bool = false
         @State private var score: Int = 0
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                SelectedItems(selectedJobs: $selectedJobs)
-                
+                SelectedItems(
+                    jobs: $selectedJobs,
+                    tasks: $selectedTasks,
+                    notes: $selectedNotes,
+                    projects: $selectedProjects,
+                    companies: $selectedCompanies
+                )
+                .onChange(of: selectedJobs) {
+                    Task {
+                        if selectedJobs.count > 0 {
+                            for job in selectedJobs {
+                                let tasks = job.tasks?.allObjects as! [LogTask]
+                                if tasks.count > 0 {
+                                    selectedTasks.append(contentsOf: tasks.filter {$0.completedDate == nil && $0.cancelledDate == nil})
+                                }
+
+                                let notes = job.mNotes?.allObjects as! [Note]
+                                if notes.count > 0 {
+                                    selectedNotes.append(contentsOf: notes.filter {$0.alive == true})
+                                }
+
+                                if let project = job.project {
+                                    if !selectedProjects.contains(where: {$0 == project}) {
+                                        selectedProjects.append(project)
+                                    }
+
+                                    if let company = job.project?.company {
+                                        if !selectedCompanies.contains(where: {$0 == company}) {
+                                            selectedCompanies.append(company)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 ZStack(alignment: .bottomLeading) {
                     ZStack(alignment: .topLeading){
                         ScrollView(showsIndicators: false) {
@@ -290,7 +329,11 @@ extension PlanTabs {
         }
 
         struct SelectedItems: View {
-            @Binding public var selectedJobs: [Job]
+            @Binding public var jobs: [Job]
+            @Binding public var tasks: [LogTask]
+            @Binding public var notes: [Note]
+            @Binding public var projects: [Project]
+            @Binding public var companies: [Company]
             @State private var taskCount: Int = 0
             @State private var jobCount: Int = 0
             @State private var noteCount: Int = 0
@@ -300,24 +343,24 @@ extension PlanTabs {
             var body: some View {
                 VStack {
                     HStack(alignment: .center, spacing: 0) {
-                        MenuItem(count: taskCount, icon: "checklist", description: "task(s) selected")
-                        MenuItem(count: selectedJobs.count, icon: "hammer", description: "job(s) selected")
-                        MenuItem(count: noteCount, icon: "note.text", description: "note(s) selected")
-                        MenuItem(count: projectCount, icon: "folder", description: "jobs selected")
-                        MenuItem(count: companyCount, icon: "building.2", description: "jobs selected")
+                        MenuItem(count: tasks.count, icon: "checklist", description: "task(s) selected")
+                        MenuItem(count: jobs.count, icon: "hammer", description: "job(s) selected")
+                        MenuItem(count: notes.count, icon: "note.text", description: "note(s) selected")
+                        MenuItem(count: projects.count, icon: "folder", description: "project(s) selected")
+                        MenuItem(count: companies.count, icon: "building.2", description: " selected")
                         Spacer()
                     }
                     .padding([.top, .bottom])
                     .background(Theme.textBackground)
-                    .onAppear(perform: self.actionOnAppear)
-                    .onChange(of: selectedJobs) {self.actionOnAppear()}
+//                    .onAppear(perform: self.actionOnAppear)
+//                    .onChange(of: jobs) {self.actionOnAppear()}
                 }
             }
             
             /// Onload handler
             /// - Returns: Void
             private func actionOnAppear() -> Void {
-                taskCount = selectedJobs.count * 2
+
             }
         }
 
