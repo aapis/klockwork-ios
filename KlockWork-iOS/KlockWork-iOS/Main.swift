@@ -14,6 +14,11 @@ struct Main: View {
 
     var body: some View {
         TabView {
+            Planning(inSheet: false, date: $date)
+            .tabItem {
+                Image(systemName: "hexagon")
+                Text("Planning")
+            }
             Today(inSheet: false, date: $date)
             .tabItem {
                 Image(systemName: "tray")
@@ -24,12 +29,6 @@ struct Main: View {
                 Image(systemName: "globe.desk")
                 Text("Explore")
             }
-            Planning(inSheet: false, date: $date)
-            .tabItem {
-                Image(systemName: "hexagon")
-                Text("Planning")
-            }
-            
             Find(date: $date)
             .tabItem {
                 Image(systemName: "magnifyingglass")
