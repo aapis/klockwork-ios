@@ -18,6 +18,11 @@ struct PlanTabs: View {
     public var content: AnyView? = nil
     public var buttons: AnyView? = nil
     public var title: AnyView? = nil
+    @State private var selectedJobs: [Job] = []
+    @State private var selectedTasks: [LogTask] = []
+    @State private var selectedNotes: [Note] = []
+    @State private var selectedProjects: [Project] = []
+    @State private var selectedCompanies: [Company] = []
     static public let animationDuration: Double = 0.2
 
     var body: some View {
@@ -39,7 +44,17 @@ struct PlanTabs: View {
             }
 
             if content == nil {
-                Content(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                Content(
+                    inSheet: inSheet,
+                    job: $job,
+                    selected: $selected,
+                    selectedJobs: $selectedJobs,
+                    selectedTasks: $selectedTasks,
+                    selectedNotes: $selectedNotes,
+                    selectedProjects: $selectedProjects,
+                    selectedCompanies: $selectedCompanies,
+                    date: $date
+                )
                     .swipe([.left, .right]) { swipe in
                         self.actionOnSwipe(swipe)
                     }
@@ -114,12 +129,24 @@ extension PlanTabs {
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: PlanType
+        @Binding public var selectedJobs: [Job]
+        @Binding public var selectedTasks: [LogTask]
+        @Binding public var selectedNotes: [Note]
+        @Binding public var selectedProjects: [Project]
+        @Binding public var selectedCompanies: [Company]
         @Binding public var date: Date
 
         var body: some View {
             switch selected {
             case .daily:
-                Daily(date: $date)
+                Daily(
+                    date: $date,
+                    selectedJobs: $selectedJobs,
+                    selectedTasks: $selectedTasks,
+                    selectedNotes: $selectedNotes,
+                    selectedProjects: $selectedProjects,
+                    selectedCompanies: $selectedCompanies
+                )
             case .feature:
                 Feature()
             }
@@ -133,11 +160,11 @@ extension PlanTabs {
         
         @Environment(\.managedObjectContext) var moc
         @Binding public var date: Date
-        @State private var selectedJobs: [Job] = []
-        @State private var selectedTasks: [LogTask] = []
-        @State private var selectedNotes: [Note] = []
-        @State private var selectedProjects: [Project] = []
-        @State private var selectedCompanies: [Company] = []
+        @Binding public var selectedJobs: [Job]
+        @Binding public var selectedTasks: [LogTask]
+        @Binding public var selectedNotes: [Note]
+        @Binding public var selectedProjects: [Project]
+        @Binding public var selectedCompanies: [Company]
         @State private var isJobSelectorPresent: Bool = false
         @State private var score: Int = 0
 
@@ -154,16 +181,6 @@ extension PlanTabs {
                     Task {
                         if selectedJobs.count > 0 {
                             for job in selectedJobs {
-                                let tasks = job.tasks?.allObjects as! [LogTask]
-                                if tasks.count > 0 {
-                                    selectedTasks.append(contentsOf: tasks.filter {$0.completedDate == nil && $0.cancelledDate == nil})
-                                }
-
-                                let notes = job.mNotes?.allObjects as! [Note]
-                                if notes.count > 0 {
-                                    selectedNotes.append(contentsOf: notes.filter {$0.alive == true})
-                                }
-
                                 if let project = job.project {
                                     if !selectedProjects.contains(where: {$0 == project}) {
                                         selectedProjects.append(project)
@@ -185,7 +202,13 @@ extension PlanTabs {
                         ScrollView(showsIndicators: false) {
                             VStack(spacing: 1) {
                                 ForEach(selectedJobs.sorted(by: {$0.project != nil && $1.project != nil ? $0.project!.name! > $1.project!.name! && $0.jid < $1.jid : $0.jid < $1.jid})) { job in // sooo sorry
-                                    Row(job: job)
+                                    Row(
+                                        job: job,
+                                        selectedTasks: $selectedTasks,
+                                        selectedNotes: $selectedNotes,
+                                        selectedProjects: $selectedProjects,
+                                        selectedCompanies: $selectedCompanies
+                                    )
                                 }
                             }
                         }
@@ -311,7 +334,6 @@ extension PlanTabs {
                 }
                 .scrollContentBackground(.hidden)
                 .presentationBackground(Theme.cOrange)
-                .navigationTitle("Jobs")
             }
 
             init(showing: Binding<Bool>, selectedJobs: Binding<[Job]>) {
@@ -334,33 +356,20 @@ extension PlanTabs {
             @Binding public var notes: [Note]
             @Binding public var projects: [Project]
             @Binding public var companies: [Company]
-            @State private var taskCount: Int = 0
-            @State private var jobCount: Int = 0
-            @State private var noteCount: Int = 0
-            @State private var projectCount: Int = 0
-            @State private var companyCount: Int = 0
 
             var body: some View {
                 VStack {
                     HStack(alignment: .center, spacing: 0) {
-                        MenuItem(count: tasks.count, icon: "checklist", description: "task(s) selected")
                         MenuItem(count: jobs.count, icon: "hammer", description: "job(s) selected")
+                        MenuItem(count: tasks.count, icon: "checklist", description: "task(s) selected")
                         MenuItem(count: notes.count, icon: "note.text", description: "note(s) selected")
-                        MenuItem(count: projects.count, icon: "folder", description: "project(s) selected")
                         MenuItem(count: companies.count, icon: "building.2", description: " selected")
+                        MenuItem(count: projects.count, icon: "folder", description: "project(s) selected")
                         Spacer()
                     }
                     .padding([.top, .bottom])
                     .background(Theme.textBackground)
-//                    .onAppear(perform: self.actionOnAppear)
-//                    .onChange(of: jobs) {self.actionOnAppear()}
                 }
-            }
-            
-            /// Onload handler
-            /// - Returns: Void
-            private func actionOnAppear() -> Void {
-
             }
         }
 
@@ -385,57 +394,140 @@ extension PlanTabs {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButton
 
             public var job: Job
+            @Binding public var selectedTasks: [LogTask]
+            @Binding public var selectedNotes: [Note]
+            @Binding public var selectedProjects: [Project]
+            @Binding public var selectedCompanies: [Company]
             @FetchRequest private var incompleteTasks: FetchedResults<LogTask>
             @FetchRequest private var notes: FetchedResults<Note>
             @State private var isDetailsPresented: Bool = false
+            @State private var isCompanyPresented: Bool = false
+            @State private var isProjectPresented: Bool = false
 
             var body: some View {
-                VStack(alignment: .leading, spacing: 1) {
-                    Row(job: job, callback: self.rowTapCallback)
+                NavigationStack {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Row(job: job, callback: self.rowTapCallback)
 
-                    if isDetailsPresented {
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text("Incomplete Tasks")
-                                Spacer()
+                        if isDetailsPresented {
+                            VStack(alignment: .leading) {
+                                OwnershipHierarchy
+                                IncompleteTasks
+                                Notes
                             }
-
-                            if incompleteTasks.count > 0 {
-                                VStack(alignment: .leading, spacing: 1) {
-                                    ForEach(incompleteTasks) { task in
-                                        PlanRowTask(task: task)
-                                    }
-                                }
-                            } else {
-                                Text("Add one")
-                            }
-
-                            HStack {
-                                Text("Notes")
-                                Spacer()
-                            }
-
-                            if notes.count > 0 {
-                                VStack(alignment: .leading, spacing: 1) {
-                                    ForEach(notes) { note in
-                                        PlanRowNote(note: note)
-                                    }
-                                }
-                            } else {
-                                Text("Add one")
-                            }
+                            .background(job.backgroundColor.opacity(0.5))
+                            .background(.gray)
                         }
-                        .padding()
-                        .background(job.backgroundColor.opacity(0.5))
-                        .background(.gray)
                     }
                 }
             }
 
-            init(job: Job) {
+            @ViewBuilder private var OwnershipHierarchy: some View {
+                LegendLabel(label: "Path")
+                    .padding([.top, .leading], 8)
+
+                HStack(alignment: .center, spacing: 8) {
+                    if let project = self.job.project {
+                        if let company = project.company {
+                            if company.name != nil {
+                                Button {
+                                    self.isCompanyPresented.toggle()
+                                } label: {
+                                    Text(company.name!)
+                                }
+                            }
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                        }
+
+                        if project.name != nil {
+                            Button {
+                                self.isProjectPresented.toggle()
+                            } label: {
+                                Text(project.name!)
+                            }
+                        }
+                    }
+                    Spacer()
+                }
+                .padding(8)
+                .background(Theme.textBackground)
+                .sheet(isPresented: $isCompanyPresented) {
+                    if let project = self.job.project {
+                        if let company = project.company {
+                            CompanyDetail(company: company)
+                                .scrollContentBackground(.hidden)
+                                .presentationBackground(Theme.cOrange)
+                        }
+                    }
+                }
+                .sheet(isPresented: $isProjectPresented) {
+                    if let project = self.job.project {
+                        ProjectDetail(project: project)
+                            .scrollContentBackground(.hidden)
+                            .presentationBackground(Theme.cOrange)
+                    }
+                }
+            }
+
+            @ViewBuilder private var IncompleteTasks: some View {
+                LegendLabel(label: "Incomplete Tasks")
+                    .padding([.top, .leading], 8)
+
+                if incompleteTasks.count > 0 {
+                    VStack(alignment: .leading, spacing: 1) {
+                        ForEach(incompleteTasks) { task in
+                            PlanRowTask(task: task, callback: self.taskRowTapCallback)
+                        }
+                    }
+                } else {
+                    NavigationLink {
+
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "plus")
+                            Text("New")
+                            Spacer()
+                        }
+                    }
+                    .padding(8)
+                    .background(Theme.textBackground)
+                }
+            }
+
+            @ViewBuilder private var Notes: some View {
+                LegendLabel(label: "Notes")
+                    .padding([.top, .leading], 8)
+
+                if notes.count > 0 {
+                    VStack(alignment: .leading, spacing: 1) {
+                        ForEach(notes) { note in
+                            PlanRowNote(note: note, callback: self.noteRowTapCallback)
+                        }
+                    }
+                } else {
+                    NavigationLink {
+
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "plus")
+                            Text("New")
+                            Spacer()
+                        }
+                    }
+                    .padding(8)
+                    .background(Theme.textBackground)
+                }
+            }
+
+            init(job: Job, selectedTasks: Binding<[LogTask]>, selectedNotes: Binding<[Note]>, selectedProjects: Binding<[Project]>, selectedCompanies: Binding<[Company]>) {
                 self.job = job
                 _incompleteTasks = CoreDataTasks.fetch(by: job)
                 _notes = CoreDataNotes.fetch(by: job)
+                _selectedTasks = selectedTasks
+                _selectedNotes = selectedNotes
+                _selectedProjects = selectedProjects
+                _selectedCompanies = selectedCompanies
             }
             
             /// Handler for when you tap on a single row
@@ -444,41 +536,94 @@ extension PlanTabs {
             private func rowTapCallback(_ job: Job) -> Void {
                 isDetailsPresented.toggle()
             }
-        }
-
-        struct PlanRowTask: View {
-            public var task: LogTask
-            @State private var selected: Bool = false
-
-            var body: some View {
-                Button {
-                    selected.toggle()
-                } label: {
-                    HStack(alignment: .center) {
-                        Image(systemName: selected ? "square.fill" : "square")
-                        if let content = task.content {
-                            Text(content)
-                        }
+            
+            /// Handler for tapping on a task
+            /// - Parameters:
+            ///   - task: LogTask
+            ///   - action: ButtonAction
+            /// - Returns: Voit
+            private func taskRowTapCallback(_ task: LogTask, _ action: ButtonAction) -> Void {
+                if action == .add {
+                    selectedTasks.append(task)
+                } else if action == .remove {
+                    if let index = selectedTasks.firstIndex(where: {$0 == task}) {
+                        selectedTasks.remove(at: index)
+                    }
+                }
+            }
+            
+            /// Handler for tapping on a note
+            /// - Parameters:
+            ///   - note: Note
+            ///   - action: ButtonAction
+            /// - Returns: Void
+            private func noteRowTapCallback(_ note: Note, _ action: ButtonAction) -> Void {
+                if action == .add {
+                    selectedNotes.append(note)
+                } else if action == .remove {
+                    if let index = selectedNotes.firstIndex(where: {$0 == note}) {
+                        selectedNotes.remove(at: index)
                     }
                 }
             }
         }
 
-        struct PlanRowNote: View {
-            public var note: Note
+        struct PlanRowTask: View {
+            public var task: LogTask
+            public var callback: (LogTask, ButtonAction) -> Void
+            public let type: ButtonType = .button
             @State private var selected: Bool = false
 
             var body: some View {
                 Button {
-                    selected.toggle()
+                    self.actionOnTap()
+                } label: {
+                    HStack(alignment: .center) {
+                        Image(systemName: self.selected ? "square.fill" : "square")
+                        if let content = self.task.content {
+                            Text(content)
+                        }
+                        Spacer()
+                    }
+                }
+                .padding(8)
+                .background(Theme.textBackground)
+            }
+            
+            /// Tap action handler
+            /// - Returns: Void
+            private func actionOnTap() -> Void {
+                self.selected.toggle()
+                callback(self.task, self.selected ? .add : .remove)
+            }
+        }
+
+        struct PlanRowNote: View {
+            public var note: Note
+            public var callback: (Note, ButtonAction) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    self.actionOnTap()
                 } label: {
                     HStack(alignment: .center) {
                         Image(systemName: selected ? "square.fill" : "square")
                         if let title = note.title {
                             Text(title)
                         }
+                        Spacer()
                     }
                 }
+                .padding(8)
+                .background(Theme.textBackground)
+            }
+
+            /// Tap action handler
+            /// - Returns: Void
+            private func actionOnTap() -> Void {
+                selected.toggle()
+                callback(note, selected ? .add : .remove)
             }
         }
     }

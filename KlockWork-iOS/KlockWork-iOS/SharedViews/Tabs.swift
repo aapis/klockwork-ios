@@ -450,10 +450,6 @@ extension Tabs.Content {
             public var callback: (Job, ButtonAction) -> Void
             @State private var selected: Bool = false
 
-            enum ButtonAction {
-                case add, remove
-            }
-
             var body: some View {
                 Button {
                     selected.toggle()

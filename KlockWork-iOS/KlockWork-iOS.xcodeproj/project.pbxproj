@@ -11,6 +11,9 @@
 		532441682C0531C800659F14 /* Rollups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441672C0531C800659F14 /* Rollups.swift */; };
 		5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416C2C06485800659F14 /* ActivityCalendar.swift */; };
 		5324416F2C067F5D00659F14 /* Assessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416E2C067F5D00659F14 /* Assessment.swift */; };
+		53274B332C120C5B008387BF /* ButtonAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B322C120C5B008387BF /* ButtonAction.swift */; };
+		53274B352C1214E0008387BF /* LegendLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B342C1214E0008387BF /* LegendLabel.swift */; };
+		53274B372C12179D008387BF /* ButtonType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B362C12179D008387BF /* ButtonType.swift */; };
 		536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536E4F682C0D77A600FDC1F4 /* ActionType.swift */; };
 		537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 537582C52BFFB37900CB528C /* Data.xcdatamodeld */; };
 		537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CB2BFFD70D00CB528C /* RecordDetail.swift */; };
@@ -98,6 +101,9 @@
 		532441672C0531C800659F14 /* Rollups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rollups.swift; sourceTree = "<group>"; };
 		5324416C2C06485800659F14 /* ActivityCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCalendar.swift; sourceTree = "<group>"; };
 		5324416E2C067F5D00659F14 /* Assessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assessment.swift; sourceTree = "<group>"; };
+		53274B322C120C5B008387BF /* ButtonAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonAction.swift; sourceTree = "<group>"; };
+		53274B342C1214E0008387BF /* LegendLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegendLabel.swift; sourceTree = "<group>"; };
+		53274B362C12179D008387BF /* ButtonType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonType.swift; sourceTree = "<group>"; };
 		536E4F682C0D77A600FDC1F4 /* ActionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionType.swift; sourceTree = "<group>"; };
 		537582C62BFFB37900CB528C /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
 		537582CB2BFFD70D00CB528C /* RecordDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDetail.swift; sourceTree = "<group>"; };
@@ -221,6 +227,7 @@
 				53E3A2662C06B4DA004A85C3 /* Trends.swift */,
 				53E50C1E2C0E6ABE00A85FDC /* Rainbow.swift */,
 				53E50C222C0FED0800A85FDC /* PlanTabs.swift */,
+				53274B342C1214E0008387BF /* LegendLabel.swift */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -231,6 +238,8 @@
 				539134E92C0269B600B48494 /* PageConfiguration.swift */,
 				536E4F682C0D77A600FDC1F4 /* ActionType.swift */,
 				53E50C0E2C0E607600A85FDC /* ActivityWeight.swift */,
+				53274B322C120C5B008387BF /* ButtonAction.swift */,
+				53274B362C12179D008387BF /* ButtonType.swift */,
 			);
 			path = SharedEnums;
 			sourceTree = "<group>";
@@ -485,6 +494,7 @@
 				53E3A26B2C098A50004A85C3 /* CDAssessmentFactor.swift in Sources */,
 				539134FA2C03A38500B48494 /* SearchLanguage.swift in Sources */,
 				53E50C1B2C0E635A00A85FDC /* Factors.swift in Sources */,
+				53274B352C1214E0008387BF /* LegendLabel.swift in Sources */,
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
 				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
 				53E50C0F2C0E607600A85FDC /* ActivityWeight.swift in Sources */,
@@ -511,7 +521,9 @@
 				532441662C04428700659F14 /* Titlebar.swift in Sources */,
 				53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */,
 				53E50C092C0E5F5800A85FDC /* Assessables.swift in Sources */,
+				53274B372C12179D008387BF /* ButtonType.swift in Sources */,
 				53F9260A2BFE9BF300948076 /* CoreDataNoteVersions.swift in Sources */,
+				53274B332C120C5B008387BF /* ButtonAction.swift in Sources */,
 				53F9260B2BFE9BF300948076 /* CoreDataPerson.swift in Sources */,
 				53F9260C2BFE9BF300948076 /* CoreDataPlan.swift in Sources */,
 				53F9260D2BFE9BF300948076 /* CoreDataProjectConfiguration.swift in Sources */,
