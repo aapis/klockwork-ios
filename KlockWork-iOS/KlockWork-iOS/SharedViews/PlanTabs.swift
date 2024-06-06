@@ -135,6 +135,7 @@ extension PlanTabs {
         @Binding public var date: Date
         @Binding public var selectedJobs: [Job]
         @State private var isJobSelectorPresent: Bool = false
+        @State private var score: Int = 0
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -157,9 +158,10 @@ extension PlanTabs {
 
         @ViewBuilder var ActionBar: some View {
             VStack(alignment: .leading) {
-                HStack(alignment: .center, spacing: 0) {
+                HStack(alignment: .center, spacing: 10) {
                     ActionBarAddButton
                     Spacer()
+                    ActionBarScore
                     ActionBarState
                 }
                 .background(Theme.cOrange.opacity(0.5))
@@ -207,6 +209,14 @@ extension PlanTabs {
             .clipShape(.capsule(style: .continuous))
             .foregroundStyle(.white)
             .padding([.trailing], 8)
+        }
+
+        @ViewBuilder var ActionBarScore: some View {
+            HStack(spacing: 0) {
+                Image(systemName: "\(self.score).circle")
+                    .font(.title)
+                    .foregroundStyle(.white)
+            }
         }
 
         struct JobSelector: View {
@@ -358,7 +368,7 @@ extension PlanTabs {
                             }
 
                             HStack {
-                                Text("Notes") 
+                                Text("Notes")
                                 Spacer()
                             }
 

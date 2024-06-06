@@ -46,11 +46,14 @@ struct Planning: View {
 extension Planning {
     struct Header: View {
         @Binding public var date: Date
+        private var isToday: Bool {
+            Calendar.autoupdatingCurrent.isDateInToday(date)
+        }
 
         var body: some View {
             HStack(alignment: .center) {
                 HStack(alignment: .center, spacing: 8) {
-                    Text(Calendar.autoupdatingCurrent.isDateInToday(date) ? "Planning" : date.formatted(date: .abbreviated, time: .omitted))
+                    Text("Planning")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .padding([.leading, .top, .bottom])
@@ -65,6 +68,18 @@ extension Planning {
                             .opacity(0.011)
                         }
                     Image(systemName: "chevron.right")
+                    Spacer()
+                    Button {
+
+                    } label: {
+                        Text("\(date.formatted(date: .abbreviated, time: .omitted))")
+                        .padding(7)
+                        .background(self.isToday ? .yellow : Theme.rowColour)
+                        .foregroundStyle(self.isToday ? Theme.cOrange : .white)
+                        .fontWeight(.bold)
+                        .cornerRadius(7)
+                    }
+                    .padding(.trailing)
                 }
 
                 Spacer()

@@ -93,7 +93,6 @@ extension Today {
                         .cornerRadius(7)
                     }
                 }
-
                 .padding(.trailing)
             }
         }
