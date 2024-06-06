@@ -130,7 +130,7 @@ extension PlanTabs {
 
 extension PlanTabs {
     struct Daily: View {
-        typealias Row = Tabs.Content.Individual.SingleJobLink
+        typealias Row = PlanRow
 
         @Binding public var date: Date
         @Binding public var selectedJobs: [Job]
@@ -139,11 +139,12 @@ extension PlanTabs {
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 SelectedItems(selectedJobs: $selectedJobs)
+                
                 ZStack(alignment: .bottomLeading) {
                     ZStack(alignment: .topLeading){
                         ScrollView(showsIndicators: false) {
                             VStack(spacing: 1) {
-                                ForEach(selectedJobs) { job in
+                                ForEach(selectedJobs.sorted(by: {$0.project != nil && $1.project != nil ? $0.project!.name! > $1.project!.name! && $0.jid < $1.jid : $0.jid < $1.jid})) { job in // sooo sorry
                                     Row(job: job)
                                 }
                             }
@@ -156,15 +157,14 @@ extension PlanTabs {
 
         @ViewBuilder var ActionBar: some View {
             VStack(alignment: .leading) {
-                HStack(alignment: .center, spacing: 10) {
+                HStack(alignment: .center, spacing: 0) {
                     ActionBarAddButton
                     Spacer()
-                    ActionBarResetButton
+                    ActionBarState
                 }
                 .background(Theme.cOrange.opacity(0.5))
-
             }
-            .clipShape(.rect(cornerRadius: 28))
+            .clipShape(.capsule(style: .continuous))
             .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)
             .padding()
             .sheet(isPresented: $isJobSelectorPresent) {
@@ -180,24 +180,37 @@ extension PlanTabs {
                     .fontWeight(.bold)
                     .font(.largeTitle)
             }
-            .clipShape(.circle)
-            .padding([.leading], 8)
+            .padding(8)
         }
 
-        @ViewBuilder var ActionBarResetButton: some View {
-            Button {
-                selectedJobs = []
-            } label: {
-                Image(systemName: "arrow.clockwise.circle.fill")
-                    .fontWeight(.bold)
-                    .font(.largeTitle)
-                    .foregroundStyle(selectedJobs.count > 0 ? .yellow : .gray)
-                    .padding(5)
+        @ViewBuilder var ActionBarState: some View {
+            HStack(spacing: 0) {
+                Button {
+
+                } label: {
+                    Text("Save")
+                }
+                .fontWeight(.bold)
+                .padding(8)
+                .background(.green.opacity(0.5))
+                .background(.gray)
+
+                Button {
+                    selectedJobs = []
+                } label: {
+                    Text("Reset")
+                }
+                .padding(8)
+                .background(.black.opacity(0.1))
+                .background(.gray)
             }
+            .clipShape(.capsule(style: .continuous))
+            .foregroundStyle(.white)
+            .padding([.trailing], 8)
         }
 
         struct JobSelector: View {
-            typealias Row = Tabs.Content.Individual.SingleJobCustomButton
+            typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState
 
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var showing: Bool
@@ -208,10 +221,10 @@ extension PlanTabs {
             }
 
             var body: some View {
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         HStack(alignment: .center, spacing: 0) {
-                            Text("What are you working on today?")
+                            Text("What's on your plate today?")
                                 .fontWeight(.bold)
                                 .font(.title2)
                             Spacer()
@@ -316,8 +329,103 @@ extension PlanTabs {
         }
 
         struct PlanRow: View {
+            typealias Row = Tabs.Content.Individual.SingleJobCustomButton
+
+            public var job: Job
+            @FetchRequest private var incompleteTasks: FetchedResults<LogTask>
+            @FetchRequest private var notes: FetchedResults<Note>
+            @State private var isDetailsPresented: Bool = false
+
             var body: some View {
-                Text("Hi")
+                VStack(alignment: .leading, spacing: 1) {
+                    Row(job: job, callback: self.rowTapCallback)
+
+                    if isDetailsPresented {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Incomplete Tasks")
+                                Spacer()
+                            }
+
+                            if incompleteTasks.count > 0 {
+                                VStack(alignment: .leading, spacing: 1) {
+                                    ForEach(incompleteTasks) { task in
+                                        PlanRowTask(task: task)
+                                    }
+                                }
+                            } else {
+                                Text("Add one")
+                            }
+
+                            HStack {
+                                Text("Notes") 
+                                Spacer()
+                            }
+
+                            if notes.count > 0 {
+                                VStack(alignment: .leading, spacing: 1) {
+                                    ForEach(notes) { note in
+                                        PlanRowNote(note: note)
+                                    }
+                                }
+                            } else {
+                                Text("Add one")
+                            }
+                        }
+                        .padding()
+                        .background(job.backgroundColor.opacity(0.5))
+                        .background(.gray)
+                    }
+                }
+            }
+
+            init(job: Job) {
+                self.job = job
+                _incompleteTasks = CoreDataTasks.fetch(by: job)
+                _notes = CoreDataNotes.fetch(by: job)
+            }
+            
+            /// Handler for when you tap on a single row
+            /// - Parameter job: Job
+            /// - Returns: Void
+            private func rowTapCallback(_ job: Job) -> Void {
+                isDetailsPresented.toggle()
+            }
+        }
+
+        struct PlanRowTask: View {
+            public var task: LogTask
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                } label: {
+                    HStack(alignment: .center) {
+                        Image(systemName: selected ? "square.fill" : "square")
+                        if let content = task.content {
+                            Text(content)
+                        }
+                    }
+                }
+            }
+        }
+
+        struct PlanRowNote: View {
+            public var note: Note
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                } label: {
+                    HStack(alignment: .center) {
+                        Image(systemName: selected ? "square.fill" : "square")
+                        if let title = note.title {
+                            Text(title)
+                        }
+                    }
+                }
             }
         }
     }

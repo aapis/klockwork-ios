@@ -426,6 +426,26 @@ extension Tabs.Content {
 
         struct SingleJobCustomButton: View {
             public let job: Job
+            public var callback: (Job) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(job)
+                } label: {
+                    ListRow(
+                        name: job.title ?? job.jid.string,
+                        colour: job.backgroundColor,
+                        icon: selected ? "minus" : "plus"
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleJobCustomButtonTwoState: View {
+            public let job: Job
             public var alreadySelected: Bool
             public var callback: (Job, ButtonAction) -> Void
             @State private var selected: Bool = false

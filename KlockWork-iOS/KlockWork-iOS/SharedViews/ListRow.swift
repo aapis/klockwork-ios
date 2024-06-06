@@ -36,8 +36,8 @@ struct ListRow: View {
 struct ToggleableListRow: View {
     public let name: String
     public var colour: Color? = .clear
-    public var iconOff: String = "chevron.right"
-    public var iconOn: String = "chevron.left"
+    public var iconOff: String = "square"
+    public var iconOn: String = "square.fill"
     public var extraColumn: AnyView?
     public var highlight: Bool = true
     @Binding public var selected: Bool
