@@ -72,6 +72,9 @@ struct PlanTabs: View {
 }
 
 extension PlanTabs {
+    /// Swipe action handler
+    /// - Parameter swipe: Swipe
+    /// - Returns: Void
     public func actionOnSwipe(_ swipe: Swipe) -> Void {
         let tabs = PlanType.allCases
         if var selectedIndex = (tabs.firstIndex(of: self.selected)) {
@@ -167,6 +170,7 @@ extension PlanTabs {
         @Binding public var selectedCompanies: [Company]
         @State private var isJobSelectorPresent: Bool = false
         @State private var score: Int = 0
+        @State private var plan: Plan? = nil
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -216,6 +220,7 @@ extension PlanTabs {
                     ActionBar
                 }
             }
+            .onAppear(perform: self.restore)
         }
 
         @ViewBuilder var ActionBar: some View {
@@ -223,7 +228,7 @@ extension PlanTabs {
                 HStack(alignment: .center, spacing: 10) {
                     ActionBarAddButton
                     Spacer()
-                    ActionBarScore
+//                    ActionBarScore // @TODO: restore this when we can calculate score for a given plan
                     ActionBarState
                 }
                 .background(Theme.cOrange.opacity(0.5))
@@ -250,7 +255,7 @@ extension PlanTabs {
         @ViewBuilder var ActionBarState: some View {
             HStack(spacing: 0) {
                 Button {
-
+                    self.store()
                 } label: {
                     Text("Save")
                 }
@@ -260,7 +265,7 @@ extension PlanTabs {
                 .background(.gray)
 
                 Button {
-                    selectedJobs = []
+                    self.destroyPlan()
                 } label: {
                     Text("Reset")
                 }
@@ -279,6 +284,67 @@ extension PlanTabs {
                     .font(.title)
                     .foregroundStyle(.white)
             }
+        }
+        
+        /// Create a new Plan for today
+        /// - Returns: Void
+        private func store() -> Void {
+            CoreDataPlan(moc: self.moc).create(
+                date: Date(),
+                jobs: Set(self.selectedJobs),
+                tasks: Set(self.selectedTasks),
+                notes: Set(self.selectedNotes),
+                projects: Set(self.selectedProjects),
+                companies: Set(self.selectedCompanies)
+            )
+        }
+        
+        /// Use the stored Plan
+        /// - Returns: Void
+        private func restore() -> Void {
+            let model = CoreDataPlan(moc: self.moc)
+            let plan = model.forToday().first
+
+            if let existingPlan = plan {
+                self.selectedJobs = existingPlan.jobs?.allObjects as! [Job]
+                self.selectedTasks = existingPlan.tasks?.allObjects as! [LogTask]
+                self.selectedNotes = existingPlan.notes?.allObjects as! [Note]
+                self.selectedProjects = existingPlan.projects?.allObjects as! [Project]
+                self.selectedCompanies = existingPlan.companies?.allObjects as! [Company]
+                self.plan = existingPlan
+                self.score = model.score(existingPlan)
+            }
+        }
+        
+        /// Destroy and recreate today's plan
+        /// - Returns: Void
+        private func destroyPlan() -> Void {
+            if self.plan != nil {
+                // Delete the old plan
+                do {
+                    try self.plan!.validateForDelete()
+                    self.moc.delete(self.plan!)
+                } catch {
+                    print("[error] Planning.PlanTabs Unable to delete old session due to error \(error)")
+                }
+
+                // Create a new empty plan
+                self.selectedJobs = []
+                self.selectedNotes = []
+                self.selectedTasks = []
+                self.selectedProjects = []
+                self.selectedCompanies = []
+                self.plan = CoreDataPlan(moc: self.moc).createAndReturn(
+                    date: Date(),
+                    jobs: Set(),
+                    tasks: Set(),
+                    notes: Set(),
+                    projects: Set(),
+                    companies: Set()
+                )
+            }
+
+            self.plan = nil
         }
 
         struct JobSelector: View {
@@ -519,7 +585,14 @@ extension PlanTabs {
                     .background(Theme.textBackground)
                 }
             }
-
+            
+            /// Default init
+            /// - Parameters:
+            ///   - job: Job
+            ///   - selectedTasks: Bound variable representing selected tasks
+            ///   - selectedNotes: Bound variable representing selected notes
+            ///   - selectedProjects: Bound variable representing selected projects
+            ///   - selectedCompanies: Bound variable representing selected companies
             init(job: Job, selectedTasks: Binding<[LogTask]>, selectedNotes: Binding<[Note]>, selectedProjects: Binding<[Project]>, selectedCompanies: Binding<[Company]>) {
                 self.job = job
                 _incompleteTasks = CoreDataTasks.fetch(by: job)
