@@ -24,8 +24,6 @@ struct ActivityCalendar: View {
     @Binding public var searchTerm: String
     @Environment(\.managedObjectContext) var moc
     @State public var month: String = "_DEFAULT_MONTH"
-    @State public var week: Int = 0
-    @State public var days: [Day] = []
     @State public var open: Bool = true
     @State public var cumulativeScore: Int = 0
     public var weekdays: [DayOfWeek] = [

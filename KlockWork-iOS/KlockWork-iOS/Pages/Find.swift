@@ -202,12 +202,6 @@ extension Find {
     }
 }
 
-extension Find.Rows {
-    private func actionOnAppear() -> Void {
-
-    }
-}
-
 extension Find {
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {

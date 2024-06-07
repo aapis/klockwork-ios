@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-// @TODO: move to ActivityAssessment.ViewFactory
 struct AssessmentFactorForm: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     @Environment(\.managedObjectContext) var moc
     public var assessment: Assessment
     @State private var job: Job?

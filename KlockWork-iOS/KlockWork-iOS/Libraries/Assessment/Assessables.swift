@@ -9,6 +9,8 @@ import SwiftUI
 import CoreData
 
 public class Assessables: Identifiable, Equatable {
+    typealias EntityType = PageConfiguration.EntityType
+
     public var id: UUID = UUID()
     var factors: [AssessmentFactor] = []
     var moc: NSManagedObjectContext?

@@ -9,6 +9,9 @@
 import SwiftUI
 
 struct Explore: View {
+    typealias EntityType = PageConfiguration.EntityType
+    typealias EntityTypePair = PageConfiguration.EntityTypePair
+
     @Binding public var date: Date
     private let fgColour: Color = .yellow
     private var columns: [GridItem] {

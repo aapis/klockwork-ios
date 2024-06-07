@@ -7,24 +7,38 @@
 
 import SwiftUI
 
+// @TODO: refactor into one that supports any PageConfiguration enum
 struct Tabs: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     public var inSheet: Bool
     @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
     @Binding public var selected: EntityType
     @Binding public var date: Date
     public var content: AnyView? = nil
+    public var buttons: AnyView? = nil
+    public var title: AnyView? = nil
     static public let animationDuration: Double = 0.2
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Buttons(inSheet: inSheet, job: $job, selected: $selected)
-                .swipe([.left, .right]) { swipe in
-                    self.actionOnSwipe(swipe)
-                }
-            MiniTitleBar(selected: $selected)
-                .border(width: 1, edges: [.bottom], color: .yellow)
-            
+            if buttons == nil {
+                Buttons(inSheet: inSheet, job: $job, selected: $selected)
+                    .swipe([.left, .right]) { swipe in
+                        self.actionOnSwipe(swipe)
+                    }
+            } else {
+                buttons
+            }
+
+            if title == nil {
+                MiniTitleBar(selected: $selected)
+                    .border(width: 1, edges: [.bottom], color: .yellow)
+            } else {
+                title
+            }
+
             if content == nil {
                 Content(inSheet: inSheet, job: $job, selected: $selected, date: $date)
                     .swipe([.left, .right]) { swipe in
@@ -46,7 +60,7 @@ struct Tabs: View {
 extension Tabs {
     public func actionOnSwipe(_ swipe: Swipe) -> Void {
         let tabs = EntityType.allCases
-        if var selectedIndex = tabs.firstIndex(of: selected) {
+        if var selectedIndex = (tabs.firstIndex(of: self.selected)) {
             if swipe == .left {
                 if selectedIndex <= tabs.count - 2 {
                     selectedIndex += 1
@@ -407,6 +421,52 @@ extension Tabs.Content {
                     )
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleJobCustomButton: View {
+            public let job: Job
+            public var callback: (Job) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(job)
+                } label: {
+                    ListRow(
+                        name: job.title ?? job.jid.string,
+                        colour: job.backgroundColor,
+                        icon: selected ? "minus" : "plus"
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleJobCustomButtonTwoState: View {
+            public let job: Job
+            public var alreadySelected: Bool
+            public var callback: (Job, ButtonAction) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(job, selected ? .add : .remove)
+                } label: {
+                    ToggleableListRow(
+                        name: job.title ?? job.jid.string,
+                        colour: job.backgroundColor,
+                        iconOff: "square",
+                        iconOn: "square.fill",
+                        selected: $selected
+                    )
+                }
+                .buttonStyle(.plain)
+                .onAppear(perform: {
+                    selected = alreadySelected
+                })
             }
         }
 

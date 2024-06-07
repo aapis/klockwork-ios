@@ -22,12 +22,14 @@ struct Panel: View {
                             .navigationTitle(date.formatted(date: .abbreviated, time: .omitted))
                             .toolbarTitleDisplayMode(.inline)
                             .toolbar {
-                                NavigationLink {
-                                    Today(inSheet: true, date: $date)
-                                } label: {
-                                    HStack(alignment: .top, spacing: 5) {
-                                        Text("Details")
-                                        Image(systemName: "chevron.right")
+                                ToolbarItem(placement: .topBarTrailing) {
+                                    NavigationLink {
+                                        Today(inSheet: true, date: $date)
+                                    } label: {
+                                        HStack(alignment: .top, spacing: 5) {
+                                            Text("Details")
+                                            Image(systemName: "chevron.right")
+                                        }
                                     }
                                 }
                             }

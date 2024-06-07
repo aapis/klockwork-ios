@@ -16,12 +16,9 @@ struct Legend: View {
         GridRow {
             VStack(alignment: .leading) {
                 GridRow {
-                    Text("Legend")
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.gray)
-                        .padding(.bottom, 10)
+                    LegendLabel(label: "Legend")
                 }
+                .padding([.bottom], 10)
                 LazyVGrid(columns: columns, alignment: .leading) {
                     ForEach(ActivityWeight.allCases, id: \.self) { assessment in
                         Row(assessment: assessment)

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct TitleBar: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     @Binding public var selected: EntityType
     @Binding public var open: Bool
     public var count: Int

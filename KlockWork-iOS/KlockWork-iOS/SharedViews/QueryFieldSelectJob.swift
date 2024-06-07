@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct QueryFieldSelectJob: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     enum Field {
         // Apparently you need to use an existing UITextContentType
         case organizationName

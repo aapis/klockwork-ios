@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct Tasks: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     private let entityType: EntityType = .tasks
     @State public var items: [LogTask] = []
 

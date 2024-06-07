@@ -9,6 +9,9 @@
 import SwiftUI
 
 struct Today: View {
+    typealias EntityType = PageConfiguration.EntityType
+    typealias PlanType = PageConfiguration.PlanType
+
     public var inSheet: Bool
     @Binding public var date: Date
     @Environment(\.managedObjectContext) var moc
@@ -44,6 +47,7 @@ struct Today: View {
             .toolbar(inSheet ? .visible : .hidden)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .scrollDismissesKeyboard(.immediately)
         }
     }
 }
@@ -89,7 +93,6 @@ extension Today {
                         .cornerRadius(7)
                     }
                 }
-
                 .padding(.trailing)
             }
         }

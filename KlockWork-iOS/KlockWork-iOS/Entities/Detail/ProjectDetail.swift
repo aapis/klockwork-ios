@@ -68,7 +68,9 @@ struct ProjectDetail: View {
                 .listStyle(.grouped)
             }
             .onAppear(perform: actionOnAppear)
-            .navigationTitle("Editing: Project")
+            .navigationTitle(project.name ?? "_PROJECT_NAME")
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 Button("Save") {
 

@@ -29,6 +29,8 @@ extension SearchLibrary {
     }
 
     struct SingleResult: Identifiable {
+        typealias EntityType = PageConfiguration.EntityType
+
         var id: UUID = UUID()
         var type: EntityType
         var view: AnyView
@@ -77,6 +79,7 @@ extension SearchLibrary.SearchEngine {
     // @TODO: consolidate these views with the Entities like Companies, Jobs, etc
     fileprivate struct CompanyEntityView: View {
         typealias Row = Tabs.Content.Individual.SingleCompany
+        typealias EntityType = PageConfiguration.EntityType
 
         @State public var entityType: EntityType
         @State private var open: Bool = true
@@ -107,6 +110,7 @@ extension SearchLibrary.SearchEngine {
 
     fileprivate struct JobsEntityView: View {
         typealias Row = Tabs.Content.Individual.SingleJobLink
+        typealias EntityType = PageConfiguration.EntityType
 
         @State public var entityType: EntityType
         @State private var open: Bool = true
@@ -137,6 +141,7 @@ extension SearchLibrary.SearchEngine {
 
     fileprivate struct NotesEntityView: View {
         typealias Row = Tabs.Content.Individual.SingleNote
+        typealias EntityType = PageConfiguration.EntityType
 
         @State public var entityType: EntityType
         @State private var open: Bool = true
@@ -167,6 +172,7 @@ extension SearchLibrary.SearchEngine {
 
     fileprivate struct PeopleEntityView: View {
         typealias Row = Tabs.Content.Individual.SinglePerson
+        typealias EntityType = PageConfiguration.EntityType
 
         @State public var entityType: EntityType
         @State private var open: Bool = true
@@ -197,6 +203,7 @@ extension SearchLibrary.SearchEngine {
 
     fileprivate struct ProjectsEntityView: View {
         typealias Row = Tabs.Content.Individual.SingleProject
+        typealias EntityType = PageConfiguration.EntityType
 
         @State public var entityType: EntityType
         @State private var open: Bool = true
@@ -227,6 +234,7 @@ extension SearchLibrary.SearchEngine {
 
     fileprivate struct RecordsEntityView: View {
         typealias Row = Tabs.Content.Individual.SingleRecord
+        typealias EntityType = PageConfiguration.EntityType
 
         @State public var entityType: EntityType
         @State private var open: Bool = true
@@ -257,6 +265,7 @@ extension SearchLibrary.SearchEngine {
 
     fileprivate struct TasksEntityView: View {
         typealias Row = Tabs.Content.Individual.SingleTask
+        typealias EntityType = PageConfiguration.EntityType
 
         @State public var entityType: EntityType
         @State private var open: Bool = true

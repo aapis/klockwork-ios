@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct People: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     private let entityType: EntityType = .people
     @State public var items: [Person] = []
 

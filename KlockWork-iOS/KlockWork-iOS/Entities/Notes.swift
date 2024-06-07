@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct Notes: View {
+    typealias EntityType = PageConfiguration.EntityType
+
     private let entityType: EntityType = .notes
     @State public var items: [Note] = []
 
