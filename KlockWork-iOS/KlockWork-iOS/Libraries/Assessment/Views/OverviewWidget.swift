@@ -95,6 +95,7 @@ struct OverviewWidget: View {
         }
         .padding()
         .onAppear(perform: {
+            assessment.assessables.evaluate()
             active = assessment.assessables.active()
             score = assessment.assessables.score
             weight = assessment.assessables.weight
@@ -108,9 +109,8 @@ extension OverviewWidget {
 
         var body: some View {
             HStack(alignment: .center, spacing: 5) {
-                Text(factor.desc!.uppercased())
+                Text(factor.factorDescription().uppercased())
                 Spacer()
-
             }
             .font(.caption)
         }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum ActionType {
+public enum ActionType: CaseIterable {
     case create, interaction
 
     // @TODO: localize, somehow?

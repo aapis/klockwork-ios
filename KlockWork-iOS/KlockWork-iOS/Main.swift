@@ -12,6 +12,25 @@ struct Main: View {
     @Environment(\.managedObjectContext) var moc
     @State public var date: Date = Date()
 
+    // Assessment factors, components of the scoring and evaluation algorithm
+    private var defaultFactors: [FactorProxy] {
+        return [
+            FactorProxy(date: self.date, weight: 1, type: .records, action: .create),
+            FactorProxy(date: self.date, weight: 1, type: .jobs, action: .create),
+            FactorProxy(date: self.date, weight: 1, type: .jobs, action: .interaction),
+            FactorProxy(date: self.date, weight: 1, type: .tasks, action: .create),
+            FactorProxy(date: self.date, weight: 1, type: .tasks, action: .interaction),
+            FactorProxy(date: self.date, weight: 1, type: .notes, action: .create),
+            FactorProxy(date: self.date, weight: 1, type: .notes, action: .interaction),
+            FactorProxy(date: self.date, weight: 1, type: .companies, action: .create),
+            FactorProxy(date: self.date, weight: 1, type: .companies, action: .interaction),
+            FactorProxy(date: self.date, weight: 1, type: .people, action: .create),
+            FactorProxy(date: self.date, weight: 1, type: .people, action: .interaction),
+            FactorProxy(date: self.date, weight: 1, type: .projects, action: .create),
+            FactorProxy(date: self.date, weight: 1, type: .projects, action: .interaction)
+        ]
+    }
+
     var body: some View {
         TabView {
             Planning(inSheet: false, date: $date)
@@ -36,5 +55,20 @@ struct Main: View {
             }
         }
         .tint(.yellow)
+        .onAppear(perform: self.onApplicationBoot)
+    }
+}
+
+extension Main {
+    /// Fires when application has loaded and view appears
+    /// - Returns: Void
+    private func onApplicationBoot() -> Void {
+        // Create the default set of assessment factors if necessary (aka, if there are no AFs)
+        let factors = CDAssessmentFactor(moc: self.moc).all(limit: 1).first
+        if factors == nil {
+            for factor in self.defaultFactors {
+                factor.createDefaultFactor(using: self.moc)
+            }
+        }
     }
 }
