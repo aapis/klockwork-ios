@@ -69,9 +69,6 @@ struct Factor: View {
         weight = Int(self.factor.weight)
         threshold = Int(self.factor.threshold)
         count = Int(self.factor.count)
-
-        if let desc = self.factor.desc {
-            description = desc
-        }
+        description = self.factor.factorDescription()
     }
 }
