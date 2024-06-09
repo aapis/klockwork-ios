@@ -8,15 +8,15 @@
 import SwiftUI
 import CoreData
 
-public class Assessment {
+class Assessment {
     typealias EntityType = PageConfiguration.EntityType
 
-    public var date: Date?
-    public var moc: NSManagedObjectContext
-    public var weight: ActivityWeight = .empty
-    public var score: Int = 0
-    public var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
-    public var assessables: Assessables = Assessables()
+    var date: Date?
+    var moc: NSManagedObjectContext
+    var weight: ActivityWeight = .empty
+    var score: Int = 0
+    var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
+    var assessables: Assessables = Assessables()
 
     init(for date: Date? = nil, moc: NSManagedObjectContext, searchTerm: String = "") {
         self.date = date
@@ -30,7 +30,7 @@ public class Assessment {
             // Create all the AssessmentFactor objects
             self.assessables.factors = CDAssessmentFactor(moc: self.moc).all()
 
-            for factor in assessables.factors {
+            for factor in self.assessables.factors {
                 factor.date = self.date
                 factor.count = factor.countFactors(using: self.moc)
             }

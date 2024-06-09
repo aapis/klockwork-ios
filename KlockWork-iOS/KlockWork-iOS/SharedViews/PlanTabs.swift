@@ -169,7 +169,6 @@ extension PlanTabs {
         @Binding public var selectedProjects: [Project]
         @Binding public var selectedCompanies: [Company]
         @State private var isJobSelectorPresent: Bool = false
-        @State private var score: Int = 0
         @State private var plan: Plan? = nil
 
         var body: some View {
@@ -228,7 +227,6 @@ extension PlanTabs {
                 HStack(alignment: .center, spacing: 10) {
                     ActionBarAddButton
                     Spacer()
-//                    ActionBarScore // @TODO: restore this when we can calculate score for a given plan
                     ActionBarState
                 }
                 .background(Theme.cOrange.opacity(0.5))
@@ -278,14 +276,6 @@ extension PlanTabs {
             .padding([.trailing], 8)
         }
 
-        @ViewBuilder var ActionBarScore: some View {
-            HStack(spacing: 0) {
-                Image(systemName: "\(self.score).circle")
-                    .font(.title)
-                    .foregroundStyle(.white)
-            }
-        }
-        
         /// Create a new Plan for today
         /// - Returns: Void
         private func store() -> Void {
@@ -312,13 +302,18 @@ extension PlanTabs {
                 self.selectedProjects = existingPlan.projects?.allObjects as! [Project]
                 self.selectedCompanies = existingPlan.companies?.allObjects as! [Company]
                 self.plan = existingPlan
-                self.score = model.score(existingPlan)
             }
         }
         
         /// Destroy and recreate today's plan
         /// - Returns: Void
         private func destroyPlan() -> Void {
+            self.selectedJobs = []
+            self.selectedNotes = []
+            self.selectedTasks = []
+            self.selectedProjects = []
+            self.selectedCompanies = []
+
             if self.plan != nil {
                 // Delete the old plan
                 do {
@@ -329,11 +324,6 @@ extension PlanTabs {
                 }
 
                 // Create a new empty plan
-                self.selectedJobs = []
-                self.selectedNotes = []
-                self.selectedTasks = []
-                self.selectedProjects = []
-                self.selectedCompanies = []
                 self.plan = CoreDataPlan(moc: self.moc).createAndReturn(
                     date: Date(),
                     jobs: Set(),
