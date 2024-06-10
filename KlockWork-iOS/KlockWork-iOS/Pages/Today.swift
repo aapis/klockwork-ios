@@ -17,6 +17,9 @@ struct Today: View {
     @Environment(\.managedObjectContext) var moc
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
+    @State private var jobs: [Job] = []
+    @State private var isSheetPresented: Bool = false
+    @FocusState private var textFieldActive: Bool
 
     var body: some View {
         NavigationStack {
@@ -27,16 +30,19 @@ struct Today: View {
 
                 ZStack(alignment: .bottomLeading) {
                     Tabs(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                    PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
                     if !inSheet {
-                        LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
-                            .frame(height: 50)
-                            .opacity(0.1)
+                        if job != nil {
+                            LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
+                                .frame(height: 50)
+                                .opacity(0.1)
+                        }
                     }
                 }
 
                 if !inSheet {
                     if selected == .records {
-                        Editor(job: $job, entityType: $selected, date: $date)
+                        Editor(job: $job, entityType: $selected, date: $date, focused: _textFieldActive)
                     }
 
                     Spacer().frame(height: 1)
@@ -48,6 +54,7 @@ struct Today: View {
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
+            .onChange(of: self.job) {self.actionOnJobChange()}
         }
     }
 }
@@ -76,24 +83,7 @@ extension Today {
                         }
                     Image(systemName: "chevron.right")
                 }
-
                 Spacer()
-
-                Button {
-                    job = nil
-                } label: {
-                    if let jerb = job {
-                        HStack(alignment: .center, spacing: 5) {
-                            Image(systemName: "xmark")
-                            Text("\(jerb.title ?? jerb.jid.string)")
-                        }
-                        .padding(7)
-                        .background(jerb.backgroundColor)
-                        .foregroundStyle(jerb.backgroundColor.isBright() ? Theme.cPurple : .white)
-                        .cornerRadius(7)
-                    }
-                }
-                .padding(.trailing)
             }
         }
     }
@@ -103,24 +93,28 @@ extension Today {
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
         @Binding public var date: Date
+        @FocusState public var focused: Bool
         @State private var text: String = ""
-        
+
         var body: some View {
-            if job == nil {
-                QueryFieldSelectJob(
-                    prompt: "What are you working on?",
-                    onSubmit: self.actionOnSubmit,
-                    text: $text,
-                    job: $job,
-                    entityType: $entityType
-                )
-            } else {
+            if job != nil {
                 QueryField(
                     prompt: "What are you working on?",
                     onSubmit: self.actionOnSubmit,
                     text: $text
                 )
+                .focused($focused)
             }
+        }
+    }
+}
+
+extension Today {
+    /// Handler for callback when self.job changes value
+    /// - Returns: Void
+    private func actionOnJobChange() -> Void {
+        if self.job != nil {
+            self.textFieldActive = true
         }
     }
 }

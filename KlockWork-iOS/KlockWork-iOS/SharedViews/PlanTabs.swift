@@ -169,7 +169,6 @@ extension PlanTabs {
         @Binding public var selectedProjects: [Project]
         @Binding public var selectedCompanies: [Company]
         @State private var isJobSelectorPresent: Bool = false
-        @State private var score: Int = 0
         @State private var plan: Plan? = nil
 
         var body: some View {
@@ -217,88 +216,20 @@ extension PlanTabs {
                             }
                         }
                     }
-                    ActionBar
+                    PageActionBar.Planning(
+                        date: $date,
+                        selectedJobs: $selectedJobs,
+                        selectedTasks: $selectedTasks,
+                        selectedNotes: $selectedNotes,
+                        selectedProjects: $selectedProjects,
+                        selectedCompanies: $selectedCompanies,
+                        isSheetPresented: $isJobSelectorPresent
+                    )
                 }
             }
             .onAppear(perform: self.restore)
         }
 
-        @ViewBuilder var ActionBar: some View {
-            VStack(alignment: .leading) {
-                HStack(alignment: .center, spacing: 10) {
-                    ActionBarAddButton
-                    Spacer()
-//                    ActionBarScore // @TODO: restore this when we can calculate score for a given plan
-                    ActionBarState
-                }
-                .background(Theme.cOrange.opacity(0.5))
-            }
-            .clipShape(.capsule(style: .continuous))
-            .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)
-            .padding()
-            .sheet(isPresented: $isJobSelectorPresent) {
-                JobSelector(showing: $isJobSelectorPresent, selectedJobs: $selectedJobs)
-            }
-        }
-
-        @ViewBuilder var ActionBarAddButton: some View {
-            Button {
-                self.isJobSelectorPresent.toggle()
-            } label: {
-                Image(systemName: "plus.circle.fill")
-                    .fontWeight(.bold)
-                    .font(.largeTitle)
-            }
-            .padding(8)
-        }
-
-        @ViewBuilder var ActionBarState: some View {
-            HStack(spacing: 0) {
-                Button {
-                    self.store()
-                } label: {
-                    Text("Save")
-                }
-                .fontWeight(.bold)
-                .padding(8)
-                .background(.green.opacity(0.5))
-                .background(.gray)
-
-                Button {
-                    self.destroyPlan()
-                } label: {
-                    Text("Reset")
-                }
-                .padding(8)
-                .background(.black.opacity(0.1))
-                .background(.gray)
-            }
-            .clipShape(.capsule(style: .continuous))
-            .foregroundStyle(.white)
-            .padding([.trailing], 8)
-        }
-
-        @ViewBuilder var ActionBarScore: some View {
-            HStack(spacing: 0) {
-                Image(systemName: "\(self.score).circle")
-                    .font(.title)
-                    .foregroundStyle(.white)
-            }
-        }
-        
-        /// Create a new Plan for today
-        /// - Returns: Void
-        private func store() -> Void {
-            CoreDataPlan(moc: self.moc).create(
-                date: Date(),
-                jobs: Set(self.selectedJobs),
-                tasks: Set(self.selectedTasks),
-                notes: Set(self.selectedNotes),
-                projects: Set(self.selectedProjects),
-                companies: Set(self.selectedCompanies)
-            )
-        }
-        
         /// Use the stored Plan
         /// - Returns: Void
         private func restore() -> Void {
@@ -312,107 +243,6 @@ extension PlanTabs {
                 self.selectedProjects = existingPlan.projects?.allObjects as! [Project]
                 self.selectedCompanies = existingPlan.companies?.allObjects as! [Company]
                 self.plan = existingPlan
-                self.score = model.score(existingPlan)
-            }
-        }
-        
-        /// Destroy and recreate today's plan
-        /// - Returns: Void
-        private func destroyPlan() -> Void {
-            if self.plan != nil {
-                // Delete the old plan
-                do {
-                    try self.plan!.validateForDelete()
-                    self.moc.delete(self.plan!)
-                } catch {
-                    print("[error] Planning.PlanTabs Unable to delete old session due to error \(error)")
-                }
-
-                // Create a new empty plan
-                self.selectedJobs = []
-                self.selectedNotes = []
-                self.selectedTasks = []
-                self.selectedProjects = []
-                self.selectedCompanies = []
-                self.plan = CoreDataPlan(moc: self.moc).createAndReturn(
-                    date: Date(),
-                    jobs: Set(),
-                    tasks: Set(),
-                    notes: Set(),
-                    projects: Set(),
-                    companies: Set()
-                )
-            }
-
-            self.plan = nil
-        }
-
-        struct JobSelector: View {
-            typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState
-
-            @FetchRequest private var items: FetchedResults<Job>
-            @Binding public var showing: Bool
-            @Binding private var selectedJobs: [Job]
-
-            private var columns: [GridItem] {
-                return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
-            }
-
-            var body: some View {
-                ScrollView(showsIndicators: false) {
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Text("What's on your plate today?")
-                                .fontWeight(.bold)
-                                .font(.title2)
-                            Spacer()
-                            Button {
-                                showing.toggle()
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
-                        }
-                        .padding()
-
-                        HStack(alignment: .center, spacing: 5) {
-                            Spacer()
-                            Text("Selected")
-                            Text(String(selectedJobs.count))
-                        }
-                        .padding()
-
-                        if items.count > 0 {
-                            ForEach(items) { jerb in
-                                Row(job: jerb, alreadySelected: self.jobIsSelected(jerb), callback: { job, action in
-                                    if action == .add {
-                                        selectedJobs.append(job)
-                                    } else if action == .remove {
-                                        if let index = selectedJobs.firstIndex(where: {$0 == job}) {
-                                            selectedJobs.remove(at: index)
-                                        }
-                                    }
-                                })
-                            }
-                        } else {
-                            StatusMessage.Warning(message: "No jobs modified within the last 7 days")
-                        }
-                    }
-                }
-                .scrollContentBackground(.hidden)
-                .presentationBackground(Theme.cOrange)
-            }
-
-            init(showing: Binding<Bool>, selectedJobs: Binding<[Job]>) {
-                _showing = showing
-                _selectedJobs = selectedJobs
-                _items = CoreDataJob.fetchAll()
-            }
-            
-            /// Determine if a given job is already within the selectedJobs list
-            /// - Parameter job: Job
-            /// - Returns: Bool
-            private func jobIsSelected(_ job: Job) -> Bool {
-                return selectedJobs.firstIndex(where: {$0 == job}) != nil
             }
         }
 

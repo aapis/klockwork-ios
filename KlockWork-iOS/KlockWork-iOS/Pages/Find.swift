@@ -12,7 +12,7 @@ struct Find: View {
     @Environment(\.managedObjectContext) var moc
     @State private var text: String = ""
     @State private var results: SearchLibrary.SearchResults?
-    @State private var recentSearchTerms: [String] = []
+    @State private var recentSearchTerms: [String] = [] // @TODO: store recent searches and track as another app use metric
 
     var body: some View {
         NavigationStack {
@@ -26,7 +26,46 @@ struct Find: View {
                             onSubmit: self.actionOnSubmit
                         )
                     } else {
-                        Widgets(date: $date, text: $text)
+                        VStack {
+                            List {
+                                Section("Recent Searches") {
+                                    if !recentSearchTerms.isEmpty {
+                                        ForEach(recentSearchTerms, id: \.self ) { term in
+                                            Button {
+                                                text = term
+                                            } label: {
+                                                HStack(alignment: .center, spacing: 0) {
+                                                    Text(term)
+                                                    Spacer()
+                                                    Image(systemName: "chevron.right")
+                                                }
+                                            }
+                                        }
+                                        .listRowBackground(Theme.textBackground)
+
+                                        Button {
+                                            recentSearchTerms = []
+                                            text = ""
+                                        } label: {
+                                            HStack {
+                                                Text("Clear list")
+                                                Spacer()
+                                                Image(systemName: "xmark")
+                                            }
+                                        }
+                                        .listRowBackground(Theme.rowColour)
+                                        .foregroundStyle(.red)
+                                    } else {
+                                        Text("None found")
+                                            .listRowBackground(Theme.textBackground)
+                                            .foregroundStyle(.gray)
+                                    }
+                                }
+                            }
+                            .background(Theme.cGreen)
+                            .scrollContentBackground(.hidden)
+                            Spacer()
+                        }
                     }
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
@@ -76,19 +115,6 @@ extension Find {
                             .fontWeight(.bold)
                     }
                 }
-
-                Spacer()
-                Button {
-                    isPresented.toggle()
-                } label: {
-                    Image(systemName: "line.3.horizontal.decrease")
-                }
-                .padding(10)
-                .background(Theme.rowColour)
-                .mask(Circle())
-                .sheet(isPresented: $isPresented) {
-                    Find.FilterPanel(text: $text, recentSearchTerms: $recentSearchTerms, isPresented: $isPresented, onSubmit: self.onSubmit)
-                }
             }
             .padding()
         }
@@ -115,89 +141,6 @@ extension Find {
                 }
                 Spacer()
             }
-        }
-    }
-
-    struct FilterPanel: View {
-        @Binding public var text: String
-        @Binding public var recentSearchTerms: [String]
-        @Binding public var isPresented: Bool
-        @AppStorage("find.widget.activityCalendar") private var showActivityCalendar: Bool = true
-        @AppStorage("find.widget.recent") private var showRecent: Bool = false
-        @AppStorage("find.widget.trends") private var showTrends: Bool = false
-        public var onSubmit: () -> Void
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                List {
-                    Section("Widgets") {
-                        Toggle("Activity Calendar", isOn: $showActivityCalendar)
-                        Toggle("Recent", isOn: $showRecent)
-                        Toggle("Trends", isOn: $showTrends)
-                    }
-                    .listRowBackground(Theme.textBackground)
-
-                    Section("Recent searches") {
-                        if !recentSearchTerms.isEmpty {
-                            ForEach(recentSearchTerms, id: \.self ) { term in
-                                Button {
-                                    text = term
-                                    isPresented.toggle()
-                                    self.onSubmit()
-                                } label: {
-                                    HStack(alignment: .center, spacing: 0) {
-                                        Text(term)
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                    }
-                                }
-                            }
-                            .listRowBackground(Theme.textBackground)
-
-                            Button {
-                                recentSearchTerms = []
-                                text = ""
-                                isPresented.toggle()
-                            } label: {
-                                HStack {
-                                    Text("Clear list")
-                                    Spacer()
-                                    Image(systemName: "xmark")
-                                }
-                            }
-                            .listRowBackground(Theme.rowColour)
-                            .foregroundStyle(.red)
-                        } else {
-                            Text("None found")
-                                .listRowBackground(Theme.textBackground)
-                                .foregroundStyle(.gray)
-                        }
-                    }
-                }
-                .background(.clear)
-                .scrollContentBackground(.hidden)
-            }
-            .background(Theme.cGreen)
-        }
-    }
-
-    struct Widgets: View {
-        @Binding public var date: Date
-        @Binding public var text: String
-        @AppStorage("find.widget.activityCalendar") private var showActivityCalendar: Bool = true
-        @AppStorage("find.widget.recent") private var showRecent: Bool = false
-        @AppStorage("find.widget.trends") private var showTrends: Bool = false
-
-        var body: some View {
-            NavigationStack {
-                ScrollView(showsIndicators: false) {
-                    if showActivityCalendar {ActivityCalendar(date: $date, searchTerm: $text)}
-                    if showRecent {Rollups()}
-                    if showTrends {Trends()}
-                }
-                .scrollContentBackground(.hidden)
-            }
-            .padding()
         }
     }
 }

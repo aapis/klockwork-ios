@@ -25,7 +25,7 @@ struct ListRow: View {
             Spacer()
             extraColumn
             Image(systemName: icon)
-                .foregroundStyle(colour!.isBright() ? .white : .gray)
+                .foregroundStyle(.gray)
         }
         .padding(8)
         .background(colour)

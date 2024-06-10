@@ -381,9 +381,8 @@ extension Tabs.Content {
                         colour: record.job != nil ? record.job!.backgroundColor : Theme.rowColour,
                         extraColumn: AnyView(
                             Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
-                                .foregroundStyle(record.job!.backgroundColor.isBright() ? .black : .gray)
-                        ),
-                        highlight: false
+                                .foregroundStyle(.gray)
+                        )
                     )
                 }
             }
