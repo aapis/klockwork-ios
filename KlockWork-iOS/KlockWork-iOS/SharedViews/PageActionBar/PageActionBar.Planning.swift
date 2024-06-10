@@ -18,6 +18,7 @@ extension PageActionBar {
         @Binding public var selectedCompanies: [Company]
         @Binding public var isSheetPresented: Bool
         @State private var plan: Plan? = nil
+        @State private var id: UUID = UUID()
 
         var body: some View {
             PageActionBar(
@@ -28,13 +29,20 @@ extension PageActionBar {
                 ),
                 isSheetPresented: $isSheetPresented
             )
+            .id(self.id)
+            .onChange(of: self.selectedJobs) { // sheet/group view are essentially static unless we manually refresh them, @TODO: fix this
+                self.id = UUID()
+            }
         }
 
         @ViewBuilder var Group: some View {
             HStack(alignment: .center, spacing: 10) {
                 AddButton
                 Spacer()
-                State
+
+                if self.selectedJobs.count > 0 {
+                    State
+                }
             }
             .background(Theme.cOrange.opacity(0.5))
         }
@@ -44,9 +52,14 @@ extension PageActionBar {
                 self.isSheetPresented.toggle()
             } label: {
                 HStack(alignment: .center) {
-                    Image(systemName: "plus.circle.fill")
+                    Image(systemName: "chevron.up.circle.fill")
                         .fontWeight(.bold)
                         .font(.largeTitle)
+
+                    if self.selectedJobs.count == 0 {
+                        Text("Add jobs to get started")
+                            .fontWeight(.bold)
+                    }
                     Spacer()
                 }
             }

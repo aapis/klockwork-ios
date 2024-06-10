@@ -12,7 +12,7 @@ struct Find: View {
     @Environment(\.managedObjectContext) var moc
     @State private var text: String = ""
     @State private var results: SearchLibrary.SearchResults?
-    @State private var recentSearchTerms: [String] = []
+    @State private var recentSearchTerms: [String] = [] // @TODO: store recent searches and track as another app use metric
 
     var body: some View {
         NavigationStack {
