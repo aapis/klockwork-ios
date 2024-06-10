@@ -55,14 +55,6 @@ struct Today: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
             .onChange(of: self.job) {self.actionOnJobChange()}
-            .onAppear {
-                // thx https://www.kodeco.com/31569019-focus-management-in-swiftui-getting-started#toc-anchor-002
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    if self.job != nil {
-                        self.textFieldActive = true
-                    }
-                }
-            }
         }
     }
 }
