@@ -23,7 +23,7 @@ extension PageActionBar {
             PageActionBar(
                 groupView: AnyView(Group),
                 sheetView: AnyView(
-                    JobSelector.Multi(showing: $isSheetPresented, selectedJobs: $selectedJobs)
+                    Widget.JobSelector.Multi(showing: $isSheetPresented, selectedJobs: $selectedJobs)
                         .presentationBackground(Theme.cOrange)
                 ),
                 isSheetPresented: $isSheetPresented

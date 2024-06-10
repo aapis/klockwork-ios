@@ -11,6 +11,8 @@
 		5311F3F62C15592A00FB3071 /* PageActionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3F52C15592A00FB3071 /* PageActionBar.swift */; };
 		5311F3F92C1794FD00FB3071 /* PageActionBar.Planning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3F82C1794FD00FB3071 /* PageActionBar.Planning.swift */; };
 		5311F3FB2C17953A00FB3071 /* PageActionBar.Today.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3FA2C17953A00FB3071 /* PageActionBar.Today.swift */; };
+		5311F3FD2C179CC100FB3071 /* DataExplorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3FC2C179CC100FB3071 /* DataExplorer.swift */; };
+		5311F4002C17A03D00FB3071 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3FF2C17A03D00FB3071 /* Widget.swift */; };
 		532441662C04428700659F14 /* Titlebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441652C04428700659F14 /* Titlebar.swift */; };
 		532441682C0531C800659F14 /* Rollups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441672C0531C800659F14 /* Rollups.swift */; };
 		5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416C2C06485800659F14 /* ActivityCalendar.swift */; };
@@ -105,6 +107,8 @@
 		5311F3F52C15592A00FB3071 /* PageActionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.swift; sourceTree = "<group>"; };
 		5311F3F82C1794FD00FB3071 /* PageActionBar.Planning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.Planning.swift; sourceTree = "<group>"; };
 		5311F3FA2C17953A00FB3071 /* PageActionBar.Today.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.Today.swift; sourceTree = "<group>"; };
+		5311F3FC2C179CC100FB3071 /* DataExplorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExplorer.swift; sourceTree = "<group>"; };
+		5311F3FF2C17A03D00FB3071 /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
 		532441652C04428700659F14 /* Titlebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Titlebar.swift; sourceTree = "<group>"; };
 		532441672C0531C800659F14 /* Rollups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rollups.swift; sourceTree = "<group>"; };
 		5324416C2C06485800659F14 /* ActivityCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCalendar.swift; sourceTree = "<group>"; };
@@ -220,6 +224,19 @@
 			path = PageActionBar;
 			sourceTree = "<group>";
 		};
+		5311F3FE2C17A03500FB3071 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				5311F3FF2C17A03D00FB3071 /* Widget.swift */,
+				5311F3F32C1558A500FB3071 /* JobSelector.swift */,
+				5311F3FC2C179CC100FB3071 /* DataExplorer.swift */,
+				5324416C2C06485800659F14 /* ActivityCalendar.swift */,
+				532441672C0531C800659F14 /* Rollups.swift */,
+				53E3A2662C06B4DA004A85C3 /* Trends.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
 		53274B3A2C13C7DB008387BF /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -231,6 +248,7 @@
 		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
+				5311F3FE2C17A03500FB3071 /* Widget */,
 				5311F3F72C1794E400FB3071 /* PageActionBar */,
 				537582D42C0033B800CB528C /* Tabs.swift */,
 				537582D62C004A9600CB528C /* StatusMessage.swift */,
@@ -241,13 +259,9 @@
 				539134FF2C03AD9A00B48494 /* ListRow.swift */,
 				539135042C040D7500B48494 /* MiniTitleBar.swift */,
 				532441652C04428700659F14 /* Titlebar.swift */,
-				532441672C0531C800659F14 /* Rollups.swift */,
-				5324416C2C06485800659F14 /* ActivityCalendar.swift */,
-				53E3A2662C06B4DA004A85C3 /* Trends.swift */,
 				53E50C1E2C0E6ABE00A85FDC /* Rainbow.swift */,
 				53E50C222C0FED0800A85FDC /* PlanTabs.swift */,
 				53274B342C1214E0008387BF /* LegendLabel.swift */,
-				5311F3F32C1558A500FB3071 /* JobSelector.swift */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -573,12 +587,14 @@
 				539134F22C03879E00B48494 /* Find.swift in Sources */,
 				53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */,
 				53D4CB7F2BFE93B000AFEDEA /* Today.swift in Sources */,
+				5311F4002C17A03D00FB3071 /* Widget.swift in Sources */,
 				53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */,
 				537582D72C004A9600CB528C /* StatusMessage.swift in Sources */,
 				53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */,
 				53E50C1F2C0E6ABE00A85FDC /* Rainbow.swift in Sources */,
 				532441682C0531C800659F14 /* Rollups.swift in Sources */,
 				539134F62C039F2600B48494 /* People.swift in Sources */,
+				5311F3FD2C179CC100FB3071 /* DataExplorer.swift in Sources */,
 				539135002C03AD9A00B48494 /* ListRow.swift in Sources */,
 				53D4CB832BFE93B000AFEDEA /* NoteDetail.swift in Sources */,
 				53274B3C2C13C7E6008387BF /* AssessmentFactor.swift in Sources */,

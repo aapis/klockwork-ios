@@ -26,7 +26,7 @@ struct Find: View {
                             onSubmit: self.actionOnSubmit
                         )
                     } else {
-                        Widgets(date: $date, text: $text)
+                            Widgets(date: $date, text: $text)
                     }
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
@@ -123,6 +123,7 @@ extension Find {
         @Binding public var recentSearchTerms: [String]
         @Binding public var isPresented: Bool
         @AppStorage("find.widget.activityCalendar") private var showActivityCalendar: Bool = true
+        @AppStorage("find.widget.dataExplorer") private var showDataExplorer: Bool = true
         @AppStorage("find.widget.recent") private var showRecent: Bool = false
         @AppStorage("find.widget.trends") private var showTrends: Bool = false
         public var onSubmit: () -> Void
@@ -132,6 +133,7 @@ extension Find {
                 List {
                     Section("Widgets") {
                         Toggle("Activity Calendar", isOn: $showActivityCalendar)
+                        Toggle("Data Explorer", isOn: $showDataExplorer)
                         Toggle("Recent", isOn: $showRecent)
                         Toggle("Trends", isOn: $showTrends)
                     }
@@ -185,15 +187,17 @@ extension Find {
         @Binding public var date: Date
         @Binding public var text: String
         @AppStorage("find.widget.activityCalendar") private var showActivityCalendar: Bool = true
+        @AppStorage("find.widget.dataExplorer") private var showDataExplorer: Bool = true
         @AppStorage("find.widget.recent") private var showRecent: Bool = false
         @AppStorage("find.widget.trends") private var showTrends: Bool = false
 
         var body: some View {
             NavigationStack {
                 ScrollView(showsIndicators: false) {
-                    if showActivityCalendar {ActivityCalendar(date: $date, searchTerm: $text)}
-                    if showRecent {Rollups()}
-                    if showTrends {Trends()}
+                    if showActivityCalendar {Widget.ActivityCalendar(date: $date, searchTerm: $text)}
+                    if showDataExplorer {Widget.DataExplorer(date: $date)}
+                    if showRecent {Widget.Rollups()}
+                    if showTrends {Widget.Trends()}
                 }
                 .scrollContentBackground(.hidden)
             }

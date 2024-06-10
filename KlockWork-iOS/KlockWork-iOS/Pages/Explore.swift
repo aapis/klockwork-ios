@@ -20,93 +20,103 @@ struct Explore: View {
 
     @State private var path = NavigationPath()
     @State private var entityCounts: [EntityTypePair] = []
+    @State private var isPresented: Bool = false
+    @State private var searchText: String = ""
 
     @Environment(\.managedObjectContext) var moc
 
     var body: some View {
         NavigationStack(path: $path) {
-            List {
-                Section("Entities") {
-                    ForEach(EntityType.allCases, id: \.self) { type in
-                        NavigationLink {
-                            switch type {
-                            case .companies:
-                                Companies()
-                                    .environment(\.managedObjectContext, moc)
-                                    .navigationTitle(type.label)
-                            case .jobs:
-                                Jobs()
-                                    .environment(\.managedObjectContext, moc)
-                                    .navigationTitle(type.label)
-                            case .notes:
-                                Notes()
-                                    .environment(\.managedObjectContext, moc)
-                                    .navigationTitle(type.label)
-                            case .people: // @TODO: implement people listing view
-                                People()
-                                    .environment(\.managedObjectContext, moc)
-                                    .navigationTitle(type.label)
-                            case .records: // @TODO: implement records listing view
-                                Records()
-                                    .environment(\.managedObjectContext, moc)
-                                    .navigationTitle(type.label)
-                            case .tasks:
-                                Tasks()
-                                    .environment(\.managedObjectContext, moc)
-                                    .navigationTitle(type.label)
-                            case .projects:
-                                Projects()
-                                    .environment(\.managedObjectContext, moc)
-                                    .navigationTitle(type.label)
-                            }
+            VStack(spacing: 0) {
+                Widgets(date: $date, text: $searchText)
+                .sheet(isPresented: $isPresented) {
+                    FilterPanel()
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Text("Explore")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            isPresented.toggle()
                         } label: {
-                            HStack {
-                                type.icon
-                                    .foregroundStyle(fgColour)
-                                Text(type.label)
-                                Spacer()
-                                Text(String(entityCounts.first(where: {$0.key == type})?.value ?? 0))
-                            }
+                            Image(systemName: "line.3.horizontal.decrease")
+                                .padding()
+                                .background(Theme.rowColour)
+                                .mask(Circle())
                         }
-                        .listRowBackground(Theme.textBackground)
                     }
                 }
             }
-            .background(Theme.cGreen)
-            .scrollContentBackground(.hidden)
-            .navigationTitle("Explore")
-            .toolbarBackground(Theme.cGreen, for: .navigationBar)
         }
         .tint(fgColour)
-        .onAppear(perform: actionOnAppear)
     }
-}
 
-extension Explore {
-    private func actionOnAppear() -> Void {
-        Task {
-            for type in EntityType.allCases {
-                var count: Int = 0
+    struct FilterPanel: View {
+        @AppStorage("explore.widget.activityCalendar") private var showActivityCalendar: Bool = true
+        @AppStorage("explore.widget.dataExplorer") private var showDataExplorer: Bool = false
+        @AppStorage("explore.widget.recent") private var showRecent: Bool = false
+        @AppStorage("explore.widget.trends") private var showTrends: Bool = false
+        @State private var activityCalendarToggleDisabled: Bool = false
 
-                switch type {
-                case .companies:
-                    count = CoreDataCompanies(moc: moc).countAll()
-                case .jobs:
-                    count = CoreDataJob(moc: moc).countAll()
-                case .notes:
-                    count = CoreDataNotes(moc: moc).alive().count
-                case .people:
-                    count = CoreDataPerson(moc: moc).countAll()
-                case .records:
-                    count = CoreDataRecords(moc: moc).countAll()
-                case .tasks:
-                    count = CoreDataTasks(moc: moc).countAllTime()
-                case .projects:
-                    count = CoreDataProjects(moc: moc).countAll()
+        var body: some View {
+            VStack(alignment: .leading, spacing: 0) {
+                List {
+                    Section("Widgets") {
+                        Toggle("Activity Calendar", isOn: $showActivityCalendar)
+                            .disabled(self.activityCalendarToggleDisabled)
+                            .onChange(of: showDataExplorer) {self.showWidgetsOrDefault()}
+                            .onChange(of: showRecent) {self.showWidgetsOrDefault()}
+                            .onChange(of: showTrends) {self.showWidgetsOrDefault()}
+                        Toggle("Data Explorer", isOn: $showDataExplorer)
+//                        Toggle("Recent", isOn: $showRecent)
+                        Toggle("Trends", isOn: $showTrends)
+                    }
+                    .listRowBackground(Theme.textBackground)
                 }
-
-                entityCounts.append(EntityTypePair(key: type, value: count))
+                .background(.clear)
+                .scrollContentBackground(.hidden)
+                .onAppear(perform: self.showWidgetsOrDefault)
             }
+            .background(Theme.cGreen)
+        }
+    }
+
+    struct Widgets: View {
+        @Binding public var date: Date
+        @Binding public var text: String
+        @AppStorage("explore.widget.activityCalendar") private var showActivityCalendar: Bool = true
+        @AppStorage("explore.widget.dataExplorer") private var showDataExplorer: Bool = false
+        @AppStorage("explore.widget.recent") private var showRecent: Bool = false
+        @AppStorage("explore.widget.trends") private var showTrends: Bool = false
+
+        var body: some View {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 20) {
+                    if showActivityCalendar {Widget.ActivityCalendar(date: $date, searchTerm: $text)}
+                    if showDataExplorer {Widget.DataExplorer(date: $date)}
+//                    if showRecent {Widget.Rollups()}
+                    if showTrends {Widget.Trends()}
+                }
+                Spacer()
+            }
+            .padding()
+            .scrollContentBackground(.hidden)
+            .background(Theme.cGreen)
         }
     }
 }
+
+extension Explore.FilterPanel {
+    private func showWidgetsOrDefault() -> Void {
+        if showRecent == false && showTrends == false && showDataExplorer == false {
+            showActivityCalendar = true
+            activityCalendarToggleDisabled = true
+        } else {
+            activityCalendarToggleDisabled = false
+        }
+    }
+}
+

@@ -19,7 +19,7 @@ extension PageActionBar {
             PageActionBar(
                 groupView: AnyView(Group),
                 sheetView: AnyView(
-                    JobSelector.Single(showing: $isSheetPresented, job: $job)
+                    Widget.JobSelector.Single(showing: $isSheetPresented, job: $job)
                         .presentationBackground(Theme.cPurple)
                 ),
                 isSheetPresented: $isSheetPresented
