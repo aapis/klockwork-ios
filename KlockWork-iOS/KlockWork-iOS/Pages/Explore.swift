@@ -119,4 +119,3 @@ extension Explore.FilterPanel {
         }
     }
 }
-
