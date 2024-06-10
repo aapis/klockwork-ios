@@ -19,6 +19,7 @@ struct Today: View {
     @State private var selected: EntityType = .records
     @State private var jobs: [Job] = []
     @State private var isSheetPresented: Bool = false
+    @FocusState private var textFieldActive: Bool
 
     var body: some View {
         NavigationStack {
@@ -41,7 +42,7 @@ struct Today: View {
 
                 if !inSheet {
                     if selected == .records {
-                        Editor(job: $job, entityType: $selected, date: $date)
+                        Editor(job: $job, entityType: $selected, date: $date, focused: _textFieldActive)
                     }
 
                     Spacer().frame(height: 1)
@@ -53,6 +54,15 @@ struct Today: View {
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
+            .onChange(of: self.job) {self.actionOnJobChange()}
+            .onAppear {
+                // thx https://www.kodeco.com/31569019-focus-management-in-swiftui-getting-started#toc-anchor-002
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    if self.job != nil {
+                        self.textFieldActive = true
+                    }
+                }
+            }
         }
     }
 }
@@ -91,6 +101,7 @@ extension Today {
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
         @Binding public var date: Date
+        @FocusState public var focused: Bool
         @State private var text: String = ""
 
         var body: some View {
@@ -100,7 +111,18 @@ extension Today {
                     onSubmit: self.actionOnSubmit,
                     text: $text
                 )
+                .focused($focused)
             }
+        }
+    }
+}
+
+extension Today {
+    /// Handler for callback when self.job changes value
+    /// - Returns: Void
+    private func actionOnJobChange() -> Void {
+        if self.job != nil {
+            self.textFieldActive = true
         }
     }
 }
