@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5311F3F42C1558A500FB3071 /* JobSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3F32C1558A500FB3071 /* JobSelector.swift */; };
+		5311F3F62C15592A00FB3071 /* PageActionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3F52C15592A00FB3071 /* PageActionBar.swift */; };
+		5311F3F92C1794FD00FB3071 /* PageActionBar.Planning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3F82C1794FD00FB3071 /* PageActionBar.Planning.swift */; };
+		5311F3FB2C17953A00FB3071 /* PageActionBar.Today.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3FA2C17953A00FB3071 /* PageActionBar.Today.swift */; };
 		532441662C04428700659F14 /* Titlebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441652C04428700659F14 /* Titlebar.swift */; };
 		532441682C0531C800659F14 /* Rollups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441672C0531C800659F14 /* Rollups.swift */; };
 		5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416C2C06485800659F14 /* ActivityCalendar.swift */; };
@@ -97,6 +101,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5311F3F32C1558A500FB3071 /* JobSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSelector.swift; sourceTree = "<group>"; };
+		5311F3F52C15592A00FB3071 /* PageActionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.swift; sourceTree = "<group>"; };
+		5311F3F82C1794FD00FB3071 /* PageActionBar.Planning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.Planning.swift; sourceTree = "<group>"; };
+		5311F3FA2C17953A00FB3071 /* PageActionBar.Today.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.Today.swift; sourceTree = "<group>"; };
 		532441652C04428700659F14 /* Titlebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Titlebar.swift; sourceTree = "<group>"; };
 		532441672C0531C800659F14 /* Rollups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rollups.swift; sourceTree = "<group>"; };
 		5324416C2C06485800659F14 /* ActivityCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCalendar.swift; sourceTree = "<group>"; };
@@ -202,6 +210,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5311F3F72C1794E400FB3071 /* PageActionBar */ = {
+			isa = PBXGroup;
+			children = (
+				5311F3F52C15592A00FB3071 /* PageActionBar.swift */,
+				5311F3F82C1794FD00FB3071 /* PageActionBar.Planning.swift */,
+				5311F3FA2C17953A00FB3071 /* PageActionBar.Today.swift */,
+			);
+			path = PageActionBar;
+			sourceTree = "<group>";
+		};
 		53274B3A2C13C7DB008387BF /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -213,6 +231,7 @@
 		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
+				5311F3F72C1794E400FB3071 /* PageActionBar */,
 				537582D42C0033B800CB528C /* Tabs.swift */,
 				537582D62C004A9600CB528C /* StatusMessage.swift */,
 				5387AE882C0143D100EEC581 /* SearchBar.swift */,
@@ -228,6 +247,7 @@
 				53E50C1E2C0E6ABE00A85FDC /* Rainbow.swift */,
 				53E50C222C0FED0800A85FDC /* PlanTabs.swift */,
 				53274B342C1214E0008387BF /* LegendLabel.swift */,
+				5311F3F32C1558A500FB3071 /* JobSelector.swift */,
 			);
 			path = SharedViews;
 			sourceTree = "<group>";
@@ -520,6 +540,7 @@
 				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
 				532441662C04428700659F14 /* Titlebar.swift in Sources */,
 				53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */,
+				5311F3F62C15592A00FB3071 /* PageActionBar.swift in Sources */,
 				53E50C092C0E5F5800A85FDC /* Assessables.swift in Sources */,
 				53274B372C12179D008387BF /* ButtonType.swift in Sources */,
 				53F9260A2BFE9BF300948076 /* CoreDataNoteVersions.swift in Sources */,
@@ -532,6 +553,7 @@
 				53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */,
 				53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */,
 				53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */,
+				5311F3FB2C17953A00FB3071 /* PageActionBar.Today.swift in Sources */,
 				53E3A26E2C098DA8004A85C3 /* AssessmentFactorForm.swift in Sources */,
 				537582D52C0033B800CB528C /* Tabs.swift in Sources */,
 				53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */,
@@ -545,6 +567,7 @@
 				53D4CBAC2BFE947900AFEDEA /* Theme.swift in Sources */,
 				539134FC2C03A8EC00B48494 /* QueryField.swift in Sources */,
 				53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */,
+				5311F3F42C1558A500FB3071 /* JobSelector.swift in Sources */,
 				53E50C0B2C0E5FA400A85FDC /* FactorProxy.swift in Sources */,
 				536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */,
 				539134F22C03879E00B48494 /* Find.swift in Sources */,
@@ -569,6 +592,7 @@
 				539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */,
 				539134F82C039F3100B48494 /* Records.swift in Sources */,
 				537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */,
+				5311F3F92C1794FD00FB3071 /* PageActionBar.Planning.swift in Sources */,
 				539134F42C0391F000B48494 /* Projects.swift in Sources */,
 				53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */,
 				53D4CB802BFE93B000AFEDEA /* CompanyDetail.swift in Sources */,

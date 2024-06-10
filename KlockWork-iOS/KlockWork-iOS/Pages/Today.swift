@@ -17,6 +17,8 @@ struct Today: View {
     @Environment(\.managedObjectContext) var moc
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
+    @State private var jobs: [Job] = []
+    @State private var isSheetPresented: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -27,10 +29,13 @@ struct Today: View {
 
                 ZStack(alignment: .bottomLeading) {
                     Tabs(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                    PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
                     if !inSheet {
-                        LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
-                            .frame(height: 50)
-                            .opacity(0.1)
+                        if job != nil {
+                            LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
+                                .frame(height: 50)
+                                .opacity(0.1)
+                        }
                     }
                 }
 
@@ -76,24 +81,7 @@ extension Today {
                         }
                     Image(systemName: "chevron.right")
                 }
-
                 Spacer()
-
-                Button {
-                    job = nil
-                } label: {
-                    if let jerb = job {
-                        HStack(alignment: .center, spacing: 5) {
-                            Image(systemName: "xmark")
-                            Text("\(jerb.title ?? jerb.jid.string)")
-                        }
-                        .padding(7)
-                        .background(jerb.backgroundColor)
-                        .foregroundStyle(jerb.backgroundColor.isBright() ? Theme.cPurple : .white)
-                        .cornerRadius(7)
-                    }
-                }
-                .padding(.trailing)
             }
         }
     }
@@ -104,17 +92,9 @@ extension Today {
         @Binding public var entityType: EntityType
         @Binding public var date: Date
         @State private var text: String = ""
-        
+
         var body: some View {
-            if job == nil {
-                QueryFieldSelectJob(
-                    prompt: "What are you working on?",
-                    onSubmit: self.actionOnSubmit,
-                    text: $text,
-                    job: $job,
-                    entityType: $entityType
-                )
-            } else {
+            if job != nil {
                 QueryField(
                     prompt: "What are you working on?",
                     onSubmit: self.actionOnSubmit,
