@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AssessmentTypeIntersitial: View {
     @Environment(\.managedObjectContext) var moc
-    public let assessment: Assessment
+    public var assessment: Assessment?
 
     var body: some View {
         NavigationStack {
@@ -20,16 +20,22 @@ struct AssessmentTypeIntersitial: View {
                         NavigationLink {
                             AssessmentThresholdForm()
                         } label: {
-                            Text("Thresholds")
+                            Text("Status")
                         }
                         .listRowBackground(Theme.textBackground)
+                        .navigationTitle("Assessment Configuration")
+                        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                        .toolbarBackground(.visible, for: .navigationBar)
+                        .toolbarTitleDisplayMode(.inline)
 
-                        NavigationLink {
-                            AssessmentFactorForm(assessment: self.assessment)
-                        } label: {
-                            Text("Factors")
+                        if let ass = self.assessment {
+                            NavigationLink {
+                                AssessmentFactorForm(assessment: ass)
+                            } label: {
+                                Text("Factors")
+                            }
+                            .listRowBackground(Theme.textBackground)
                         }
-                        .listRowBackground(Theme.textBackground)
                     }
 
                     LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
@@ -40,8 +46,13 @@ struct AssessmentTypeIntersitial: View {
         }
         .background(Theme.cGreen)
         .scrollContentBackground(.hidden)
+        .presentationDetents([.medium, .large])
+        .scrollDismissesKeyboard(.immediately)
+        .toolbarTitleDisplayMode(.inline)
+        .presentationBackground(Theme.cGreen)
         .navigationTitle("Assessment Configuration")
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarTitleDisplayMode(.inline)
     }
 }

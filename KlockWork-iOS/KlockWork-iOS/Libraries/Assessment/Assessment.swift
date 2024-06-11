@@ -38,6 +38,7 @@ class Assessment {
             // Perform the assessment by iterating over all the things and calculating the score
             self.assessables.evaluate()
             self.weight = self.assessables.weight
+            self.score = self.assessables.score
         }
     }
 }

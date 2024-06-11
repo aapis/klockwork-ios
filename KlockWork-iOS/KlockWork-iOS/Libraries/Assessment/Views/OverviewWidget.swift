@@ -25,7 +25,6 @@ struct OverviewWidget: View {
 
                         NavigationLink {
                             AssessmentTypeIntersitial(assessment: assessment)
-                                .toolbarTitleDisplayMode(.inline)
                         } label: {
                             HStack {
                                 Spacer()

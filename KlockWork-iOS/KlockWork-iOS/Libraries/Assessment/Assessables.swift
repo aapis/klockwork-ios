@@ -103,6 +103,7 @@ public class Assessables: Identifiable, Equatable {
     /// @TODO: move to ActivityWeightAssessment
     /// - Returns: Void
     func weigh() -> Void {
+//        let 
         if self.score == 0 {
             self.weight = .empty
         } else if self.score > 0 && self.score < 5 {

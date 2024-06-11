@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct Legend: View {
+    @State private var isSheetPresented: Bool = false
     private var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 3)
     }
@@ -16,7 +17,21 @@ struct Legend: View {
         GridRow {
             VStack(alignment: .leading) {
                 GridRow {
-                    LegendLabel(label: "Legend")
+                    HStack(alignment: .center) {
+                        LegendLabel(label: "Legend")
+
+                        // Legend settings/gear button
+                        Button {
+                            self.isSheetPresented.toggle()
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Image(systemName: "gear")
+                            }
+                        }
+                        .foregroundStyle(.yellow)
+                        .help("Modify assessment factors")
+                    }
                 }
                 .padding([.bottom], 10)
                 LazyVGrid(columns: columns, alignment: .leading) {
@@ -30,6 +45,9 @@ struct Legend: View {
         }
         .padding()
         .background(Theme.textBackground)
+        .sheet(isPresented: $isSheetPresented) {
+            AssessmentTypeIntersitial()
+        }
     }
 }
 
