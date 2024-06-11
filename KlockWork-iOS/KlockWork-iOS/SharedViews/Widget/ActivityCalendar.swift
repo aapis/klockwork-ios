@@ -91,7 +91,6 @@ extension Widget {
                             }
 
                             Button {
-                                CDAssessmentFactor(moc: self.moc).delete()
                                 self.date = Date()
                             } label: {
                                 Image(systemName: "arrow.triangle.2.circlepath.circle.fill")

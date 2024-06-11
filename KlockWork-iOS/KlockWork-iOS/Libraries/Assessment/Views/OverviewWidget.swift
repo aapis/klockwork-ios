@@ -24,7 +24,7 @@ struct OverviewWidget: View {
                         Spacer()
 
                         NavigationLink {
-                            AssessmentFactorForm(assessment: assessment)
+                            AssessmentTypeIntersitial(assessment: assessment)
                                 .toolbarTitleDisplayMode(.inline)
                         } label: {
                             HStack {

@@ -39,25 +39,6 @@ class FactorProxy {
         self.schemaVersion = 1
     }
 
-//    func create(using moc: NSManagedObjectContext) -> AssessmentFactor {
-//        let af = AssessmentFactor(context: moc)
-//        af.id = self.id
-//        af.alive = self.alive
-//        af.count = self.count(moc: moc)
-//        af.date = self.date
-//        af.desc = "\(af.count) \(af.count > 1 ? self.type.label : self.type.enSingular) \(af.count > 1 ? self.action.enPlural : self.action.enSingular))"
-//        af.created = self.created
-//        af.lastUpdate = self.lastUpdate
-//        af.schemaVersion = self.schemaVersion
-//        af.threshold = self.threshold
-//        af.weight = self.weight
-//        af.type = self.type.label
-//        af.action = self.action.label
-//
-//        PersistenceController.shared.save()
-//        return af
-//    }
-
     func createDefaultFactor(using moc: NSManagedObjectContext) -> Void {
         let af = AssessmentFactor(context: moc)
         af.id = self.id

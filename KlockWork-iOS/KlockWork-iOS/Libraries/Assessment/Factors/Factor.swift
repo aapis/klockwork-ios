@@ -44,9 +44,9 @@ struct Factor: View {
                             ForEach(0..<6) { Text($0.string)}
                         }
                     }
-
                 }
                 .padding([.leading, .trailing])
+                .padding(.bottom, 8)
             }
             .background(count < threshold ? Theme.base : Theme.textBackground)
             .clipShape(.rect(cornerRadius: 16))

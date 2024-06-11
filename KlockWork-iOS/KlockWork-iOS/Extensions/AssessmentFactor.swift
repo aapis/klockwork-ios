@@ -14,7 +14,11 @@ extension AssessmentFactor {
     func factorDescription() -> String {
         if let type = self.getType() {
             if let action = self.getAction() {
-                return "\(self.count) \(self.count > 1 ? type.label : type.enSingular) \(self.count > 1 ? action.enPlural : action.enSingular)"
+                if self.count > 0 {
+                    return "\(self.count) \(self.count > 1 ? type.label : type.enSingular) \(self.count > 1 ? action.enPlural : action.enSingular)"
+                } else {
+                    return "\(type.enSingular) \(action.enSingular)"
+                }
             }
         }
 
