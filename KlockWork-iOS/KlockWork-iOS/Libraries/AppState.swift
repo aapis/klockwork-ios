@@ -16,6 +16,12 @@ class AppState: ObservableObject {
     init() {
         self.activities.state = self
     }
+    
+    /// Shortcut for determining if the current AppState.date value is today's date or not
+    /// - Returns: Bool
+    func isToday() -> Bool {
+        return Calendar.autoupdatingCurrent.isDateInToday(self.date)
+    }
 }
 
 class Activities {
@@ -34,7 +40,9 @@ class Activities {
         self.createAssessments()
         self.calculateScore()
     }
-    
+
+
+
     /// Calculate overall score for the day by tallying up the factors. Sets self.score
     /// - Returns: Void
     private func calculateScore() -> Void {

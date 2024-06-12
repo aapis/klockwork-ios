@@ -45,9 +45,6 @@ extension Planning {
     struct Header: View {
         @EnvironmentObject private var state: AppState
         @State private var date: Date = Date()
-        private var isToday: Bool {
-            Calendar.autoupdatingCurrent.isDateInToday(self.state.date)
-        }
 
         var body: some View {
             HStack(alignment: .center) {
@@ -73,8 +70,8 @@ extension Planning {
                     } label: {
                         Text("\(date.formatted(date: .abbreviated, time: .omitted))")
                         .padding(7)
-                        .background(self.isToday ? .yellow : Theme.rowColour)
-                        .foregroundStyle(self.isToday ? Theme.cOrange : .white)
+                        .background(self.state.isToday() ? .yellow : Theme.rowColour)
+                        .foregroundStyle(self.state.isToday() ? Theme.cOrange : .white)
                         .fontWeight(.bold)
                         .cornerRadius(7)
                     }

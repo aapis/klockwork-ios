@@ -24,7 +24,7 @@ struct Today: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 if !inSheet {
-                    Header(job: $job)
+                    Header()
                 }
 
                 ZStack(alignment: .bottomLeading) {
@@ -61,7 +61,6 @@ struct Today: View {
 extension Today {
     struct Header: View {
         @EnvironmentObject private var state: AppState
-        @Binding public var job: Job?
         @State public var date: Date = Date()
 
         var body: some View {

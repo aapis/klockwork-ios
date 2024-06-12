@@ -26,30 +26,60 @@ struct Explore: View {
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
+                Header()
                 Widgets(text: $searchText)
-                .sheet(isPresented: $isPresented) {
-                    FilterPanel()
-                }
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Text("Explore")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
+                    .sheet(isPresented: $isPresented) {
+                        FilterPanel()
                     }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            isPresented.toggle()
-                        } label: {
-                            Image(systemName: "line.3.horizontal.decrease")
-                                .padding()
-                                .background(Theme.rowColour)
-                                .mask(Circle())
-                        }
-                    }
-                }
             }
+            .navigationBarTitleDisplayMode(.inline)
+            .background(Theme.cGreen)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .scrollDismissesKeyboard(.immediately)
         }
         .tint(fgColour)
+    }
+
+    struct Header: View {
+        @EnvironmentObject private var state: AppState
+        @State public var date: Date = Date()
+
+        var body: some View {
+            HStack(alignment: .center) {
+                HStack(alignment: .center, spacing: 8) {
+                    Text(Calendar.autoupdatingCurrent.isDateInToday(self.state.date) ? "Explore" : self.state.date.formatted(date: .abbreviated, time: .omitted))
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding([.leading, .top, .bottom])
+                        .overlay {
+                            DatePicker(
+                                "Date picker",
+                                selection: $date,
+                                displayedComponents: [.date]
+                            )
+                            .labelsHidden()
+                            .contentShape(Rectangle())
+                            .opacity(0.011)
+                        }
+                    Image(systemName: "chevron.right")
+                }
+                Spacer()
+                Button {
+                    // pass
+                } label: {
+                    Text("\(date.formatted(date: .abbreviated, time: .omitted))")
+                    .padding(7)
+                    .background(self.state.isToday() ? .yellow : Theme.rowColour)
+                    .foregroundStyle(self.state.isToday() ? Theme.cOrange : .white)
+                    .fontWeight(.bold)
+                    .cornerRadius(7)
+                }
+                .padding(.trailing)
+            }
+            .onAppear(perform: {
+                date = self.state.date
+            })
+        }
     }
 
     struct FilterPanel: View {
@@ -90,12 +120,29 @@ struct Explore: View {
         @AppStorage("explore.widget.trends") private var showTrends: Bool = false
 
         var body: some View {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 20) {
-                    if showActivityCalendar {Widget.ActivityCalendar(searchTerm: $text)}
-                    if showDataExplorer {Widget.DataExplorer()}
-//                    if showRecent {Widget.Rollups()}
-                    if showTrends {Widget.Trends()}
+            NavigationStack {
+                List {
+                    Section("Visualize your data") {
+                        NavigationLink {
+                            Widget.ActivityCalendar(searchTerm: $text)
+                        } label: {
+                            HStack {
+                                Image(systemName: "calendar")
+                                Text("Activity Calendar")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
+
+                        NavigationLink {
+                            Widget.DataExplorer()
+                        } label: {
+                            HStack {
+                                Image(systemName: "world")
+                                Text("Data Explorer")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
+                    }
                 }
                 Spacer()
             }
