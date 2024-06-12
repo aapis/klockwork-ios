@@ -11,12 +11,12 @@ import CoreData
 class Assessables: Identifiable, Equatable {
     typealias EntityType = PageConfiguration.EntityType
 
-    public var id: UUID = UUID()
+    var id: UUID = UUID()
     var factors: [AssessmentFactor] = []
     var moc: NSManagedObjectContext?
     var score: Int = 0
     var weight: ActivityWeight = .empty
-    var date: Date? = Date()
+    var date: Date? = nil
     var statuses: [AssessmentThreshold] = []
 
     /// Stub for Equatable compliance
@@ -92,7 +92,6 @@ class Assessables: Identifiable, Equatable {
     /// - Returns:Void
     func calculateScore() -> Void {
         self.score = 0
-
         for factor in self.factors {
             factor.count = factor.countFactors(using: self.moc!, for: self.date)
 
@@ -108,76 +107,19 @@ class Assessables: Identifiable, Equatable {
     /// @TODO: move to ActivityWeightAssessment
     /// @TODO: also this sucks
     /// - Returns: Void
-    func weigh(with statuses: [AssessmentThreshold]?) -> Void {
-        if let moc = self.moc {
-            if let stats = statuses {
-//                print("DERPO should work")
-                for (idx, status) in stats.enumerated() {
-                    //                var prev: Int = statuses.count - 1
-                    //                var current: Int = idx
-                    //                var next: Int = idx + 1
-                    //
-                    //                if statuses.endIndex <= next {
-                    //                    current += 1
-                    //                    next += 1
-                    //
-                    //                    let nextStatus = statuses[next]
-                    ////                    if status.value nextStatus.value
-                    //                } else {
-                    //                    next = current
-                    //                    current -= 1
-                    //                    prev -= 1
-                    //                }
-                    //
-                    let bounds = (status.value, Int64(status.value + 10))
+    func weigh(with statuses: [AssessmentThreshold]) -> Void {
+        for (idx, status) in statuses.enumerated() {
+            if (idx + 1) < statuses.count {
+                let nextStatus =  statuses[idx + 1]
+                let bounds = (nextStatus.value, status.value - 1)
 
-                    switch status.label {
-                    case "Clear":
-                        if self.score == 0 {
-                            self.weight = .empty
+                if self.score >= bounds.0 && self.score <= bounds.1 {
+                    if let label = status.label {
+                        if let weight = ActivityWeight.typeFromLabel(label: label) {
+                            self.weight = weight
                         }
-                    case "Light":
-                        if self.score > 0 && self.score <= status.value {
-                            print("DERPO light \(self.score) <= \(status.value)")
-                            self.weight = .light
-                        }
-                    case "Busy":
-                        if self.score >= bounds.0 && self.score <= bounds.1 {
-                            print("DERPO busy \(self.score) <= \(status.value)")
-                            self.weight = .medium
-                        }
-                    case "At Capacity":
-                        if self.score >= bounds.0 && self.score <= bounds.1 {
-                            print("DERPO at capacity \(self.score) <= \(status.value)")
-                            self.weight = .heavy
-                        }
-                    case "Overloaded":
-                        if self.score >= bounds.0 && self.score <= bounds.1 {
-                            print("DERPO overloaded \(self.score) >= \(status.value)")
-                            self.weight = .significant
-                        }
-                    case .none:
-                        print("DERPO none triggered")
-                        self.weight = .empty
-                    case .some(_):
-                        print("DERPO SOME triggered")
-                        self.weight = .light
                     }
                 }
-            }
-        } else {
-//            print("DERPO fail")
-            // Use default, hardcoded values if we don't have a MOC
-            if self.score == 0 {
-                self.weight = .empty
-            } else if self.score > 0 && self.score < 5 {
-                self.weight = .light
-            } else if self.score >= 5 && self.score < 10 {
-                self.weight = .medium
-            } else if self.score > 10 && self.score <= 13 {
-                self.weight = .heavy
-            } else {
-                self.weight = .significant
             }
         }
     }
@@ -194,11 +136,11 @@ class Assessables: Identifiable, Equatable {
             stats = self.statuses
         }
 
-        if stats.count > 0 {
+        if stats.count > 0 && self.score > 0 {
             self.weigh(with: stats)
         }
     }
-    
+
     // @TODO: activeToggle(), threshold(), weight() probably shouldn't exist (or, shouldn't exist here anyways)
     /// Modify and save the active status on a given AssessmentFactor
     /// - Parameter factor: AssessmentFactor

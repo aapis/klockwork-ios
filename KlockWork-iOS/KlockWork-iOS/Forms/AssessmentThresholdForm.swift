@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct AssessmentThresholdForm: View {
-    @Environment(\.managedObjectContext) var moc
     @EnvironmentObject private var state: AppState
     @State private var isResetAlertPresented: Bool = false
 
@@ -19,7 +18,7 @@ struct AssessmentThresholdForm: View {
                 ZStack(alignment: .topLeading) {
                     List {
                         Section {
-                            ForEach(self.state.assessment.statuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
+                            ForEach(self.state.activities.statuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
                                 Row(status: status)
                             }
                         }
@@ -60,7 +59,7 @@ struct AssessmentThresholdForm: View {
                 }
                 .alert("Reset to default values? No data will be lost.", isPresented: $isResetAlertPresented) {
                     Button("Yes", role: .destructive) {
-                        self.state.assessment.statuses = CDAssessmentThreshold(moc: self.moc).recreateAndReturn()
+                        self.state.activities.statuses = CDAssessmentThreshold(moc: self.state.moc).recreateAndReturn()
                     }
                     Button("No", role: .cancel) {}
                 }
@@ -71,7 +70,6 @@ struct AssessmentThresholdForm: View {
 
 extension AssessmentThresholdForm {
     struct Row: View {
-        @Environment(\.managedObjectContext) var moc
         public let status: AssessmentThreshold
         @State private var value: Int = 0
         @State private var colour: Color = .clear

@@ -13,7 +13,6 @@ struct Statuses: Equatable, Identifiable {
 }
 
 struct Legend: View {
-    @Environment(\.managedObjectContext) var moc
     @EnvironmentObject private var state: AppState
     @State private var id: UUID = UUID()
     @State private var isSheetPresented: Bool = false
@@ -37,14 +36,14 @@ struct Legend: View {
                                 Image(systemName: "gear")
                             }
                         }
-                        .foregroundStyle(self.state.assessment.statuses.isEmpty ? .gray : .yellow)
+                        .foregroundStyle(self.state.activities.statuses.isEmpty ? .gray : .yellow)
                         .help("Modify assessment factors")
-                        .disabled(self.state.assessment.statuses.isEmpty)
+                        .disabled(self.state.activities.statuses.isEmpty)
                     }
                 }
                 .padding([.bottom], 10)
                 LazyVGrid(columns: columns, alignment: .leading) {
-                    ForEach(self.state.assessment.statuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
+                    ForEach(self.state.activities.statuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
                         Row(status: status)
                     }
                     RowBasic(colour: .yellow, label: "Today")

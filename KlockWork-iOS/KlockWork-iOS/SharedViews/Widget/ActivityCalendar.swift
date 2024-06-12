@@ -23,7 +23,6 @@ extension Widget {
     struct ActivityCalendar: View {
         @EnvironmentObject private var state: AppState
         @Binding public var searchTerm: String
-        @State private var assessmentStatuses: [AssessmentThreshold] = []
         @State public var month: String = "_DEFAULT_MONTH"
         @State public var open: Bool = true
         @State public var cumulativeScore: Int = 0
@@ -80,19 +79,19 @@ extension Widget {
                             .padding([.top, .bottom], 8)
                             .background(Theme.rowColour)
                             .mask(Capsule(style: .continuous))
-                            .overlay {
+                            .overlay { // @TODO: only this date selector doesn't is broken in iOS 18 - bug?
                                 DatePicker(
                                     "Date picker",
                                     selection: $date,
                                     displayedComponents: [.date]
                                 )
                                 .labelsHidden()
-                                .contentShape(Rectangle())
+//                                .background(.red)
                                 .opacity(0.011)
                             }
 
                             Button {
-                                self.date = Date()
+                                self.state.date = Date()
                             } label: {
                                 Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
                                     .font(.title2)
@@ -132,8 +131,7 @@ extension Widget {
                     .background(Theme.rowColour)
 
                     // List of days representing 1 month
-                    Month(date: $date, cumulativeScore: $cumulativeScore, month: $month, searchTerm: searchTerm)
-                        .environment(\.managedObjectContext, self.state.moc)
+                    Month(month: $month, searchTerm: searchTerm)
                         .background(Theme.rowColour)
 
                     // Legend
@@ -143,15 +141,15 @@ extension Widget {
             }
             .background(Theme.cGreen)
             .onAppear(perform: actionOnAppear)
-            .onChange(of: self.date) { self.actionChangeDate()}
+            .onChange(of: self.state.date) { self.actionChangeDate()}
             // @TODO: swipe between months
-            //                .swipe([.left, .right]) { swipe in
-            //                    if swipe == .left {
-            //
-            //                    } else if swipe == .right {
-            //
-            //                    }
-            //                }
+//            .swipe([.left, .right]) { swipe in
+//                if swipe == .left {
+//
+//                } else if swipe == .right {
+//
+//                }
+//            }
         }
     }
 }
@@ -163,14 +161,19 @@ extension Widget.ActivityCalendar {
         let df = DateFormatter()
         df.dateFormat = "MMM"
         self.month = df.string(from: self.state.date)
-
-        self.date = self.state.date // @TODO: remove eventually
+        self.date = self.state.date // Used by DatePicker
+        print("DERPO date set \(self.date)")
     }
     
     /// Onload handler, creates assessment statuses (if required)
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.actionChangeDate()
-        self.assessmentStatuses = state.assessment.statuses
+    }
+
+    /// <#Description#>
+    /// - Returns: <#description#>
+    private func redraw() -> Void {
+        
     }
 }

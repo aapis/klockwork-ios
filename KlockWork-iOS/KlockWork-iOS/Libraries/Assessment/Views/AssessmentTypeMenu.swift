@@ -68,6 +68,6 @@ extension AssessmentTypeMenu {
     /// Onload handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-//        self.state.assessment.statuses = CDAssessmentThreshold(moc: self.moc).all()
+//        self.state.activities.statuses = CDAssessmentThreshold(moc: self.moc).all()
     }
 }

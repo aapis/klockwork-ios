@@ -78,6 +78,7 @@ extension Main {
             allStatuses = CDAssessmentThreshold(moc: self.moc).recreateAndReturn()
         }
 
-        self.state.assessment.statuses = allStatuses
+        self.state.activities.statuses = allStatuses
+        self.state.activities.assess(date: self.state.date)
     }
 }
