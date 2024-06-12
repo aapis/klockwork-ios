@@ -21,13 +21,13 @@ struct DayOfWeek: Identifiable {
 
 extension Widget {
     struct ActivityCalendar: View {
-        @Binding public var date: Date
+        @EnvironmentObject private var state: AppState
         @Binding public var searchTerm: String
         @State private var assessmentStatuses: [AssessmentThreshold] = []
-        @Environment(\.managedObjectContext) var moc
         @State public var month: String = "_DEFAULT_MONTH"
         @State public var open: Bool = true
         @State public var cumulativeScore: Int = 0
+        @State private var date: Date = Date()
         public var weekdays: [DayOfWeek] = [
             DayOfWeek(symbol: "Sun"),
             DayOfWeek(symbol: "Mon"),
@@ -132,12 +132,12 @@ extension Widget {
                     .background(Theme.rowColour)
 
                     // List of days representing 1 month
-                    Month(date: $date, cumulativeScore: $cumulativeScore, month: $month, assessmentStatuses: $assessmentStatuses, searchTerm: searchTerm)
-                        .environment(\.managedObjectContext, moc)
+                    Month(date: $date, cumulativeScore: $cumulativeScore, month: $month, searchTerm: searchTerm)
+                        .environment(\.managedObjectContext, self.state.moc)
                         .background(Theme.rowColour)
 
                     // Legend
-                    Legend(assessmentStatuses: $assessmentStatuses)
+                    Legend()
                         .border(width: 1, edges: [.top], color: .gray.opacity(0.7))
                 }
             }
@@ -162,20 +162,15 @@ extension Widget.ActivityCalendar {
     private func actionChangeDate() -> Void {
         let df = DateFormatter()
         df.dateFormat = "MMM"
-        self.month = df.string(from: self.date)
+        self.month = df.string(from: self.state.date)
+
+        self.date = self.state.date // @TODO: remove eventually
     }
     
     /// Onload handler, creates assessment statuses (if required)
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.actionChangeDate()
-
-        // Create assessment Status/Threshold objects
-        let allStatuses = CDAssessmentThreshold(moc: self.moc).all() // @TODO: replace with a .count call instead!
-        if allStatuses.isEmpty || allStatuses.count < ActivityWeight.allCases.count {
-            self.assessmentStatuses = CDAssessmentThreshold(moc: self.moc).recreateAndReturn()
-        } else {
-            self.assessmentStatuses = allStatuses
-        }
+        self.assessmentStatuses = state.assessment.statuses
     }
 }

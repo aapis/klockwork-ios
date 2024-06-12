@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-public class Assessables: Identifiable, Equatable {
+class Assessables: Identifiable, Equatable {
     typealias EntityType = PageConfiguration.EntityType
 
     public var id: UUID = UUID()
@@ -17,6 +17,7 @@ public class Assessables: Identifiable, Equatable {
     var score: Int = 0
     var weight: ActivityWeight = .empty
     var date: Date? = Date()
+    var statuses: [AssessmentThreshold] = []
 
     /// Stub for Equatable compliance
     /// - Parameters:
@@ -31,7 +32,7 @@ public class Assessables: Identifiable, Equatable {
     /// - Parameters:
     ///   - factors: Optional(Array<AssessmentFactor>)
     ///   - moc: Optional(NSManagedObjectContext)
-    init(factors: [AssessmentFactor]? = nil, moc: NSManagedObjectContext? = nil) {
+    init(factors: [AssessmentFactor]? = nil, statuses: [AssessmentThreshold]? = nil, moc: NSManagedObjectContext? = nil) {
         self.id = UUID()
 
         if moc != nil {
@@ -42,9 +43,13 @@ public class Assessables: Identifiable, Equatable {
             self.factors = factors!
         }
 
+        if let stats = statuses {
+            self.statuses = stats
+        }
+
         self.evaluate()
     }
-    
+
     /// Shortcut for self.factors.isEmpty
     /// - Returns: Bool
     func isEmpty() -> Bool {
@@ -103,63 +108,65 @@ public class Assessables: Identifiable, Equatable {
     /// @TODO: move to ActivityWeightAssessment
     /// @TODO: also this sucks
     /// - Returns: Void
-    func weigh() -> Void {
+    func weigh(with statuses: [AssessmentThreshold]?) -> Void {
         if let moc = self.moc {
-            let statuses = CDAssessmentThreshold(moc: moc).all()
+            if let stats = statuses {
+//                print("DERPO should work")
+                for (idx, status) in stats.enumerated() {
+                    //                var prev: Int = statuses.count - 1
+                    //                var current: Int = idx
+                    //                var next: Int = idx + 1
+                    //
+                    //                if statuses.endIndex <= next {
+                    //                    current += 1
+                    //                    next += 1
+                    //
+                    //                    let nextStatus = statuses[next]
+                    ////                    if status.value nextStatus.value
+                    //                } else {
+                    //                    next = current
+                    //                    current -= 1
+                    //                    prev -= 1
+                    //                }
+                    //
+                    let bounds = (status.value, Int64(status.value + 10))
 
-            for (idx, status) in statuses.enumerated() {
-//                var prev: Int = statuses.count - 1
-//                var current: Int = idx
-//                var next: Int = idx + 1
-//
-//                if statuses.endIndex <= next {
-//                    current += 1
-//                    next += 1
-//
-//                    let nextStatus = statuses[next]
-////                    if status.value nextStatus.value
-//                } else {
-//                    next = current
-//                    current -= 1
-//                    prev -= 1
-//                }
-//
-                let bounds = (status.value, Int64(status.value + 10))
-
-                switch status.label {
-                case "Clear":
-                    if self.score == 0 {
+                    switch status.label {
+                    case "Clear":
+                        if self.score == 0 {
+                            self.weight = .empty
+                        }
+                    case "Light":
+                        if self.score > 0 && self.score <= status.value {
+                            print("DERPO light \(self.score) <= \(status.value)")
+                            self.weight = .light
+                        }
+                    case "Busy":
+                        if self.score >= bounds.0 && self.score <= bounds.1 {
+                            print("DERPO busy \(self.score) <= \(status.value)")
+                            self.weight = .medium
+                        }
+                    case "At Capacity":
+                        if self.score >= bounds.0 && self.score <= bounds.1 {
+                            print("DERPO at capacity \(self.score) <= \(status.value)")
+                            self.weight = .heavy
+                        }
+                    case "Overloaded":
+                        if self.score >= bounds.0 && self.score <= bounds.1 {
+                            print("DERPO overloaded \(self.score) >= \(status.value)")
+                            self.weight = .significant
+                        }
+                    case .none:
+                        print("DERPO none triggered")
                         self.weight = .empty
-                    }
-                case "Light":
-                    if self.score > 0 && self.score <= status.value {
-                        print("DERPO light \(self.score) <= \(status.value)")
+                    case .some(_):
+                        print("DERPO SOME triggered")
                         self.weight = .light
                     }
-                case "Busy":
-                    if self.score >= bounds.0 && self.score <= bounds.1 {
-                        print("DERPO busy \(self.score) <= \(status.value)")
-                        self.weight = .medium
-                    }
-                case "At Capacity":
-                    if self.score >= bounds.0 && self.score <= bounds.1 {
-                        print("DERPO at capacity \(self.score) <= \(status.value)")
-                        self.weight = .heavy
-                    }
-                case "Overloaded":
-                    if self.score >= bounds.0 && self.score <= bounds.1 {
-                        print("DERPO overloaded \(self.score) >= \(status.value)")
-                        self.weight = .significant
-                    }
-                case .none:
-                    print("DERPO none triggered")
-                    self.weight = .empty
-                case .some(_):
-                    print("DERPO SOME triggered")
-                    self.weight = .light
                 }
             }
         } else {
+//            print("DERPO fail")
             // Use default, hardcoded values if we don't have a MOC
             if self.score == 0 {
                 self.weight = .empty
@@ -177,9 +184,19 @@ public class Assessables: Identifiable, Equatable {
     
     /// Weigh and score the factors
     /// - Returns: Void
-    func evaluate() -> Void {
+    func evaluate(with statuses: [AssessmentThreshold]? = nil) -> Void {
         self.calculateScore()
-        self.weigh()
+        
+        var stats: [AssessmentThreshold] = []
+        if statuses != nil {
+            stats = statuses!
+        } else {
+            stats = self.statuses
+        }
+
+        if stats.count > 0 {
+            self.weigh(with: stats)
+        }
     }
     
     // @TODO: activeToggle(), threshold(), weight() probably shouldn't exist (or, shouldn't exist here anyways)
@@ -189,7 +206,7 @@ public class Assessables: Identifiable, Equatable {
     func activeToggle(factor: AssessmentFactor) -> Void {
         factor.alive.toggle()
         PersistenceController.shared.save()
-        self.evaluate()
+//        self.evaluate()
     }
     
     /// Modify and save the threshold of a given AssessmentFactor
@@ -200,7 +217,7 @@ public class Assessables: Identifiable, Equatable {
     func threshold(factor: AssessmentFactor, threshold: Int) -> Void {
         factor.threshold = Int64(threshold)
         PersistenceController.shared.save()
-        self.evaluate()
+//        self.evaluate()
     }
     
     /// Modify and save the weight for a given AssessmentFactor
@@ -211,6 +228,6 @@ public class Assessables: Identifiable, Equatable {
     func weight(factor: AssessmentFactor, weight: Int) -> Void {
         factor.weight = Int64(weight)
         PersistenceController.shared.save()
-        self.evaluate()
+//        self.evaluate()
     }
 }

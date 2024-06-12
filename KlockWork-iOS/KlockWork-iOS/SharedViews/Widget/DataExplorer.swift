@@ -12,7 +12,7 @@ extension Widget {
         typealias EntityType = PageConfiguration.EntityType
         typealias EntityTypePair = PageConfiguration.EntityTypePair
 
-        @Binding public var date: Date
+        @EnvironmentObject private var state: AppState
         private let fgColour: Color = .yellow
         private var columns: [GridItem] {
             Array(repeating: .init(.flexible()), count: 2)
@@ -22,8 +22,6 @@ extension Widget {
         @State private var isPresented: Bool = false
         @State private var searchText: String = ""
         @State private var open: Bool = false
-
-        @Environment(\.managedObjectContext) var moc
 
         var body: some View {
             NavigationStack(path: $path) {
@@ -59,31 +57,24 @@ extension Widget {
                                     switch type {
                                     case .companies:
                                         Companies()
-                                            .environment(\.managedObjectContext, moc)
                                             .navigationTitle(type.label)
                                     case .jobs:
                                         Jobs()
-                                            .environment(\.managedObjectContext, moc)
                                             .navigationTitle(type.label)
                                     case .notes:
                                         Notes()
-                                            .environment(\.managedObjectContext, moc)
                                             .navigationTitle(type.label)
-                                    case .people: // @TODO: implement people listing view
+                                    case .people:
                                         People()
-                                            .environment(\.managedObjectContext, moc)
                                             .navigationTitle(type.label)
-                                    case .records: // @TODO: implement records listing view
+                                    case .records:
                                         Records()
-                                            .environment(\.managedObjectContext, moc)
                                             .navigationTitle(type.label)
                                     case .tasks:
                                         Tasks()
-                                            .environment(\.managedObjectContext, moc)
                                             .navigationTitle(type.label)
                                     case .projects:
                                         Projects()
-                                            .environment(\.managedObjectContext, moc)
                                             .navigationTitle(type.label)
                                     }
                                 } label: {
@@ -119,19 +110,19 @@ extension Widget.DataExplorer {
 
                 switch type {
                 case .companies:
-                    count = CoreDataCompanies(moc: moc).countAll()
+                    count = CoreDataCompanies(moc: self.state.moc).countAll()
                 case .jobs:
-                    count = CoreDataJob(moc: moc).countAll()
+                    count = CoreDataJob(moc: self.state.moc).countAll()
                 case .notes:
-                    count = CoreDataNotes(moc: moc).alive().count
+                    count = CoreDataNotes(moc: self.state.moc).alive().count
                 case .people:
-                    count = CoreDataPerson(moc: moc).countAll()
+                    count = CoreDataPerson(moc: self.state.moc).countAll()
                 case .records:
-                    count = CoreDataRecords(moc: moc).countAll()
+                    count = CoreDataRecords(moc: self.state.moc).countAll()
                 case .tasks:
-                    count = CoreDataTasks(moc: moc).countAllTime()
+                    count = CoreDataTasks(moc: self.state.moc).countAllTime()
                 case .projects:
-                    count = CoreDataProjects(moc: moc).countAll()
+                    count = CoreDataProjects(moc: self.state.moc).countAll()
                 }
 
                 entityCounts.append(EntityTypePair(key: type, value: count))

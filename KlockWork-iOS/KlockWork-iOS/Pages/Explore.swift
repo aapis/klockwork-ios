@@ -12,7 +12,7 @@ struct Explore: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias EntityTypePair = PageConfiguration.EntityTypePair
 
-    @Binding public var date: Date
+    @EnvironmentObject private var state: AppState
     private let fgColour: Color = .yellow
     private var columns: [GridItem] {
         Array(repeating: .init(.flexible()), count: 2)
@@ -23,12 +23,10 @@ struct Explore: View {
     @State private var isPresented: Bool = false
     @State private var searchText: String = ""
 
-    @Environment(\.managedObjectContext) var moc
-
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
-                Widgets(date: $date, text: $searchText)
+                Widgets(text: $searchText)
                 .sheet(isPresented: $isPresented) {
                     FilterPanel()
                 }
@@ -85,7 +83,6 @@ struct Explore: View {
     }
 
     struct Widgets: View {
-        @Binding public var date: Date
         @Binding public var text: String
         @AppStorage("explore.widget.activityCalendar") private var showActivityCalendar: Bool = true
         @AppStorage("explore.widget.dataExplorer") private var showDataExplorer: Bool = false
@@ -95,8 +92,8 @@ struct Explore: View {
         var body: some View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
-                    if showActivityCalendar {Widget.ActivityCalendar(date: $date, searchTerm: $text)}
-                    if showDataExplorer {Widget.DataExplorer(date: $date)}
+                    if showActivityCalendar {Widget.ActivityCalendar(searchTerm: $text)}
+                    if showDataExplorer {Widget.DataExplorer()}
 //                    if showRecent {Widget.Rollups()}
                     if showTrends {Widget.Trends()}
                 }

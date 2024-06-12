@@ -18,7 +18,7 @@ class Assessment {
     var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
     var assessables: Assessables = Assessables()
 
-    init(for date: Date? = nil, moc: NSManagedObjectContext, searchTerm: String = "") {
+    init(for date: Date? = nil, moc: NSManagedObjectContext, searchTerm: String = "", assessmentStatuses: inout [AssessmentThreshold]) {
         self.date = date
         self.moc = moc
         self.searchTerm = searchTerm
@@ -36,7 +36,7 @@ class Assessment {
             }
 
             // Perform the assessment by iterating over all the things and calculating the score
-            self.assessables.evaluate()
+            self.assessables.evaluate(with: assessmentStatuses)
             self.weight = self.assessables.weight
             self.score = self.assessables.score
         }

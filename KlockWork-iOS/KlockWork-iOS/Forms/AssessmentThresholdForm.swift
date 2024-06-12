@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AssessmentThresholdForm: View {
     @Environment(\.managedObjectContext) var moc
-    @Binding public var assessmentStatuses: [AssessmentThreshold]
+    @EnvironmentObject private var state: AppState
     @State private var isResetAlertPresented: Bool = false
 
     var body: some View {
@@ -19,7 +19,7 @@ struct AssessmentThresholdForm: View {
                 ZStack(alignment: .topLeading) {
                     List {
                         Section {
-                            ForEach(assessmentStatuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
+                            ForEach(self.state.assessment.statuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
                                 Row(status: status)
                             }
                         }
@@ -51,7 +51,6 @@ struct AssessmentThresholdForm: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        .onAppear(perform: actionOnAppear)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -61,7 +60,7 @@ struct AssessmentThresholdForm: View {
                 }
                 .alert("Reset to default values? No data will be lost.", isPresented: $isResetAlertPresented) {
                     Button("Yes", role: .destructive) {
-                        self.assessmentStatuses = CDAssessmentThreshold(moc: self.moc).recreateAndReturn()
+                        self.state.assessment.statuses = CDAssessmentThreshold(moc: self.moc).recreateAndReturn()
                     }
                     Button("No", role: .cancel) {}
                 }
@@ -109,14 +108,6 @@ extension AssessmentThresholdForm {
                 self.actionOnChangeColour()
             }
         }
-    }
-}
-
-extension AssessmentThresholdForm {
-    /// Determine the threshold values by either creating new ones based on ActivityWeight data, or by querying the database
-    /// - Returns: Void
-    private func actionOnAppear() -> Void {
-//        self.assessmentStatuses = CDAssessmentThreshold(moc: self.moc).all()
     }
 }
 

@@ -24,6 +24,7 @@
 		53274B352C1214E0008387BF /* LegendLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B342C1214E0008387BF /* LegendLabel.swift */; };
 		53274B372C12179D008387BF /* ButtonType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B362C12179D008387BF /* ButtonType.swift */; };
 		53274B3C2C13C7E6008387BF /* AssessmentFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */; };
+		536B32B22C1A03BB00E01517 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536B32B12C1A038E00E01517 /* AppState.swift */; };
 		536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536E4F682C0D77A600FDC1F4 /* ActionType.swift */; };
 		537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 537582C52BFFB37900CB528C /* Data.xcdatamodeld */; };
 		537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CB2BFFD70D00CB528C /* RecordDetail.swift */; };
@@ -31,6 +32,7 @@
 		537582D52C0033B800CB528C /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D42C0033B800CB528C /* Tabs.swift */; };
 		537582D72C004A9600CB528C /* StatusMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D62C004A9600CB528C /* StatusMessage.swift */; };
 		5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5387AE882C0143D100EEC581 /* SearchBar.swift */; };
+		53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53911FC42C19E87300B77DAB /* ActivityWeight.swift */; };
 		539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134E92C0269B600B48494 /* PageConfiguration.swift */; };
 		539134EC2C02883000B48494 /* PersonDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EB2C02883000B48494 /* PersonDetail.swift */; };
 		539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134ED2C028F6900B48494 /* ProjectDetail.swift */; };
@@ -70,7 +72,6 @@
 		53E3A26E2C098DA8004A85C3 /* AssessmentFactorForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E3A26D2C098DA8004A85C3 /* AssessmentFactorForm.swift */; };
 		53E50C092C0E5F5800A85FDC /* Assessables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C082C0E5F5800A85FDC /* Assessables.swift */; };
 		53E50C0B2C0E5FA400A85FDC /* FactorProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C0A2C0E5FA400A85FDC /* FactorProxy.swift */; };
-		53E50C0F2C0E607600A85FDC /* ActivityWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C0E2C0E607600A85FDC /* ActivityWeight.swift */; };
 		53E50C112C0E60A800A85FDC /* Month.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C102C0E60A800A85FDC /* Month.swift */; };
 		53E50C132C0E60ED00A85FDC /* Day.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C122C0E60ED00A85FDC /* Day.swift */; };
 		53E50C152C0E617100A85FDC /* Panel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C142C0E617100A85FDC /* Panel.swift */; };
@@ -123,6 +124,7 @@
 		53274B342C1214E0008387BF /* LegendLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegendLabel.swift; sourceTree = "<group>"; };
 		53274B362C12179D008387BF /* ButtonType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonType.swift; sourceTree = "<group>"; };
 		53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentFactor.swift; sourceTree = "<group>"; };
+		536B32B12C1A038E00E01517 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		536E4F682C0D77A600FDC1F4 /* ActionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionType.swift; sourceTree = "<group>"; };
 		537582C62BFFB37900CB528C /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
 		537582CB2BFFD70D00CB528C /* RecordDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDetail.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 		537582D42C0033B800CB528C /* Tabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
 		537582D62C004A9600CB528C /* StatusMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMessage.swift; sourceTree = "<group>"; };
 		5387AE882C0143D100EEC581 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
+		53911FC42C19E87300B77DAB /* ActivityWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ActivityWeight.swift; path = ../../DLPrototype/DLPrototype/Enums/ActivityWeight.swift; sourceTree = "<group>"; };
 		539134E92C0269B600B48494 /* PageConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageConfiguration.swift; sourceTree = "<group>"; };
 		539134EB2C02883000B48494 /* PersonDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonDetail.swift; sourceTree = "<group>"; };
 		539134ED2C028F6900B48494 /* ProjectDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetail.swift; sourceTree = "<group>"; };
@@ -186,7 +189,6 @@
 		53E3A26D2C098DA8004A85C3 /* AssessmentFactorForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentFactorForm.swift; sourceTree = "<group>"; };
 		53E50C082C0E5F5800A85FDC /* Assessables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assessables.swift; sourceTree = "<group>"; };
 		53E50C0A2C0E5FA400A85FDC /* FactorProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorProxy.swift; sourceTree = "<group>"; };
-		53E50C0E2C0E607600A85FDC /* ActivityWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWeight.swift; sourceTree = "<group>"; };
 		53E50C102C0E60A800A85FDC /* Month.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Month.swift; sourceTree = "<group>"; };
 		53E50C122C0E60ED00A85FDC /* Day.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Day.swift; sourceTree = "<group>"; };
 		53E50C142C0E617100A85FDC /* Panel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Panel.swift; sourceTree = "<group>"; };
@@ -277,7 +279,6 @@
 			children = (
 				539134E92C0269B600B48494 /* PageConfiguration.swift */,
 				536E4F682C0D77A600FDC1F4 /* ActionType.swift */,
-				53E50C0E2C0E607600A85FDC /* ActivityWeight.swift */,
 				53274B322C120C5B008387BF /* ButtonAction.swift */,
 				53274B362C12179D008387BF /* ButtonType.swift */,
 			);
@@ -287,6 +288,7 @@
 		539135012C03EF0300B48494 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				536B32B12C1A038E00E01517 /* AppState.swift */,
 				53E50C072C0E5F4800A85FDC /* Assessment */,
 				539135022C03EF6E00B48494 /* SearchLibrary.swift */,
 			);
@@ -296,6 +298,7 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				53911FC42C19E87300B77DAB /* ActivityWeight.swift */,
 				5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */,
 				53E3A26A2C098A50004A85C3 /* CDAssessmentFactor.swift */,
 				539134F92C03A38500B48494 /* SearchLanguage.swift */,
@@ -492,7 +495,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					53D4CB522BFE930100AFEDEA = {
 						CreatedOnToolsVersion = 15.4;
@@ -534,6 +537,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */,
 				5311F4062C17C66900FB3071 /* CDAssessmentThreshold.swift in Sources */,
 				53E3A26B2C098A50004A85C3 /* CDAssessmentFactor.swift in Sources */,
 				539134FA2C03A38500B48494 /* SearchLanguage.swift in Sources */,
@@ -541,7 +545,6 @@
 				53274B352C1214E0008387BF /* LegendLabel.swift in Sources */,
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
 				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
-				53E50C0F2C0E607600A85FDC /* ActivityWeight.swift in Sources */,
 				539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */,
 				53F926292BFEA00E00948076 /* Project.swift in Sources */,
 				53F9262A2BFEA00E00948076 /* Job.swift in Sources */,
@@ -607,6 +610,7 @@
 				532441682C0531C800659F14 /* Rollups.swift in Sources */,
 				539134F62C039F2600B48494 /* People.swift in Sources */,
 				5311F3FD2C179CC100FB3071 /* DataExplorer.swift in Sources */,
+				536B32B22C1A03BB00E01517 /* AppState.swift in Sources */,
 				539135002C03AD9A00B48494 /* ListRow.swift in Sources */,
 				53D4CB832BFE93B000AFEDEA /* NoteDetail.swift in Sources */,
 				53274B3C2C13C7E6008387BF /* AssessmentFactor.swift in Sources */,
@@ -668,6 +672,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -729,6 +734,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -756,6 +762,7 @@
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 6;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 6DT7L2N5X6;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -797,6 +804,7 @@
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 6;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 6DT7L2N5X6;
 				ENABLE_HARDENED_RUNTIME = YES;

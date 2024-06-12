@@ -10,8 +10,8 @@ import SwiftUI
 // @TODO: remove or repurpose
 struct AssessmentTypeMenu: View {
     @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
     public var assessment: Assessment?
-    @Binding public var assessmentStatuses: [AssessmentThreshold]
 
     var body: some View {
         NavigationStack {
@@ -20,7 +20,7 @@ struct AssessmentTypeMenu: View {
                 ZStack(alignment: .topLeading) {
                     List {
                         NavigationLink {
-                            AssessmentThresholdForm(assessmentStatuses: $assessmentStatuses)
+                            AssessmentThresholdForm()
                         } label: {
                             Text("Status")
                         }
@@ -68,6 +68,6 @@ extension AssessmentTypeMenu {
     /// Onload handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        assessmentStatuses = CDAssessmentThreshold(moc: self.moc).all()
+//        self.state.assessment.statuses = CDAssessmentThreshold(moc: self.moc).all()
     }
 }

@@ -12,9 +12,8 @@ struct Today: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias PlanType = PageConfiguration.PlanType
 
+    @EnvironmentObject private var state: AppState
     public var inSheet: Bool
-    @Binding public var date: Date
-    @Environment(\.managedObjectContext) var moc
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
     @State private var jobs: [Job] = []
@@ -25,11 +24,11 @@ struct Today: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 if !inSheet {
-                    Header(job: $job, date: $date)
+                    Header(job: $job)
                 }
 
                 ZStack(alignment: .bottomLeading) {
-                    Tabs(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                    Tabs(inSheet: inSheet, job: $job, selected: $selected)
                     if !inSheet {
                         PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
                         if job != nil {
@@ -42,7 +41,7 @@ struct Today: View {
 
                 if !inSheet {
                     if selected == .records {
-                        Editor(job: $job, entityType: $selected, date: $date, focused: _textFieldActive)
+                        Editor(job: $job, entityType: $selected, focused: _textFieldActive)
                     }
 
                     Spacer().frame(height: 1)
@@ -61,8 +60,9 @@ struct Today: View {
 
 extension Today {
     struct Header: View {
+        @EnvironmentObject private var state: AppState
         @Binding public var job: Job?
-        @Binding public var date: Date
+        @State public var date: Date = Date()
 
         var body: some View {
             HStack(alignment: .center) {
@@ -85,14 +85,16 @@ extension Today {
                 }
                 Spacer()
             }
+            .onAppear(perform: {
+                date = self.state.date
+            })
         }
     }
 
     struct Editor: View {
-        @Environment(\.managedObjectContext) var moc
+        @EnvironmentObject private var state: AppState
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
-        @Binding public var date: Date
         @FocusState public var focused: Bool
         @State private var text: String = ""
 
@@ -125,9 +127,9 @@ extension Today.Editor {
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
             if let job = self.job {
-                CoreDataRecords(moc: moc).createWithJob(
+                CoreDataRecords(moc: self.state.moc).createWithJob(
                     job: job,
-                    date: Date(), // LogRecord.createdDate == CURRENT DATE
+                    date: Date(),
                     text: text
                 )
                 text = ""

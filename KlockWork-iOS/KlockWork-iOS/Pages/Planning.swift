@@ -12,9 +12,8 @@ struct Planning: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias PlanType = PageConfiguration.PlanType
 
+    @EnvironmentObject private var state: AppState
     public var inSheet: Bool
-    @Binding public var date: Date
-    @Environment(\.managedObjectContext) var moc
     @State private var text: String = ""
     @State private var job: Job? = nil
     @State private var selected: PlanType = .daily
@@ -22,13 +21,12 @@ struct Planning: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                Header(date: $date)
+                Header()
                 Divider().background(.gray).frame(height: 1)
                 PlanTabs(
                     inSheet: true,
                     job: $job,
-                    selected: $selected,
-                    date: $date
+                    selected: $selected
                 )
                 
                 Spacer()
@@ -45,9 +43,10 @@ struct Planning: View {
 
 extension Planning {
     struct Header: View {
-        @Binding public var date: Date
+        @EnvironmentObject private var state: AppState
+        @State private var date: Date = Date()
         private var isToday: Bool {
-            Calendar.autoupdatingCurrent.isDateInToday(date)
+            Calendar.autoupdatingCurrent.isDateInToday(self.state.date)
         }
 
         var body: some View {
@@ -84,6 +83,9 @@ extension Planning {
 
                 Spacer()
             }
+            .onAppear(perform: {
+                date = self.state.date
+            })
         }
     }
 

@@ -13,10 +13,10 @@ struct Statuses: Equatable, Identifiable {
 }
 
 struct Legend: View {
-    @State private var id: UUID = UUID()
     @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
+    @State private var id: UUID = UUID()
     @State private var isSheetPresented: Bool = false
-    @Binding public var assessmentStatuses: [AssessmentThreshold]
     private var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 3)
     }
@@ -37,14 +37,14 @@ struct Legend: View {
                                 Image(systemName: "gear")
                             }
                         }
-                        .foregroundStyle(assessmentStatuses.isEmpty ? .gray : .yellow)
+                        .foregroundStyle(self.state.assessment.statuses.isEmpty ? .gray : .yellow)
                         .help("Modify assessment factors")
-                        .disabled(assessmentStatuses.isEmpty)
+                        .disabled(self.state.assessment.statuses.isEmpty)
                     }
                 }
                 .padding([.bottom], 10)
                 LazyVGrid(columns: columns, alignment: .leading) {
-                    ForEach(assessmentStatuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
+                    ForEach(self.state.assessment.statuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
                         Row(status: status)
                     }
                     RowBasic(colour: .yellow, label: "Today")
@@ -56,7 +56,7 @@ struct Legend: View {
         .background(Theme.textBackground)
         .sheet(isPresented: $isSheetPresented) {
             NavigationStack {
-                AssessmentThresholdForm(assessmentStatuses: $assessmentStatuses)
+                AssessmentThresholdForm()
             }
             .presentationDetents([.medium, .large])
             .scrollDismissesKeyboard(.immediately)

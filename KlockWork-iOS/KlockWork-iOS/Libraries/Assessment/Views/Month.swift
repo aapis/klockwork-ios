@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct Month: View {
-    @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
     @Binding public var date: Date
     @Binding public var cumulativeScore: Int
     @Binding public var month: String
-    @Binding public var assessmentStatuses: [AssessmentThreshold]
     public var searchTerm: String
     @State private var days: [Day] = []
+    @State private var id: UUID = UUID()
     private var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
     }
@@ -31,6 +31,11 @@ struct Month: View {
             self.days = []
             self.actionOnAppear()
         }
+        .onChange(of: self.state.assessment.statuses) {
+            print("DERPO Month.asStatusChanged")
+            self.id = UUID()
+        }
+        .id(self.id)
     }
 
     /// Onload handler
@@ -68,9 +73,8 @@ struct Month: View {
                         Day(
                             day: 0,
                             isSelected: false,
-                            assessment: Assessment(moc: moc),
-                            calendarDate: $date,
-                            assessmentStatuses: $assessmentStatuses
+                            assessment: Assessment(moc: self.state.moc, assessmentStatuses: &self.state.assessment.statuses),
+                            calendarDate: $date
                         )
                     )
                 }
@@ -103,9 +107,13 @@ struct Month: View {
                                         day: idx,
                                         isSelected: dayComponent == idx && selectorComponents.month == month,
                                         isWeekend: selectorComponents.weekday == 1 || selectorComponents.weekday! == 7,
-                                        assessment: Assessment(for: date, moc: moc, searchTerm: searchTerm),
-                                        calendarDate: $date,
-                                        assessmentStatuses: $assessmentStatuses
+                                        assessment: Assessment(
+                                            for: date,
+                                            moc: self.state.moc,
+                                            searchTerm: searchTerm,
+                                            assessmentStatuses: &self.state.assessment.statuses
+                                        ),
+                                        calendarDate: $date
                                     )
                                 )
                             }

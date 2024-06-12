@@ -9,13 +9,13 @@ import SwiftUI
 
 /// An individual calendar day "tile"
 struct Day: View, Identifiable {
+    @EnvironmentObject private var state: AppState
     public let id: UUID = UUID()
     public let day: Int
     public let isSelected: Bool
     public var isWeekend: Bool? = false
     public var assessment: Assessment
     @Binding public var calendarDate: Date
-    @Binding public var assessmentStatuses: [AssessmentThreshold]
     @State private var bgColour: Color = .clear
     @State private var isPresented: Bool = false
     private let gridSize: CGFloat = 40
@@ -37,15 +37,27 @@ struct Day: View, Identifiable {
 //        .foregroundColor(self.isToday && !self.isSelected ? .black : .white)
         .foregroundColor(self.isToday ? .black : .white)
         .clipShape(.rect(cornerRadius: 6))
-        .onAppear(perform: actionOnAppear)
+        .onAppear(perform: self.actionOnAppear)
         .sheet(isPresented: $isPresented) {
-            Panel(assessment: assessment, calendarDate: $calendarDate, assessmentStatuses: $assessmentStatuses)
+            Panel(assessment: assessment, calendarDate: $calendarDate)
+                .onDisappear(perform: self.actionOnAppear)
         }
     }
+}
 
+extension Day {
     /// Onload handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
+        // Pull colour from either the ActivityWeight instance or the AssessmentThreshold for the determined weight
+        // @TODO: remove in favour of redrawing all Day objects
+        var colour: Color = assessment.weight.colour
+        if let status = self.state.assessment.statuses.first(where: {$0.label == assessment.weight.label}) {
+            if let color = status.colour {
+                colour = Color.fromStored(color)
+            }
+        }
+
         if self.isToday {
             bgColour = .yellow
         } else if self.isSelected {
@@ -59,7 +71,7 @@ struct Day: View, Identifiable {
                     bgColour = .clear
                 }
             } else {
-                bgColour = assessment.weight.colour
+                bgColour = colour
             }
         }
     }

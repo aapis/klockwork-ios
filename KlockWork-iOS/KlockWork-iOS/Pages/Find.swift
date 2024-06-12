@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Find: View {
-    @Binding public var date: Date
+    @EnvironmentObject private var state: AppState
     @Environment(\.managedObjectContext) var moc
     @State private var text: String = ""
     @State private var results: SearchLibrary.SearchResults?
