@@ -53,7 +53,7 @@ struct Legend: View {
             }
         }
         .padding()
-        .background(Theme.textBackground)
+//        .background(Theme.textBackground)
         .sheet(isPresented: $isSheetPresented) {
             NavigationStack {
                 AssessmentThresholdForm()
@@ -61,7 +61,6 @@ struct Legend: View {
             }
             .presentationDetents([.medium, .large])
             .scrollDismissesKeyboard(.immediately)
-
         }
     }
 }

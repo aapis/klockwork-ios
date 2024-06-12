@@ -20,7 +20,6 @@ struct Explore: View {
 
     @State private var path = NavigationPath()
     @State private var entityCounts: [EntityTypePair] = []
-    @State private var isPresented: Bool = false
     @State private var searchText: String = ""
 
     var body: some View {
@@ -28,9 +27,6 @@ struct Explore: View {
             VStack(spacing: 0) {
                 Header()
                 Widgets(text: $searchText)
-                    .sheet(isPresented: $isPresented) {
-                        FilterPanel()
-                    }
             }
             .navigationBarTitleDisplayMode(.inline)
             .background(Theme.cGreen)
@@ -137,7 +133,7 @@ struct Explore: View {
                             Widget.DataExplorer()
                         } label: {
                             HStack {
-                                Image(systemName: "world")
+                                Image(systemName: "globe")
                                 Text("Data Explorer")
                             }
                         }
@@ -146,7 +142,6 @@ struct Explore: View {
                 }
                 Spacer()
             }
-            .padding()
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)
         }
