@@ -69,7 +69,7 @@ extension Planning {
                     Image(systemName: "chevron.right")
                     Spacer()
                     Button {
-
+                        // pass
                     } label: {
                         Text("\(date.formatted(date: .abbreviated, time: .omitted))")
                         .padding(7)
@@ -86,6 +86,9 @@ extension Planning {
             .onAppear(perform: {
                 date = self.state.date
             })
+            .onChange(of: date) {
+                self.state.date = date
+            }
         }
     }
 

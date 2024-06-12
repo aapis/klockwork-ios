@@ -25,8 +25,9 @@ extension Widget {
         @Binding public var searchTerm: String
         @State public var month: String = "_DEFAULT_MONTH"
         @State public var open: Bool = true
-        @State public var cumulativeScore: Int = 0
         @State private var date: Date = Date()
+        @State private var legendId: UUID = UUID() // @TODO: remove this gross hack once views refresh properly
+        @State private var calendarId: UUID = UUID() // @TODO: remove this gross hack once views refresh properly
         public var weekdays: [DayOfWeek] = [
             DayOfWeek(symbol: "Sun"),
             DayOfWeek(symbol: "Mon"),
@@ -70,25 +71,32 @@ extension Widget {
                     // Month row
                     GridRow {
                         HStack {
-                            HStack {
-                                Text(self.month)
-                                Image(systemName: "chevron.right")
-                            }
-                            .foregroundStyle(.yellow)
-                            .padding([.leading, .trailing])
-                            .padding([.top, .bottom], 8)
-                            .background(Theme.rowColour)
-                            .mask(Capsule(style: .continuous))
-                            .overlay { // @TODO: only this date selector doesn't is broken in iOS 18 - bug?
-                                DatePicker(
-                                    "Date picker",
-                                    selection: $date,
-                                    displayedComponents: [.date]
-                                )
-                                .labelsHidden()
+//                            Button {
+//
+//                            } label: {
+//                                HStack {
+//                                    Text(self.month)
+//                                    Image(systemName: "chevron.right")
+//                                }
+//                            }
+//                            .foregroundStyle(.yellow)
+//                            .padding([.leading, .trailing])
+//                            .padding([.top, .bottom], 8)
+//                            .background(Theme.rowColour)
+//                            .mask(Capsule(style: .continuous))
+//                            .overlay { // @TODO: only this date selector doesn't is broken in iOS 18 - bug?
+//                                DatePicker(
+//                                    "Date picker",
+//                                    selection: $date,
+//                                    displayedComponents: [.date]
+//                                )
+//                                .labelsHidden()
 //                                .background(.red)
-                                .opacity(0.011)
-                            }
+////                                .opacity(0.011)
+//                            }
+
+                            DatePicker("Date picker", selection: $date, displayedComponents: [.date])
+                                .labelsHidden()
 
                             Button {
                                 self.state.date = Date()
@@ -99,7 +107,7 @@ extension Widget {
 
                             Spacer()
 
-                            Text("Score: \(self.cumulativeScore)")
+                            Text("Score: \(self.state.activities.score)")
                                 .padding([.leading, .trailing])
                                 .padding([.top, .bottom], 8)
                                 .background(Theme.rowColour)
@@ -131,17 +139,19 @@ extension Widget {
                     .background(Theme.rowColour)
 
                     // List of days representing 1 month
-                    Month(month: $month, searchTerm: searchTerm)
+                    Month(month: $month, id: $calendarId, searchTerm: searchTerm)
                         .background(Theme.rowColour)
+                        .id(self.calendarId)
 
                     // Legend
-                    Legend()
+                    Legend(id: $legendId, calendarId: $calendarId)
                         .border(width: 1, edges: [.top], color: .gray.opacity(0.7))
+                        .id(self.legendId)
                 }
             }
             .background(Theme.cGreen)
-            .onAppear(perform: actionOnAppear)
-            .onChange(of: self.state.date) { self.actionChangeDate()}
+            .onAppear(perform: self.actionOnAppear)
+            .onChange(of: self.date) { self.actionChangeDate()}
             // @TODO: swipe between months
 //            .swipe([.left, .right]) { swipe in
 //                if swipe == .left {
@@ -160,20 +170,11 @@ extension Widget.ActivityCalendar {
     private func actionChangeDate() -> Void {
         let df = DateFormatter()
         df.dateFormat = "MMM"
-        self.month = df.string(from: self.state.date)
-        self.date = self.state.date // Used by DatePicker
-        print("DERPO date set \(self.date)")
-    }
-    
-    /// Onload handler, creates assessment statuses (if required)
-    /// - Returns: Void
-    private func actionOnAppear() -> Void {
-        self.actionChangeDate()
+        self.month = df.string(from: self.date)
+        self.state.date = self.date // sets AppState.date whenever we change $date
     }
 
-    /// <#Description#>
-    /// - Returns: <#description#>
-    private func redraw() -> Void {
-        
+    private func actionOnAppear() -> Void {
+        self.date = self.state.date // Used by DatePicker, should be AppState.date by default
     }
 }

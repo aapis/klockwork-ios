@@ -26,17 +26,17 @@ class Activities {
     var assessed: [Assessment] = []
     var searchTerm: String = ""
     var score: Int = 0
-    var changed: Bool = false // @TODO: nah
 
-    /// <#Description#>
-    /// - Parameter date: <#date description#>
-    /// - Returns: <#description#>
-    func assess(date: Date) -> Void {
+    /// Run the assessments for a given day
+    /// - Returns: Void
+    func assess() -> Void {
+        self.assessed = []
         self.createAssessments()
+        self.calculateScore()
     }
     
-    /// <#Description#>
-    /// - Returns: <#description#>
+    /// Calculate overall score for the day by tallying up the factors. Sets self.score
+    /// - Returns: Void
     private func calculateScore() -> Void {
         self.score = 0
 

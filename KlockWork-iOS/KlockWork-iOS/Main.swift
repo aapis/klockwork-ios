@@ -79,6 +79,6 @@ extension Main {
         }
 
         self.state.activities.statuses = allStatuses
-        self.state.activities.assess(date: self.state.date)
+        self.state.activities.assess()
     }
 }

@@ -14,7 +14,8 @@ struct Statuses: Equatable, Identifiable {
 
 struct Legend: View {
     @EnvironmentObject private var state: AppState
-    @State private var id: UUID = UUID()
+    @Binding public var id: UUID
+    @Binding public var calendarId: UUID
     @State private var isSheetPresented: Bool = false
     private var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 3)
@@ -56,12 +57,12 @@ struct Legend: View {
         .sheet(isPresented: $isSheetPresented) {
             NavigationStack {
                 AssessmentThresholdForm()
+                    .onDisappear(perform: self.actionOnDisappear)
             }
             .presentationDetents([.medium, .large])
             .scrollDismissesKeyboard(.immediately)
-            .onDisappear(perform: self.actionOnDisappear)
+
         }
-        .id(self.id)
     }
 }
 
@@ -120,5 +121,6 @@ extension Legend {
     /// - Returns: Void
     private func actionOnDisappear() -> Void {
         self.id = UUID()
+        self.calendarId = UUID()
     }
 }
