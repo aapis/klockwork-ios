@@ -15,6 +15,7 @@ struct Day: View, Identifiable {
     public var isWeekend: Bool? = false
     public var assessment: Assessment
     @Binding public var calendarDate: Date
+    @Binding public var assessmentStatuses: [AssessmentThreshold]
     @State private var bgColour: Color = .clear
     @State private var isPresented: Bool = false
     private let gridSize: CGFloat = 40
@@ -24,7 +25,7 @@ struct Day: View, Identifiable {
 
     var body: some View {
         Button {
-//            calendarDate = assessment.date
+//            calendarDate = assessment.date!
             isPresented.toggle()
         } label: {
             if self.day > 0 {
@@ -38,7 +39,7 @@ struct Day: View, Identifiable {
         .clipShape(.rect(cornerRadius: 6))
         .onAppear(perform: actionOnAppear)
         .sheet(isPresented: $isPresented) {
-            Panel(assessment: assessment, calendarDate: $calendarDate)
+            Panel(assessment: assessment, calendarDate: $calendarDate, assessmentStatuses: $assessmentStatuses)
         }
     }
 

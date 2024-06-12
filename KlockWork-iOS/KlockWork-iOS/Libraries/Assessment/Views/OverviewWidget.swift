@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OverviewWidget: View {
     public var assessment: Assessment
+    @Binding public var assessmentStatuses: [AssessmentThreshold]
     @State private var active: [AssessmentFactor] = []
     @State private var score: Int = 0
     @State private var weight: ActivityWeight = .empty
@@ -24,7 +25,7 @@ struct OverviewWidget: View {
                         Spacer()
 
                         NavigationLink {
-                            AssessmentTypeIntersitial(assessment: assessment)
+                            AssessmentTypeMenu(assessment: assessment, assessmentStatuses: $assessmentStatuses)
                         } label: {
                             HStack {
                                 Spacer()

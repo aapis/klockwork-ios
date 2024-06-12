@@ -15,7 +15,7 @@
 		5311F4002C17A03D00FB3071 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F3FF2C17A03D00FB3071 /* Widget.swift */; };
 		5311F4022C17BFFF00FB3071 /* AssessmentThresholdForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4012C17BFFF00FB3071 /* AssessmentThresholdForm.swift */; };
 		5311F4062C17C66900FB3071 /* CDAssessmentThreshold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */; };
-		5311F4082C17E86500FB3071 /* AssessmentTypeIntersitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4072C17E86500FB3071 /* AssessmentTypeIntersitial.swift */; };
+		5311F4082C17E86500FB3071 /* AssessmentTypeMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4072C17E86500FB3071 /* AssessmentTypeMenu.swift */; };
 		532441662C04428700659F14 /* Titlebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441652C04428700659F14 /* Titlebar.swift */; };
 		532441682C0531C800659F14 /* Rollups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441672C0531C800659F14 /* Rollups.swift */; };
 		5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416C2C06485800659F14 /* ActivityCalendar.swift */; };
@@ -114,7 +114,7 @@
 		5311F3FF2C17A03D00FB3071 /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
 		5311F4012C17BFFF00FB3071 /* AssessmentThresholdForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentThresholdForm.swift; sourceTree = "<group>"; };
 		5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CDAssessmentThreshold.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CDAssessmentThreshold.swift; sourceTree = "<group>"; };
-		5311F4072C17E86500FB3071 /* AssessmentTypeIntersitial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentTypeIntersitial.swift; sourceTree = "<group>"; };
+		5311F4072C17E86500FB3071 /* AssessmentTypeMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentTypeMenu.swift; sourceTree = "<group>"; };
 		532441652C04428700659F14 /* Titlebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Titlebar.swift; sourceTree = "<group>"; };
 		532441672C0531C800659F14 /* Rollups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rollups.swift; sourceTree = "<group>"; };
 		5324416C2C06485800659F14 /* ActivityCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCalendar.swift; sourceTree = "<group>"; };
@@ -459,7 +459,7 @@
 				53E50C142C0E617100A85FDC /* Panel.swift */,
 				53E50C162C0E619C00A85FDC /* OverviewWidget.swift */,
 				53E50C182C0E61DB00A85FDC /* Legend.swift */,
-				5311F4072C17E86500FB3071 /* AssessmentTypeIntersitial.swift */,
+				5311F4072C17E86500FB3071 /* AssessmentTypeMenu.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -578,7 +578,7 @@
 				53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */,
 				53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */,
 				53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */,
-				5311F4082C17E86500FB3071 /* AssessmentTypeIntersitial.swift in Sources */,
+				5311F4082C17E86500FB3071 /* AssessmentTypeMenu.swift in Sources */,
 				5311F3FB2C17953A00FB3071 /* PageActionBar.Today.swift in Sources */,
 				53E3A26E2C098DA8004A85C3 /* AssessmentFactorForm.swift in Sources */,
 				537582D52C0033B800CB528C /* Tabs.swift in Sources */,
@@ -762,7 +762,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "KlockWork-iOS/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = KlockWork;
+				INFOPLIST_KEY_CFBundleDisplayName = KlockWork.Beta;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Associate information with specific meetings";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;

@@ -9,73 +9,105 @@ import SwiftUI
 
 struct AssessmentThresholdForm: View {
     @Environment(\.managedObjectContext) var moc
-    @State private var thresholds: [AssessmentThreshold] = []
+    @Binding public var assessmentStatuses: [AssessmentThreshold]
+    @State private var isResetAlertPresented: Bool = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Divider().background(.gray).frame(height: 1)
-            ZStack(alignment: .topLeading) {
-                List {
-                    ForEach(thresholds.sorted(by: {$0.defaultValue < $1.defaultValue})) { threshold in
-                        Row(threshold: threshold)
-                            .listRowBackground(Color.fromStored(threshold.colour!))
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 0) {
+                Divider().background(.gray).frame(height: 1)
+                ZStack(alignment: .topLeading) {
+                    List {
+                        Section {
+                            ForEach(assessmentStatuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
+                                Row(status: status)
+                            }
+                        }
+
+                        Section("About") {
+                            ForEach(ActivityWeight.allCases, id: \.self) { weight in
+                                HStack(spacing: 5) {
+                                    Text(weight.emoji)
+                                    Text("\(weight.label): \(weight.helpText)")
+                                    Spacer()
+                                }
+                                .foregroundStyle(.gray)
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
                     }
+
+                    LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                        .frame(height: 50)
+                        .opacity(0.1)
                 }
 
-                LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                    .frame(height: 50)
-                    .opacity(0.1)
+                Spacer()
             }
-
-            Spacer()
         }
         .background(Theme.cGreen)
         .scrollContentBackground(.hidden)
         .navigationTitle("Modify Status")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .onAppear(perform: actionOnAppear)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    self.isResetAlertPresented.toggle()
+                } label: {
+                    Text("Reset")
+                }
+                .alert("Reset to default values? No data will be lost.", isPresented: $isResetAlertPresented) {
+                    Button("Yes", role: .destructive) {
+                        self.assessmentStatuses = CDAssessmentThreshold(moc: self.moc).recreateAndReturn()
+                    }
+                    Button("No", role: .cancel) {}
+                }
+            }
+        }
     }
 }
 
 extension AssessmentThresholdForm {
     struct Row: View {
         @Environment(\.managedObjectContext) var moc
-        public let threshold: AssessmentThreshold
-
-        var body: some View {
-            RowBasic(colour: Color.fromStored(threshold.colour!), label: threshold.label!, model: threshold)
-        }
-    }
-
-    struct RowBasic: View {
-        public let colour: Color
-        public let label: String
-        public let model: AssessmentThreshold
+        public let status: AssessmentThreshold
         @State private var value: Int = 0
-        private let by1to20: StrideTo<Int> = stride(from: 0, to: 20, by: 1)
-        private let by5to50: StrideTo<Int> = stride(from: 20, to: 49, by: 5)
-        private let by10to100: StrideTo<Int> = stride(from: 50, to: 101, by: 10)
+        @State private var colour: Color = .clear
+        @State private var emoji: String = "🏖️"
         private var range: [Int] {
-            let g1 = Array(by1to20)
-            let g2 = Array(by5to50)
-            let g3 = Array(by10to100)
-
-            return g1 + g2 + g3
+            return Array(stride(from: 0, to: 20, by: 1)) + Array(stride(from: 20, to: 49, by: 5)) + Array(stride(from: 50, to: 101, by: 10))
         }
 
         var body: some View {
             VStack {
                 HStack(alignment: .center, spacing: 5) {
-                    Picker(label, selection: $value) {
-                        ForEach(range, id: \.self) {Text($0.string).tag(Int($0))}
-                    }
-                    .onSubmit {
-                        self.actionOnSubmit()
+                    // A clear day is always going to be 0
+                    if status.label != "Clear" {
+                        ColorPicker("Choose a colour for this status", selection: $colour, supportsOpacity: false)
+                            .labelsHidden()
+                        Spacer()
+                        Picker("\(status.emoji!) \(status.label!)", selection: $value) {
+                            ForEach(range, id: \.self) {Text($0.string).tag(Int($0))}
+                        }
+                    } else {
+                        Text("\(status.emoji ?? "🏖️") \(status.label ?? "Clear")")
+                        Spacer()
+                        Text(String(0))
+                            .foregroundStyle(.gray)
                     }
                 }
             }
+            .listRowBackground(colour)
             .onAppear(perform: actionOnAppear)
+            .onChange(of: value) {
+                self.actionOnSubmit()
+            }
+            .onChange(of: colour) {
+                self.actionOnChangeColour()
+            }
         }
     }
 }
@@ -84,44 +116,38 @@ extension AssessmentThresholdForm {
     /// Determine the threshold values by either creating new ones based on ActivityWeight data, or by querying the database
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        if thresholds.isEmpty  {
-            for weight in ActivityWeight.allCases {
-                self.thresholds.append(
-                    CDAssessmentThreshold(moc: self.moc).createAndReturn(
-                        colour: weight.colour,
-                        value: 0,
-                        defaultValue: weight.defaultValue,
-                        label: weight.label
-                    )
-                )
-            }
-
-            PersistenceController.shared.save()
-        } else {
-            // @TODO: delete this, it'll clear out all the AT's but we don't want to do that each time
-//            Task {
-//                CDAssessmentThreshold(moc: self.moc).delete()
-//            }
-
-            self.thresholds = CDAssessmentThreshold(moc: self.moc).all()
-        }
+//        self.assessmentStatuses = CDAssessmentThreshold(moc: self.moc).all()
     }
 }
 
-extension AssessmentThresholdForm.RowBasic {
+extension AssessmentThresholdForm.Row {
     /// Onload handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        if model.value > 0 {
-            value = Int(model.value)
+        if status.value > 0 {
+            value = Int(status.value)
         } else {
-            value = Int(model.defaultValue)
+            value = Int(status.defaultValue)
+        }
+
+        if let c = status.colour {
+            colour = Color.fromStored(c)
         }
     }
     
     /// On submit handler
     /// - Returns: Void
     private func actionOnSubmit() -> Void {
-        self.model.value = Int64(value)
+        status.value = Int64(value)
+        PersistenceController.shared.save()
+        self.actionOnAppear()
+    }
+    
+    /// Colour picker callback, saves colour choice
+    /// - Returns: Void
+    private func actionOnChangeColour() -> Void {
+        status.colour = colour.toStored()
+        PersistenceController.shared.save()
+        self.actionOnAppear()
     }
 }

@@ -101,19 +101,77 @@ public class Assessables: Identifiable, Equatable {
 
     /// Determines the factor's weight
     /// @TODO: move to ActivityWeightAssessment
+    /// @TODO: also this sucks
     /// - Returns: Void
     func weigh() -> Void {
-//        let 
-        if self.score == 0 {
-            self.weight = .empty
-        } else if self.score > 0 && self.score < 5 {
-            self.weight = .light
-        } else if self.score >= 5 && self.score < 10 {
-            self.weight = .medium
-        } else if self.score > 10 && self.score <= 13 {
-            self.weight = .heavy
+        if let moc = self.moc {
+            let statuses = CDAssessmentThreshold(moc: moc).all()
+
+            for (idx, status) in statuses.enumerated() {
+//                var prev: Int = statuses.count - 1
+//                var current: Int = idx
+//                var next: Int = idx + 1
+//
+//                if statuses.endIndex <= next {
+//                    current += 1
+//                    next += 1
+//
+//                    let nextStatus = statuses[next]
+////                    if status.value nextStatus.value
+//                } else {
+//                    next = current
+//                    current -= 1
+//                    prev -= 1
+//                }
+//
+                let bounds = (status.value, Int64(status.value + 10))
+
+                switch status.label {
+                case "Clear":
+                    if self.score == 0 {
+                        self.weight = .empty
+                    }
+                case "Light":
+                    if self.score > 0 && self.score <= status.value {
+                        print("DERPO light \(self.score) <= \(status.value)")
+                        self.weight = .light
+                    }
+                case "Busy":
+                    if self.score >= bounds.0 && self.score <= bounds.1 {
+                        print("DERPO busy \(self.score) <= \(status.value)")
+                        self.weight = .medium
+                    }
+                case "At Capacity":
+                    if self.score >= bounds.0 && self.score <= bounds.1 {
+                        print("DERPO at capacity \(self.score) <= \(status.value)")
+                        self.weight = .heavy
+                    }
+                case "Overloaded":
+                    if self.score >= bounds.0 && self.score <= bounds.1 {
+                        print("DERPO overloaded \(self.score) >= \(status.value)")
+                        self.weight = .significant
+                    }
+                case .none:
+                    print("DERPO none triggered")
+                    self.weight = .empty
+                case .some(_):
+                    print("DERPO SOME triggered")
+                    self.weight = .light
+                }
+            }
         } else {
-            self.weight = .significant
+            // Use default, hardcoded values if we don't have a MOC
+            if self.score == 0 {
+                self.weight = .empty
+            } else if self.score > 0 && self.score < 5 {
+                self.weight = .light
+            } else if self.score >= 5 && self.score < 10 {
+                self.weight = .medium
+            } else if self.score > 10 && self.score <= 13 {
+                self.weight = .heavy
+            } else {
+                self.weight = .significant
+            }
         }
     }
     

@@ -30,8 +30,8 @@ struct Today: View {
 
                 ZStack(alignment: .bottomLeading) {
                     Tabs(inSheet: inSheet, job: $job, selected: $selected, date: $date)
-                    PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
                     if !inSheet {
+                        PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
                         if job != nil {
                             LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                                 .frame(height: 50)

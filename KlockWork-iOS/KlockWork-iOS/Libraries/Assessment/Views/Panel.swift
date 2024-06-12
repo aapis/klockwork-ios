@@ -10,6 +10,7 @@ import SwiftUI
 struct Panel: View {
     public var assessment: Assessment
     @Binding public var calendarDate: Date
+    @Binding public var assessmentStatuses: [AssessmentThreshold]
     @State private var date: Date = Date()
 
     var body: some View {
@@ -18,7 +19,7 @@ struct Panel: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Divider().background(.gray).frame(height: 1)
                     ZStack(alignment: .topLeading) {
-                        OverviewWidget(assessment: assessment)
+                        OverviewWidget(assessment: assessment, assessmentStatuses: $assessmentStatuses)
                             .navigationTitle(date.formatted(date: .abbreviated, time: .omitted))
                             .toolbarTitleDisplayMode(.inline)
                             .toolbar {

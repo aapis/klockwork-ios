@@ -7,8 +7,16 @@
 
 import SwiftUI
 
+struct Statuses: Equatable, Identifiable {
+    var id: UUID = UUID()
+    var list: [AssessmentThreshold]
+}
+
 struct Legend: View {
+    @State private var id: UUID = UUID()
+    @Environment(\.managedObjectContext) var moc
     @State private var isSheetPresented: Bool = false
+    @Binding public var assessmentStatuses: [AssessmentThreshold]
     private var columns: [GridItem] {
         return Array(repeating: GridItem(.flexible(), spacing: 1), count: 3)
     }
@@ -29,14 +37,15 @@ struct Legend: View {
                                 Image(systemName: "gear")
                             }
                         }
-                        .foregroundStyle(.yellow)
+                        .foregroundStyle(assessmentStatuses.isEmpty ? .gray : .yellow)
                         .help("Modify assessment factors")
+                        .disabled(assessmentStatuses.isEmpty)
                     }
                 }
                 .padding([.bottom], 10)
                 LazyVGrid(columns: columns, alignment: .leading) {
-                    ForEach(ActivityWeight.allCases, id: \.self) { assessment in
-                        Row(assessment: assessment)
+                    ForEach(assessmentStatuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
+                        Row(status: status)
                     }
                     RowBasic(colour: .yellow, label: "Today")
                     RowBasic(colour: .blue, label: "Selected")
@@ -46,30 +55,57 @@ struct Legend: View {
         .padding()
         .background(Theme.textBackground)
         .sheet(isPresented: $isSheetPresented) {
-            AssessmentTypeIntersitial()
+            NavigationStack {
+                AssessmentThresholdForm(assessmentStatuses: $assessmentStatuses)
+            }
+            .presentationDetents([.medium, .large])
+            .scrollDismissesKeyboard(.immediately)
+            .onDisappear(perform: self.actionOnDisappear)
         }
+        .id(self.id)
     }
 }
 
 extension Legend {
     struct Row: View {
-        public let assessment: ActivityWeight
+        public var status: AssessmentThreshold
+        @State private var colour: Color = .clear
+        @State private var label: String = "_LABEL_TEXT"
+        @State private var emoji: String = "🏖️"
 
         var body: some View {
-            RowBasic(colour: assessment.colour, label: assessment.label)
+            RowBasic(
+                colour: colour,
+                label: label,
+                emoji: emoji
+            )
+            .onAppear(perform: {
+                if let col = self.status.colour {
+                    self.colour = Color.fromStored(col)
+                }
+
+                if let lab = self.status.label {
+                    self.label = lab
+                }
+
+                if let emo = self.status.emoji {
+                    self.emoji = emo
+                }
+            })
         }
     }
 
     struct RowBasic: View {
-        public let colour: Color
-        public let label: String
+        public var colour: Color?
+        public var label: String
+        public var emoji: String? = "🏖️"
 
         var body: some View {
             VStack {
                 HStack(alignment: .center, spacing: 5) {
                     Rectangle()
                         .frame(width: 20, height: 20)
-                        .foregroundStyle(colour)
+                        .foregroundStyle(colour!)
                         .border(width: 1, edges: [.top, .bottom, .leading, .trailing], color: .gray)
 
                     Text(label)
@@ -77,5 +113,13 @@ extension Legend {
                 }
             }
         }
+    }
+}
+
+extension Legend {
+    /// Callback handler, fired when the OverviewWidget sheet is closed
+    /// - Returns: Void
+    private func actionOnDisappear() -> Void {
+        self.id = UUID()
     }
 }

@@ -13,7 +13,7 @@ class Assessment {
 
     var date: Date?
     var moc: NSManagedObjectContext
-    var weight: ActivityWeight = .empty
+    var weight: ActivityWeight = .empty // @TODO: need to replace ActivityWeight with AssessmentThreshold somehow
     var score: Int = 0
     var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
     var assessables: Assessables = Assessables()

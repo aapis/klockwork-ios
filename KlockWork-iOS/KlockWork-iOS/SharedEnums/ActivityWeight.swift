@@ -47,4 +47,35 @@ public enum ActivityWeight: CaseIterable {
         case .significant: 20
         }
     }
+
+    var emoji: String {
+        switch self {
+        case .empty: "🏖️"
+        case .light: "🙂"
+        case .medium: "😶"
+        case .heavy: "😡"
+        case .significant: "🤬"
+        }
+    }
+
+    // @TODO: localize
+    var helpText: String {
+        switch self {
+        case .empty: "Little to no work"
+        case .light: "Easily manageable"
+        case .medium: "No time for tea"
+        case .heavy: "That's it, no more!"
+        case .significant: "FILE_NOT_FOUND"
+        }
+    }
+
+    func typeFromLabel(label: String) -> Self? {
+        for w in Self.allCases {
+            if w.label == label {
+                return w
+            }
+        }
+
+        return nil
+    }
 }

@@ -110,6 +110,8 @@ struct Explore: View {
 }
 
 extension Explore.FilterPanel {
+    /// Show user's selected widgets, or the default one (ActivityCalendar) if none selected
+    /// - Returns: Void
     private func showWidgetsOrDefault() -> Void {
         if showRecent == false && showTrends == false && showDataExplorer == false {
             showActivityCalendar = true

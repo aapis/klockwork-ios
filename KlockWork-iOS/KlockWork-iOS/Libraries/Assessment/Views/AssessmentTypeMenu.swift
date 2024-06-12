@@ -7,9 +7,11 @@
 
 import SwiftUI
 
-struct AssessmentTypeIntersitial: View {
+// @TODO: remove or repurpose
+struct AssessmentTypeMenu: View {
     @Environment(\.managedObjectContext) var moc
     public var assessment: Assessment?
+    @Binding public var assessmentStatuses: [AssessmentThreshold]
 
     var body: some View {
         NavigationStack {
@@ -18,7 +20,7 @@ struct AssessmentTypeIntersitial: View {
                 ZStack(alignment: .topLeading) {
                     List {
                         NavigationLink {
-                            AssessmentThresholdForm()
+                            AssessmentThresholdForm(assessmentStatuses: $assessmentStatuses)
                         } label: {
                             Text("Status")
                         }
@@ -35,6 +37,10 @@ struct AssessmentTypeIntersitial: View {
                                 Text("Factors")
                             }
                             .listRowBackground(Theme.textBackground)
+                            .navigationTitle("Assessment Configuration")
+                            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                            .toolbarBackground(.visible, for: .navigationBar)
+                            .toolbarTitleDisplayMode(.inline)
                         }
                     }
 
@@ -54,5 +60,14 @@ struct AssessmentTypeIntersitial: View {
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarTitleDisplayMode(.inline)
+        .onAppear(perform: self.actionOnAppear)
+    }
+}
+
+extension AssessmentTypeMenu {
+    /// Onload handler
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        assessmentStatuses = CDAssessmentThreshold(moc: self.moc).all()
     }
 }

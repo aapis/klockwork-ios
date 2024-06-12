@@ -12,6 +12,7 @@ struct Month: View {
     @Binding public var date: Date
     @Binding public var cumulativeScore: Int
     @Binding public var month: String
+    @Binding public var assessmentStatuses: [AssessmentThreshold]
     public var searchTerm: String
     @State private var days: [Day] = []
     private var columns: [GridItem] {
@@ -68,7 +69,8 @@ struct Month: View {
                             day: 0,
                             isSelected: false,
                             assessment: Assessment(moc: moc),
-                            calendarDate: $date
+                            calendarDate: $date,
+                            assessmentStatuses: $assessmentStatuses
                         )
                     )
                 }
@@ -102,7 +104,8 @@ struct Month: View {
                                         isSelected: dayComponent == idx && selectorComponents.month == month,
                                         isWeekend: selectorComponents.weekday == 1 || selectorComponents.weekday! == 7,
                                         assessment: Assessment(for: date, moc: moc, searchTerm: searchTerm),
-                                        calendarDate: $date
+                                        calendarDate: $date,
+                                        assessmentStatuses: $assessmentStatuses
                                     )
                                 )
                             }
