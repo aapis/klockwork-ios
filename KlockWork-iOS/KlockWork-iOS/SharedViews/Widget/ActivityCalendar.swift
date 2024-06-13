@@ -98,6 +98,9 @@ extension Widget {
                         }
                     }
                 }
+                .swipe([.left, .right]) { swipe in
+                    self.actionOnSwipe(swipe)
+                }
             }
         }
 
@@ -161,7 +164,10 @@ extension Widget {
                 }
                 .frame(width: 80, height: 75)
             }
-
+            
+            /// Navigate between months by tapping on the button
+            /// @TODO: shared functionality with ActivityCalendar.actionOnSwipe, refactor!
+            /// - Returns: Void
             private func actionOnTap() -> Void {
                 let oneMonthMs: Double = 2592000
 
@@ -184,8 +190,24 @@ extension Widget.ActivityCalendar {
         self.month = df.string(from: self.date)
         self.state.date = self.date // sets AppState.date whenever we change $date
     }
-
+    
+    /// Onload handler. Used by DatePicker, should be AppState.date by default
+    /// - Returns: Void
     private func actionOnAppear() -> Void {
-        self.date = self.state.date // Used by DatePicker, should be AppState.date by default
+        self.date = self.state.date
+    }
+    
+    /// Navigate between months using swipe gestures
+    /// @TODO: shared functionality with MonthNavButton.actionOnTap, refactor!
+    /// - Parameter swipe: Swipe
+    /// - Returns: Void
+    public func actionOnSwipe(_ swipe: Swipe) -> Void {
+        let oneMonthMs: Double = 2592000
+
+        if swipe == .right {
+            self.date = self.state.date - oneMonthMs
+        } else {
+            self.date = self.state.date + oneMonthMs
+        }
     }
 }
