@@ -10,45 +10,45 @@ import SwiftUI
 
 struct Main: View {
     @Environment(\.managedObjectContext) var moc
-    @State public var date: Date = Date()
+    @StateObject public var state: AppState = AppState()
 
     // Assessment factors, components of the scoring and evaluation algorithm
     private var defaultFactors: [FactorProxy] {
         return [
-            FactorProxy(date: self.date, weight: 1, type: .records, action: .create),
-            FactorProxy(date: self.date, weight: 1, type: .jobs, action: .create),
-            FactorProxy(date: self.date, weight: 1, type: .jobs, action: .interaction),
-            FactorProxy(date: self.date, weight: 1, type: .tasks, action: .create),
-            FactorProxy(date: self.date, weight: 1, type: .tasks, action: .interaction),
-            FactorProxy(date: self.date, weight: 1, type: .notes, action: .create),
-            FactorProxy(date: self.date, weight: 1, type: .notes, action: .interaction),
-            FactorProxy(date: self.date, weight: 1, type: .companies, action: .create),
-            FactorProxy(date: self.date, weight: 1, type: .companies, action: .interaction),
-            FactorProxy(date: self.date, weight: 1, type: .people, action: .create),
-            FactorProxy(date: self.date, weight: 1, type: .people, action: .interaction),
-            FactorProxy(date: self.date, weight: 1, type: .projects, action: .create),
-            FactorProxy(date: self.date, weight: 1, type: .projects, action: .interaction)
+            FactorProxy(date: self.state.date, weight: 1, type: .records, action: .create),
+            FactorProxy(date: self.state.date, weight: 1, type: .jobs, action: .create),
+            FactorProxy(date: self.state.date, weight: 1, type: .jobs, action: .interaction),
+            FactorProxy(date: self.state.date, weight: 1, type: .tasks, action: .create),
+            FactorProxy(date: self.state.date, weight: 1, type: .tasks, action: .interaction),
+            FactorProxy(date: self.state.date, weight: 1, type: .notes, action: .create),
+            FactorProxy(date: self.state.date, weight: 1, type: .notes, action: .interaction),
+            FactorProxy(date: self.state.date, weight: 1, type: .companies, action: .create),
+            FactorProxy(date: self.state.date, weight: 1, type: .companies, action: .interaction),
+            FactorProxy(date: self.state.date, weight: 1, type: .people, action: .create),
+            FactorProxy(date: self.state.date, weight: 1, type: .people, action: .interaction),
+            FactorProxy(date: self.state.date, weight: 1, type: .projects, action: .create),
+            FactorProxy(date: self.state.date, weight: 1, type: .projects, action: .interaction)
         ]
     }
 
     var body: some View {
         TabView {
-            Planning(inSheet: false, date: $date)
+            Planning(inSheet: false)
             .tabItem {
                 Image(systemName: "hexagon")
                 Text("Planning")
             }
-            Today(inSheet: false, date: $date)
+            Today(inSheet: false)
             .tabItem {
                 Image(systemName: "tray")
                 Text("Today")
             }
-            Explore(date: $date)
+            Explore()
             .tabItem {
                 Image(systemName: "globe.desk")
                 Text("Explore")
             }
-            Find(date: $date)
+            Find()
             .tabItem {
                 Image(systemName: "magnifyingglass")
                 Text("Find")
@@ -56,6 +56,7 @@ struct Main: View {
         }
         .tint(.yellow)
         .onAppear(perform: self.onApplicationBoot)
+        .environmentObject(self.state)
     }
 }
 
@@ -70,5 +71,14 @@ extension Main {
                 factor.createDefaultFactor(using: self.moc)
             }
         }
+
+        // Create assessment Status/Threshold objects
+        var allStatuses = CDAssessmentThreshold(moc: self.moc).all() // @TODO: replace with a .count call instead!
+        if allStatuses.isEmpty || allStatuses.count < ActivityWeight.allCases.count {
+            allStatuses = CDAssessmentThreshold(moc: self.moc).recreateAndReturn()
+        }
+
+        self.state.activities.statuses = allStatuses
+        self.state.activities.assess()
     }
 }

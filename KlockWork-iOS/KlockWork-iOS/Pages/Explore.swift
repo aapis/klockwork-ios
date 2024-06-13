@@ -12,80 +12,49 @@ struct Explore: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias EntityTypePair = PageConfiguration.EntityTypePair
 
-    @Binding public var date: Date
+    @EnvironmentObject private var state: AppState
     private let fgColour: Color = .yellow
     private var columns: [GridItem] {
         Array(repeating: .init(.flexible()), count: 2)
     }
-
+    private let page: PageConfiguration.AppPage = .explore
     @State private var path = NavigationPath()
     @State private var entityCounts: [EntityTypePair] = []
-    @State private var isPresented: Bool = false
     @State private var searchText: String = ""
 
-    @Environment(\.managedObjectContext) var moc
 
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
-                Widgets(date: $date, text: $searchText)
-                .sheet(isPresented: $isPresented) {
-                    FilterPanel()
-                }
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Text("Explore")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            isPresented.toggle()
-                        } label: {
-                            Image(systemName: "line.3.horizontal.decrease")
-                                .padding()
-                                .background(Theme.rowColour)
-                                .mask(Circle())
-                        }
-                    }
-                }
+                Header()
+                Widgets(text: $searchText)
             }
+            .navigationBarTitleDisplayMode(.inline)
+            .background(page.primaryColour)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .scrollDismissesKeyboard(.immediately)
         }
-        .tint(fgColour)
+        .tint(self.state.theme.tint)
     }
 
-    struct FilterPanel: View {
-        @AppStorage("explore.widget.activityCalendar") private var showActivityCalendar: Bool = true
-        @AppStorage("explore.widget.dataExplorer") private var showDataExplorer: Bool = false
-        @AppStorage("explore.widget.recent") private var showRecent: Bool = false
-        @AppStorage("explore.widget.trends") private var showTrends: Bool = false
-        @State private var activityCalendarToggleDisabled: Bool = false
+    struct Header: View {
+        @EnvironmentObject private var state: AppState
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                List {
-                    Section("Widgets") {
-                        Toggle("Activity Calendar", isOn: $showActivityCalendar)
-                            .disabled(self.activityCalendarToggleDisabled)
-                            .onChange(of: showDataExplorer) {self.showWidgetsOrDefault()}
-                            .onChange(of: showRecent) {self.showWidgetsOrDefault()}
-                            .onChange(of: showTrends) {self.showWidgetsOrDefault()}
-                        Toggle("Data Explorer", isOn: $showDataExplorer)
-//                        Toggle("Recent", isOn: $showRecent)
-                        Toggle("Trends", isOn: $showTrends)
-                    }
-                    .listRowBackground(Theme.textBackground)
+            HStack(alignment: .center) {
+                HStack(alignment: .center, spacing: 8) {
+                    Text("Explore")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding([.leading, .top, .bottom])
                 }
-                .background(.clear)
-                .scrollContentBackground(.hidden)
-                .onAppear(perform: self.showWidgetsOrDefault)
+                Spacer()
             }
-            .background(Theme.cGreen)
         }
     }
 
     struct Widgets: View {
-        @Binding public var date: Date
+        @EnvironmentObject private var state: AppState
         @Binding public var text: String
         @AppStorage("explore.widget.activityCalendar") private var showActivityCalendar: Bool = true
         @AppStorage("explore.widget.dataExplorer") private var showDataExplorer: Bool = false
@@ -93,29 +62,36 @@ struct Explore: View {
         @AppStorage("explore.widget.trends") private var showTrends: Bool = false
 
         var body: some View {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 20) {
-                    if showActivityCalendar {Widget.ActivityCalendar(date: $date, searchTerm: $text)}
-                    if showDataExplorer {Widget.DataExplorer(date: $date)}
-//                    if showRecent {Widget.Rollups()}
-                    if showTrends {Widget.Trends()}
+            NavigationStack {
+                List {
+                    Section("Visualize your data") {
+                        NavigationLink {
+                            Widget.ActivityCalendar(searchTerm: $text)
+                        } label: {
+                            HStack {
+                                Image(systemName: "calendar")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Activity Calendar")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
+
+                        NavigationLink {
+                            Widget.DataExplorer()
+                        } label: {
+                            HStack {
+                                Image(systemName: "globe")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Data Explorer")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
+                    }
                 }
                 Spacer()
             }
-            .padding()
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)
-        }
-    }
-}
-
-extension Explore.FilterPanel {
-    private func showWidgetsOrDefault() -> Void {
-        if showRecent == false && showTrends == false && showDataExplorer == false {
-            showActivityCalendar = true
-            activityCalendarToggleDisabled = true
-        } else {
-            activityCalendarToggleDisabled = false
         }
     }
 }

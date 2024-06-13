@@ -10,7 +10,7 @@ import SwiftUI
 struct AssessmentFactorForm: View {
     typealias EntityType = PageConfiguration.EntityType
 
-    @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
     public var assessment: Assessment
     @State private var job: Job?
     @State private var selected: EntityType = .records
@@ -23,13 +23,12 @@ struct AssessmentFactorForm: View {
                 inSheet: true,
                 job: $job,
                 selected: $selected,
-                date: $date,
                 content: AnyView(
                     Factors(
                         assessables: assessment.assessables,
                         type: $selected
                     )
-                    .environment(\.managedObjectContext, moc)
+                    .environment(\.managedObjectContext, self.state.moc)
                 )
             )
             Spacer()
@@ -39,5 +38,6 @@ struct AssessmentFactorForm: View {
         .navigationTitle("Modify Assessment Factors")
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarTitleDisplayMode(.inline)
     }
 }

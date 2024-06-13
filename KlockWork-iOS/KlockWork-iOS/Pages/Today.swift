@@ -12,26 +12,26 @@ struct Today: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias PlanType = PageConfiguration.PlanType
 
+    @EnvironmentObject private var state: AppState
     public var inSheet: Bool
-    @Binding public var date: Date
-    @Environment(\.managedObjectContext) var moc
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
     @State private var jobs: [Job] = []
     @State private var isSheetPresented: Bool = false
     @FocusState private var textFieldActive: Bool
+    private let page: PageConfiguration.AppPage = .today
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 if !inSheet {
-                    Header(job: $job, date: $date)
+                    Header(page: self.page)
                 }
 
                 ZStack(alignment: .bottomLeading) {
-                    Tabs(inSheet: inSheet, job: $job, selected: $selected, date: $date)
-                    PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
+                    Tabs(inSheet: inSheet, job: $job, selected: $selected)
                     if !inSheet {
+                        PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
                         if job != nil {
                             LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                                 .frame(height: 50)
@@ -42,13 +42,13 @@ struct Today: View {
 
                 if !inSheet {
                     if selected == .records {
-                        Editor(job: $job, entityType: $selected, date: $date, focused: _textFieldActive)
+                        Editor(job: $job, entityType: $selected, focused: _textFieldActive)
                     }
 
                     Spacer().frame(height: 1)
                 }
             }
-            .background(Theme.cPurple)
+            .background(page.primaryColour)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(inSheet ? .visible : .hidden)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -61,8 +61,9 @@ struct Today: View {
 
 extension Today {
     struct Header: View {
-        @Binding public var job: Job?
-        @Binding public var date: Date
+        @EnvironmentObject private var state: AppState
+        @State public var date: Date = Date()
+        public let page: PageConfiguration.AppPage
 
         var body: some View {
             HStack(alignment: .center) {
@@ -82,17 +83,29 @@ extension Today {
                             .opacity(0.011)
                         }
                     Image(systemName: "chevron.right")
+
+                    if self.state.isToday() {
+                        Spacer()
+                        LargeDateIndicator(page: self.page)
+                    }
                 }
                 Spacer()
+            }
+            .onAppear(perform: {
+                self.date = self.state.date
+            })
+            .onChange(of: self.date) {
+                if self.state.date != self.date {
+                    self.state.date = self.date
+                }
             }
         }
     }
 
     struct Editor: View {
-        @Environment(\.managedObjectContext) var moc
+        @EnvironmentObject private var state: AppState
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
-        @Binding public var date: Date
         @FocusState public var focused: Bool
         @State private var text: String = ""
 
@@ -125,9 +138,9 @@ extension Today.Editor {
     private func actionOnSubmit() -> Void {
         if !text.isEmpty {
             if let job = self.job {
-                CoreDataRecords(moc: moc).createWithJob(
+                CoreDataRecords(moc: self.state.moc).createWithJob(
                     job: job,
-                    date: Date(), // LogRecord.createdDate == CURRENT DATE
+                    date: Date(),
                     text: text
                 )
                 text = ""

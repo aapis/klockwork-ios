@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct Panel: View {
+    @EnvironmentObject private var state: AppState
     public var assessment: Assessment
-    @Binding public var calendarDate: Date
-    @State private var date: Date = Date()
 
     var body: some View {
         NavigationStack {
@@ -19,12 +18,12 @@ struct Panel: View {
                     Divider().background(.gray).frame(height: 1)
                     ZStack(alignment: .topLeading) {
                         OverviewWidget(assessment: assessment)
-                            .navigationTitle(date.formatted(date: .abbreviated, time: .omitted))
+                            .navigationTitle(assessment.date.formatted(date: .abbreviated, time: .omitted))
                             .toolbarTitleDisplayMode(.inline)
                             .toolbar {
                                 ToolbarItem(placement: .topBarTrailing) {
                                     NavigationLink {
-                                        Today(inSheet: true, date: $date)
+                                        Today(inSheet: true)
                                     } label: {
                                         HStack(alignment: .top, spacing: 5) {
                                             Text("Details")
@@ -44,12 +43,6 @@ struct Panel: View {
                 Spacer()
             }
         }
-        .onAppear(perform: {
-//            calendarDate = assessment.date!
-            if let date = assessment.date {
-                self.date = date
-            }
-        })
         .presentationDetents([.medium, .large])
         .presentationBackground(Theme.cGreen)
         .scrollDismissesKeyboard(.immediately)

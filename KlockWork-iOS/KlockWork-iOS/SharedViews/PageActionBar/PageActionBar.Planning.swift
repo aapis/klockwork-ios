@@ -9,8 +9,7 @@ import SwiftUI
 
 extension PageActionBar {
     struct Planning: View {
-        @Environment(\.managedObjectContext) var moc
-        @Binding public var date: Date
+        @EnvironmentObject private var state: AppState
         @Binding public var selectedJobs: [Job]
         @Binding public var selectedTasks: [LogTask]
         @Binding public var selectedNotes: [Note]
@@ -98,7 +97,7 @@ extension PageActionBar.Planning {
     /// Create a new Plan for today
     /// - Returns: Void
     private func store() -> Void {
-        CoreDataPlan(moc: self.moc).create(
+        CoreDataPlan(moc: self.state.moc).create(
             date: Date(),
             jobs: Set(self.selectedJobs),
             tasks: Set(self.selectedTasks),
@@ -121,13 +120,13 @@ extension PageActionBar.Planning {
             // Delete the old plan
             do {
                 try self.plan!.validateForDelete()
-                self.moc.delete(self.plan!)
+                self.state.moc.delete(self.plan!)
             } catch {
                 print("[error] Planning.PlanTabs Unable to delete old session due to error \(error)")
             }
 
             // Create a new empty plan
-            self.plan = CoreDataPlan(moc: self.moc).createAndReturn(
+            self.plan = CoreDataPlan(moc: self.state.moc).createAndReturn(
                 date: Date(),
                 jobs: Set(),
                 tasks: Set(),

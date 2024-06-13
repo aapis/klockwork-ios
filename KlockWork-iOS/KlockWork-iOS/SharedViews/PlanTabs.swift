@@ -10,11 +10,10 @@ import SwiftUI
 struct PlanTabs: View {
     typealias PlanType = PageConfiguration.PlanType
 
+    @EnvironmentObject private var state: AppState
     public var inSheet: Bool
-    @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
     @Binding public var selected: PlanType
-    @Binding public var date: Date
     public var content: AnyView? = nil
     public var buttons: AnyView? = nil
     public var title: AnyView? = nil
@@ -52,8 +51,7 @@ struct PlanTabs: View {
                     selectedTasks: $selectedTasks,
                     selectedNotes: $selectedNotes,
                     selectedProjects: $selectedProjects,
-                    selectedCompanies: $selectedCompanies,
-                    date: $date
+                    selectedCompanies: $selectedCompanies
                 )
                     .swipe([.left, .right]) { swipe in
                         self.actionOnSwipe(swipe)
@@ -129,6 +127,7 @@ extension PlanTabs {
     }
 
     struct Content: View {
+        @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: PlanType
@@ -137,13 +136,11 @@ extension PlanTabs {
         @Binding public var selectedNotes: [Note]
         @Binding public var selectedProjects: [Project]
         @Binding public var selectedCompanies: [Company]
-        @Binding public var date: Date
 
         var body: some View {
             switch selected {
             case .daily:
                 Daily(
-                    date: $date,
                     selectedJobs: $selectedJobs,
                     selectedTasks: $selectedTasks,
                     selectedNotes: $selectedNotes,
@@ -161,8 +158,7 @@ extension PlanTabs {
     struct Daily: View {
         typealias Row = PlanRow
         
-        @Environment(\.managedObjectContext) var moc
-        @Binding public var date: Date
+        @EnvironmentObject private var state: AppState
         @Binding public var selectedJobs: [Job]
         @Binding public var selectedTasks: [LogTask]
         @Binding public var selectedNotes: [Note]
@@ -217,7 +213,6 @@ extension PlanTabs {
                         }
                     }
                     PageActionBar.Planning(
-                        date: $date,
                         selectedJobs: $selectedJobs,
                         selectedTasks: $selectedTasks,
                         selectedNotes: $selectedNotes,
@@ -233,7 +228,7 @@ extension PlanTabs {
         /// Use the stored Plan
         /// - Returns: Void
         private func restore() -> Void {
-            let model = CoreDataPlan(moc: self.moc)
+            let model = CoreDataPlan(moc: self.state.moc)
             let plan = model.forToday().first
 
             if let existingPlan = plan {

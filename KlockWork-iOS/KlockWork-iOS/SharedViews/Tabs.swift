@@ -11,11 +11,10 @@ import SwiftUI
 struct Tabs: View {
     typealias EntityType = PageConfiguration.EntityType
 
+    @EnvironmentObject private var state: AppState
     public var inSheet: Bool
-    @Environment(\.managedObjectContext) var moc
     @Binding public var job: Job?
     @Binding public var selected: EntityType
-    @Binding public var date: Date
     public var content: AnyView? = nil
     public var buttons: AnyView? = nil
     public var title: AnyView? = nil
@@ -40,7 +39,7 @@ struct Tabs: View {
             }
 
             if content == nil {
-                Content(inSheet: inSheet, job: $job, selected: $selected, date: $date)
+                Content(inSheet: inSheet, job: $job, selected: $selected)
                     .swipe([.left, .right]) { swipe in
                         self.actionOnSwipe(swipe)
                     }
@@ -120,27 +119,27 @@ extension Tabs {
     }
 
     struct Content: View {
+        @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
-        @Binding public var date: Date
 
         var body: some View {
             switch selected {
             case .records:
-                List.Records(job: $job, date: date, inSheet: inSheet)
+                List.Records(job: $job, date: self.state.date, inSheet: inSheet)
             case .jobs:
-                List.Jobs(job: $job, date: date, inSheet: inSheet)
+                List.Jobs(job: $job, date: self.state.date, inSheet: inSheet)
             case .tasks:
-                List.Tasks(date: date, inSheet: inSheet)
+                List.Tasks(date: self.state.date, inSheet: inSheet)
             case .notes:
-                List.Notes(date: date, inSheet: inSheet)
+                List.Notes(date: self.state.date, inSheet: inSheet)
             case .companies:
-                List.Companies(date: date, inSheet: inSheet)
+                List.Companies(date: self.state.date, inSheet: inSheet)
             case .people:
-                List.People(date: date, inSheet: inSheet)
+                List.People(date: self.state.date, inSheet: inSheet)
             case .projects:
-                List.Projects(date: date, inSheet: inSheet)
+                List.Projects(date: self.state.date, inSheet: inSheet)
             }
         }
     }
@@ -149,10 +148,11 @@ extension Tabs {
 extension Tabs.Content {
     struct List {
         struct Records: View {
+            @EnvironmentObject private var state: AppState
             public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<LogRecord>
             @Binding public var job: Job?
-            public var date: Date
+            private var date: Date
 
             var body: some View {
                 ScrollView {
@@ -162,7 +162,7 @@ extension Tabs.Content {
                                 Individual.SingleRecord(record: record)
                             }
                         } else {
-                            StatusMessage.Warning(message: "No records found for \(date.formatted(date: .abbreviated, time: .omitted))")
+                            StatusMessage.Warning(message: "No records found for \(self.state.date.formatted(date: .abbreviated, time: .omitted))")
                         }
                     }
                 }
@@ -368,6 +368,7 @@ extension Tabs.Content {
 extension Tabs.Content {
     struct Individual {
         struct SingleRecord: View {
+            @EnvironmentObject private var state: AppState
             public let record: LogRecord
 
             var body: some View {
@@ -385,6 +386,7 @@ extension Tabs.Content {
                         )
                     )
                 }
+                // @TODO: use .onLongPressGesture to open record inspector view, allowing job selection and other functions
             }
         }
 

@@ -8,15 +8,16 @@
 import SwiftUI
 import CoreData
 
-public class Assessables: Identifiable, Equatable {
+class Assessables: Identifiable, Equatable {
     typealias EntityType = PageConfiguration.EntityType
 
-    public var id: UUID = UUID()
+    var id: UUID = UUID()
     var factors: [AssessmentFactor] = []
     var moc: NSManagedObjectContext?
     var score: Int = 0
     var weight: ActivityWeight = .empty
-    var date: Date? = Date()
+    var date: Date? = nil
+    var statuses: [AssessmentThreshold] = []
 
     /// Stub for Equatable compliance
     /// - Parameters:
@@ -31,7 +32,7 @@ public class Assessables: Identifiable, Equatable {
     /// - Parameters:
     ///   - factors: Optional(Array<AssessmentFactor>)
     ///   - moc: Optional(NSManagedObjectContext)
-    init(factors: [AssessmentFactor]? = nil, moc: NSManagedObjectContext? = nil) {
+    init(factors: [AssessmentFactor]? = nil, statuses: [AssessmentThreshold]? = nil, moc: NSManagedObjectContext? = nil) {
         self.id = UUID()
 
         if moc != nil {
@@ -42,9 +43,13 @@ public class Assessables: Identifiable, Equatable {
             self.factors = factors!
         }
 
+        if let stats = statuses {
+            self.statuses = stats
+        }
+
         self.evaluate()
     }
-    
+
     /// Shortcut for self.factors.isEmpty
     /// - Returns: Bool
     func isEmpty() -> Bool {
@@ -87,7 +92,6 @@ public class Assessables: Identifiable, Equatable {
     /// - Returns:Void
     func calculateScore() -> Void {
         self.score = 0
-
         for factor in self.factors {
             factor.count = factor.countFactors(using: self.moc!, for: self.date)
 
@@ -101,28 +105,42 @@ public class Assessables: Identifiable, Equatable {
 
     /// Determines the factor's weight
     /// @TODO: move to ActivityWeightAssessment
+    /// @TODO: also this sucks
     /// - Returns: Void
-    func weigh() -> Void {
-        if self.score == 0 {
-            self.weight = .empty
-        } else if self.score > 0 && self.score < 5 {
-            self.weight = .light
-        } else if self.score >= 5 && self.score < 10 {
-            self.weight = .medium
-        } else if self.score > 10 && self.score <= 13 {
-            self.weight = .heavy
-        } else {
-            self.weight = .significant
+    func weigh(with statuses: [AssessmentThreshold]) -> Void {
+        for (idx, status) in statuses.enumerated() {
+            if (idx + 1) < statuses.count {
+                let nextStatus =  statuses[idx + 1]
+                let bounds = (nextStatus.value, status.value - 1)
+
+                if self.score >= bounds.0 && self.score <= bounds.1 {
+                    if let label = status.label {
+                        if let weight = ActivityWeight.typeFromLabel(label: label) {
+                            self.weight = weight
+                        }
+                    }
+                }
+            }
         }
     }
     
     /// Weigh and score the factors
     /// - Returns: Void
-    func evaluate() -> Void {
+    func evaluate(with statuses: [AssessmentThreshold]? = nil) -> Void {
         self.calculateScore()
-        self.weigh()
+        
+        var stats: [AssessmentThreshold] = []
+        if statuses != nil {
+            stats = statuses!
+        } else {
+            stats = self.statuses
+        }
+
+        if stats.count > 0 && self.score > 0 {
+            self.weigh(with: stats)
+        }
     }
-    
+
     // @TODO: activeToggle(), threshold(), weight() probably shouldn't exist (or, shouldn't exist here anyways)
     /// Modify and save the active status on a given AssessmentFactor
     /// - Parameter factor: AssessmentFactor
@@ -130,7 +148,7 @@ public class Assessables: Identifiable, Equatable {
     func activeToggle(factor: AssessmentFactor) -> Void {
         factor.alive.toggle()
         PersistenceController.shared.save()
-        self.evaluate()
+//        self.evaluate()
     }
     
     /// Modify and save the threshold of a given AssessmentFactor
@@ -141,7 +159,7 @@ public class Assessables: Identifiable, Equatable {
     func threshold(factor: AssessmentFactor, threshold: Int) -> Void {
         factor.threshold = Int64(threshold)
         PersistenceController.shared.save()
-        self.evaluate()
+//        self.evaluate()
     }
     
     /// Modify and save the weight for a given AssessmentFactor
@@ -152,6 +170,6 @@ public class Assessables: Identifiable, Equatable {
     func weight(factor: AssessmentFactor, weight: Int) -> Void {
         factor.weight = Int64(weight)
         PersistenceController.shared.save()
-        self.evaluate()
+//        self.evaluate()
     }
 }

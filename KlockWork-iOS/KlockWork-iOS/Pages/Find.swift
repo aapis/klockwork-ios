@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct Find: View {
-    @Binding public var date: Date
-    @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
     @State private var text: String = ""
     @State private var results: SearchLibrary.SearchResults?
     @State private var recentSearchTerms: [String] = [] // @TODO: store recent searches and track as another app use metric
+    private let page: PageConfiguration.AppPage = .find
 
     var body: some View {
         NavigationStack {
@@ -62,7 +62,7 @@ struct Find: View {
                                     }
                                 }
                             }
-                            .background(Theme.cGreen)
+                            .background(page.primaryColour)
                             .scrollContentBackground(.hidden)
                             Spacer()
                         }
@@ -80,7 +80,7 @@ struct Find: View {
                 )
                 Spacer().frame(height: 1)
             }
-            .background(Theme.cGreen)
+            .background(page.primaryColour)
             .onChange(of: text) {
                 if text.isEmpty {
                     results?.reset()

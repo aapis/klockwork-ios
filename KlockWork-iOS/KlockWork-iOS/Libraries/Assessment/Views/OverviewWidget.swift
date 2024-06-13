@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OverviewWidget: View {
+    @EnvironmentObject private var state: AppState
     public var assessment: Assessment
     @State private var active: [AssessmentFactor] = []
     @State private var score: Int = 0
@@ -24,8 +25,7 @@ struct OverviewWidget: View {
                         Spacer()
 
                         NavigationLink {
-                            AssessmentTypeIntersitial(assessment: assessment)
-                                .toolbarTitleDisplayMode(.inline)
+                            AssessmentTypeMenu(assessment: assessment)
                         } label: {
                             HStack {
                                 Spacer()
@@ -94,12 +94,7 @@ struct OverviewWidget: View {
             .clipShape(.rect(cornerRadius: 16))
         }
         .padding()
-        .onAppear(perform: {
-            assessment.assessables.evaluate()
-            active = assessment.assessables.active()
-            score = assessment.assessables.score
-            weight = assessment.assessables.weight
-        })
+        .onAppear(perform: self.actionOnAppear)
     }
 }
 
@@ -130,5 +125,16 @@ extension OverviewWidget {
                 weighting = factor.count * factor.weight
             })
         }
+    }
+}
+
+extension OverviewWidget {
+    /// Onload handler, evaluates the day given the factors, statuses and other components it has received
+    /// - Returns: Void
+    public func actionOnAppear() -> Void {
+        assessment.assessables.evaluate()
+        active = assessment.assessables.active()
+        score = assessment.assessables.score
+        weight = assessment.assessables.weight
     }
 }
