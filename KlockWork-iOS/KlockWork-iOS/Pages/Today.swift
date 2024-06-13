@@ -81,6 +81,11 @@ extension Today {
                             .opacity(0.011)
                         }
                     Image(systemName: "chevron.right")
+
+                    if self.state.isToday() {
+                        Spacer()
+                        LargeDateIndicator()
+                    }
                 }
                 Spacer()
             }

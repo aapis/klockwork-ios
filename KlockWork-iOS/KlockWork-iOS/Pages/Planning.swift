@@ -65,19 +65,8 @@ extension Planning {
                         }
                     Image(systemName: "chevron.right")
                     Spacer()
-                    Button {
-                        // pass
-                    } label: {
-                        Text("\(date.formatted(date: .abbreviated, time: .omitted))")
-                        .padding(7)
-                        .background(self.state.isToday() ? .yellow : Theme.rowColour)
-                        .foregroundStyle(self.state.isToday() ? Theme.cOrange : .white)
-                        .fontWeight(.bold)
-                        .cornerRadius(7)
-                    }
-                    .padding(.trailing)
+                    LargeDateIndicator()
                 }
-
                 Spacer()
             }
             .onAppear(perform: {
