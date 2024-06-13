@@ -28,7 +28,7 @@ class AppState: ObservableObject {
 
 class AppTheme {
     var tint: Color = .yellow
-    var pageBackgroundColour: PageConfiguration.AppPage = .planning
+    var page: PageConfiguration.AppPage = .planning
 }
 
 class TodayPage {

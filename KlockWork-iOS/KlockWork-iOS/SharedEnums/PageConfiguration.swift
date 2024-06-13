@@ -91,7 +91,7 @@ extension PageConfiguration {
     enum AppPage: CaseIterable, Equatable {
         case planning, today, explore, find
 
-        var colour: Color {
+        var primaryColour: Color {
             switch self {
             case .planning: Theme.cOrange
             case .today: Theme.cPurple

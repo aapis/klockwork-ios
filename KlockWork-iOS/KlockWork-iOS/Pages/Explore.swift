@@ -17,10 +17,11 @@ struct Explore: View {
     private var columns: [GridItem] {
         Array(repeating: .init(.flexible()), count: 2)
     }
-
+    private let page: PageConfiguration.AppPage = .explore
     @State private var path = NavigationPath()
     @State private var entityCounts: [EntityTypePair] = []
     @State private var searchText: String = ""
+
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -29,11 +30,11 @@ struct Explore: View {
                 Widgets(text: $searchText)
             }
             .navigationBarTitleDisplayMode(.inline)
-            .background(Theme.cGreen)
+            .background(page.primaryColour)
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
         }
-        .tint(fgColour)
+        .tint(self.state.theme.tint)
     }
 
     struct Header: View {

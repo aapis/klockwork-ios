@@ -19,12 +19,13 @@ struct Today: View {
     @State private var jobs: [Job] = []
     @State private var isSheetPresented: Bool = false
     @FocusState private var textFieldActive: Bool
+    private let page: PageConfiguration.AppPage = .today
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 if !inSheet {
-                    Header()
+                    Header(page: self.page)
                 }
 
                 ZStack(alignment: .bottomLeading) {
@@ -47,7 +48,7 @@ struct Today: View {
                     Spacer().frame(height: 1)
                 }
             }
-            .background(Theme.cPurple)
+            .background(page.primaryColour)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(inSheet ? .visible : .hidden)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -62,6 +63,7 @@ extension Today {
     struct Header: View {
         @EnvironmentObject private var state: AppState
         @State public var date: Date = Date()
+        public let page: PageConfiguration.AppPage
 
         var body: some View {
             HStack(alignment: .center) {
@@ -84,7 +86,7 @@ extension Today {
 
                     if self.state.isToday() {
                         Spacer()
-                        LargeDateIndicator()
+                        LargeDateIndicator(page: self.page)
                     }
                 }
                 Spacer()

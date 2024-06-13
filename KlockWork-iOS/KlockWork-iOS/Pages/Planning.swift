@@ -17,11 +17,12 @@ struct Planning: View {
     @State private var text: String = ""
     @State private var job: Job? = nil
     @State private var selected: PlanType = .daily
+    private let page: PageConfiguration.AppPage = .planning
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                Header()
+                Header(page: self.page)
                 Divider().background(.gray).frame(height: 1)
                 PlanTabs(
                     inSheet: true,
@@ -31,7 +32,7 @@ struct Planning: View {
                 
                 Spacer()
             }
-            .background(Theme.cOrange)
+            .background(page.primaryColour)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(inSheet ? .visible : .hidden)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -45,6 +46,7 @@ extension Planning {
     struct Header: View {
         @EnvironmentObject private var state: AppState
         @State private var date: Date = Date()
+        public let page: PageConfiguration.AppPage
 
         var body: some View {
             HStack(alignment: .center) {
@@ -65,7 +67,7 @@ extension Planning {
                         }
                     Image(systemName: "chevron.right")
                     Spacer()
-                    LargeDateIndicator()
+                    LargeDateIndicator(page: self.page)
                 }
                 Spacer()
             }
