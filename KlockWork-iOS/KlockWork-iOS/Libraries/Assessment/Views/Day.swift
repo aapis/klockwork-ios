@@ -19,6 +19,7 @@ struct Day: View, Identifiable {
 
     var body: some View {
         Button {
+            self.state.date = assessment.date
             isPresented.toggle()
         } label: {
             if self.assessment.dayNumber > 0 {
