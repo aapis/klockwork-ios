@@ -70,6 +70,7 @@ struct AssessmentThresholdForm: View {
 
 extension AssessmentThresholdForm {
     struct Row: View {
+        @EnvironmentObject private var state: AppState
         public let status: AssessmentThreshold
         @State private var value: Int = 0
         @State private var colour: Color = .clear
@@ -87,8 +88,11 @@ extension AssessmentThresholdForm {
                             .labelsHidden()
                         Spacer()
                         Picker("\(status.emoji!) \(status.label!)", selection: $value) {
-                            ForEach(range, id: \.self) {Text($0.string).tag(Int($0))}
+                            ForEach(range, id: \.self) {
+                                Text($0.string).tag(Int($0))
+                            }
                         }
+                        .foregroundStyle(self.state.theme.tint)
                     } else {
                         Text("\(status.emoji ?? "🏖️") \(status.label ?? "Clear")")
                         Spacer()
@@ -97,7 +101,7 @@ extension AssessmentThresholdForm {
                     }
                 }
             }
-            .listRowBackground(colour)
+            .listRowBackground(colour.opacity(0.5))
             .onAppear(perform: actionOnAppear)
             .onChange(of: value) {
                 self.actionOnSubmit()
