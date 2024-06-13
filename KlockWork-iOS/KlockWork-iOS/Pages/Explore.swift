@@ -52,37 +52,8 @@ struct Explore: View {
         }
     }
 
-    struct FilterPanel: View {
-        @AppStorage("explore.widget.activityCalendar") private var showActivityCalendar: Bool = true
-        @AppStorage("explore.widget.dataExplorer") private var showDataExplorer: Bool = false
-        @AppStorage("explore.widget.recent") private var showRecent: Bool = false
-        @AppStorage("explore.widget.trends") private var showTrends: Bool = false
-        @State private var activityCalendarToggleDisabled: Bool = false
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                List {
-                    Section("Widgets") {
-                        Toggle("Activity Calendar", isOn: $showActivityCalendar)
-                            .disabled(self.activityCalendarToggleDisabled)
-                            .onChange(of: showDataExplorer) {self.showWidgetsOrDefault()}
-                            .onChange(of: showRecent) {self.showWidgetsOrDefault()}
-                            .onChange(of: showTrends) {self.showWidgetsOrDefault()}
-                        Toggle("Data Explorer", isOn: $showDataExplorer)
-//                        Toggle("Recent", isOn: $showRecent)
-                        Toggle("Trends", isOn: $showTrends)
-                    }
-                    .listRowBackground(Theme.textBackground)
-                }
-                .background(.clear)
-                .scrollContentBackground(.hidden)
-                .onAppear(perform: self.showWidgetsOrDefault)
-            }
-            .background(Theme.cGreen)
-        }
-    }
-
     struct Widgets: View {
+        @EnvironmentObject private var state: AppState
         @Binding public var text: String
         @AppStorage("explore.widget.activityCalendar") private var showActivityCalendar: Bool = true
         @AppStorage("explore.widget.dataExplorer") private var showDataExplorer: Bool = false
@@ -98,6 +69,7 @@ struct Explore: View {
                         } label: {
                             HStack {
                                 Image(systemName: "calendar")
+                                    .foregroundStyle(self.state.theme.tint)
                                 Text("Activity Calendar")
                             }
                         }
@@ -108,6 +80,7 @@ struct Explore: View {
                         } label: {
                             HStack {
                                 Image(systemName: "globe")
+                                    .foregroundStyle(self.state.theme.tint)
                                 Text("Data Explorer")
                             }
                         }
@@ -118,19 +91,6 @@ struct Explore: View {
             }
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)
-        }
-    }
-}
-
-extension Explore.FilterPanel {
-    /// Show user's selected widgets, or the default one (ActivityCalendar) if none selected
-    /// - Returns: Void
-    private func showWidgetsOrDefault() -> Void {
-        if showRecent == false && showTrends == false && showDataExplorer == false {
-            showActivityCalendar = true
-            activityCalendarToggleDisabled = true
-        } else {
-            activityCalendarToggleDisabled = false
         }
     }
 }
