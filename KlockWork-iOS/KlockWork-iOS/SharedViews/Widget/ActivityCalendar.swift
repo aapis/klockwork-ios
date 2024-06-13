@@ -160,7 +160,6 @@ extension Widget {
                     }
                 }
                 .frame(width: 80, height: 75)
-                .onAppear(perform: self.actionOnTap)
             }
 
             private func actionOnTap() -> Void {

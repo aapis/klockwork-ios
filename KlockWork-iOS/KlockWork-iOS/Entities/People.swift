@@ -10,6 +10,7 @@ import SwiftUI
 struct People: View {
     typealias EntityType = PageConfiguration.EntityType
 
+    @EnvironmentObject private var state: AppState
     private let entityType: EntityType = .people
     @State public var items: [Person] = []
 
@@ -48,9 +49,12 @@ struct People: View {
             .onAppear(perform: {
                 items = CoreDataPerson(moc: moc).all()
             })
-            .background(Theme.cGreen)
             .scrollContentBackground(.hidden)
-            .toolbarBackground(Theme.cGreen, for: .navigationBar)
+            .background(Theme.cGreen)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
                 ToolbarItem {
                     Button(action: {}/*addItem*/) {

@@ -44,9 +44,7 @@ extension PageConfiguration {
             }
         }
     }
-}
 
-extension PageConfiguration {
     enum EntityType: CaseIterable, Equatable {
         case records, jobs, tasks, notes, companies, people, projects
 
@@ -89,9 +87,20 @@ extension PageConfiguration {
             }
         }
     }
-}
+    
+    enum AppPage: CaseIterable, Equatable {
+        case planning, today, explore, find
 
-extension PageConfiguration {
+        var colour: Color {
+            switch self {
+            case .planning: Theme.cOrange
+            case .today: Theme.cPurple
+            default:
+                Theme.cGreen
+            }
+        }
+    }
+
     struct EntityTypePair {
         var key: EntityType
         var value: Int

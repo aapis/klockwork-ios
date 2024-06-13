@@ -46,10 +46,5 @@ struct Panel: View {
         .presentationDetents([.medium, .large])
         .presentationBackground(Theme.cGreen)
         .scrollDismissesKeyboard(.immediately)
-        .onDisappear(perform: self.actionOnAppear)
-    }
-
-    private func actionOnAppear() -> Void {
-//        self.bgColour = self.assessment.backgroundColourFromWeight()
     }
 }

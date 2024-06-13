@@ -12,6 +12,7 @@ class AppState: ObservableObject {
     @Published var moc: NSManagedObjectContext = PersistenceController.shared.container.viewContext
     @Published var date: Date = Date()
     @Published var activities: Activities = Activities()
+    @Published var theme: AppTheme = AppTheme()
 
     init() {
         self.activities.state = self
@@ -22,6 +23,11 @@ class AppState: ObservableObject {
     func isToday() -> Bool {
         return Calendar.autoupdatingCurrent.isDateInToday(self.date)
     }
+}
+
+class AppTheme {
+    var tint: Color = .yellow
+    var pageBackgroundColour: PageConfiguration.AppPage = .planning
 }
 
 class Activities {

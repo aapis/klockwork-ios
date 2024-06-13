@@ -85,8 +85,13 @@ extension Today {
                 Spacer()
             }
             .onAppear(perform: {
-                date = self.state.date
+                self.date = self.state.date
             })
+            .onChange(of: self.date) {
+                if self.state.date != self.date {
+                    self.state.date = self.date
+                }
+            }
         }
     }
 
