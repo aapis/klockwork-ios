@@ -368,6 +368,7 @@ extension Tabs.Content {
 extension Tabs.Content {
     struct Individual {
         struct SingleRecord: View {
+            @EnvironmentObject private var state: AppState
             public let record: LogRecord
 
             var body: some View {
@@ -385,6 +386,7 @@ extension Tabs.Content {
                         )
                     )
                 }
+                // @TODO: use .onLongPressGesture to open record inspector view, allowing job selection and other functions
             }
         }
 

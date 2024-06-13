@@ -13,6 +13,7 @@ class AppState: ObservableObject {
     @Published var date: Date = Date()
     @Published var activities: Activities = Activities()
     @Published var theme: AppTheme = AppTheme()
+    @Published var today: TodayPage = TodayPage()
 
     init() {
         self.activities.state = self
@@ -28,6 +29,10 @@ class AppState: ObservableObject {
 class AppTheme {
     var tint: Color = .yellow
     var pageBackgroundColour: PageConfiguration.AppPage = .planning
+}
+
+class TodayPage {
+    var job: Job? = nil
 }
 
 class Activities {
@@ -46,8 +51,6 @@ class Activities {
         self.createAssessments()
         self.calculateScore()
     }
-
-
 
     /// Calculate overall score for the day by tallying up the factors. Sets self.score
     /// - Returns: Void
