@@ -44,49 +44,7 @@ extension Widget {
             NavigationStack {
                 VStack {
                     Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 0) {
-                        // Month row
-                        GridRow {
-                            HStack {
-                                HStack {
-                                    Text(self.month)
-                                    Image(systemName: "chevron.right")
-                                }
-                                .foregroundStyle(.yellow)
-                                .padding([.leading, .trailing])
-                                .padding([.top, .bottom], 8)
-                                .background(Theme.rowColour)
-                                .mask(Capsule(style: .continuous))
-                                .overlay { // @TODO: only this date selector doesn't is broken in iOS 18 - bug?
-                                    DatePicker(
-                                        "Date picker",
-                                        selection: $date,
-                                        displayedComponents: [.date]
-                                    )
-                                    .labelsHidden()
-//                                                                .background(.red)
-                                    .opacity(0.011)
-                                }
-
-                                Button {
-                                    self.state.date = Date()
-                                } label: {
-                                    Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
-                                        .font(.title2)
-                                }
-
-                                Spacer()
-
-                                Text("Score: \(self.state.activities.score)")
-                                    .padding([.leading, .trailing])
-                                    .padding([.top, .bottom], 8)
-                                    .background(Theme.rowColour)
-                                    .foregroundStyle(.gray)
-                                    .mask(Capsule(style: .continuous))
-                            }
-                            .padding()
-                        }
-                        .border(width: 1, edges: [.bottom], color: Theme.cGreen)
-                        .background(Theme.rowColour)
+                        MonthNav(date: $date)
 
                         // Day of week
                         GridRow {
@@ -130,15 +88,89 @@ extension Widget {
                 .onAppear(perform: self.actionOnAppear)
                 .onChange(of: self.date) { self.actionChangeDate()}
                 .navigationTitle("Activity Calendar")
-//                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-                // @TODO: swipe between months
-                //            .swipe([.left, .right]) { swipe in
-                //                if swipe == .left {
-                //
-                //                } else if swipe == .right {
-                //
-                //                }
-                //            }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            self.state.date = Date()
+                            self.date = self.state.date
+                        } label: {
+                            Image(systemName: "clock.arrow.circlepath")
+                        }
+                    }
+                }
+            }
+        }
+
+        struct MonthNav: View {
+            @Binding public var date: Date
+            @State private var isCurrentMonth: Bool = false // @TODO: implement
+
+            var body: some View {
+                GridRow {
+                    HStack {
+                        MonthNavButton(orientation: .leading, date: $date)
+                        Spacer()
+
+                        DatePicker(
+                            "Date picker",
+                            selection: $date,
+                            displayedComponents: [.date]
+                        )
+                        .background(self.isCurrentMonth ? .yellow : Theme.rowColour)
+                        .labelsHidden()
+                        .mask(Capsule(style: .continuous))
+                        .foregroundStyle(self.isCurrentMonth ? Theme.cGreen : .gray)
+                        .padding([.leading, .trailing])
+                        .padding([.top, .bottom], 12)
+
+                        .shadow(color: .white.opacity(0.1), radius: 7, x: 0, y: 0)
+
+                        Spacer()
+                        MonthNavButton(orientation: .trailing, date: $date)
+                    }
+                }
+                .border(width: 1, edges: [.bottom], color: .gray)
+                .background(Theme.cGreen)
+            }
+        }
+
+        struct MonthNavButton: View {
+            @EnvironmentObject private var state: AppState
+            public var orientation: UnitPoint
+            @Binding public var date: Date
+            @State private var previousMonth: String = ""
+            @State private var nextMonth: String = ""
+
+            var body: some View {
+                HStack {
+                    ZStack {
+                        LinearGradient(gradient: Gradient(colors: [Theme.textBackground, Theme.cGreen]), startPoint: self.orientation, endPoint: self.orientation == .leading ? .trailing : .leading)
+                        Button {
+                            self.actionOnTap()
+                        } label: {
+                            HStack {
+                                Image(systemName: self.orientation == .leading ? "chevron.left" : "chevron.right")
+                            }
+                            .padding([.leading, .trailing], 16)
+                            .padding([.top, .bottom], 12)
+                            .background(Theme.cPurple)
+                        }
+                        .clipShape(.capsule(style: .continuous))
+                        .shadow(color: .black.opacity(0.2), radius: 2, x: 1, y: 1)
+                    }
+                }
+                .frame(width: 80, height: 75)
+                .onAppear(perform: self.actionOnTap)
+            }
+
+            private func actionOnTap() -> Void {
+                let oneMonthMs: Double = 2592000
+
+                if self.orientation == .leading {
+                    self.date = self.state.date - oneMonthMs
+                } else {
+                    self.date = self.state.date + oneMonthMs
+                }
             }
         }
     }
