@@ -83,9 +83,12 @@ extension AssessmentThresholdForm {
             VStack {
                 HStack(alignment: .center, spacing: 5) {
                     // A clear day is always going to be 0
+                    ColorPicker("Choose a colour for this status", selection: $colour, supportsOpacity: false)
+                        .labelsHidden()
+                        .disabled(status.label == "Clear")
+                        .opacity(status.label == "Clear" ? 0.1 : 1.0)
+
                     if status.label != "Clear" {
-                        ColorPicker("Choose a colour for this status", selection: $colour, supportsOpacity: false)
-                            .labelsHidden()
                         Spacer()
                         Picker("\(status.emoji!) \(status.label!)", selection: $value) {
                             ForEach(range, id: \.self) {
@@ -95,6 +98,7 @@ extension AssessmentThresholdForm {
                         .foregroundStyle(self.state.theme.tint)
                     } else {
                         Text("\(status.emoji ?? "🏖️") \(status.label ?? "Clear")")
+                            .padding([.leading])
                         Spacer()
                         Text(String(0))
                             .foregroundStyle(.gray)
