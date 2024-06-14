@@ -19,6 +19,7 @@ struct TaskDetail: View {
     @State private var job: Job?
     @State private var isCompleted: Bool = false
     @State private var isCancelled: Bool = false
+    private let page: PageConfiguration.AppPage = .create
 
     var body: some View {
         NavigationStack {
@@ -59,22 +60,30 @@ struct TaskDetail: View {
                         }
                     }
                     .listRowBackground(Theme.textBackground)
-                    
-                    if job != nil {
-                        Section("Job") {
+
+                    Section("Job") {
+                        if job != nil {
                             NavigationLink {
                                 JobDetail(job: job!)
-                                    .background(Theme.cPurple)
-                                    .scrollContentBackground(.hidden)
+                                    .toolbar {
+                                        ToolbarItem(placement: .topBarTrailing) {
+                                            Button("Save") {
+                                                PersistenceController.shared.save()
+                                            }
+                                        }
+                                    }
                             } label: {
                                 Text(job!.title ?? job!.jid.string)
                                     .foregroundStyle(job!.backgroundColor.isBright() ? .black : .white)
                             }
+                            .listRowBackground(job!.backgroundColor)
+                        } else {
+                            Text("Job selector")
+                                .listRowBackground(Theme.textBackground)
                         }
-                        .listRowBackground(job!.backgroundColor)
                     }
 
-                    Section("Content") {
+                    Section("What needs to be done?") {
                         TextField("Task content", text: $content, axis: .vertical)
                     }
                     .listRowBackground(Theme.textBackground)
@@ -83,18 +92,18 @@ struct TaskDetail: View {
             }
             .onAppear(perform: actionOnAppear)
             .navigationTitle("Task")
+            .background(page.primaryColour)
+            .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbar {
-                Button("Save") {
-
-                }
-            }
         }
     }
 }
 
 extension TaskDetail {
+    /// Onload handler, sets view data
+    /// - Returns: Void
     private func actionOnAppear() -> Void {
         if let coDate = task.completedDate {
             completedDate = coDate
@@ -110,5 +119,24 @@ extension TaskDetail {
         if let uDate = task.lastUpdate {lastUpdate = uDate}
         if let co = task.content {content = co}
         if let jo = task.owner {job = jo}
+    }
+}
+
+extension TaskDetail {
+    struct Sheet: View {
+        public let task: LogTask
+        @Binding public var isPresented: Bool
+
+        var body: some View {
+            TaskDetail(task: self.task)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        self.isPresented.toggle()
+                        PersistenceController.shared.save()
+                    }
+                }
+            }
+        }
     }
 }

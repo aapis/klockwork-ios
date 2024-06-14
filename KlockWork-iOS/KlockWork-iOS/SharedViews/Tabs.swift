@@ -413,8 +413,13 @@ extension Tabs.Content {
             var body: some View {
                 NavigationLink {
                     JobDetail(job: job)
-                        .background(Theme.cPurple)
-                        .scrollContentBackground(.hidden)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button("Save") {
+                                    PersistenceController.shared.save()
+                                }
+                            }
+                        }
                 } label: {
                     ListRow(
                         name: job.title ?? job.jid.string,

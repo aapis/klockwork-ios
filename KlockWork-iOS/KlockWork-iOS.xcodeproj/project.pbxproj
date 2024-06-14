@@ -31,6 +31,8 @@
 		537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CD2BFFEB7500CB528C /* EdgeBorder.swift */; };
 		537582D52C0033B800CB528C /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D42C0033B800CB528C /* Tabs.swift */; };
 		537582D72C004A9600CB528C /* StatusMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D62C004A9600CB528C /* StatusMessage.swift */; };
+		538328682C1BE8B900105B14 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538328672C1BE8B000105B14 /* ErrorView.swift */; };
+		5383286A2C1CA86F00105B14 /* CreateSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538328692C1CA86D00105B14 /* CreateSheet.swift */; };
 		5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5387AE882C0143D100EEC581 /* SearchBar.swift */; };
 		53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53911FC42C19E87300B77DAB /* ActivityWeight.swift */; };
 		539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134E92C0269B600B48494 /* PageConfiguration.swift */; };
@@ -134,6 +136,8 @@
 		537582D02C00332600CB528C /* FancyGenericToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FancyGenericToolbar.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/Fancy/FancyGenericToolbar.swift; sourceTree = "<group>"; };
 		537582D42C0033B800CB528C /* Tabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
 		537582D62C004A9600CB528C /* StatusMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMessage.swift; sourceTree = "<group>"; };
+		538328672C1BE8B000105B14 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		538328692C1CA86D00105B14 /* CreateSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSheet.swift; sourceTree = "<group>"; };
 		5387AE882C0143D100EEC581 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		53911FC42C19E87300B77DAB /* ActivityWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ActivityWeight.swift; path = ../../DLPrototype/DLPrototype/Enums/ActivityWeight.swift; sourceTree = "<group>"; };
 		539134E92C0269B600B48494 /* PageConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageConfiguration.swift; sourceTree = "<group>"; };
@@ -224,6 +228,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		530C8D1F2C1BE87600ED3AD1 /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				538328672C1BE8B000105B14 /* ErrorView.swift */,
+			);
+			path = Error;
+			sourceTree = "<group>";
+		};
 		5311F3F72C1794E400FB3071 /* PageActionBar */ = {
 			isa = PBXGroup;
 			children = (
@@ -258,6 +270,8 @@
 		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
+				538328692C1CA86D00105B14 /* CreateSheet.swift */,
+				530C8D1F2C1BE87600ED3AD1 /* Error */,
 				53E33F842C1B8D2D001191ED /* LargeDateIndicator.swift */,
 				5311F3FE2C17A03500FB3071 /* Widget */,
 				5311F3F72C1794E400FB3071 /* PageActionBar */,
@@ -543,6 +557,7 @@
 				53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */,
 				5311F4062C17C66900FB3071 /* CDAssessmentThreshold.swift in Sources */,
 				53E3A26B2C098A50004A85C3 /* CDAssessmentFactor.swift in Sources */,
+				538328682C1BE8B900105B14 /* ErrorView.swift in Sources */,
 				539134FA2C03A38500B48494 /* SearchLanguage.swift in Sources */,
 				53E50C1B2C0E635A00A85FDC /* Factors.swift in Sources */,
 				53274B352C1214E0008387BF /* LegendLabel.swift in Sources */,
@@ -570,6 +585,7 @@
 				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
 				532441662C04428700659F14 /* Titlebar.swift in Sources */,
 				53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */,
+				5383286A2C1CA86F00105B14 /* CreateSheet.swift in Sources */,
 				5311F3F62C15592A00FB3071 /* PageActionBar.swift in Sources */,
 				53E50C092C0E5F5800A85FDC /* Assessables.swift in Sources */,
 				53274B372C12179D008387BF /* ButtonType.swift in Sources */,

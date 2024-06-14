@@ -89,12 +89,20 @@ extension PageConfiguration {
     }
     
     enum AppPage: CaseIterable, Equatable {
-        case planning, today, explore, find
+        case planning, today, explore, find, create, error, intersitial
 
         var primaryColour: Color {
             switch self {
             case .planning: Theme.cOrange
-            case .today: Theme.cPurple
+            case .today, .create: Theme.cPurple
+            case .error, .intersitial: .white
+            default:
+                Theme.cGreen
+            }
+        }
+
+        var buttonBackgroundColour: Color {
+            switch self {
             default:
                 Theme.cGreen
             }

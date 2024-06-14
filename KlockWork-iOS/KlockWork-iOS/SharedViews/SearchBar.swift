@@ -109,6 +109,13 @@ extension SearchBar {
                                 }) { row in
                                     NavigationLink {
                                         JobDetail(job: row)
+                                            .toolbar {
+                                                ToolbarItem(placement: .topBarTrailing) {
+                                                    Button("Save") {
+                                                        PersistenceController.shared.save()
+                                                    }
+                                                }
+                                            }
                                     } label: {
                                         Text(row.title ?? row.jid.string)
                                     }

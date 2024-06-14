@@ -10,18 +10,19 @@ import SwiftUI
 
 struct JobDetail: View {
     public let job: Job
-    
+
     @State private var alive: Bool = false
     @State private var colour: Color = .clear
+    @State private var company: Company? = nil
     @State private var created: Date = Date()
     @State private var jid: Double = 0.0
     @State private var lastUpdate: Date = Date()
     @State private var overview: String = ""
     @State private var shredable: Bool = false
     @State private var title: String = ""
-    @State private var url: URL? = nil
+    @State private var url: String = "https://"
     @State private var project: Project? = nil
-    @State private var company: Company? = nil
+    private let page: PageConfiguration.AppPage = .create
 
     var body: some View {
         VStack {
@@ -50,8 +51,6 @@ struct JobDetail: View {
                         Section("Company") {
                             NavigationLink {
                                 CompanyDetail(company: company)
-                                    .background(Theme.cPurple)
-                                    .scrollContentBackground(.hidden)
                             } label: {
                                 Text(company.name!)
                             }
@@ -62,26 +61,38 @@ struct JobDetail: View {
                     Section("Project") {
                         NavigationLink {
                             ProjectDetail(project: project)
-                                .background(Theme.cPurple)
-                                .scrollContentBackground(.hidden)
                         } label: {
                             Text(project.name!)
                         }
                         .listRowBackground(Theme.textBackground)
                     }
                 }
+
+                Section("Title") {
+                    TextField("Title", text: $title)
+                }
+                .listRowBackground(Theme.textBackground)
+
+                Section("URL") {
+                    TextField("URL", text: $url)
+                }
+                .listRowBackground(Theme.textBackground)
+
+                Section("Overview") {
+                    TextEditor(text: $overview).lineLimit(3...)
+                }
+                .listRowBackground(Theme.textBackground)
             }
             .listStyle(.grouped)
         }
         .onAppear(perform: actionOnAppear)
-        .navigationTitle(job.title != nil ? job.title!.capitalized : "Job #\(job.jid.string)")
+        .navigationTitle(self.jid == 0.0 ? "New Job" : job.title != nil ? job.title!.capitalized : "Job #\(job.jid.string)")
+        .background(page.primaryColour)
+        .scrollContentBackground(.hidden)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        .toolbar {
-            Button("Save") {
-
-            }
-        }
+        .scrollDismissesKeyboard(.immediately)
     }
 }
 
@@ -89,9 +100,11 @@ extension JobDetail {
     private func actionOnAppear() -> Void {
         self.alive = job.alive
         self.colour = job.colour_from_stored()
-        self.created = job.created ?? Date()
+        if let cDate = job.created {
+            self.created = cDate
+        }
         self.jid = job.jid
-        self.lastUpdate = job.lastUpdate ?? Date()
+        self.lastUpdate = Date()
         self.overview = job.overview ?? ""
         self.shredable = job.shredable
         self.title  = job.title ?? ""
@@ -104,7 +117,32 @@ extension JobDetail {
         }
 
         if let link = job.uri {
-            self.url = link
+            self.url = link.absoluteString
+        }
+    }
+}
+
+extension JobDetail {
+    struct Sheet: View {
+        public let job: Job
+        @Binding public var isPresented: Bool
+
+        var body: some View {
+            JobDetail(job: self.job)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        self.isPresented.toggle()
+                    }
+                }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        self.isPresented.toggle()
+                        PersistenceController.shared.save()
+                    }
+                }
+            }
         }
     }
 }

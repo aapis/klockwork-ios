@@ -63,6 +63,7 @@ extension Today {
     struct Header: View {
         @EnvironmentObject private var state: AppState
         @State public var date: Date = Date()
+        @State private var isCreateSheetPresented: Bool = false
         public let page: PageConfiguration.AppPage
 
         var body: some View {
@@ -83,11 +84,20 @@ extension Today {
                             .opacity(0.011)
                         }
                     Image(systemName: "chevron.right")
+                    
+                    Spacer()
+                    // @TODO: decide if keeping LDI on this page?
+//                    if self.state.isToday() {
+//                        LargeDateIndicator(page: self.page)
+//                    }
 
-                    if self.state.isToday() {
-                        Spacer()
-                        LargeDateIndicator(page: self.page)
+                    Button {
+                        self.isCreateSheetPresented.toggle()
+                    } label: {
+                        Image(systemName: "plus")
                     }
+                    .font(.title2)
+                    .padding(.trailing)
                 }
                 Spacer()
             }
@@ -98,6 +108,9 @@ extension Today {
                 if self.state.date != self.date {
                     self.state.date = self.date
                 }
+            }
+            .sheet(isPresented: $isCreateSheetPresented) {
+                CreateSheet(isPresented: $isCreateSheetPresented)
             }
         }
     }
