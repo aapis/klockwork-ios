@@ -40,13 +40,24 @@ struct CreateSheet: View {
             saveByDefault: false
         )
     }
+    private var note: Note {
+        return CoreDataNotes(moc: self.state.moc).createAndReturn(
+            alive: true,
+            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae enim ut elit vestibulum fringilla.",
+            lastUpdate: Date(),
+            postedDate: Date(),
+            starred: false,
+            title: "Sample Note Title",
+            saveByDefault: false
+        )
+    }
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .center, spacing: 30) {
                 PageLink(label: "Job", target: AnyView(JobDetail.Sheet(job: self.job, isPresented: $isPresented)), page: self.page)
                 PageLink(label: "Task", target: AnyView(TaskDetail.Sheet(task: self.task, isPresented: $isPresented)), page: self.page)
-                PageLink(label: "Note", target: AnyView(TaskDetail(task: self.task)), page: self.page)
+                PageLink(label: "Note", target: AnyView(NoteDetail.Sheet(note: self.note, isPresented: $isPresented)), page: self.page)
             }
         }
         .presentationBackground(self.page.primaryColour)

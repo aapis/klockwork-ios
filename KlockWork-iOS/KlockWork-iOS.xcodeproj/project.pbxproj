@@ -31,6 +31,7 @@
 		537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CD2BFFEB7500CB528C /* EdgeBorder.swift */; };
 		537582D52C0033B800CB528C /* Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D42C0033B800CB528C /* Tabs.swift */; };
 		537582D72C004A9600CB528C /* StatusMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D62C004A9600CB528C /* StatusMessage.swift */; };
+		5380795F2C1CF6B100B97D55 /* PageActionBar.Create.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5380795E2C1CF6AA00B97D55 /* PageActionBar.Create.swift */; };
 		538328682C1BE8B900105B14 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538328672C1BE8B000105B14 /* ErrorView.swift */; };
 		5383286A2C1CA86F00105B14 /* CreateSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538328692C1CA86D00105B14 /* CreateSheet.swift */; };
 		5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5387AE882C0143D100EEC581 /* SearchBar.swift */; };
@@ -136,6 +137,7 @@
 		537582D02C00332600CB528C /* FancyGenericToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FancyGenericToolbar.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/Fancy/FancyGenericToolbar.swift; sourceTree = "<group>"; };
 		537582D42C0033B800CB528C /* Tabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.swift; sourceTree = "<group>"; };
 		537582D62C004A9600CB528C /* StatusMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMessage.swift; sourceTree = "<group>"; };
+		5380795E2C1CF6AA00B97D55 /* PageActionBar.Create.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.Create.swift; sourceTree = "<group>"; };
 		538328672C1BE8B000105B14 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		538328692C1CA86D00105B14 /* CreateSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSheet.swift; sourceTree = "<group>"; };
 		5387AE882C0143D100EEC581 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
@@ -239,6 +241,7 @@
 		5311F3F72C1794E400FB3071 /* PageActionBar */ = {
 			isa = PBXGroup;
 			children = (
+				5380795E2C1CF6AA00B97D55 /* PageActionBar.Create.swift */,
 				5311F3F52C15592A00FB3071 /* PageActionBar.swift */,
 				5311F3F82C1794FD00FB3071 /* PageActionBar.Planning.swift */,
 				5311F3FA2C17953A00FB3071 /* PageActionBar.Today.swift */,
@@ -563,6 +566,7 @@
 				53274B352C1214E0008387BF /* LegendLabel.swift in Sources */,
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
 				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
+				5380795F2C1CF6B100B97D55 /* PageActionBar.Create.swift in Sources */,
 				539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */,
 				53F926292BFEA00E00948076 /* Project.swift in Sources */,
 				53F9262A2BFEA00E00948076 /* Job.swift in Sources */,
@@ -889,7 +893,7 @@
 			);
 			currentVersion = 537582C62BFFB37900CB528C /* Note.xcdatamodel */;
 			name = Data.xcdatamodeld;
-			path = /Users/prieber/Documents/CloudCode/Personal/DLPrototype/DLPrototype/CoreData/Data.xcdatamodeld;
+			path = /Users/prieber/LocalCode/Personal/DLPrototype/DLPrototype/CoreData/Data.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

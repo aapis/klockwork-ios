@@ -125,14 +125,17 @@ extension JobDetail {
 extension JobDetail {
     struct Sheet: View {
         public let job: Job
+        public var standalone: Bool = false
         @Binding public var isPresented: Bool
 
         var body: some View {
             JobDetail(job: self.job)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        self.isPresented.toggle()
+                if self.standalone {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Cancel") {
+                            self.isPresented.toggle()
+                        }
                     }
                 }
 

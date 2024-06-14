@@ -87,7 +87,7 @@ struct Jobs: View {
                             project: project
                         ) {
                             NavigationStack {
-                                JobDetail.Sheet(job: newJob, isPresented: $isCreateEditorPresented)
+                                JobDetail.Sheet(job: newJob, standalone: true, isPresented: $isCreateEditorPresented)
                             }
                         }
                     } else {
