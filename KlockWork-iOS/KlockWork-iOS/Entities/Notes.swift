@@ -13,8 +13,9 @@ struct Notes: View {
 
     private let entityType: EntityType = .notes
     @State public var items: [Note] = []
+    @State private var isSheetPresented: Bool = false
 
-    @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
 
     var body: some View {
         NavigationStack {
@@ -28,7 +29,7 @@ struct Notes: View {
                     if items.count > 0 {
                         ForEach(items) { item in
                             NavigationLink {
-                                NoteDetail(note: item)
+                                NoteDetail(note: item, isSheetPresented: $isSheetPresented)
                             } label: {
                                 Text(item.title!.capitalized)
                             }
@@ -44,7 +45,7 @@ struct Notes: View {
                 }
             }
             .onAppear(perform: {
-                items = CoreDataNotes(moc: moc).alive()
+                items = CoreDataNotes(moc: self.state.moc).alive()
             })
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)

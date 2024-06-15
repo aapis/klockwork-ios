@@ -27,6 +27,7 @@ struct NoteDetail: View {
 
                 ZStack {
                     VStack {
+                        Editor()
                         HStack {
                             TextEditor(text: $content)
                                 .padding()
@@ -55,6 +56,12 @@ struct NoteDetail: View {
 //        }
     }
 
+    struct Editor: View {
+        var body: some View {
+            Text("HI")
+        }
+    }
+
     struct Sheet: View {
         public let note: Note
         public var currentVersion: NoteVersion? = nil
@@ -64,18 +71,14 @@ struct NoteDetail: View {
             NoteDetail(note: note, isSheetPresented: $isPresented)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") {
-                        self.isPresented.toggle()
-                        PersistenceController.shared.save()
-                        print("DERPO should have saved")
-                    }
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
                         MetaData(note: note, version: self.currentVersion)
                     } label: {
-                        Label("Edit meta data", systemImage: "line.3.horizontal")
+                        HStack(spacing: 5) {
+                            Text("More")
+                            Image(systemName: "chevron.right")
+                                .font(.headline)
+                        }
                     }
                 }
             }
@@ -134,6 +137,7 @@ struct NoteDetail: View {
                 }
                 .listStyle(.grouped)
             }
+            .navigationTitle("Metadata")
             .background(self.page.primaryColour)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
