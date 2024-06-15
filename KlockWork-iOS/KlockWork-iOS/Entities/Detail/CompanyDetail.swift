@@ -20,6 +20,7 @@ struct CompanyDetail: View {
     @State private var hidden: Bool = false
     @State private var colour: Color = .clear
     private let page: PageConfiguration.AppPage = .create
+    static public let defaultName: String = "Initech Inc"
 
     var body: some View {
         NavigationStack {

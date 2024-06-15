@@ -20,6 +20,7 @@ struct TaskDetail: View {
     @State private var isCompleted: Bool = false
     @State private var isCancelled: Bool = false
     private let page: PageConfiguration.AppPage = .create
+    static public let defaultContent: String = "Sample task content"
 
     var body: some View {
         NavigationStack {

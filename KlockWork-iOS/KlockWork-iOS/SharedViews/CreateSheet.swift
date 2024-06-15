@@ -10,9 +10,10 @@ struct CreateSheet: View {
     @EnvironmentObject private var state: AppState
     public let page: PageConfiguration.AppPage = .intersitial
     @Binding public var isPresented: Bool
+    /// A temporary Project to pass to the view
     private var project: Project {
-        return CoreDataProjects(moc: self.state.moc).createAndReturn(
-            name: "A Really Good Project Name",
+        return CoreDataProjects(moc: PersistenceController.shared.container.viewContext).createAndReturn(
+            name: ProjectDetail.defaultName,
             abbreviation: "ARGPN",
             colour: Color.random().toStored(),
             created: Date(),
@@ -20,34 +21,38 @@ struct CreateSheet: View {
             saveByDefault: false
         )
     }
+    /// A temporary Job to pass to the view
     private var job: Job {
-        return CoreDataJob(moc: self.state.moc).createAndReturn(
+        return CoreDataJob(moc: PersistenceController.shared.container.viewContext).createAndReturn(
             alive: true,
             colour: Color.randomStorable(),
             jid: 0.0,
             overview: "I'm the overview, edit me",
             shredable: false,
-            title: "Descriptive job title",
+            title: JobDetail.defaultTitle,
             uri: "https://",
-            project: self.project
-        )!
-    }
-    private var task: LogTask {
-        return CoreDataTasks(moc: self.state.moc).createAndReturn(
-            content: "Sample task content",
-            created: Date(),
-            job: self.job, // @TODO: this should be optional
+            project: self.project,
             saveByDefault: false
         )
     }
+    /// A temporary LogTask to pass to the view
+    private var task: LogTask {
+        return CoreDataTasks(moc: PersistenceController.shared.container.viewContext).createAndReturn(
+            content: TaskDetail.defaultContent,
+            created: Date(),
+            job: self.job,
+            saveByDefault: false
+        )
+    }
+    /// A temporary Note to pass to the view
     private var note: Note {
-        return CoreDataNotes(moc: self.state.moc).createAndReturn(
+        return CoreDataNotes(moc: PersistenceController.shared.container.viewContext).createAndReturn(
             alive: true,
             body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae enim ut elit vestibulum fringilla.",
             lastUpdate: Date(),
             postedDate: Date(),
             starred: false,
-            title: "Sample Note Title",
+            title: NoteDetail.defaultTitle,
             saveByDefault: false
         )
     }
@@ -88,3 +93,11 @@ struct CreateSheet: View {
 //#Preview {
 //    CreateSheet()
 //}
+
+struct ContainerView<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        content
+    }
+}

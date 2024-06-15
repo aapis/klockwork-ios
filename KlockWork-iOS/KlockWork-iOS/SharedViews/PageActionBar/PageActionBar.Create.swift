@@ -9,25 +9,11 @@ import SwiftUI
 extension PageActionBar {
     struct Create: View {
         @EnvironmentObject private var state: AppState
+        public let page: PageConfiguration.AppPage
+        @Binding public var isSheetPresented: Bool
 
         var body: some View {
-            PageActionBarSingleAction(
-                groupView: AnyView(Group)
-            )
-        }
-
-        @ViewBuilder var Group: some View {
-            Button {
-
-            } label: {
-                HStack(alignment: .center, spacing: 10) {
-                    Text("Save")
-                }
-                .padding()
-            }
-            .background(.green)
-            .padding()
-            .padding(.bottom, 50)
+            PageActionBarSingleAction(page: self.page, isSheetPresented: $isSheetPresented)
         }
     }
 }

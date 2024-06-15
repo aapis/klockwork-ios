@@ -76,19 +76,22 @@ struct Jobs: View {
                 if let defaultCompany = CoreDataCompanies(moc: self.state.moc).findDefault() {
                     let projects = defaultCompany.projects!.allObjects as! [Project]
                     if let project = projects.first {
-                        if let newJob = CoreDataJob(moc: self.state.moc).createAndReturn(
-                            alive: true,
-                            colour: Color.randomStorable(),
-                            jid: 0.0,
-                            overview: "I'm the overview, edit me",
-                            shredable: false,
-                            title: "Descriptive job title",
-                            uri: "https://",
-                            project: project
-                        ) {
-                            NavigationStack {
-                                JobDetail.Sheet(job: newJob, standalone: true, isPresented: $isCreateEditorPresented)
-                            }
+                        NavigationStack {
+                            JobDetail.Sheet(
+                                job: CoreDataJob(moc: self.state.moc).createAndReturn(
+                                    alive: true,
+                                    colour: Color.randomStorable(),
+                                    jid: 0.0,
+                                    overview: "I'm the overview, edit me",
+                                    shredable: false,
+                                    title: JobDetail.defaultTitle,
+                                    uri: "https://",
+                                    project: project,
+                                    saveByDefault: false
+                                ),
+                                standalone: true,
+                                isPresented: $isCreateEditorPresented
+                            )
                         }
                     } else {
                         ErrorView.MissingProject(isPresented: $isCreateEditorPresented)

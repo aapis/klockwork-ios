@@ -17,6 +17,7 @@ struct ProjectDetail: View {
     @State private var createdDate: Date = Date()
     @State private var lastUpdate: Date = Date()
     @State private var name: String = ""
+    static public let defaultName: String = "A Really Good Project Name"
 
     private let page: PageConfiguration.AppPage = .create
 

@@ -73,6 +73,37 @@ extension Planning {
             }
             .onAppear(perform: {
                 date = self.state.date
+
+                // @TODO: obviously for testing
+                let testJobs = CoreDataJob(moc: self.state.moc).all().filter({$0.title == JobDetail.defaultTitle})
+                for job in testJobs {
+                    self.state.moc.delete(job)
+                    print("DERPO DELETED job=\(job.title!) job.id=\(job.jid.string)")
+                }
+
+                let projects = CoreDataProjects(moc: self.state.moc).all().filter({$0.name == ProjectDetail.defaultName})
+                for entity in projects {
+                    self.state.moc.delete(entity)
+                    print("DERPO DELETED project=\(entity.name!)")
+                }
+
+                let tasks = CoreDataTasks(moc: self.state.moc).all().filter({$0.content == TaskDetail.defaultContent})
+                for entity in tasks {
+                    self.state.moc.delete(entity)
+                    print("DERPO DELETED task=\(entity.content!)")
+                }
+
+                let companies = CoreDataCompanies(moc: self.state.moc).indescriminate().filter({$0.name == CompanyDetail.defaultName})
+                for entity in companies {
+                    self.state.moc.delete(entity)
+                    print("DERPO DELETED company=\(entity.name!)")
+                }
+
+                let notes = CoreDataNotes(moc: self.state.moc).all().filter({$0.title == NoteDetail.defaultTitle})
+                for note in notes {
+                    self.state.moc.delete(note)
+                    print("DERPO DELETED note=\(note.title!)")
+                }
             })
             .onChange(of: date) {
                 self.state.date = date

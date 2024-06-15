@@ -23,6 +23,7 @@ struct JobDetail: View {
     @State private var url: String = "https://"
     @State private var project: Project? = nil
     private let page: PageConfiguration.AppPage = .create
+    static public let defaultTitle: String = "Descriptive job title"
 
     var body: some View {
         VStack {

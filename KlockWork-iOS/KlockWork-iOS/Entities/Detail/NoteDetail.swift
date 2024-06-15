@@ -10,13 +10,13 @@ import SwiftUI
 
 struct NoteDetail: View {
     public let note: Note
-    
+    @Binding public var isSheetPresented: Bool
     @State private var versions: [NoteVersion] = []
     @State private var current: NoteVersion? = nil
     @State private var content: String = ""
     @State private var title: String = ""
-    @State private var isSheetPresented: Bool = false
     private let page: PageConfiguration.AppPage = .create
+    static public let defaultTitle: String = "Sample Note Title"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
@@ -33,7 +33,7 @@ struct NoteDetail: View {
                             Spacer()
                         }
                         Spacer()
-                        PageActionBar.Create()
+                        PageActionBar.Create(page: self.page, isSheetPresented: $isSheetPresented)
                     }
                 }
             }
@@ -61,7 +61,7 @@ struct NoteDetail: View {
         @Binding public var isPresented: Bool
 
         var body: some View {
-            NoteDetail(note: note)
+            NoteDetail(note: note, isSheetPresented: $isPresented)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
