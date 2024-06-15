@@ -30,29 +30,33 @@ struct PageActionBar: View {
 /// An action bar meant to perform a single action
 /// @TODO: rename, this is criminal
 struct PageActionBarSingleAction: View {
-    @EnvironmentObject private var state: AppState
     public let page: PageConfiguration.AppPage
     @Binding public var isSheetPresented: Bool
+    @Binding public var job: Job?
 
     var body: some View {
         VStack {
             Button {
                 self.isSheetPresented.toggle()
             } label: {
-                HStack(alignment: .center, spacing: 10) {
-                    Spacer()
-                    Text("Save")
+                HStack(alignment: .center) {
+                    Image(systemName: "plus.circle.fill")
+                        .fontWeight(.bold)
+                        .font(.largeTitle)
+                    Text("Create note")
                         .bold()
                     Spacer()
                 }
             }
-            .padding()
-            .background(self.page.primaryColour.opacity(0.5))
-            .background(.green.opacity(0.4))
+            .padding(8)
+            .background(job?.backgroundColor.opacity(0.4))
         }
         .clipShape(.capsule(style: .continuous))
         .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)
         .padding()
-        .padding(.bottom, 50)
     }
 }
+
+//#Preview {
+//    PageActionBarSingleAction(page: .today)
+//}

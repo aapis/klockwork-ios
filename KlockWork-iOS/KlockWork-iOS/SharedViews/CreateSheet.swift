@@ -53,6 +53,7 @@ struct CreateSheet: View {
             postedDate: Date(),
             starred: false,
             title: NoteDetail.defaultTitle,
+            job: self.job,
             saveByDefault: false
         )
     }

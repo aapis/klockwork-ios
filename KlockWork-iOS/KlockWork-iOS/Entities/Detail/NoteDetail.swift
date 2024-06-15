@@ -15,50 +15,84 @@ struct NoteDetail: View {
     @State private var current: NoteVersion? = nil
     @State private var content: String = ""
     @State private var title: String = ""
+    @State private var job: Job? = nil
     private let page: PageConfiguration.AppPage = .create
     static public let defaultTitle: String = "Sample Note Title"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
             ZStack(alignment: .topLeading) {
-                RadialGradient(gradient: Gradient(colors: [.black, .clear]), center: .bottomLeading, startRadius: 0, endRadius: 400)
-                    .opacity(0.4)
+                RadialGradient(gradient: Gradient(colors: [.black, .clear]), center: .topTrailing, startRadius: 0, endRadius: 400)
+                    .opacity(0.45)
                     .blendMode(.softLight)
 
                 ZStack {
                     VStack {
-                        Editor()
+//                        if job != nil {
+                            Editor(job: $job)
+//                        }
+
                         HStack {
                             TextEditor(text: $content)
                                 .padding()
                             Spacer()
                         }
                         Spacer()
-                        PageActionBar.Create(page: self.page, isSheetPresented: $isSheetPresented)
+                        PageActionBar.Create(page: self.page, isSheetPresented: $isSheetPresented, job: $job)
                     }
                 }
             }
         }
-        .ignoresSafeArea()
         .scrollContentBackground(.hidden)
         .onAppear(perform: actionOnAppear)
         .navigationTitle(self.current != nil ? current!.title! : title)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .background(self.page.primaryColour)
-        // @TODO: delete if still commented out
-//        .toolbar {
-//            ToolbarItem {
-//                Button(action: {}) {
-//                    Label("Versions", systemImage: "questionmark.circle")
-//                }
-//            }
-//        }
+//        .scrollDismissesKeyboard(.immediately) // @TODO: remove if still commented out
     }
 
     struct Editor: View {
+        @EnvironmentObject private var state: AppState
+        @Binding public var job: Job?
+        @FetchRequest private var recentJobs: FetchedResults<Job>
+
         var body: some View {
-            Text("HI")
+            VStack {
+                HStack {
+                    Menu {
+                        Text("Choose from recently used")
+                        Divider()
+
+                        ForEach(recentJobs) { jerb in
+                            Button {
+                                job = jerb
+                            } label: {
+                                Text(jerb.title ?? jerb.jid.string)
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "hammer")
+                                .frame(maxHeight: 20)
+                            Text(self.job != nil ? "Selected: \(self.job!.title ?? self.job!.jid.string)" : "None")
+                        }
+                        .padding(14)
+                        .tint(self.job != nil ? self.job!.backgroundColor.isBright() ? Theme.base : self.state.theme.tint : self.state.theme.tint)
+                        .background(self.job != nil ? self.job!.backgroundColor : Theme.rowColour)
+                    }
+
+                    Spacer()
+                }
+                .frame(height: 50)
+            }
+            .background(Theme.textBackground)
+            .border(width: 1, edges: [.bottom], color: Theme.rowColour)
+        }
+
+        init(job: Binding<Job?>) {
+            _job = job
+            _recentJobs = CoreDataJob.fetchRecent(numDaysPrior: 7, limit: 10)
         }
     }
 
@@ -161,6 +195,10 @@ extension NoteDetail {
                 }
                 return false
             }).first
+
+            if let jerb = self.note.mJob {
+                job = jerb
+            }
 
             if let curr = current {
                 title = curr.title ?? "_NOTE_TITLE"

@@ -11,9 +11,10 @@ extension PageActionBar {
         @EnvironmentObject private var state: AppState
         public let page: PageConfiguration.AppPage
         @Binding public var isSheetPresented: Bool
+        @Binding public var job: Job?
 
         var body: some View {
-            PageActionBarSingleAction(page: self.page, isSheetPresented: $isSheetPresented)
+            PageActionBarSingleAction(page: self.page, isSheetPresented: $isSheetPresented, job: $job)
         }
     }
 }
