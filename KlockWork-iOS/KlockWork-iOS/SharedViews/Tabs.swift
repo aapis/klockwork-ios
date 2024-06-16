@@ -497,10 +497,11 @@ extension Tabs.Content {
         struct SingleNote: View {
             public let note: Note
             @State private var isSheetPresented = false
+//            private let detailPageType: PageConfiguration.AppPage = .modify
 
             var body: some View {
                 NavigationLink {
-                    NoteDetail(note: note, isSheetPresented: $isSheetPresented)
+                    NoteDetail(note: note, isSheetPresented: $isSheetPresented/*, page: self.detailPageType*/)
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {

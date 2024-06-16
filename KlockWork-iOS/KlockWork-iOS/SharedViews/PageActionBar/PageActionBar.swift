@@ -33,17 +33,19 @@ struct PageActionBarSingleAction: View {
     public let page: PageConfiguration.AppPage
     @Binding public var isSheetPresented: Bool
     @Binding public var job: Job?
+    public let onSave: () -> Void
 
     var body: some View {
         VStack {
             Button {
+                self.onSave()
                 self.isSheetPresented.toggle()
             } label: {
                 HStack(alignment: .center) {
                     Image(systemName: "plus.circle.fill")
                         .fontWeight(.bold)
                         .font(.largeTitle)
-                    Text("Create note")
+                    Text(self.page == .create ? "Create note" : "Save note")
                         .bold()
                     Spacer()
                 }

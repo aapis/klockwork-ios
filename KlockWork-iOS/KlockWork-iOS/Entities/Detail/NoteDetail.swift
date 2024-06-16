@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct NoteDetail: View {
+    @EnvironmentObject private var state: AppState
     public let note: Note
     @Binding public var isSheetPresented: Bool
     @State private var versions: [NoteVersion] = []
@@ -16,8 +17,12 @@ struct NoteDetail: View {
     @State private var content: String = ""
     @State private var title: String = ""
     @State private var job: Job? = nil
-    private let page: PageConfiguration.AppPage = .create
+    @State private var starred: Bool = false
+    @State private var postedDate: Date = Date()
+    @State private var alive: Bool = true
+    public var page: PageConfiguration.AppPage = .create
     static public let defaultTitle: String = "Sample Note Title"
+    @FocusState private var contentFieldFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
@@ -28,85 +33,143 @@ struct NoteDetail: View {
 
                 ZStack {
                     VStack {
-//                        if job != nil {
-                            Editor(job: $job)
-//                        }
-
+                        Editor(job: $job, title: $title)
                         HStack {
                             TextEditor(text: $content)
+                                .focused($contentFieldFocused)
                                 .padding()
+                                .foregroundStyle(contentFieldFocused ? .white : .gray)
                             Spacer()
                         }
                         Spacer()
-                        PageActionBar.Create(page: self.page, isSheetPresented: $isSheetPresented, job: $job)
+                        PageActionBar.Create(
+                            page: self.page,
+                            isSheetPresented: $isSheetPresented,
+                            job: $job,
+                            onSave: self.actionOnSave
+                        )
                     }
                 }
             }
         }
         .scrollContentBackground(.hidden)
-        .onAppear(perform: actionOnAppear)
-        .navigationTitle(self.current != nil ? current!.title! : title)
+        .onAppear(perform: self.actionOnAppear)
+        .navigationTitle(self.title.prefix(25))
+        .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .background(self.page.primaryColour)
-//        .scrollDismissesKeyboard(.immediately) // @TODO: remove if still commented out
     }
 
     struct Editor: View {
         @EnvironmentObject private var state: AppState
         @Binding public var job: Job?
+        @Binding public var title: String
         @FetchRequest private var recentJobs: FetchedResults<Job>
+        @State private var fromCurrentProject: [Job] = []
+        @State private var fromCurrentCompany: [Job] = []
+        @FocusState private var titleFieldFocused: Bool
 
         var body: some View {
             VStack {
                 HStack {
+                    TextField("Title", text: $title)
+                        .focused($titleFieldFocused)
+                        .padding(.leading)
+                        .foregroundStyle(titleFieldFocused ? .white : .gray)
+                    Spacer()
                     Menu {
-                        Text("Choose from recently used")
-                        Divider()
+                        // A little bit of info about the current job (title and JID)
+                        if self.job != nil {
+                            Text("Title: \((title).prefix(25))")
+                            Text("ID: \(self.job!.jid.string)")
+                            Divider()
+                        }
 
-                        ForEach(recentJobs) { jerb in
-                            Button {
-                                job = jerb
-                            } label: {
-                                Text(jerb.title ?? jerb.jid.string)
+                        if !self.recentJobs.isEmpty {
+                            Menu("Recent", systemImage: "clock") {
+                                ForEach(recentJobs) { jerb in
+                                    Button {
+                                        job = jerb
+                                    } label: {
+                                        Text(jerb.title ?? jerb.jid.string)
+                                    }
+                                }
+                            }
+                        }
+
+                        if !self.fromCurrentProject.isEmpty {
+                            Menu("From this Project", systemImage: "folder") {
+                                ForEach(fromCurrentProject) { entity in
+                                    Button {
+                                        job = entity
+                                    } label: {
+                                        Text(entity.title ?? entity.jid.string)
+                                    }
+                                }
+                            }
+                        }
+
+                        if !self.fromCurrentCompany.isEmpty {
+                            Menu("From this Company", systemImage: "building.2") {
+                                ForEach(fromCurrentCompany) { jerb in
+                                    Button {
+                                        job = jerb
+                                    } label: {
+                                        Text(jerb.title ?? jerb.jid.string)
+                                    }
+                                }
                             }
                         }
                     } label: {
                         HStack {
                             Image(systemName: "hammer")
                                 .frame(maxHeight: 20)
-                            Text(self.job != nil ? "Selected: \(self.job!.title ?? self.job!.jid.string)" : "None")
                         }
                         .padding(14)
                         .tint(self.job != nil ? self.job!.backgroundColor.isBright() ? Theme.base : self.state.theme.tint : self.state.theme.tint)
                         .background(self.job != nil ? self.job!.backgroundColor : Theme.rowColour)
                     }
-
-                    Spacer()
                 }
                 .frame(height: 50)
             }
             .background(Theme.textBackground)
             .border(width: 1, edges: [.bottom], color: Theme.rowColour)
+            .onChange(of: self.job) {
+                self.populateJobSelector()
+            }
+            .onAppear(perform: self.populateJobSelector)
         }
 
-        init(job: Binding<Job?>) {
+        init(job: Binding<Job?>, title: Binding<String>) {
             _job = job
-            _recentJobs = CoreDataJob.fetchRecent(numDaysPrior: 7, limit: 10)
+            _title = title
+            _recentJobs = CoreDataJob.fetchRecent(numDaysPrior: 7, limit: 7)
         }
     }
 
     struct Sheet: View {
         public let note: Note
-        public var currentVersion: NoteVersion? = nil
         @Binding public var isPresented: Bool
+        @State private var starred: Bool = false
+        @State private var alive: Bool = true
+        @State private var lastUpdate: Date = Date()
+        @State private var versionTitle: String = ""
+        @State private var versionCreatedDate: Date = Date()
+        @State private var versionSource: SaveSource = .manual
+        private let detailPageType: PageConfiguration.AppPage = .modify
 
         var body: some View {
-            NoteDetail(note: note, isSheetPresented: $isPresented)
+            NoteDetail(note: note, isSheetPresented: $isPresented, page: self.detailPageType)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
-                        MetaData(note: note, version: self.currentVersion)
+                        MetaData(
+                            starred: $starred,
+                            alive: $alive,
+                            lastUpdate: $lastUpdate,
+                            created: $versionCreatedDate
+                        )
                     } label: {
                         HStack(spacing: 5) {
                             Text("More")
@@ -124,50 +187,53 @@ struct NoteDetail: View {
 
             let versions = note.versions!.allObjects as! [NoteVersion]
             if let version = versions.sorted(by: {$0.created! < $1.created!}).first {
-                self.currentVersion = version
+                starred = version.starred
+                versionTitle = version.title ?? "_NOTE_VERSION_TITLE"
+                versionCreatedDate = version.created!
+                lastUpdate = note.lastUpdate ?? Date()
+//                versionSource = version.source
+            }
+
+            if versionTitle.isEmpty {
+                if note.title != nil {
+                    self.versionTitle = note.title!
+                }
+            }
+
+            if note.postedDate != nil {
+                versionCreatedDate = note.postedDate!
             }
         }
     }
 
     struct MetaData: View {
-        public let note: Note
-        public let version: NoteVersion?
         private let page: PageConfiguration.AppPage = .create
-        @State private var starred: Bool = false
-        @State private var alive: Bool = true
-        @State private var lastUpdate: Date = Date()
-        @State private var versionTitle: String = ""
-        @State private var versionCreatedDate: Date = Date()
-        @State private var versionSource: SaveSource = .manual
+        @Binding public var starred: Bool
+        @Binding public var alive: Bool
+        @Binding public var lastUpdate: Date
+        @Binding public var created: Date
+//        @Binding public var source: SaveSource = .manual
 
         var body: some View {
             VStack {
                 List {
                     Section("Settings") {
                         Toggle("Published", isOn: $alive)
+                        Toggle("Favourite", isOn: $starred)
 
-                        if version != nil {
-                            DatePicker(
-                                "Created",
-                                selection: $versionCreatedDate,
-                                displayedComponents: [.date, .hourAndMinute]
-                            )
+                        DatePicker(
+                            "Created",
+                            selection: $created,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
 
-                            DatePicker(
-                                "Last Updated",
-                                selection: $lastUpdate,
-                                displayedComponents: [.date, .hourAndMinute]
-                            )
-                        }
+                        DatePicker(
+                            "Last Updated",
+                            selection: $lastUpdate,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
                     }
                     .listRowBackground(Theme.textBackground)
-
-                    if version != nil {
-                        Section("Title") {
-                            TextField("Title", text: $versionTitle)
-                        }
-                        .listRowBackground(Theme.textBackground)
-                    }
                 }
                 .listStyle(.grouped)
             }
@@ -177,7 +243,6 @@ struct NoteDetail: View {
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollContentBackground(.hidden)
-            .onAppear(perform: self.actionOnAppear)
         }
     }
 }
@@ -187,36 +252,69 @@ extension NoteDetail {
     /// Onload handler. Gets the latest version of the note and populates the title field
     /// - Returns: Void
     private func actionOnAppear() -> Void {
+        self.title = self.note.title ?? "_NOTE_TITLE"
+        self.starred = self.note.starred
+        self.postedDate = self.note.postedDate ?? Date()
+        self.alive = self.note.alive
+        self.content = self.note.body ?? "_NOTE_CONTENT"
+        if let jerb = self.note.mJob {
+            self.job = jerb
+        }
+
         if let vers = note.versions {
-            versions = vers.allObjects as! [NoteVersion]
-            current = versions.sorted(by: {
+            self.versions = vers.allObjects as! [NoteVersion]
+            self.current = versions.sorted(by: {
                 if $0.created != nil && $1.created != nil {
                     return $0.created! < $1.created!
                 }
                 return false
             }).first
 
-            if let jerb = self.note.mJob {
-                job = jerb
+            if let current = self.current {
+                self.title = current.title ?? "_NOTE_TITLE"
+                self.content = current.content ?? "_NOTE_CONTENT"
             }
-
-            if let curr = current {
-                title = curr.title ?? "_NOTE_TITLE"
-                content = curr.content ?? "_NOTE_CONTENT"
-            }
-        } else if let body = note.body {
-            title = note.title ?? "_NOTE_TITLE"
-            content = body
         }
+    }
+    
+    /// Save a new version
+    /// - Returns: Void
+    private func actionOnSave() -> Void {
+        self.note.title = self.title
+        self.note.starred = self.starred
+        self.note.postedDate = self.postedDate
+        self.note.alive = self.alive
+        self.note.lastUpdate = Date()
+        if let job = self.job {
+            self.note.mJob = job
+        }
+        self.note.addToVersions(
+            CoreDataNoteVersions(moc: self.state.moc).from(self.note, source: .manual)
+        )
+        print("DERPO saving note")
+//        PersistenceController.shared.save()
     }
 }
 
-extension NoteDetail.MetaData {
-    /// Onload handler. Sets all the required fields
+extension NoteDetail.Editor {
+    /// Find related jobs for a given Job
     /// - Returns: Void
-    public func actionOnAppear() -> Void {
-        self.alive = self.note.alive
-        self.versionCreatedDate = self.version!.created!
-        self.versionTitle = self.version!.title!
+    private func populateJobSelector() -> Void {
+        self.fromCurrentProject = []
+        self.fromCurrentCompany = []
+
+        if let job = self.job {
+            if let project = job.project {
+                self.fromCurrentProject.append(
+                    contentsOf: CoreDataJob(moc: self.state.moc).byProject(project)
+                )
+
+                if let company = project.company {
+                    self.fromCurrentCompany.append(
+                        contentsOf: CoreDataJob(moc: self.state.moc).byCompany(company)
+                    )
+                }
+            }
+        }
     }
 }

@@ -10,12 +10,13 @@ import SwiftUI
 
 struct Notes: View {
     typealias EntityType = PageConfiguration.EntityType
-
-    private let entityType: EntityType = .notes
-    @State public var items: [Note] = []
-    @State private var isSheetPresented: Bool = false
+    typealias PageType = PageConfiguration.AppPage
 
     @EnvironmentObject private var state: AppState
+    private let entityType: EntityType = .notes
+    private let detailPageType: PageType = .modify
+    @State public var items: [Note] = []
+    @State private var isSheetPresented: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -29,7 +30,7 @@ struct Notes: View {
                     if items.count > 0 {
                         ForEach(items) { item in
                             NavigationLink {
-                                NoteDetail(note: item, isSheetPresented: $isSheetPresented)
+                                NoteDetail(note: item, isSheetPresented: $isSheetPresented, page: self.detailPageType)
                             } label: {
                                 Text(item.title!.capitalized)
                             }
@@ -58,9 +59,35 @@ struct Notes: View {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: addItem) {
+                    Button(action: self.toggleCreateSheet) {
                         Label("Add Item", systemImage: "plus")
                     }
+                }
+            }
+            .sheet(isPresented: $isSheetPresented) {
+                if let defaultCompany = CoreDataCompanies(moc: self.state.moc).findDefault() {
+                    let projects = defaultCompany.projects!.allObjects as! [Project]
+                    if let _ = projects.first {
+                        NavigationStack {
+                            NoteDetail.Sheet(
+                                note: CoreDataNotes(moc: self.state.moc).createAndReturn(
+                                    alive: true,
+                                    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae enim ut elit vestibulum fringilla.",
+                                    lastUpdate: Date(),
+                                    postedDate: Date(),
+                                    starred: false,
+                                    title: NoteDetail.defaultTitle,
+                                    job: DefaultObjects.job,
+                                    saveByDefault: false
+                                ),
+                                isPresented: $isSheetPresented
+                            )
+                        }
+                    } else {
+                        ErrorView.MissingProject(isPresented: $isSheetPresented)
+                    }
+                } else {
+                    ErrorView.MissingCompany(isPresented: $isSheetPresented)
                 }
             }
         }
@@ -68,6 +95,12 @@ struct Notes: View {
 }
 
 extension Notes {
+    /// Shows or hides the create job sheet
+    /// - Returns: Void
+    private func toggleCreateSheet() -> Void {
+        self.isSheetPresented.toggle()
+    }
+
     private func addItem() {
         withAnimation {
             let newItem = Item(timestamp: Date())

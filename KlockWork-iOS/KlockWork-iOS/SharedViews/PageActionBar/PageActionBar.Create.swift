@@ -12,9 +12,10 @@ extension PageActionBar {
         public let page: PageConfiguration.AppPage
         @Binding public var isSheetPresented: Bool
         @Binding public var job: Job?
+        public let onSave: () -> Void
 
         var body: some View {
-            PageActionBarSingleAction(page: self.page, isSheetPresented: $isSheetPresented, job: $job)
+            PageActionBarSingleAction(page: self.page, isSheetPresented: $isSheetPresented, job: $job, onSave: self.onSave)
         }
     }
 }
