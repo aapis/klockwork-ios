@@ -14,9 +14,9 @@ struct CreateSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .center, spacing: 30) {
-                PageLink(label: "Job", target: AnyView(JobDetail.Sheet(job: DefaultObjects.job, isPresented: $isPresented)), page: self.page)
-                PageLink(label: "Task", target: AnyView(TaskDetail.Sheet(task: DefaultObjects.task, isPresented: $isPresented)), page: self.page)
-                PageLink(label: "Note", target: AnyView(NoteDetail.Sheet(note: DefaultObjects.note, isPresented: $isPresented)), page: self.page)
+                PageLink(label: "Job", target: AnyView(JobDetail.Sheet(isPresented: $isPresented)), page: self.page)
+                PageLink(label: "Task", target: AnyView(TaskDetail.Sheet(isPresented: $isPresented)), page: self.page)
+                PageLink(label: "Note", target: AnyView(NoteDetail.Sheet(isPresented: $isPresented)), page: self.page)
             }
         }
         .presentationBackground(self.page.primaryColour)
@@ -47,11 +47,3 @@ struct CreateSheet: View {
 //#Preview {
 //    CreateSheet()
 //}
-
-struct ContainerView<Content: View>: View {
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        content
-    }
-}

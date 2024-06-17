@@ -55,7 +55,7 @@ struct NoteDetail: View {
         .background(self.page.primaryColour)
         .scrollContentBackground(.hidden)
         .onAppear(perform: self.actionOnAppear)
-        .navigationTitle(self.title.prefix(25))
+        .navigationTitle(title.prefix(25))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
@@ -126,12 +126,12 @@ struct NoteDetail: View {
                         }
                     } label: {
                         HStack {
-                            Image(systemName: "hammer")
+                            Image(systemName: self.job != nil ? "hammer.fill" : "hammer")
                                 .frame(maxHeight: 20)
                         }
                         .padding(14)
-                        .tint(self.job != nil ? self.job!.backgroundColor.isBright() ? Theme.base : self.state.theme.tint : self.state.theme.tint)
-                        .background(self.job != nil ? self.job!.backgroundColor : Theme.rowColour)
+                        .tint(self.job != nil ? self.job!.backgroundColor.isBright() ? Theme.base : self.state.theme.tint : .white)
+                        .background(self.job != nil ? self.job!.backgroundColor : .red)
                     }
                 }
                 .frame(height: 50)
@@ -152,7 +152,7 @@ struct NoteDetail: View {
     }
 
     struct Sheet: View {
-        public let note: Note
+        public var note: Note
         public var page: PageConfiguration.AppPage = .modify
         @Binding public var isPresented: Bool
         @State private var starred: Bool = false
@@ -184,28 +184,32 @@ struct NoteDetail: View {
                 }
         }
 
-        init(note: Note, page: PageConfiguration.AppPage = .create, isPresented: Binding<Bool>) {
-            self.note = note
+        init(note: Note? = nil, page: PageConfiguration.AppPage = .create, isPresented: Binding<Bool>) {
+            if note == nil {
+                self.note = DefaultObjects.note
+            } else {
+                self.note = note!
+            }
+
             self.page = page
             _isPresented = isPresented
 
-            let versions = note.versions!.allObjects as! [NoteVersion]
+            let versions = self.note.versions!.allObjects as! [NoteVersion]
             if let version = versions.sorted(by: {$0.created! < $1.created!}).first {
                 starred = version.starred
                 versionTitle = version.title ?? "_NOTE_VERSION_TITLE"
                 versionCreatedDate = version.created!
-                lastUpdate = note.lastUpdate ?? Date()
-//                versionSource = version.source
+                lastUpdate = self.note.lastUpdate ?? Date()
             }
 
             if versionTitle.isEmpty {
-                if note.title != nil {
-                    self.versionTitle = note.title!
+                if self.note.title != nil {
+                    versionTitle = self.note.title!
                 }
             }
 
-            if note.postedDate != nil {
-                versionCreatedDate = note.postedDate!
+            if self.note.postedDate != nil {
+                versionCreatedDate = self.note.postedDate!
             }
         }
     }
@@ -216,7 +220,6 @@ struct NoteDetail: View {
         @Binding public var alive: Bool
         @Binding public var lastUpdate: Date
         @Binding public var created: Date
-//        @Binding public var source: SaveSource = .manual
 
         var body: some View {
             VStack {
@@ -272,10 +275,9 @@ extension NoteDetail {
                     return $0.created! < $1.created!
                 }
                 return false
-            }).first
+            }).last
 
             if let current = self.current {
-                self.title = current.title ?? "_NOTE_TITLE"
                 self.content = current.content ?? "_NOTE_CONTENT"
             }
         }
@@ -289,13 +291,15 @@ extension NoteDetail {
         self.note.postedDate = self.postedDate
         self.note.alive = self.alive
         self.note.lastUpdate = Date()
+        self.note.body = self.content
         if let job = self.job {
             self.note.mJob = job
         }
+
         self.note.addToVersions(
             CoreDataNoteVersions(moc: self.state.moc).from(self.note, source: .manual)
         )
-//        print("DERPO saving note")
+
         PersistenceController.shared.save()
     }
 }

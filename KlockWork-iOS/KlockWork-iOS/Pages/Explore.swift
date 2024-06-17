@@ -27,6 +27,7 @@ struct Explore: View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
                 Header()
+                Divider().background(.white).frame(height: 1)
                 Widgets(text: $searchText)
             }
             .navigationBarTitleDisplayMode(.inline)

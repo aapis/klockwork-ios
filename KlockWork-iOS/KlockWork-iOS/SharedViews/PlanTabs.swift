@@ -62,7 +62,7 @@ struct PlanTabs: View {
         }
         .background(.clear)
         .onChange(of: job) {
-            withAnimation(.easeIn(duration: Tabs.animationDuration)) {
+            withAnimation(.bouncy(duration: Tabs.animationDuration)) {
                 selected = .daily
             }
         }
@@ -106,7 +106,7 @@ extension PlanTabs {
                 ForEach(PlanType.allCases, id: \.self) { page in
                     VStack {
                         Button {
-                            withAnimation(.easeIn(duration: Tabs.animationDuration)) {
+                            withAnimation(.bouncy(duration: Tabs.animationDuration)) {
                                 selected = page
                             }
                         } label: {
@@ -536,6 +536,7 @@ extension PlanTabs {
                 .padding()
                 .background(Theme.textBackground)
                 .clipShape(.rect(cornerRadius: 16))
+                Spacer()
             }
             .padding()
         }

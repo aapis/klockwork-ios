@@ -70,16 +70,6 @@ struct Notes: View {
                     if let _ = projects.first {
                         NavigationStack {
                             NoteDetail.Sheet(
-                                note: CoreDataNotes(moc: self.state.moc).createAndReturn(
-                                    alive: true,
-                                    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae enim ut elit vestibulum fringilla.",
-                                    lastUpdate: Date(),
-                                    postedDate: Date(),
-                                    starred: false,
-                                    title: NoteDetail.defaultTitle,
-                                    job: DefaultObjects.job,
-                                    saveByDefault: false
-                                ),
                                 page: self.detailPageType,
                                 isPresented: $isPresented
                             )

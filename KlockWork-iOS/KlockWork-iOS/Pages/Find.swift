@@ -18,6 +18,8 @@ struct Find: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 Header(text: $text, recentSearchTerms: $recentSearchTerms, onSubmit: self.actionOnSubmit)
+                Divider().background(.white).frame(height: 1)
+
                 ZStack(alignment: .bottomLeading) {
                     if !text.isEmpty {
                         Rows(

@@ -10,7 +10,6 @@ import SwiftUI
 
 struct TaskDetail: View {
     public let task: LogTask
-
     @State private var completedDate: Date = Date()
     @State private var cancelledDate: Date = Date()
     @State private var content: String = ""
@@ -100,6 +99,16 @@ struct TaskDetail: View {
             .toolbarBackground(.visible, for: .navigationBar)
         }
     }
+    
+    /// Default initializer
+    /// - Parameter task: LogTask
+    init(task: LogTask? = nil) {
+        if task == nil {
+            self.task = DefaultObjects.task
+        } else {
+            self.task = task!
+        }
+    }
 }
 
 extension TaskDetail {
@@ -125,7 +134,7 @@ extension TaskDetail {
 
 extension TaskDetail {
     struct Sheet: View {
-        public let task: LogTask
+        public var task: LogTask? = nil
         public var page: PageConfiguration.AppPage = .create
         @Binding public var isPresented: Bool
 

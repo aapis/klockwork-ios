@@ -49,7 +49,7 @@ struct Tabs: View {
         }
         .background(.clear)
         .onChange(of: job) {
-            withAnimation(.easeIn(duration: Tabs.animationDuration)) {
+            withAnimation(.bouncy(duration: Tabs.animationDuration)) {
                 selected = .records
             }
         }
@@ -90,23 +90,15 @@ extension Tabs {
                 ForEach(EntityType.allCases, id: \.self) { page in
                     VStack {
                         Button {
-                            withAnimation(.easeIn(duration: Tabs.animationDuration)) {
+                            withAnimation(.bouncy(duration: Tabs.animationDuration)) {
                                 selected = page
                             }
                         } label: {
-                            if page != .jobs {
-                                page.icon
+                            (page == selected ? page.selectedIcon : page.icon)
                                 .frame(maxHeight: 20)
                                 .padding(14)
                                 .background(page == selected ? .white : .clear)
                                 .foregroundStyle(page == selected ? Theme.cPurple : .gray)
-                            } else {
-                                page.icon
-                                    .frame(maxHeight: 20)
-                                .padding(14)
-                                .background(job == nil && !inSheet ? .red : page == selected ? .white : .clear) // sorry
-                                .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? (inSheet ? .gray : .white) : .gray) // sorry
-                            }
                         }
                         .buttonStyle(.plain)
                     }
@@ -194,11 +186,7 @@ extension Tabs.Content {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         if items.count > 0 {
                             ForEach(items) { jerb in
-                                if self.inSheet {
-                                    Individual.SingleJobLink(job: jerb)
-                                } else {
-                                    Individual.SingleJob(job: jerb, stateJob: $job)
-                                }
+                                Individual.SingleJobLink(job: jerb)
                             }
                         } else {
                             StatusMessage.Warning(message: "No jobs modified within the last 7 days")

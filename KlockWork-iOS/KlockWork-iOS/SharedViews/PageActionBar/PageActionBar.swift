@@ -51,7 +51,7 @@ struct PageActionBarSingleAction: View {
                 }
             }
             .padding(8)
-            .background(job?.backgroundColor.opacity(0.4))
+            .background((job?.backgroundColor ?? self.page.primaryColour).opacity(0.4))
         }
         .clipShape(.capsule(style: .continuous))
         .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)

@@ -75,20 +75,9 @@ struct Jobs: View {
             .sheet(isPresented: $isCreateEditorPresented) {
                 if let defaultCompany = CoreDataCompanies(moc: self.state.moc).findDefault() {
                     let projects = defaultCompany.projects!.allObjects as! [Project]
-                    if let project = projects.first {
+                    if let _ = projects.first {
                         NavigationStack {
                             JobDetail.Sheet(
-                                job: CoreDataJob(moc: self.state.moc).createAndReturn(
-                                    alive: true,
-                                    colour: Color.randomStorable(),
-                                    jid: 0.0,
-                                    overview: "I'm the overview, edit me",
-                                    shredable: false,
-                                    title: JobDetail.defaultTitle,
-                                    uri: "https://",
-                                    project: project,
-                                    saveByDefault: false
-                                ),
                                 standalone: true,
                                 isPresented: $isCreateEditorPresented
                             )

@@ -97,22 +97,12 @@ extension ErrorView {
     struct MissingProject: View {
         @EnvironmentObject private var state: AppState
         @Binding public var isPresented: Bool
-        private var project: Project {
-            return CoreDataProjects(moc: self.state.moc).createAndReturn(
-                name: "A Really Good Project Name",
-                abbreviation: "ARGPN",
-                colour: Color.random().toStored(),
-                created: Date(),
-                pid: 1,
-                saveByDefault: false
-            )
-        }
 
         var body: some View {
             PresentableErrorView(
                 icon: "square.3.layers.3d.slash",
                 message: "You need to create a Project first",
-                redirectTarget: AnyView(ProjectDetail(project: self.project)),
+                redirectTarget: AnyView(ProjectDetail(project: DefaultObjects.project)),
                 isPresented: $isPresented
             )
         }
@@ -121,23 +111,12 @@ extension ErrorView {
     struct MissingCompany: View {
         @EnvironmentObject private var state: AppState
         @Binding public var isPresented: Bool
-        private var company: Company {
-            return CoreDataCompanies(moc: self.state.moc).createAndReturn(
-                name: "Initech Inc",
-                abbreviation: "II",
-                colour: Color.randomStorable(),
-                created: Date(),
-                isDefault: false,
-                pid: 2,
-                saveByDefault: false
-            )
-        }
 
         var body: some View {
             PresentableErrorView(
                 icon: "square.3.layers.3d.slash",
                 message: "You need to create a Company and a Project first",
-                redirectTarget: AnyView(CompanyDetail(company: self.company)),
+                redirectTarget: AnyView(CompanyDetail(company: DefaultObjects.company)),
                 isPresented: $isPresented
             )
         }

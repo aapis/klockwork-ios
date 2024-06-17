@@ -86,6 +86,18 @@ extension PageConfiguration {
             case .projects: Image(systemName: "folder")
             }
         }
+
+        var selectedIcon: Image {
+            switch self {
+            case .records: Image(systemName: "tray.fill")
+            case .jobs: Image(systemName: "hammer.fill")
+            case .tasks: Image(systemName: "checklist")
+            case .notes: Image(systemName: "note.text")
+            case .companies: Image(systemName: "building.2.fill")
+            case .people: Image(systemName: "person.2.fill")
+            case .projects: Image(systemName: "folder.fill")
+            }
+        }
     }
     
     enum AppPage: CaseIterable, Equatable {

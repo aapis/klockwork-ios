@@ -10,7 +10,7 @@ import SwiftUI
 
 struct JobDetail: View {
     public let job: Job
-
+    public var page: PageConfiguration.AppPage = .create
     @State private var alive: Bool = false
     @State private var colour: Color = .clear
     @State private var company: Company? = nil
@@ -22,7 +22,6 @@ struct JobDetail: View {
     @State private var title: String = ""
     @State private var url: String = "https://"
     @State private var project: Project? = nil
-    public var page: PageConfiguration.AppPage = .create
     static public let defaultTitle: String = "Descriptive job title"
 
     var body: some View {
@@ -95,6 +94,16 @@ struct JobDetail: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .scrollDismissesKeyboard(.immediately)
     }
+    
+    /// Default initializer
+    /// - Parameter job: Job
+    init(job: Job? = nil) {
+        if job == nil {
+            self.job = DefaultObjects.job
+        } else {
+            self.job = job!
+        }
+    }
 }
 
 extension JobDetail {
@@ -125,7 +134,7 @@ extension JobDetail {
 
 extension JobDetail {
     struct Sheet: View {
-        public let job: Job
+        public var job: Job? = nil
         public var page: PageConfiguration.AppPage = .create
         public var standalone: Bool = false
         @Binding public var isPresented: Bool

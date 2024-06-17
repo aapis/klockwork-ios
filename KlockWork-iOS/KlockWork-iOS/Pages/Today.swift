@@ -27,7 +27,7 @@ struct Today: View {
                 if !inSheet {
                     Header(page: self.page)
                 }
-
+                Divider().background(.white).frame(height: 1)
                 ZStack(alignment: .bottomLeading) {
                     Tabs(inSheet: inSheet, job: $job, selected: $selected)
                     if !inSheet {
@@ -111,6 +111,7 @@ extension Today {
             }
             .sheet(isPresented: $isCreateSheetPresented) {
                 CreateSheet(isPresented: $isCreateSheetPresented)
+                    .onDisappear(perform: self.actionOnCreateSheetDismissed)
             }
         }
     }
@@ -142,6 +143,14 @@ extension Today {
         if self.job != nil {
             self.textFieldActive = true
         }
+    }
+}
+
+extension Today.Header {
+    /// Callback that fires when the CreateSheet disappears
+    /// - Returns: Void
+    private func actionOnCreateSheetDismissed() -> Void {
+        DefaultObjects.deleteDefaultJobs()
     }
 }
 
