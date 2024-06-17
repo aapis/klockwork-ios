@@ -15,7 +15,7 @@ extension PageActionBar {
         @Binding public var selectedNotes: [Note]
         @Binding public var selectedProjects: [Project]
         @Binding public var selectedCompanies: [Company]
-        @Binding public var isSheetPresented: Bool
+        @Binding public var isPresented: Bool
         @State private var plan: Plan? = nil
         @State private var id: UUID = UUID()
 
@@ -23,10 +23,10 @@ extension PageActionBar {
             PageActionBar(
                 groupView: AnyView(Group),
                 sheetView: AnyView(
-                    Widget.JobSelector.Multi(showing: $isSheetPresented, selectedJobs: $selectedJobs)
+                    Widget.JobSelector.Multi(showing: $isPresented, selectedJobs: $selectedJobs)
                         .presentationBackground(Theme.cOrange)
                 ),
-                isSheetPresented: $isSheetPresented
+                isPresented: $isPresented
             )
             .id(self.id)
             .onChange(of: self.selectedJobs) { // sheet/group view are essentially static unless we manually refresh them, @TODO: fix this
@@ -48,7 +48,7 @@ extension PageActionBar {
 
         @ViewBuilder var AddButton: some View {
             Button {
-                self.isSheetPresented.toggle()
+                self.isPresented.toggle()
             } label: {
                 HStack(alignment: .center) {
                     Image(systemName: "chevron.up.circle.fill")

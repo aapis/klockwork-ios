@@ -12,7 +12,7 @@ struct PageActionBar: View {
     @Environment(\.managedObjectContext) var moc
     @State public var groupView: AnyView? = AnyView(EmptyView())
     @State public var sheetView: AnyView? = AnyView(EmptyView())
-    @Binding public var isSheetPresented: Bool
+    @Binding public var isPresented: Bool
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -21,7 +21,7 @@ struct PageActionBar: View {
         .clipShape(.capsule(style: .continuous))
         .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)
         .padding()
-        .sheet(isPresented: $isSheetPresented) {
+        .sheet(isPresented: $isPresented) {
             sheetView
         }
     }
@@ -31,7 +31,7 @@ struct PageActionBar: View {
 /// @TODO: rename, this is criminal
 struct PageActionBarSingleAction: View {
     public let page: PageConfiguration.AppPage
-    @Binding public var isSheetPresented: Bool
+    @Binding public var isPresented: Bool
     @Binding public var job: Job?
     public let onSave: () -> Void
 
@@ -39,13 +39,13 @@ struct PageActionBarSingleAction: View {
         VStack {
             Button {
                 self.onSave()
-                self.isSheetPresented.toggle()
+                self.isPresented.toggle()
             } label: {
                 HStack(alignment: .center) {
                     Image(systemName: "plus.circle.fill")
                         .fontWeight(.bold)
                         .font(.largeTitle)
-                    Text(self.page == .create ? "Create note" : "Save note")
+                    Text("Save note")
                         .bold()
                     Spacer()
                 }

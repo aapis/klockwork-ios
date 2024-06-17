@@ -10,7 +10,6 @@ struct CreateSheet: View {
     @EnvironmentObject private var state: AppState
     public let page: PageConfiguration.AppPage = .intersitial
     @Binding public var isPresented: Bool
-    
 
     var body: some View {
         NavigationStack {

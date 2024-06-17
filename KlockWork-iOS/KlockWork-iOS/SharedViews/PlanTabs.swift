@@ -218,7 +218,7 @@ extension PlanTabs {
                         selectedNotes: $selectedNotes,
                         selectedProjects: $selectedProjects,
                         selectedCompanies: $selectedCompanies,
-                        isSheetPresented: $isJobSelectorPresent
+                        isPresented: $isJobSelectorPresent
                     )
                 }
             }

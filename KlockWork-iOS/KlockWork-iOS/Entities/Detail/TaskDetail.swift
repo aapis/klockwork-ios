@@ -19,7 +19,7 @@ struct TaskDetail: View {
     @State private var job: Job?
     @State private var isCompleted: Bool = false
     @State private var isCancelled: Bool = false
-    private let page: PageConfiguration.AppPage = .create
+    public var page: PageConfiguration.AppPage = .create
     static public let defaultContent: String = "Sample task content"
 
     var body: some View {
@@ -126,6 +126,7 @@ extension TaskDetail {
 extension TaskDetail {
     struct Sheet: View {
         public let task: LogTask
+        public var page: PageConfiguration.AppPage = .create
         @Binding public var isPresented: Bool
 
         var body: some View {

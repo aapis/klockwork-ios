@@ -16,7 +16,7 @@ struct Notes: View {
     private let entityType: EntityType = .notes
     private let detailPageType: PageType = .modify
     @State public var items: [Note] = []
-    @State private var isSheetPresented: Bool = false
+    @State private var isPresented: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -30,7 +30,7 @@ struct Notes: View {
                     if items.count > 0 {
                         ForEach(items) { item in
                             NavigationLink {
-                                NoteDetail(note: item, isSheetPresented: $isSheetPresented, page: self.detailPageType)
+                                NoteDetail(note: item, isPresented: $isPresented, page: self.detailPageType)
                             } label: {
                                 Text(item.title!.capitalized)
                             }
@@ -64,7 +64,7 @@ struct Notes: View {
                     }
                 }
             }
-            .sheet(isPresented: $isSheetPresented) {
+            .sheet(isPresented: $isPresented) {
                 if let defaultCompany = CoreDataCompanies(moc: self.state.moc).findDefault() {
                     let projects = defaultCompany.projects!.allObjects as! [Project]
                     if let _ = projects.first {
@@ -80,14 +80,15 @@ struct Notes: View {
                                     job: DefaultObjects.job,
                                     saveByDefault: false
                                 ),
-                                isPresented: $isSheetPresented
+                                page: self.detailPageType,
+                                isPresented: $isPresented
                             )
                         }
                     } else {
-                        ErrorView.MissingProject(isPresented: $isSheetPresented)
+                        ErrorView.MissingProject(isPresented: $isPresented)
                     }
                 } else {
-                    ErrorView.MissingCompany(isPresented: $isSheetPresented)
+                    ErrorView.MissingCompany(isPresented: $isPresented)
                 }
             }
         }
@@ -98,7 +99,7 @@ extension Notes {
     /// Shows or hides the create job sheet
     /// - Returns: Void
     private func toggleCreateSheet() -> Void {
-        self.isSheetPresented.toggle()
+        self.isPresented.toggle()
     }
 
     private func addItem() {

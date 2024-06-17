@@ -496,20 +496,27 @@ extension Tabs.Content {
 
         struct SingleNote: View {
             public let note: Note
+            private let page: PageConfiguration.AppPage = .modify
             @State private var isSheetPresented = false
-//            private let detailPageType: PageConfiguration.AppPage = .modify
 
             var body: some View {
                 NavigationLink {
-                    NoteDetail(note: note, isSheetPresented: $isSheetPresented/*, page: self.detailPageType*/)
-                        .background(Theme.cPurple)
-                        .scrollContentBackground(.hidden)
+                    NoteDetail.Sheet(note: note, page: self.page, isPresented: $isSheetPresented)
                 } label: {
                     ListRow(
                         name: note.title ?? "_NOTE_TITLE",
-                        colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour
+                        colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour,
+                        extraColumn: AnyView(VersionCountBadge)
                     )
                 }
+            }
+
+            @ViewBuilder private var VersionCountBadge: some View {
+                Text(String(note.versions?.count ?? 0))
+                    .padding(8)
+                    .foregroundStyle(.white)
+                    .background(Theme.base.opacity(0.2))
+                    .clipShape(.circle)
             }
         }
 

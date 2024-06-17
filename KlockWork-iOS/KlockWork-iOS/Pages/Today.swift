@@ -17,7 +17,7 @@ struct Today: View {
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
     @State private var jobs: [Job] = []
-    @State private var isSheetPresented: Bool = false
+    @State private var isPresented: Bool = false
     @FocusState private var textFieldActive: Bool
     private let page: PageConfiguration.AppPage = .today
 
@@ -31,7 +31,7 @@ struct Today: View {
                 ZStack(alignment: .bottomLeading) {
                     Tabs(inSheet: inSheet, job: $job, selected: $selected)
                     if !inSheet {
-                        PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
+                        PageActionBar.Today(job: $job, isPresented: $isPresented)
                         if job != nil {
                             LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                                 .frame(height: 50)

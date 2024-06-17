@@ -11,7 +11,7 @@ import SwiftUI
 struct NoteDetail: View {
     @EnvironmentObject private var state: AppState
     public let note: Note
-    @Binding public var isSheetPresented: Bool
+    @Binding public var isPresented: Bool
     @State private var versions: [NoteVersion] = []
     @State private var current: NoteVersion? = nil
     @State private var content: String = ""
@@ -44,7 +44,7 @@ struct NoteDetail: View {
                         Spacer()
                         PageActionBar.Create(
                             page: self.page,
-                            isSheetPresented: $isSheetPresented,
+                            isPresented: $isPresented,
                             job: $job,
                             onSave: self.actionOnSave
                         )
@@ -52,13 +52,16 @@ struct NoteDetail: View {
                 }
             }
         }
+        .background(self.page.primaryColour)
         .scrollContentBackground(.hidden)
         .onAppear(perform: self.actionOnAppear)
         .navigationTitle(self.title.prefix(25))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        .background(self.page.primaryColour)
+        .onChange(of: title) {
+            self.note.title =  title
+        }
     }
 
     struct Editor: View {
@@ -150,6 +153,7 @@ struct NoteDetail: View {
 
     struct Sheet: View {
         public let note: Note
+        public var page: PageConfiguration.AppPage = .modify
         @Binding public var isPresented: Bool
         @State private var starred: Bool = false
         @State private var alive: Bool = true
@@ -157,32 +161,32 @@ struct NoteDetail: View {
         @State private var versionTitle: String = ""
         @State private var versionCreatedDate: Date = Date()
         @State private var versionSource: SaveSource = .manual
-        private let detailPageType: PageConfiguration.AppPage = .modify
 
         var body: some View {
-            NoteDetail(note: note, isSheetPresented: $isPresented, page: self.detailPageType)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        MetaData(
-                            starred: $starred,
-                            alive: $alive,
-                            lastUpdate: $lastUpdate,
-                            created: $versionCreatedDate
-                        )
-                    } label: {
-                        HStack(spacing: 5) {
-                            Text("More")
-                            Image(systemName: "chevron.right")
-                                .font(.headline)
+            NoteDetail(note: note, isPresented: $isPresented, page: self.page)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            MetaData(
+                                starred: $starred,
+                                alive: $alive,
+                                lastUpdate: $lastUpdate,
+                                created: $versionCreatedDate
+                            )
+                        } label: {
+                            HStack(spacing: 5) {
+                                Text("More")
+                                Image(systemName: "chevron.right")
+                                    .font(.headline)
+                            }
                         }
                     }
                 }
-            }
         }
 
-        init(note: Note, isPresented: Binding<Bool>) {
+        init(note: Note, page: PageConfiguration.AppPage = .create, isPresented: Binding<Bool>) {
             self.note = note
+            self.page = page
             _isPresented = isPresented
 
             let versions = note.versions!.allObjects as! [NoteVersion]
@@ -291,8 +295,8 @@ extension NoteDetail {
         self.note.addToVersions(
             CoreDataNoteVersions(moc: self.state.moc).from(self.note, source: .manual)
         )
-        print("DERPO saving note")
-//        PersistenceController.shared.save()
+//        print("DERPO saving note")
+        PersistenceController.shared.save()
     }
 }
 

@@ -22,7 +22,7 @@ struct JobDetail: View {
     @State private var title: String = ""
     @State private var url: String = "https://"
     @State private var project: Project? = nil
-    private let page: PageConfiguration.AppPage = .create
+    public var page: PageConfiguration.AppPage = .create
     static public let defaultTitle: String = "Descriptive job title"
 
     var body: some View {
@@ -126,6 +126,7 @@ extension JobDetail {
 extension JobDetail {
     struct Sheet: View {
         public let job: Job
+        public var page: PageConfiguration.AppPage = .create
         public var standalone: Bool = false
         @Binding public var isPresented: Bool
 
