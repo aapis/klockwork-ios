@@ -27,6 +27,21 @@ struct JobDetail: View {
     var body: some View {
         VStack {
             List {
+                Section("Title") {
+                    TextField("Title", text: $title)
+                }
+                .listRowBackground(Theme.textBackground)
+
+                Section("URL") {
+                    TextField("URL", text: $url)
+                }
+                .listRowBackground(Theme.textBackground)
+
+                Section("Overview") {
+                    TextEditor(text: $overview).lineLimit(3...)
+                }
+                .listRowBackground(Theme.textBackground)
+
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
                     DatePicker(
@@ -67,21 +82,6 @@ struct JobDetail: View {
                         .listRowBackground(Theme.textBackground)
                     }
                 }
-
-                Section("Title") {
-                    TextField("Title", text: $title)
-                }
-                .listRowBackground(Theme.textBackground)
-
-                Section("URL") {
-                    TextField("URL", text: $url)
-                }
-                .listRowBackground(Theme.textBackground)
-
-                Section("Overview") {
-                    TextEditor(text: $overview).lineLimit(3...)
-                }
-                .listRowBackground(Theme.textBackground)
             }
             .listStyle(.grouped)
         }
@@ -107,6 +107,8 @@ struct JobDetail: View {
 }
 
 extension JobDetail {
+    /// Onload handler. Sets state variables
+    /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.alive = job.alive
         self.colour = job.colour_from_stored()
@@ -152,11 +154,21 @@ extension JobDetail {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
+                        self.actionOnSave()
                         self.isPresented.toggle()
-                        PersistenceController.shared.save()
                     }
                 }
             }
         }
+    }
+}
+
+extension JobDetail.Sheet {
+    /// Save handler, fires when the Save button is tapped in navTopBar. Relies on other methods to modify self.job for this to work
+    /// - Returns: Void
+    private func actionOnSave() -> Void {
+
+//        print("DERPO job=\(self.job!.jid.string)")
+//        PersistenceController.shared.save()
     }
 }

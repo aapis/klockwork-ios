@@ -33,6 +33,7 @@ class AppTheme {
 
 class TodayPage {
     var job: Job? = nil
+    var mode: PageMode = .read
 }
 
 class Activities {

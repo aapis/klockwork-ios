@@ -57,6 +57,9 @@ struct Tabs: View {
 }
 
 extension Tabs {
+    /// Callback that fires when a swipe event is triggered
+    /// - Parameter swipe: Swipe
+    /// - Returns: Void
     public func actionOnSwipe(_ swipe: Swipe) -> Void {
         let tabs = EntityType.allCases
         if var selectedIndex = (tabs.firstIndex(of: self.selected)) {
@@ -81,31 +84,38 @@ extension Tabs {
 
 extension Tabs {
     struct Buttons: View {
+        @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
 
         var body: some View {
-            HStack(alignment: .center, spacing: 1) {
-                ForEach(EntityType.allCases, id: \.self) { page in
-                    VStack {
-                        Button {
-                            withAnimation(.bouncy(duration: Tabs.animationDuration)) {
-                                selected = page
-                            }
-                        } label: {
-                            (page == selected ? page.selectedIcon : page.icon)
-                                .frame(maxHeight: 20)
-                                .padding(14)
-                                .background(page == selected ? .white : .clear)
-                                .foregroundStyle(page == selected ? Theme.cPurple : .gray)
-                        }
-                        .buttonStyle(.plain)
-                    }
+            ZStack {
+                if state.today.mode == .create {
+                    Theme.cGreen
                 }
-                Spacer()
+                HStack(alignment: .center, spacing: 1) {
+                    ForEach(EntityType.allCases, id: \.self) { page in
+                        VStack {
+                            Button {
+                                withAnimation(.bouncy(duration: Tabs.animationDuration)) {
+                                    selected = page
+                                }
+                            } label: {
+                                (page == selected ? page.selectedIcon : page.icon)
+                                    .frame(maxHeight: 20)
+                                    .padding(14)
+                                    .background(page == selected ? .white : .clear)
+                                    .foregroundStyle(page == selected ? Theme.cPurple : .gray)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    Spacer()
+                }
+                .background(Theme.textBackground)
+
             }
-            .background(Theme.textBackground)
             .frame(height: 50)
         }
     }

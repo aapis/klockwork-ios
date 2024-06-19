@@ -32,6 +32,7 @@ struct Today: View {
                     Tabs(inSheet: inSheet, job: $job, selected: $selected)
                     if !inSheet {
                         PageActionBar.Today(job: $job, isPresented: $isPresented)
+
                         if job != nil {
                             LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                                 .frame(height: 50)
@@ -84,20 +85,8 @@ extension Today {
                             .opacity(0.011)
                         }
                     Image(systemName: "chevron.right")
-                    
                     Spacer()
-                    // @TODO: decide if keeping LDI on this page?
-//                    if self.state.isToday() {
-//                        LargeDateIndicator(page: self.page)
-//                    }
-
-                    Button {
-                        self.isCreateSheetPresented.toggle()
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                    .font(.title2)
-                    .padding(.trailing)
+                    AddButton()
                 }
                 Spacer()
             }
@@ -108,10 +97,6 @@ extension Today {
                 if self.state.date != self.date {
                     self.state.date = self.date
                 }
-            }
-            .sheet(isPresented: $isCreateSheetPresented) {
-                CreateSheet(isPresented: $isCreateSheetPresented)
-                    .onDisappear(perform: self.actionOnCreateSheetDismissed)
             }
         }
     }
@@ -132,6 +117,59 @@ extension Today {
                 )
                 .focused($focused)
             }
+        }
+    }
+
+    struct AddButton: View {
+        typealias Entity = PageConfiguration.EntityType
+        @EnvironmentObject private var state: AppState
+        @State private var isPresented: Bool = false
+
+        var body: some View {
+            NavigationStack {
+                Menu("", systemImage: "plus") {
+                    NavigationLink {
+                        JobDetail.Sheet(isPresented: $isPresented)
+                    } label: {
+                        Text(Entity.jobs.label)
+                        Entity.jobs.icon
+                    }
+
+                    NavigationLink {
+                        TaskDetail.Sheet(isPresented: $isPresented)
+                    } label: {
+                        Text(Entity.tasks.label)
+                        Entity.tasks.icon
+                    }
+
+                    NavigationLink {
+                        NoteDetail.Sheet(isPresented: $isPresented)
+                    } label: {
+                        Text(Entity.notes.label)
+                        Entity.notes.icon
+                    }
+
+                    NavigationLink {
+                    } label: {
+                        Text(Entity.people.label)
+                        Entity.people.icon
+                    }
+
+                    NavigationLink {
+                    } label: {
+                        Text(Entity.companies.label)
+                        Entity.companies.icon
+                    }
+
+                    NavigationLink {
+                    } label: {
+                        Text(Entity.projects.label)
+                        Entity.projects.icon
+                    }
+                }
+            }
+            .font(.title2)
+            .padding(.trailing)
         }
     }
 }

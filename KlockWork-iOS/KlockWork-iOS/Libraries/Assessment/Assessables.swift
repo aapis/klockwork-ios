@@ -105,8 +105,6 @@ class Assessables: Identifiable, Equatable {
     }
 
     /// Determines the factor's weight
-    /// @TODO: move to ActivityWeightAssessment
-    /// @TODO: also this sucks
     /// - Returns: Void
     func weigh(with statuses: [AssessmentThreshold]) -> Void {
         for (idx, status) in statuses.enumerated() {
