@@ -30,7 +30,7 @@ struct Notes: View {
                     if items.count > 0 {
                         ForEach(items) { item in
                             NavigationLink {
-                                NoteDetail(note: item, isPresented: $isPresented, page: self.detailPageType)
+                                NoteDetail(note: item, page: self.detailPageType)
                             } label: {
                                 Text(item.title!.capitalized)
                             }
@@ -38,7 +38,7 @@ struct Notes: View {
                         .onDelete(perform: deleteItems)
                         .listRowBackground(Theme.textBackground)
                     } else {
-                        Button(action: addItem) {
+                        Button(action: {}) {
                             Text("No notes found. Create one!")
                         }
                         .listRowBackground(Theme.textBackground)
@@ -70,8 +70,7 @@ struct Notes: View {
                     if let _ = projects.first {
                         NavigationStack {
                             NoteDetail.Sheet(
-                                page: self.detailPageType,
-                                isPresented: $isPresented
+                                page: self.detailPageType
                             )
                         }
                     } else {

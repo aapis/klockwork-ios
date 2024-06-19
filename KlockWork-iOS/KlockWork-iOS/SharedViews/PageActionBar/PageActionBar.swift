@@ -31,7 +31,6 @@ struct PageActionBar: View {
 /// @TODO: rename, this is criminal
 struct PageActionBarSingleAction: View {
     public let page: PageConfiguration.AppPage
-    @Binding public var isPresented: Bool
     @Binding public var job: Job?
     public let onSave: () -> Void
 
@@ -39,7 +38,6 @@ struct PageActionBarSingleAction: View {
         VStack {
             Button {
                 self.onSave()
-                self.isPresented.toggle()
             } label: {
                 HStack(alignment: .center) {
                     Image(systemName: "plus.circle.fill")

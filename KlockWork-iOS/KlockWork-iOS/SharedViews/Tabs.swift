@@ -499,7 +499,7 @@ extension Tabs.Content {
 
             var body: some View {
                 NavigationLink {
-                    NoteDetail.Sheet(note: note, page: self.page, isPresented: $isSheetPresented)
+                    NoteDetail.Sheet(note: note, page: self.page)
                 } label: {
                     ListRow(
                         name: note.title ?? "_NOTE_TITLE",

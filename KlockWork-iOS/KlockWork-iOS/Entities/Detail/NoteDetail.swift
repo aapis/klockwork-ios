@@ -11,7 +11,6 @@ import SwiftUI
 struct NoteDetail: View {
     @EnvironmentObject private var state: AppState
     public let note: Note
-    @Binding public var isPresented: Bool
     @State private var versions: [NoteVersion] = []
     @State private var current: NoteVersion? = nil
     @State private var content: String = ""
@@ -44,7 +43,6 @@ struct NoteDetail: View {
                         Spacer()
                         PageActionBar.Create(
                             page: self.page,
-                            isPresented: $isPresented,
                             job: $job,
                             onSave: self.actionOnSave
                         )
@@ -154,7 +152,6 @@ struct NoteDetail: View {
     struct Sheet: View {
         public var note: Note
         public var page: PageConfiguration.AppPage = .modify
-        @Binding public var isPresented: Bool
         @State private var starred: Bool = false
         @State private var alive: Bool = true
         @State private var lastUpdate: Date = Date()
@@ -163,7 +160,7 @@ struct NoteDetail: View {
         @State private var versionSource: SaveSource = .manual
 
         var body: some View {
-            NoteDetail(note: note, isPresented: $isPresented, page: self.page)
+            NoteDetail(note: note, page: self.page)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink {
@@ -184,7 +181,7 @@ struct NoteDetail: View {
                 }
         }
 
-        init(note: Note? = nil, page: PageConfiguration.AppPage = .create, isPresented: Binding<Bool>) {
+        init(note: Note? = nil, page: PageConfiguration.AppPage = .create) {
             if note == nil {
                 self.note = DefaultObjects.note
             } else {
@@ -192,7 +189,6 @@ struct NoteDetail: View {
             }
 
             self.page = page
-            _isPresented = isPresented
 
             let versions = self.note.versions!.allObjects as! [NoteVersion]
             if let version = versions.sorted(by: {$0.created! < $1.created!}).first {

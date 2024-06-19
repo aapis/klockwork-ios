@@ -139,7 +139,7 @@ extension SearchBar {
                                     $0.alive == true && ($0.title!.lowercased().contains(text.lowercased()) || $0.body!.lowercased().contains(text.lowercased()))
                                 }) { row in
                                     NavigationLink {
-                                        NoteDetail.Sheet(note: row, page: .modify, isPresented: $sheetPresented)
+                                        NoteDetail.Sheet(note: row, page: .modify)
                                     } label: {
                                         Text(row.title!)
                                     }

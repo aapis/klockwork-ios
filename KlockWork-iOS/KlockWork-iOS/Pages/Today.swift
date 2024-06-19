@@ -131,39 +131,42 @@ extension Today {
                     NavigationLink {
                         JobDetail.Sheet(isPresented: $isPresented)
                     } label: {
-                        Text(Entity.jobs.label)
+                        Text(Entity.jobs.enSingular)
                         Entity.jobs.icon
                     }
 
                     NavigationLink {
                         TaskDetail.Sheet(isPresented: $isPresented)
                     } label: {
-                        Text(Entity.tasks.label)
+                        Text(Entity.tasks.enSingular)
                         Entity.tasks.icon
                     }
 
                     NavigationLink {
-                        NoteDetail.Sheet(isPresented: $isPresented)
+                        NoteDetail.Sheet()
                     } label: {
-                        Text(Entity.notes.label)
+                        Text(Entity.notes.enSingular)
                         Entity.notes.icon
                     }
 
                     NavigationLink {
+                        NoteDetail.Sheet() // @TODO: change, obviously
                     } label: {
-                        Text(Entity.people.label)
+                        Text(Entity.people.enSingular)
                         Entity.people.icon
                     }
 
                     NavigationLink {
+                        NoteDetail.Sheet() // @TODO: change, obviously
                     } label: {
-                        Text(Entity.companies.label)
+                        Text(Entity.companies.enSingular)
                         Entity.companies.icon
                     }
 
                     NavigationLink {
+                        NoteDetail.Sheet() // @TODO: change, obviously
                     } label: {
-                        Text(Entity.projects.label)
+                        Text(Entity.projects.enSingular)
                         Entity.projects.icon
                     }
                 }
