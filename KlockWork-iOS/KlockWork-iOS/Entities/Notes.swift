@@ -10,11 +10,13 @@ import SwiftUI
 
 struct Notes: View {
     typealias EntityType = PageConfiguration.EntityType
+    typealias PageType = PageConfiguration.AppPage
 
+    @EnvironmentObject private var state: AppState
     private let entityType: EntityType = .notes
+    private let detailPageType: PageType = .modify
     @State public var items: [Note] = []
-
-    @Environment(\.managedObjectContext) var moc
+    @State private var isPresented: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -28,7 +30,7 @@ struct Notes: View {
                     if items.count > 0 {
                         ForEach(items) { item in
                             NavigationLink {
-                                NoteDetail(note: item)
+                                NoteDetail(note: item, page: self.detailPageType)
                             } label: {
                                 Text(item.title!.capitalized)
                             }
@@ -36,7 +38,7 @@ struct Notes: View {
                         .onDelete(perform: deleteItems)
                         .listRowBackground(Theme.textBackground)
                     } else {
-                        Button(action: addItem) {
+                        Button(action: {}) {
                             Text("No notes found. Create one!")
                         }
                         .listRowBackground(Theme.textBackground)
@@ -44,7 +46,7 @@ struct Notes: View {
                 }
             }
             .onAppear(perform: {
-                items = CoreDataNotes(moc: moc).alive()
+                items = CoreDataNotes(moc: self.state.moc).alive()
             })
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)
@@ -57,9 +59,25 @@ struct Notes: View {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: addItem) {
+                    Button(action: self.toggleCreateSheet) {
                         Label("Add Item", systemImage: "plus")
                     }
+                }
+            }
+            .sheet(isPresented: $isPresented) {
+                if let defaultCompany = CoreDataCompanies(moc: self.state.moc).findDefault() {
+                    let projects = defaultCompany.projects!.allObjects as! [Project]
+                    if let _ = projects.first {
+                        NavigationStack {
+                            NoteDetail.Sheet(
+                                page: self.detailPageType
+                            )
+                        }
+                    } else {
+                        ErrorView.MissingProject(isPresented: $isPresented)
+                    }
+                } else {
+                    ErrorView.MissingCompany(isPresented: $isPresented)
                 }
             }
         }
@@ -67,11 +85,10 @@ struct Notes: View {
 }
 
 extension Notes {
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-//            modelContext.insert(newItem)
-        }
+    /// Shows or hides the create job sheet
+    /// - Returns: Void
+    private func toggleCreateSheet() -> Void {
+        self.isPresented.toggle()
     }
 
     private func deleteItems(offsets: IndexSet) {

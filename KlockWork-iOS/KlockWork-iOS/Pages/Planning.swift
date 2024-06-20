@@ -23,14 +23,12 @@ struct Planning: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 Header(page: self.page)
-                Divider().background(.gray).frame(height: 1)
+                Divider().background(.white).frame(height: 1)
                 PlanTabs(
                     inSheet: true,
                     job: $job,
                     selected: $selected
                 )
-                
-                Spacer()
             }
             .background(page.primaryColour)
             .navigationBarTitleDisplayMode(.inline)
@@ -73,6 +71,7 @@ extension Planning {
             }
             .onAppear(perform: {
                 date = self.state.date
+                DefaultObjects.deleteDefaultObjects()
             })
             .onChange(of: date) {
                 self.state.date = date

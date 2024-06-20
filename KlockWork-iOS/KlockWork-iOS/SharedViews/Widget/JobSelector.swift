@@ -26,7 +26,6 @@ extension Widget {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         HStack(alignment: .center, spacing: 0) {
                             Text("What's on your plate today?")
-                                .fontWeight(.bold)
                                 .font(.title2)
                             Spacer()
                             Button {
@@ -94,7 +93,6 @@ extension Widget {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         HStack(alignment: .center, spacing: 0) {
                             Text("What are you working on now?")
-                                .fontWeight(.bold)
                                 .font(.title2)
                             Spacer()
                             Button {

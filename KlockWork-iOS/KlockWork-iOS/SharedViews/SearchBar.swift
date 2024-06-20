@@ -109,6 +109,13 @@ extension SearchBar {
                                 }) { row in
                                     NavigationLink {
                                         JobDetail(job: row)
+                                            .toolbar {
+                                                ToolbarItem(placement: .topBarTrailing) {
+                                                    Button("Save") {
+                                                        PersistenceController.shared.save()
+                                                    }
+                                                }
+                                            }
                                     } label: {
                                         Text(row.title ?? row.jid.string)
                                     }
@@ -132,7 +139,7 @@ extension SearchBar {
                                     $0.alive == true && ($0.title!.lowercased().contains(text.lowercased()) || $0.body!.lowercased().contains(text.lowercased()))
                                 }) { row in
                                     NavigationLink {
-                                        NoteDetail(note: row)
+                                        NoteDetail.Sheet(note: row, page: .modify)
                                     } label: {
                                         Text(row.title!)
                                     }

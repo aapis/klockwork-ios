@@ -86,6 +86,7 @@ class Assessables: Identifiable, Equatable {
     func clear() -> Void {
         self.factors = []
         self.score = 0
+        self.weight = .empty
     }
     
     /// Calculates the score based on the weight, threshold and entity count factors of a given assessment factor
@@ -104,15 +105,12 @@ class Assessables: Identifiable, Equatable {
     }
 
     /// Determines the factor's weight
-    /// @TODO: move to ActivityWeightAssessment
-    /// @TODO: also this sucks
     /// - Returns: Void
     func weigh(with statuses: [AssessmentThreshold]) -> Void {
         for (idx, status) in statuses.enumerated() {
             if (idx + 1) < statuses.count {
                 let nextStatus =  statuses[idx + 1]
                 let bounds = (nextStatus.value, status.value - 1)
-
                 if self.score >= bounds.0 && self.score <= bounds.1 {
                     if let label = status.label {
                         if let weight = ActivityWeight.typeFromLabel(label: label) {
@@ -120,6 +118,12 @@ class Assessables: Identifiable, Equatable {
                         }
                     }
                 }
+            }
+        }
+
+        if let heaviestStatus = statuses.sorted(by: {$0.defaultValue > $1.defaultValue}).first {
+            if self.score > heaviestStatus.defaultValue {
+                self.weight = .significant
             }
         }
     }

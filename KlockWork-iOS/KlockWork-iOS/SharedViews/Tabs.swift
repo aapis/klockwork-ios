@@ -49,7 +49,7 @@ struct Tabs: View {
         }
         .background(.clear)
         .onChange(of: job) {
-            withAnimation(.easeIn(duration: Tabs.animationDuration)) {
+            withAnimation(.bouncy(duration: Tabs.animationDuration)) {
                 selected = .records
             }
         }
@@ -57,6 +57,9 @@ struct Tabs: View {
 }
 
 extension Tabs {
+    /// Callback that fires when a swipe event is triggered
+    /// - Parameter swipe: Swipe
+    /// - Returns: Void
     public func actionOnSwipe(_ swipe: Swipe) -> Void {
         let tabs = EntityType.allCases
         if var selectedIndex = (tabs.firstIndex(of: self.selected)) {
@@ -81,39 +84,38 @@ extension Tabs {
 
 extension Tabs {
     struct Buttons: View {
+        @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
 
         var body: some View {
-            HStack(alignment: .center, spacing: 1) {
-                ForEach(EntityType.allCases, id: \.self) { page in
-                    VStack {
-                        Button {
-                            withAnimation(.easeIn(duration: Tabs.animationDuration)) {
-                                selected = page
-                            }
-                        } label: {
-                            if page != .jobs {
-                                page.icon
-                                .frame(maxHeight: 20)
-                                .padding(14)
-                                .background(page == selected ? .white : .clear)
-                                .foregroundStyle(page == selected ? Theme.cPurple : .gray)
-                            } else {
-                                page.icon
-                                    .frame(maxHeight: 20)
-                                .padding(14)
-                                .background(job == nil && !inSheet ? .red : page == selected ? .white : .clear) // sorry
-                                .foregroundStyle(page == selected ? Theme.cPurple : job == nil ? (inSheet ? .gray : .white) : .gray) // sorry
-                            }
-                        }
-                        .buttonStyle(.plain)
-                    }
+            ZStack {
+                if state.today.mode == .create {
+                    Theme.cGreen
                 }
-                Spacer()
+                HStack(alignment: .center, spacing: 1) {
+                    ForEach(EntityType.allCases, id: \.self) { page in
+                        VStack {
+                            Button {
+                                withAnimation(.bouncy(duration: Tabs.animationDuration)) {
+                                    selected = page
+                                }
+                            } label: {
+                                (page == selected ? page.selectedIcon : page.icon)
+                                    .frame(maxHeight: 20)
+                                    .padding(14)
+                                    .background(page == selected ? .white : .clear)
+                                    .foregroundStyle(page == selected ? Theme.cPurple : .gray)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    Spacer()
+                }
+                .background(Theme.textBackground)
+
             }
-            .background(Theme.textBackground)
             .frame(height: 50)
         }
     }
@@ -194,11 +196,7 @@ extension Tabs.Content {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         if items.count > 0 {
                             ForEach(items) { jerb in
-                                if self.inSheet {
-                                    Individual.SingleJobLink(job: jerb)
-                                } else {
-                                    Individual.SingleJob(job: jerb, stateJob: $job)
-                                }
+                                Individual.SingleJobLink(job: jerb)
                             }
                         } else {
                             StatusMessage.Warning(message: "No jobs modified within the last 7 days")
@@ -413,8 +411,13 @@ extension Tabs.Content {
             var body: some View {
                 NavigationLink {
                     JobDetail(job: job)
-                        .background(Theme.cPurple)
-                        .scrollContentBackground(.hidden)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button("Save") {
+                                    PersistenceController.shared.save()
+                                }
+                            }
+                        }
                 } label: {
                     ListRow(
                         name: job.title ?? job.jid.string,
@@ -491,18 +494,27 @@ extension Tabs.Content {
 
         struct SingleNote: View {
             public let note: Note
+            private let page: PageConfiguration.AppPage = .modify
+            @State private var isSheetPresented = false
 
             var body: some View {
                 NavigationLink {
-                    NoteDetail(note: note)
-                        .background(Theme.cPurple)
-                        .scrollContentBackground(.hidden)
+                    NoteDetail.Sheet(note: note, page: self.page)
                 } label: {
                     ListRow(
-                        name: note.title ?? "_NOTE_TITLE",
-                        colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour
+                        name: note.title ?? "",
+                        colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour,
+                        extraColumn: AnyView(VersionCountBadge)
                     )
                 }
+            }
+
+            @ViewBuilder private var VersionCountBadge: some View {
+                Text(String(note.versions?.count ?? 0))
+                    .padding(8)
+                    .foregroundStyle(.white)
+                    .background(Theme.base.opacity(0.2))
+                    .clipShape(.circle)
             }
         }
 
@@ -518,6 +530,26 @@ extension Tabs.Content {
                     ListRow(
                         name: company.name ?? "_COMPANY_NAME",
                         colour: Color.fromStored(company.colour ?? Theme.rowColourAsDouble)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleCompanyCustomButton: View {
+            public let company: Company
+            public var callback: (Company) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(company)
+                } label: {
+                    ListRow(
+                        name: company.name ?? "[NO NAME]",
+                        colour: Color.fromStored(company.colour ?? Theme.rowColourAsDouble),
+                        icon: selected ? "minus" : "plus"
                     )
                 }
                 .buttonStyle(.plain)
@@ -554,6 +586,26 @@ extension Tabs.Content {
                     ListRow(
                         name: project.name ?? "_PROJECT_NAME",
                         colour: Color.fromStored(project.colour ?? Theme.rowColourAsDouble)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleProjectCustomButton: View {
+            public let entity: Project
+            public var callback: (Project) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(entity)
+                } label: {
+                    ListRow(
+                        name: entity.name ?? "[NO NAME]",
+                        colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
+                        icon: selected ? "minus" : "plus"
                     )
                 }
                 .buttonStyle(.plain)

@@ -17,7 +17,7 @@ struct Today: View {
     @State private var job: Job? = nil
     @State private var selected: EntityType = .records
     @State private var jobs: [Job] = []
-    @State private var isSheetPresented: Bool = false
+    @State private var isPresented: Bool = false
     @FocusState private var textFieldActive: Bool
     private let page: PageConfiguration.AppPage = .today
 
@@ -27,11 +27,12 @@ struct Today: View {
                 if !inSheet {
                     Header(page: self.page)
                 }
-
+                Divider().background(.white).frame(height: 1)
                 ZStack(alignment: .bottomLeading) {
                     Tabs(inSheet: inSheet, job: $job, selected: $selected)
                     if !inSheet {
-                        PageActionBar.Today(job: $job, isSheetPresented: $isSheetPresented)
+                        PageActionBar.Today(job: $job, isPresented: $isPresented)
+
                         if job != nil {
                             LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                                 .frame(height: 50)
@@ -63,6 +64,7 @@ extension Today {
     struct Header: View {
         @EnvironmentObject private var state: AppState
         @State public var date: Date = Date()
+        @State private var isCreateSheetPresented: Bool = false
         public let page: PageConfiguration.AppPage
 
         var body: some View {
@@ -83,11 +85,8 @@ extension Today {
                             .opacity(0.011)
                         }
                     Image(systemName: "chevron.right")
-
-                    if self.state.isToday() {
-                        Spacer()
-                        LargeDateIndicator(page: self.page)
-                    }
+                    Spacer()
+                    AddButton()
                 }
                 Spacer()
             }
@@ -120,6 +119,62 @@ extension Today {
             }
         }
     }
+
+    struct AddButton: View {
+        typealias Entity = PageConfiguration.EntityType
+        @EnvironmentObject private var state: AppState
+        @State private var isPresented: Bool = false
+
+        var body: some View {
+            NavigationStack {
+                Menu("", systemImage: "plus") {
+                    NavigationLink {
+                        JobDetail()
+                    } label: {
+                        Text(Entity.jobs.enSingular)
+                        Entity.jobs.icon
+                    }
+
+                    NavigationLink {
+                        TaskDetail.Sheet(isPresented: $isPresented)
+                    } label: {
+                        Text(Entity.tasks.enSingular)
+                        Entity.tasks.icon
+                    }
+
+                    NavigationLink {
+                        NoteDetail.Sheet()
+                    } label: {
+                        Text(Entity.notes.enSingular)
+                        Entity.notes.icon
+                    }
+
+                    NavigationLink {
+                        NoteDetail.Sheet() // @TODO: change, obviously
+                    } label: {
+                        Text(Entity.people.enSingular)
+                        Entity.people.icon
+                    }
+
+                    NavigationLink {
+                        NoteDetail.Sheet() // @TODO: change, obviously
+                    } label: {
+                        Text(Entity.companies.enSingular)
+                        Entity.companies.icon
+                    }
+
+                    NavigationLink {
+                        NoteDetail.Sheet() // @TODO: change, obviously
+                    } label: {
+                        Text(Entity.projects.enSingular)
+                        Entity.projects.icon
+                    }
+                }
+            }
+            .font(.title2)
+            .foregroundStyle(self.state.theme.tint)
+        }
+    }
 }
 
 extension Today {
@@ -129,6 +184,14 @@ extension Today {
         if self.job != nil {
             self.textFieldActive = true
         }
+    }
+}
+
+extension Today.Header {
+    /// Callback that fires when the CreateSheet disappears
+    /// - Returns: Void
+    private func actionOnCreateSheetDismissed() -> Void {
+        DefaultObjects.deleteDefaultJobs()
     }
 }
 

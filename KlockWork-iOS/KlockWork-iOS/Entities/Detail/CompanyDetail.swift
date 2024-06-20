@@ -19,6 +19,8 @@ struct CompanyDetail: View {
     @State private var abbreviation: String = ""
     @State private var hidden: Bool = false
     @State private var colour: Color = .clear
+    private let page: PageConfiguration.AppPage = .create
+    static public let defaultName: String = "Initech Inc"
 
     var body: some View {
         NavigationStack {
@@ -75,10 +77,12 @@ struct CompanyDetail: View {
                 }
                 .listStyle(.grouped)
             }
+            .background(page.primaryColour)
             .onAppear(perform: actionOnAppear)
             .navigationTitle("\(self.name) (\(self.abbreviation))")
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .scrollContentBackground(.hidden)
             .toolbar {
                 Button("Save") {
                     

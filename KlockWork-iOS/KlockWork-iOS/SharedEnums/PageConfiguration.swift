@@ -86,15 +86,35 @@ extension PageConfiguration {
             case .projects: Image(systemName: "folder")
             }
         }
+
+        var selectedIcon: Image {
+            switch self {
+            case .records: Image(systemName: "tray.fill")
+            case .jobs: Image(systemName: "hammer.fill")
+            case .tasks: Image(systemName: "checklist")
+            case .notes: Image(systemName: "note.text")
+            case .companies: Image(systemName: "building.2.fill")
+            case .people: Image(systemName: "person.2.fill")
+            case .projects: Image(systemName: "folder.fill")
+            }
+        }
     }
     
     enum AppPage: CaseIterable, Equatable {
-        case planning, today, explore, find
+        case planning, today, explore, find, create, modify, error, intersitial
 
         var primaryColour: Color {
             switch self {
             case .planning: Theme.cOrange
-            case .today: Theme.cPurple
+            case .today, .create, .modify: Theme.cPurple
+            case .error, .intersitial: .white
+            default:
+                Theme.cGreen
+            }
+        }
+
+        var buttonBackgroundColour: Color {
+            switch self {
             default:
                 Theme.cGreen
             }

@@ -21,10 +21,10 @@ class Assessment {
     var score: Int = 0
     var searchTerm: String = "" // @TODO: will have to refactor a fair bit to make this possible
     var weight: ActivityWeight = .empty // @TODO: need to replace ActivityWeight with AssessmentThreshold somehow
-    private var statuses: Statuses = []
+    var statuses: Statuses = []
     var isToday: Bool {Calendar.autoupdatingCurrent.isDateInToday(self.date)}
 
-    init(assessmentStatuses: inout [AssessmentThreshold], date: Date, dayNumber: Int = 0, isSelected: Bool = false, isWeekend: Bool = false, moc: NSManagedObjectContext, searchTerm: String = "") {
+    init(assessmentStatuses: inout Statuses, date: Date, dayNumber: Int = 0, isSelected: Bool = false, isWeekend: Bool = false, moc: NSManagedObjectContext, searchTerm: String = "") {
         self.date = date
         self.dayNumber = dayNumber
         self.isSelected = isSelected
@@ -49,7 +49,6 @@ class Assessment {
         self.score = self.assessables.score
     }
 
-    // @TODO: this doesn't work yet, only allows change onappear
     func backgroundColourFromWeight() -> Color {
         var colour: Color = self.weight.colour
         if let status = self.statuses.first(where: {$0.label == self.weight.label}) {

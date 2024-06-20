@@ -11,8 +11,11 @@ import SwiftUI
 struct Jobs: View {
     typealias EntityType = PageConfiguration.EntityType
 
+    @EnvironmentObject private var state: AppState
     private let entityType: EntityType = .jobs
     @State public var items: [Job] = []
+    @State private var isCreateEditorPresented: Bool = false
+    private let page: PageConfiguration.AppPage = .create
 
     @Environment(\.managedObjectContext) var moc
 
@@ -29,8 +32,13 @@ struct Jobs: View {
                         ForEach(items) { item in
                             NavigationLink {
                                 JobDetail(job: item)
-                                    .background(Theme.cGreen)
-                                    .scrollContentBackground(.hidden)
+                                    .toolbar {
+                                        ToolbarItem(placement: .topBarTrailing) {
+                                            Button("Save") {
+                                                PersistenceController.shared.save()
+                                            }
+                                        }
+                                    }
                             } label: {
                                 Text(item.title != nil ? item.title!.isEmpty ? item.jid.string : item.title!.capitalized : item.jid.string)
                             }
@@ -38,7 +46,7 @@ struct Jobs: View {
                         .onDelete(perform: deleteItems)
                         .listRowBackground(Theme.textBackground)
                     } else {
-                        Button(action: addItem) {
+                        Button(action: self.toggleCreateSheet) {
                             Text("No jobs found. Create one!")
                         }
                         .listRowBackground(Theme.textBackground)
@@ -59,9 +67,23 @@ struct Jobs: View {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: addItem) {
+                    Button(action: self.toggleCreateSheet) {
                         Label("Add Item", systemImage: "plus")
                     }
+                }
+            }
+            .sheet(isPresented: $isCreateEditorPresented) {
+                if let defaultCompany = CoreDataCompanies(moc: self.state.moc).findDefault() {
+                    let projects = defaultCompany.projects!.allObjects as! [Project]
+                    if let _ = projects.first {
+                        NavigationStack {
+                            JobDetail(job: DefaultObjects.job)
+                        }
+                    } else {
+                        ErrorView.MissingProject(isPresented: $isCreateEditorPresented)
+                    }
+                } else {
+                    ErrorView.MissingCompany(isPresented: $isCreateEditorPresented)
                 }
             }
         }
@@ -69,16 +91,18 @@ struct Jobs: View {
 }
 
 extension Jobs {
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-//            modelContext.insert(newItem)
-        }
+    /// Shows or hides the create job sheet
+    /// - Returns: Void
+    private func toggleCreateSheet() -> Void {
+        self.isCreateEditorPresented.toggle()
     }
-
+    
+    /// Delete items
+    /// - Parameter offsets: IndexSet
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
+//                self.state.moc.delete(offsets[index])
 //                modelContext.delete(items[index])
             }
         }

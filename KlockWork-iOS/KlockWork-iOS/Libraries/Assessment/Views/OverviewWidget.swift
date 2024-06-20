@@ -13,6 +13,8 @@ struct OverviewWidget: View {
     @State private var active: [AssessmentFactor] = []
     @State private var score: Int = 0
     @State private var weight: ActivityWeight = .empty
+    @State private var scoreBackgroundColour: Color = .clear
+    @State private var scoreForegroundColour: Color = .white
     private let scoreDiameter: CGFloat = 100
 
     var body: some View {
@@ -60,10 +62,11 @@ struct OverviewWidget: View {
                     GridRow(alignment: .top) {
                         VStack(alignment: .center) {
                             ZStack {
-                                weight.colour
-                                Text(String(score))
+                                self.scoreBackgroundColour
+                                Text(String(self.score))
                                     .font(.system(size: 50))
                                     .fontWeight(.bold)
+                                    .foregroundStyle(self.scoreForegroundColour)
                             }
                             .frame(width: self.scoreDiameter, height: self.scoreDiameter)
                             .mask(Circle())
@@ -133,8 +136,15 @@ extension OverviewWidget {
     /// - Returns: Void
     public func actionOnAppear() -> Void {
         assessment.assessables.evaluate()
-        active = assessment.assessables.active()
-        score = assessment.assessables.score
-        weight = assessment.assessables.weight
+        self.active = assessment.assessables.active()
+        self.score = assessment.assessables.score
+        self.weight = assessment.assessables.weight
+
+        if let newWeight = assessment.statuses.first(where: {$0.label == weight.label}) {
+            if let stored = newWeight.colour {
+                self.scoreBackgroundColour = Color.fromStored(stored)
+                self.scoreForegroundColour = self.scoreBackgroundColour.isBright() ? Theme.cGreen : .white
+            }
+        }
     }
 }
