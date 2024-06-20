@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Page action bar whose primary functionality occurs through interaction with another sheet
 struct PageActionBar: View {
-    @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
     @State public var groupView: AnyView? = AnyView(EmptyView())
     @State public var sheetView: AnyView? = AnyView(EmptyView())
     @Binding public var isPresented: Bool
@@ -18,6 +18,7 @@ struct PageActionBar: View {
         VStack(alignment: .leading) {
             groupView
         }
+        .foregroundStyle(self.state.theme.tint)
         .clipShape(.capsule(style: .continuous))
         .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)
         .padding()
@@ -30,6 +31,7 @@ struct PageActionBar: View {
 /// An action bar meant to perform a single action
 /// @TODO: rename, this is criminal
 struct PageActionBarSingleAction: View {
+    @EnvironmentObject private var state: AppState
     public let page: PageConfiguration.AppPage
     @Binding public var job: Job?
     public let onSave: () -> Void

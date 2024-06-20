@@ -10,7 +10,7 @@ import SwiftUI
 
 struct NoteDetail: View {
     @EnvironmentObject private var state: AppState
-    public let note: Note
+    public var note: Note? = nil
     @State private var versions: [NoteVersion] = []
     @State private var current: NoteVersion? = nil
     @State private var content: String = ""
@@ -50,6 +50,7 @@ struct NoteDetail: View {
                 }
             }
         }
+        .foregroundStyle(self.state.theme.tint)
         .background(self.page.primaryColour)
         .scrollContentBackground(.hidden)
         .onAppear(perform: self.actionOnAppear)
@@ -57,9 +58,6 @@ struct NoteDetail: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        .onChange(of: title) {
-            self.note.title =  title
-        }
     }
 
     struct Editor: View {
@@ -150,7 +148,8 @@ struct NoteDetail: View {
     }
 
     struct Sheet: View {
-        public var note: Note
+        @EnvironmentObject private var state: AppState
+        public var note: Note?
         public var page: PageConfiguration.AppPage = .modify
         @State private var starred: Bool = false
         @State private var alive: Bool = true
@@ -176,36 +175,34 @@ struct NoteDetail: View {
                                 Image(systemName: "chevron.right")
                                     .font(.headline)
                             }
+                            .foregroundStyle(self.state.theme.tint)
                         }
                     }
                 }
         }
 
         init(note: Note? = nil, page: PageConfiguration.AppPage = .create) {
-            if note == nil {
-                self.note = DefaultObjects.note
-            } else {
-                self.note = note!
-            }
-
+            self.note = note
             self.page = page
 
-            let versions = self.note.versions!.allObjects as! [NoteVersion]
-            if let version = versions.sorted(by: {$0.created! < $1.created!}).first {
-                starred = version.starred
-                versionTitle = version.title ?? "_NOTE_VERSION_TITLE"
-                versionCreatedDate = version.created!
-                lastUpdate = self.note.lastUpdate ?? Date()
-            }
-
-            if versionTitle.isEmpty {
-                if self.note.title != nil {
-                    versionTitle = self.note.title!
+            if self.note != nil {
+                let versions = self.note!.versions!.allObjects as! [NoteVersion]
+                if let version = versions.sorted(by: {$0.created! < $1.created!}).first {
+                    starred = version.starred
+                    versionTitle = version.title ?? ""
+                    versionCreatedDate = version.created!
+                    lastUpdate = self.note!.lastUpdate ?? Date()
                 }
-            }
 
-            if self.note.postedDate != nil {
-                versionCreatedDate = self.note.postedDate!
+                if versionTitle.isEmpty {
+                    if self.note!.title != nil {
+                        versionTitle = self.note!.title!
+                    }
+                }
+
+                if self.note!.postedDate != nil {
+                    versionCreatedDate = self.note!.postedDate!
+                }
             }
         }
     }
@@ -255,48 +252,53 @@ extension NoteDetail {
     /// Onload handler. Gets the latest version of the note and populates the title field
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        self.title = self.note.title ?? "_NOTE_TITLE"
-        self.starred = self.note.starred
-        self.postedDate = self.note.postedDate ?? Date()
-        self.alive = self.note.alive
-        self.content = self.note.body ?? "_NOTE_CONTENT"
-        if let jerb = self.note.mJob {
-            self.job = jerb
-        }
+        if let note = self.note {
+            self.title = note.title ?? ""
+            self.starred = note.starred
+            self.postedDate = note.postedDate ?? Date()
+            self.alive = note.alive
+            self.content = note.body ?? ""
+            if let jerb = note.mJob {
+                self.job = jerb
+            }
 
-        if let vers = note.versions {
-            self.versions = vers.allObjects as! [NoteVersion]
-            self.current = versions.sorted(by: {
-                if $0.created != nil && $1.created != nil {
-                    return $0.created! < $1.created!
+            if let vers = note.versions {
+                self.versions = vers.allObjects as! [NoteVersion]
+                self.current = versions.sorted(by: {
+                    if $0.created != nil && $1.created != nil {
+                        return $0.created! < $1.created!
+                    }
+                    return false
+                }).last
+
+                if let current = self.current {
+                    self.content = current.content ?? ""
                 }
-                return false
-            }).last
-
-            if let current = self.current {
-                self.content = current.content ?? "_NOTE_CONTENT"
             }
         }
+
     }
     
     /// Save a new version
     /// - Returns: Void
     private func actionOnSave() -> Void {
-        self.note.title = self.title
-        self.note.starred = self.starred
-        self.note.postedDate = self.postedDate
-        self.note.alive = self.alive
-        self.note.lastUpdate = Date()
-        self.note.body = self.content
-        if let job = self.job {
-            self.note.mJob = job
+        if self.note != nil {
+            self.note!.title = self.title
+            self.note!.starred = self.starred
+            self.note!.postedDate = self.postedDate
+            self.note!.alive = self.alive
+            self.note!.lastUpdate = Date()
+            self.note!.body = self.content
+            if let job = self.job {
+                self.note!.mJob = job
+            }
+
+            self.note!.addToVersions(
+                CoreDataNoteVersions(moc: self.state.moc).from(self.note!, source: .manual)
+            )
+
+            PersistenceController.shared.save()
         }
-
-        self.note.addToVersions(
-            CoreDataNoteVersions(moc: self.state.moc).from(self.note, source: .manual)
-        )
-
-        PersistenceController.shared.save()
     }
 }
 

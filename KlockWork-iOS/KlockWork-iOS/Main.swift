@@ -54,6 +54,8 @@ struct Main: View {
                 Text("Find")
             }
         }
+        .foregroundStyle(.white)
+        .preferredColorScheme(.dark) // intentionally forcing dark mode on this view for aesthetics
         .tint(.yellow)
         .onAppear(perform: self.onApplicationBoot)
         .environmentObject(self.state)

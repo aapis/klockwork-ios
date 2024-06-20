@@ -77,10 +77,7 @@ struct Jobs: View {
                     let projects = defaultCompany.projects!.allObjects as! [Project]
                     if let _ = projects.first {
                         NavigationStack {
-                            JobDetail.Sheet(
-                                standalone: true,
-                                isPresented: $isCreateEditorPresented
-                            )
+                            JobDetail(job: DefaultObjects.job)
                         }
                     } else {
                         ErrorView.MissingProject(isPresented: $isCreateEditorPresented)

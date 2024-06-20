@@ -55,7 +55,7 @@ extension AssessmentFactor {
                     case .create:
                         return Int64(CoreDataNotes(moc: moc).countByDate(for: selectedDate))
                     case .interaction:
-                        return Int64(CoreDataNotes(moc: moc).countByDate(for: selectedDate)) // @TODO: change query
+                        return Int64(CoreDataNoteVersions(moc: moc).countByDate(for: selectedDate))
                     }
                     //            case .companies:
                     //            case .people:

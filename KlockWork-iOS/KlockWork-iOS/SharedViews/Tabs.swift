@@ -502,7 +502,7 @@ extension Tabs.Content {
                     NoteDetail.Sheet(note: note, page: self.page)
                 } label: {
                     ListRow(
-                        name: note.title ?? "_NOTE_TITLE",
+                        name: note.title ?? "",
                         colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour,
                         extraColumn: AnyView(VersionCountBadge)
                     )
@@ -530,6 +530,26 @@ extension Tabs.Content {
                     ListRow(
                         name: company.name ?? "_COMPANY_NAME",
                         colour: Color.fromStored(company.colour ?? Theme.rowColourAsDouble)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleCompanyCustomButton: View {
+            public let company: Company
+            public var callback: (Company) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(company)
+                } label: {
+                    ListRow(
+                        name: company.name ?? "[NO NAME]",
+                        colour: Color.fromStored(company.colour ?? Theme.rowColourAsDouble),
+                        icon: selected ? "minus" : "plus"
                     )
                 }
                 .buttonStyle(.plain)
@@ -566,6 +586,26 @@ extension Tabs.Content {
                     ListRow(
                         name: project.name ?? "_PROJECT_NAME",
                         colour: Color.fromStored(project.colour ?? Theme.rowColourAsDouble)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleProjectCustomButton: View {
+            public let entity: Project
+            public var callback: (Project) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(entity)
+                } label: {
+                    ListRow(
+                        name: entity.name ?? "[NO NAME]",
+                        colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
+                        icon: selected ? "minus" : "plus"
                     )
                 }
                 .buttonStyle(.plain)

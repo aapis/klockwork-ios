@@ -65,13 +65,6 @@ struct TaskDetail: View {
                         if job != nil {
                             NavigationLink {
                                 JobDetail(job: job!)
-                                    .toolbar {
-                                        ToolbarItem(placement: .topBarTrailing) {
-                                            Button("Save") {
-                                                PersistenceController.shared.save()
-                                            }
-                                        }
-                                    }
                             } label: {
                                 Text(job!.title ?? job!.jid.string)
                                     .foregroundStyle(job!.backgroundColor.isBright() ? .black : .white)

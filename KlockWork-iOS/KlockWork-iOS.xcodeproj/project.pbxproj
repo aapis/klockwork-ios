@@ -86,6 +86,8 @@
 		53E50C1D2C0E638100A85FDC /* Factor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C1C2C0E638100A85FDC /* Factor.swift */; };
 		53E50C1F2C0E6ABE00A85FDC /* Rainbow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C1E2C0E6ABE00A85FDC /* Rainbow.swift */; };
 		53E50C232C0FED0800A85FDC /* PlanTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E50C222C0FED0800A85FDC /* PlanTabs.swift */; };
+		53E6974C2C23ABA7005A7375 /* CompanySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E6974B2C23ABA2005A7375 /* CompanySelector.swift */; };
+		53E6974E2C23ABB0005A7375 /* ProjectSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E6974D2C23ABAD005A7375 /* ProjectSelector.swift */; };
 		53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBCC2BFE97CC00AFEDEA /* PersistenceController.swift */; };
 		53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB12BFE94A200AFEDEA /* CoreDataCalendarEvent.swift */; };
 		53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CBB72BFE94A300AFEDEA /* CoreDataCompanies.swift */; };
@@ -208,6 +210,8 @@
 		53E50C1C2C0E638100A85FDC /* Factor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Factor.swift; sourceTree = "<group>"; };
 		53E50C1E2C0E6ABE00A85FDC /* Rainbow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rainbow.swift; sourceTree = "<group>"; };
 		53E50C222C0FED0800A85FDC /* PlanTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTabs.swift; sourceTree = "<group>"; };
+		53E6974B2C23ABA2005A7375 /* CompanySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanySelector.swift; sourceTree = "<group>"; };
+		53E6974D2C23ABAD005A7375 /* ProjectSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectSelector.swift; sourceTree = "<group>"; };
 		53F9261F2BFEA00E00948076 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Project.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Project.swift; sourceTree = "<group>"; };
 		53F926202BFEA00E00948076 /* Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Job.swift; path = ../../DLPrototype/DLPrototype/Extensions/Models/Job.swift; sourceTree = "<group>"; };
 		53F926212BFEA00E00948076 /* EKEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EKEvent.swift; path = ../../DLPrototype/DLPrototype/Extensions/EKEvent.swift; sourceTree = "<group>"; };
@@ -254,8 +258,10 @@
 		5311F3FE2C17A03500FB3071 /* Widget */ = {
 			isa = PBXGroup;
 			children = (
-				5311F3FF2C17A03D00FB3071 /* Widget.swift */,
+				53E6974D2C23ABAD005A7375 /* ProjectSelector.swift */,
+				53E6974B2C23ABA2005A7375 /* CompanySelector.swift */,
 				5311F3F32C1558A500FB3071 /* JobSelector.swift */,
+				5311F3FF2C17A03D00FB3071 /* Widget.swift */,
 				5311F3FC2C179CC100FB3071 /* DataExplorer.swift */,
 				5324416C2C06485800659F14 /* ActivityCalendar.swift */,
 				532441672C0531C800659F14 /* Rollups.swift */,
@@ -602,6 +608,7 @@
 				53F9260C2BFE9BF300948076 /* CoreDataPlan.swift in Sources */,
 				53F9260D2BFE9BF300948076 /* CoreDataProjectConfiguration.swift in Sources */,
 				5324416F2C067F5D00659F14 /* Assessment.swift in Sources */,
+				53E6974E2C23ABB0005A7375 /* ProjectSelector.swift in Sources */,
 				53B2C3692C1F7D65003507CE /* DefaultObjects.swift in Sources */,
 				5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */,
 				5311F4022C17BFFF00FB3071 /* AssessmentThresholdForm.swift in Sources */,
@@ -651,6 +658,7 @@
 				53E50C192C0E61DB00A85FDC /* Legend.swift in Sources */,
 				539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */,
 				539134F82C039F3100B48494 /* Records.swift in Sources */,
+				53E6974C2C23ABA7005A7375 /* CompanySelector.swift in Sources */,
 				537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */,
 				5311F3F92C1794FD00FB3071 /* PageActionBar.Planning.swift in Sources */,
 				539134F42C0391F000B48494 /* Projects.swift in Sources */,

@@ -129,7 +129,7 @@ extension Today {
             NavigationStack {
                 Menu("", systemImage: "plus") {
                     NavigationLink {
-                        JobDetail.Sheet(isPresented: $isPresented)
+                        JobDetail()
                     } label: {
                         Text(Entity.jobs.enSingular)
                         Entity.jobs.icon
@@ -172,7 +172,7 @@ extension Today {
                 }
             }
             .font(.title2)
-            .padding(.trailing)
+            .foregroundStyle(self.state.theme.tint)
         }
     }
 }
