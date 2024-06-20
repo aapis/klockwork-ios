@@ -9,6 +9,31 @@ import SwiftUI
 
 extension Widget {
     struct ProjectSelector {
+        struct FormField: View {
+            @Binding public var project: Project?
+            @Binding public var company: Company?
+            @Binding public var isProjectSelectorPresented: Bool
+
+            var body: some View {
+                Section("Project") {
+                    Button {
+                        isProjectSelectorPresented.toggle()
+                    } label: {
+                        if project == nil {
+                            Text("Select...")
+                        } else {
+                            Text(project!.name!)
+                                .padding(5)
+                                .background(Theme.base.opacity(0.2))
+                                .cornerRadius(5)
+                        }
+                    }
+                    .disabled(company == nil)
+                }
+                .listRowBackground(project == nil ? Theme.textBackground : Color.fromStored(project!.colour ?? Theme.rowColourAsDouble))
+            }
+        }
+
         struct Single: View {
             typealias Row = Tabs.Content.Individual.SingleProjectCustomButton
 

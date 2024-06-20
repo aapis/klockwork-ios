@@ -45,38 +45,19 @@ struct JobDetail: View {
                 }
                 .listRowBackground(Theme.textBackground)
 
-                Section("Company") {
-                    Button {
-                        self.isCompanySelectorPresented.toggle()
-                    } label: {
-                        if self.company == nil {
-                            Text("Select...")
-                        } else {
-                            Text(self.company!.name!)
-                                .padding(5)
-                                .background(Theme.base.opacity(0.2))
-                                .cornerRadius(5)
-                        }
-                    }
-                }
-                .listRowBackground(self.company == nil ? Theme.textBackground : Color.fromStored(self.company!.colour ?? Theme.rowColourAsDouble))
+                Widget.CompanySelector.FormField(
+                    company: $company,
+                    isCompanySelectorPresented: $isCompanySelectorPresented
+                )
 
-                Section("Project") {
-                    Button {
-                        self.isProjectSelectorPresented.toggle()
-                    } label: {
-                        if self.project == nil {
-                            Text("Select...")
-                        } else {
-                            Text(self.project!.name!)
-                                .padding(5)
-                                .background(Theme.base.opacity(0.2))
-                                .cornerRadius(5)
-                        }
-                    }
-                    .disabled(self.company == nil)
+                // Evaluating self.company here seems to trigger a view refresh that we need to make this combo selector thing work
+                if self.company != nil {
+                    Widget.ProjectSelector.FormField(
+                        project: $project,
+                        company: $company,
+                        isProjectSelectorPresented: $isProjectSelectorPresented
+                    )
                 }
-                .listRowBackground(self.project == nil ? Theme.textBackground : Color.fromStored(self.project!.colour ?? Theme.rowColourAsDouble))
 
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
