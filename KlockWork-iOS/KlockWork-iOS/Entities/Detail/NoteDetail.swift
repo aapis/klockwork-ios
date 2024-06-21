@@ -315,6 +315,16 @@ extension NoteDetail {
             )
 
             PersistenceController.shared.save()
+        } else {
+            CoreDataNotes(moc: self.state.moc).create(
+                alive: self.alive,
+                body: self.content,
+                lastUpdate: Date(),
+                postedDate: Date(),
+                starred: self.starred,
+                title: self.title,
+                job: self.job
+            )
         }
     }
 }
