@@ -226,7 +226,7 @@ extension Tabs.Content {
                     VStack(alignment: .leading, spacing: 1) {
                         if items.count > 0 {
                             ForEach(items) { task in
-                                Individual.SingleTask(task: task)
+                                Individual.SingleTaskChecklistItem(task: task)
                             }
                         } else {
                             StatusMessage.Warning(message: "No tasks modified within the last 7 days")
@@ -407,10 +407,11 @@ extension Tabs.Content {
 
         struct SingleJobLink: View {
             public let job: Job
+            @State private var path: NavigationPath = NavigationPath()
 
             var body: some View {
                 NavigationLink {
-                    JobDetail(job: job)
+                    JobDetail(job: job, path: $path)
                         .toolbar {
                             ToolbarItem(placement: .topBarTrailing) {
                                 Button("Save") {
@@ -489,6 +490,66 @@ extension Tabs.Content {
                     )
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleTaskChecklistItem: View {
+            public let task: LogTask
+            @State private var isCompleted: Bool = false
+            @State private var isCancelled: Bool = false
+
+            var body: some View {
+                HStack(alignment: .center, spacing: 0) {
+                    Button {
+                        isCompleted.toggle()
+                        self.actionOnSave()
+                    } label: {
+                        Image(systemName: isCompleted ? "square.fill" : "square")
+                            .font(.title2)
+                    }
+                    .padding(8)
+                    .opacity(isCompleted ? 0.5 : 1.0)
+
+                    NavigationLink {
+                        TaskDetail(task: task)
+                            .background(Theme.cPurple)
+                            .scrollContentBackground(.hidden)
+                    } label: {
+                        ListRow(
+                            name: task.content ?? "_TASK_CONTENT",
+                            colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour
+                        )
+                        .opacity(isCompleted ? 0.5 : 1.0)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .background(self.task.owner!.backgroundColor)
+                .onAppear(perform: self.actionOnAppear)
+            }
+            
+            /// Onload handler. Sets state vars isCompleted and isCancelled to default state
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+                self.isCompleted = self.task.completedDate != nil
+                self.isCancelled = self.task.cancelledDate != nil
+            }
+            
+            /// Save handler. Saves completed or cancelled status for the given task.
+            /// - Returns: Void
+            private func actionOnSave() -> Void {
+                if self.isCompleted {
+                    self.task.completedDate = Date()
+                } else {
+                    self.task.completedDate = nil
+                }
+
+                if self.isCancelled {
+                    self.task.cancelledDate = Date()
+                } else {
+                    self.task.cancelledDate = nil
+                }
+
+                PersistenceController.shared.save()
             }
         }
 
