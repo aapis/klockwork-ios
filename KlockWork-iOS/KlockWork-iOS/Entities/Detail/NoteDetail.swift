@@ -65,6 +65,7 @@ struct NoteDetail: View {
         @Binding public var job: Job?
         @Binding public var title: String
         @FetchRequest private var recentJobs: FetchedResults<Job>
+        @FetchRequest private var mostCommonJobs: FetchedResults<Job>
         @State private var fromCurrentProject: [Job] = []
         @State private var fromCurrentCompany: [Job] = []
         @FocusState private var titleFieldFocused: Bool
@@ -82,7 +83,22 @@ struct NoteDetail: View {
                         if self.job != nil {
                             Text("Title: \((title).prefix(25))")
                             Text("ID: \(self.job!.jid.string)")
-                            Divider()
+                        } else {
+                            Text("Select a job")
+                        }
+
+                        Divider()
+                        
+                        if !self.mostCommonJobs.isEmpty {
+                            Menu("Popular", systemImage: "checkmark.seal") {
+                                ForEach(mostCommonJobs) { jerb in
+                                    Button {
+                                        job = jerb
+                                    } label: {
+                                        Text(jerb.title ?? jerb.jid.string)
+                                    }
+                                }
+                            }
                         }
 
                         if !self.recentJobs.isEmpty {
@@ -144,6 +160,7 @@ struct NoteDetail: View {
             _job = job
             _title = title
             _recentJobs = CoreDataJob.fetchRecent(numDaysPrior: 7, limit: 7)
+            _mostCommonJobs = CoreDataJob.fetchAll(limit: 7) // @TODO: use .fetchCommon instead
         }
     }
 
