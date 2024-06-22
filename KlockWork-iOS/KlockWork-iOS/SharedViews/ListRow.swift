@@ -40,6 +40,7 @@ struct ToggleableListRow: View {
     public var iconOn: String = "square.fill"
     public var extraColumn: AnyView?
     public var highlight: Bool = true
+    public var padding: CGFloat = 8
     @Binding public var selected: Bool
 
     var body: some View {
@@ -65,7 +66,7 @@ struct ToggleableListRow: View {
             .listRowBackground(selected ? Color.yellow : Color.clear)
             .cornerRadius(5)
         }
-        .padding(8)
+        .padding([.leading, .trailing, .top, .bottom], self.padding)
         .background(selected ? colour.opacity(1) : colour.opacity(0.3))
         .listRowBackground(selected ? colour.opacity(1) : colour.opacity(0.3))
     }

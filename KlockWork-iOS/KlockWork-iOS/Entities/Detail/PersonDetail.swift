@@ -8,22 +8,37 @@
 import SwiftUI
 
 struct PersonDetail: View {
-    public let person: Person
-
-    @State private var createdDate: Date = Date()
+    @EnvironmentObject private var state: AppState
+    @Environment(\.dismiss) private var dismiss
+    public var person: Person?
+    public var page: PageConfiguration.AppPage = .create
+    @State private var created: Date = Date()
     @State private var lastUpdate: Date = Date()
     @State private var name: String = ""
     @State private var title: String = ""
     @State private var company: Company? = nil
+    @State private var isCompanySelectorPresented: Bool = false
+    @State private var isSaveAlertPresented: Bool = false
 
     var body: some View {
         NavigationStack {
             VStack {
                 List {
+                    Section {
+                        TextField("Name", text: $name, axis: .vertical)
+                        TextField("Title", text: $title, axis: .vertical)
+                        Widget.CompanySelector.FormField(
+                            company: $company,
+                            isCompanySelectorPresented: $isCompanySelectorPresented,
+                            orientation: .horizontal
+                        )
+                    }
+                    .listRowBackground(Theme.textBackground)
+
                     Section("Settings") {
                         DatePicker(
                             "Created",
-                            selection: $createdDate,
+                            selection: $created,
                             displayedComponents: [.date, .hourAndMinute]
                         )
 
@@ -34,51 +49,79 @@ struct PersonDetail: View {
                         )
                     }
                     .listRowBackground(Theme.textBackground)
-
-                    if company != nil {
-                        Section("Company") {
-                            NavigationLink {
-                                CompanyDetail(company: company!)
-                                    .background(Theme.cPurple)
-                                    .scrollContentBackground(.hidden)
-                            } label: {
-                                Text(company!.name!)
-                            }
-                        }
-                        .listRowBackground(Theme.textBackground)
-                    }
-
-                    Section("Name") {
-                        TextField("Person name", text: $name, axis: .vertical)
-                    }
-                    .listRowBackground(Theme.textBackground)
-
-                    Section("Title") {
-                        TextField("Person's title", text: $title, axis: .vertical)
-                    }
-                    .listRowBackground(Theme.textBackground)
                 }
-                .listStyle(.grouped)
             }
-            .onAppear(perform: actionOnAppear)
-            .navigationTitle(person.name != nil ? person.name! : "_PERSON")
+            .onAppear(perform: self.actionOnAppear)
+            .navigationTitle(self.person != nil ? self.person!.name! : "New Person")
+            .background(self.page.primaryColour)
+            .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
-                Button("Save") {
-
+                ToolbarItem(placement: .topBarTrailing) {
+                    // Creates new entity on tap, then sends user back to Today
+                    Button {
+                        self.actionOnSave()
+                    } label: {
+                        Text("Save")
+                    }
+                    .foregroundStyle(self.state.theme.tint)
+                    .alert("Saved", isPresented: $isSaveAlertPresented) {
+                        Button("OK") {
+                            dismiss()
+                        }
+                    } message: {
+                        Text("\"\(self.name)\" saved")
+                    }
                 }
+            }
+            .sheet(isPresented: $isCompanySelectorPresented) {
+                Widget.CompanySelector.Single(
+                    showing: $isCompanySelectorPresented,
+                    entity: $company
+                )
+                .presentationBackground(self.page.primaryColour)
             }
         }
     }
 }
 
 extension PersonDetail {
+    /// Onload handler. Modifies view state
+    /// - Returns: Void
     private func actionOnAppear() -> Void {
-        if let cDate = person.created {createdDate = cDate}
-        if let uDate = person.lastUpdate {lastUpdate = uDate}
-        if let nm = person.name {name = nm}
-        if let ti = person.title {title = ti}
-        if let co = person.company {company = co}
+        if let person = self.person {
+            if let cDate = person.created {created = cDate}
+            if let uDate = person.lastUpdate {lastUpdate = uDate}
+            if let nm = person.name {name = nm}
+            if let ti = person.title {title = ti}
+            if let co = person.company {company = co}
+        }
+    }
+    
+    /// Callback for the Save button. Modifies an existing user, creates a new one if one cannot be found
+    /// - Returns: Void
+    private func actionOnSave() -> Void {
+        if self.person != nil {
+            self.person!.name = self.name
+            self.person!.company = self.company
+            self.person!.created = self.created
+            self.person!.lastUpdate = Date()
+            self.person!.title = self.title
+        } else {
+            CoreDataPerson(moc: self.state.moc).create(
+                created: self.created,
+                lastUpdate: self.lastUpdate,
+                name: self.name,
+                title: self.title,
+                company: self.company!, // @TODO: add form validation to prevent this from causing crashes
+                saveByDefault: false
+           )
+        }
+
+        isSaveAlertPresented.toggle()
+        PersistenceController.shared.save()
     }
 }

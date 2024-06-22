@@ -67,6 +67,8 @@ class DefaultObjects {
             abbreviation: "II",
             colour: Color.randomStorable(),
             created: Date(),
+            updated: Date(),
+            projects: NSSet(array: []),
             isDefault: false,
             pid: 2,
             saveByDefault: false

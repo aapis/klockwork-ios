@@ -620,7 +620,7 @@ extension Tabs.Content {
                 } label: {
                     ListRow(
                         name: person.name ?? "_PERSON_NAME",
-                        colour: Theme.textBackground
+                        colour: Color.fromStored(person.company != nil ? person.company!.colour! : Theme.rowColourAsDouble)
                     )
                 }
                 .buttonStyle(.plain)
@@ -662,6 +662,33 @@ extension Tabs.Content {
                     )
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleProjectCustomButtonTwoState: View {
+            public let entity: Project
+            public var alreadySelected: Bool
+            public var callback: (Project, ButtonAction) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(entity, selected ? .add : .remove)
+                } label: {
+                    ToggleableListRow(
+                        name: entity.name ?? "_NAME",
+                        colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
+                        iconOff: "square",
+                        iconOn: "square.fill",
+                        selected: $selected
+                    )
+                }
+                .listRowBackground(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
+                .buttonStyle(.plain)
+                .onAppear(perform: {
+                    selected = alreadySelected
+                })
             }
         }
     }

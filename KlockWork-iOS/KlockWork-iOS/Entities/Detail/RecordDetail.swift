@@ -31,7 +31,6 @@ struct RecordDetail: View {
                 }
                 .listRowBackground(Theme.textBackground)
             }
-            .listStyle(.grouped)
             Spacer()
         }
         .onAppear(perform: actionOnAppear)

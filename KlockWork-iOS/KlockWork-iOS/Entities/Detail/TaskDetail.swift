@@ -83,7 +83,6 @@ struct TaskDetail: View {
                     }
                     .listRowBackground(Theme.textBackground)
                 }
-                .listStyle(.grouped)
             }
             .onAppear(perform: self.actionOnAppear)
             .navigationTitle("Task")

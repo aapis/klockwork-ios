@@ -254,7 +254,6 @@ struct NoteDetail: View {
                     }
                     .listRowBackground(Theme.textBackground)
                 }
-                .listStyle(.grouped)
             }
             .navigationTitle("Metadata")
             .background(self.page.primaryColour)

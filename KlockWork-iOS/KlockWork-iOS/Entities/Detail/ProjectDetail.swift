@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct ProjectDetail: View {
-    public let project: Project
-
+    @EnvironmentObject private var state: AppState
+    @Environment(\.dismiss) private var dismiss
+    public var project: Project?
     @State private var abbreviation: String = ""
     @State private var alive: Bool = false
     @State private var colour: Color = .clear
@@ -17,6 +18,10 @@ struct ProjectDetail: View {
     @State private var createdDate: Date = Date()
     @State private var lastUpdate: Date = Date()
     @State private var name: String = ""
+    @State private var pid: Int64 = 0
+    @State private var isCompanySelectorPresent: Bool = false
+    @State private var isSaveAlertPresented: Bool = false
+    @State private var isDeleteAlertPresented: Bool = false
     static public let defaultName: String = "A Really Good Project Name"
 
     private let page: PageConfiguration.AppPage = .create
@@ -25,15 +30,24 @@ struct ProjectDetail: View {
         NavigationStack {
             VStack {
                 List {
+                    Section {
+                        TextField("Name", text: $name, axis: .vertical)
+                        TextField("Abbreviation/Code", text: $abbreviation, axis: .vertical)
+                        Widget.CompanySelector.FormField(
+                            company: $company,
+                            isCompanySelectorPresented: $isCompanySelectorPresent,
+                            orientation: .horizontal
+                        )
+                    }
+                    .listRowBackground(Theme.textBackground)
+
                     Section("Settings") {
                         Toggle("Published", isOn: $alive)
-
                         DatePicker(
                             "Created",
                             selection: $createdDate,
                             displayedComponents: [.date, .hourAndMinute]
                         )
-
                         DatePicker(
                             "Last updated",
                             selection: $lastUpdate,
@@ -41,77 +55,114 @@ struct ProjectDetail: View {
                         )
                         ColorPicker(selection: $colour) {
                             Text("Colour")
+                                .foregroundStyle(.gray)
                         }
+                        .listRowBackground(colour == .clear ? Theme.textBackground : colour)
                     }
                     .listRowBackground(Theme.textBackground)
 
-                    if company != nil {
-                        Section("Company") {
-                            NavigationLink {
-                                CompanyDetail(company: company!)
-                                    .background(Theme.cPurple)
-                                    .scrollContentBackground(.hidden)
-                            } label: {
-                                Text(company!.name!)
+                    if self.project != nil {
+                        Button("Delete Project", role: .destructive, action: self.actionOnDelete)
+                            .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                                Button("Yes", role: .destructive) {
+                                    dismiss()
+                                }
+                            } message: {
+                                Text("\"\(self.name)\" will be deleted, but is recoverable.")
                             }
-                        }
-                        .listRowBackground(Theme.textBackground)
+                            .listRowBackground(Color.red)
+                            .foregroundStyle(.white)
                     }
-
-                    Section("Name") {
-                        TextField("Project name", text: $name, axis: .vertical)
-                    }
-                    .listRowBackground(Theme.textBackground)
-
-                    Section("Abbreviation") {
-                        TextField("Project abbreviation", text: $abbreviation, axis: .vertical)
-                    }
-                    .listRowBackground(Theme.textBackground)
                 }
-                .listStyle(.grouped)
             }
             .background(page.primaryColour)
             .onAppear(perform: actionOnAppear)
-            .navigationTitle(project.name ?? "_PROJECT_NAME")
+            .navigationTitle(self.project != nil ? "Project" : "New Project")
+            .background(self.page.primaryColour)
+            .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
-            .scrollContentBackground(.hidden)
+            .scrollDismissesKeyboard(.immediately)
             .toolbar {
-                Button("Save") {
-                    self.actionOnSave()
+                ToolbarItem(placement: .topBarTrailing) {
+                    // Creates new entity on tap, then sends user back to Today
+                    Button {
+                        self.actionOnSave()
+                    } label: {
+                        Text("Save")
+                    }
+                    .foregroundStyle(self.state.theme.tint)
+                    .alert("Saved", isPresented: $isSaveAlertPresented) {
+                        Button("OK") {
+                            dismiss()
+                        }
+                    } message: {
+                        Text("\"\(self.name)\" saved")
+                    }
                 }
+            }
+            .sheet(isPresented: $isCompanySelectorPresent) {
+                Widget.CompanySelector.Single(
+                    showing: $isCompanySelectorPresent,
+                    entity: $company
+                )
+                .presentationBackground(self.page.primaryColour)
             }
         }
     }
 }
 
-
-
 extension ProjectDetail {
     /// Onload handler. Sets form field values
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        if let cDate = project.created {createdDate = cDate}
-        if let uDate = project.lastUpdate {lastUpdate = uDate}
-        if let nm = project.name {name = nm}
-        if let ab = project.abbreviation {abbreviation = ab}
-        if let co = project.colour {colour = Color.fromStored(co)}
-        if let comp = project.company {company = comp}
-        alive = project.alive
+        if let project = self.project {
+            if let cDate = project.created {createdDate = cDate}
+            if let uDate = project.lastUpdate {lastUpdate = uDate}
+            if let nm = project.name {name = nm}
+            if let ab = project.abbreviation {abbreviation = ab}
+            if let co = project.colour {colour = Color.fromStored(co)}
+            if let comp = project.company {company = comp}
+            self.alive = project.alive
+            self.pid = project.pid
+        }
     }
     
     /// Fired when the save button is tapped in the toolbar. Saves project object
     /// - Returns: Void
     private func actionOnSave() -> Void {
-        project.abbreviation = abbreviation
-        project.alive = alive
-        project.colour = colour.toStored()
-        project.company = project.company
-        project.lastUpdate = Date()
-        project.name = name
+        if self.project != nil {
+            project!.abbreviation = self.abbreviation // @TODO: generate a new abbreviation
+            project!.alive = self.alive
+            project!.colour = self.colour.toStored()
+            project!.company = self.company
+            project!.lastUpdate = Date()
+            project!.name = name
+        } else {
+            CoreDataProjects(moc: self.state.moc).create(
+                name: self.name,
+                abbreviation: self.abbreviation,
+                colour: self.colour.toStored(),
+                created: self.createdDate,
+                pid: self.pid,
+                company: self.company
+            )
+        }
+        
+        isSaveAlertPresented.toggle()
+        PersistenceController.shared.save()
+    }
+    
+    /// Soft delete a Project
+    /// - Returns: Void
+    private func actionOnDelete() -> Void {
+        self.alive = false
+        if self.project != nil {
+            self.project!.alive = self.alive
+        }
 
+        isDeleteAlertPresented.toggle()
         PersistenceController.shared.save()
     }
 }
-
-
