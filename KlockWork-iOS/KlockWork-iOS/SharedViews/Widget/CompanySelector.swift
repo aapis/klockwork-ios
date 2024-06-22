@@ -46,7 +46,7 @@ extension Widget {
                             isCompanySelectorPresented.toggle()
                         } label: {
                             if company == nil {
-                                Text("Select Company...")
+                                Text("Select...")
                             } else {
                                 Text(company!.name!)
                                     .padding(5)

@@ -169,7 +169,7 @@ extension Today {
                     }
 
                     NavigationLink {
-//                        ProjectDetail()
+                        ProjectDetail()
                     } label: {
                         Text(Entity.projects.enSingular)
                         Entity.projects.icon

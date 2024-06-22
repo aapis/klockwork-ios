@@ -44,7 +44,7 @@ extension Widget {
                             isProjectSelectorPresented.toggle()
                         } label: {
                             if project == nil {
-                                Text("Select Project...")
+                                Text("Select...")
                             } else {
                                 Text(project!.name!)
                                     .padding(5)
