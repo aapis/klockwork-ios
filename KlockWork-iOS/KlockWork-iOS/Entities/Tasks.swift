@@ -11,10 +11,9 @@ import SwiftUI
 struct Tasks: View {
     typealias EntityType = PageConfiguration.EntityType
 
+    @EnvironmentObject private var state: AppState
     private let entityType: EntityType = .tasks
     @State public var items: [LogTask] = []
-
-    @Environment(\.managedObjectContext) var moc
 
     var body: some View {
         NavigationStack {
@@ -46,7 +45,7 @@ struct Tasks: View {
                 }
             }
             .onAppear(perform: {
-                items = CoreDataTasks(moc: moc).all()
+                items = CoreDataTasks(moc: self.state.moc).all()
             })
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)

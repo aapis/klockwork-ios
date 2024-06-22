@@ -158,7 +158,7 @@ extension Tabs.Content {
 
             var body: some View {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if items.count > 0 {
                             ForEach(items) { record in
                                 Individual.SingleRecord(record: record)
@@ -193,7 +193,7 @@ extension Tabs.Content {
 
             var body: some View {
                 ScrollView {
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 0) {
                         if items.count > 0 {
                             ForEach(items) { jerb in
                                 Individual.SingleJobLink(job: jerb)
@@ -223,7 +223,7 @@ extension Tabs.Content {
 
             var body: some View {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if items.count > 0 {
                             ForEach(items) { task in
                                 Individual.SingleTaskChecklistItem(task: task)
@@ -252,7 +252,7 @@ extension Tabs.Content {
 
             var body: some View {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if items.count > 0 {
                             ForEach(items) { note in
                                 Individual.SingleNote(note: note)
@@ -281,7 +281,7 @@ extension Tabs.Content {
 
             var body: some View {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if items.count > 0 {
                             ForEach(items) { item in
                                 Individual.SingleCompany(company: item)
@@ -310,7 +310,7 @@ extension Tabs.Content {
 
             var body: some View {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if items.count > 0 {
                             ForEach(items) { item in
                                 Individual.SinglePerson(person: item)
@@ -339,7 +339,7 @@ extension Tabs.Content {
 
             var body: some View {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if items.count > 0 {
                             ForEach(items) { item in
                                 Individual.SingleProject(project: item)
@@ -407,18 +407,10 @@ extension Tabs.Content {
 
         struct SingleJobLink: View {
             public let job: Job
-            @State private var path: NavigationPath = NavigationPath()
 
             var body: some View {
                 NavigationLink {
-                    JobDetail(job: job, path: $path)
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button("Save") {
-                                    PersistenceController.shared.save()
-                                }
-                            }
-                        }
+                    JobDetail(job: job)
                 } label: {
                     ListRow(
                         name: job.title ?? job.jid.string,

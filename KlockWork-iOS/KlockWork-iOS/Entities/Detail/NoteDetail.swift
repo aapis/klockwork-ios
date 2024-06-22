@@ -10,6 +10,7 @@ import SwiftUI
 
 struct NoteDetail: View {
     @EnvironmentObject private var state: AppState
+    @Environment(\.dismiss) private var dismiss
     public var note: Note? = nil
     @State private var versions: [NoteVersion] = []
     @State private var current: NoteVersion? = nil
@@ -19,6 +20,7 @@ struct NoteDetail: View {
     @State private var starred: Bool = false
     @State private var postedDate: Date = Date()
     @State private var alive: Bool = true
+    @State private var isSaveAlertPresented: Bool = false
     public var page: PageConfiguration.AppPage = .create
     static public let defaultTitle: String = "Sample Note Title"
     @FocusState private var contentFieldFocused: Bool
@@ -300,21 +302,16 @@ extension NoteDetail {
     /// - Returns: Void
     private func actionOnSave() -> Void {
         if self.note != nil {
-            self.note!.title = self.title
-            self.note!.starred = self.starred
-            self.note!.postedDate = self.postedDate
-            self.note!.alive = self.alive
-            self.note!.lastUpdate = Date()
-            self.note!.body = self.content
-            if let job = self.job {
-                self.note!.mJob = job
-            }
-
-            self.note!.addToVersions(
-                CoreDataNoteVersions(moc: self.state.moc).from(self.note!, source: .manual)
+            CoreDataNotes(moc: self.state.moc).update(
+                entity: self.note!,
+                alive: self.alive,
+                body: self.content,
+                lastUpdate: Date(),
+                postedDate: Date(),
+                starred: self.starred,
+                title: self.title,
+                job: self.job
             )
-
-            PersistenceController.shared.save()
         } else {
             CoreDataNotes(moc: self.state.moc).create(
                 alive: self.alive,
@@ -326,6 +323,8 @@ extension NoteDetail {
                 job: self.job
             )
         }
+
+        isSaveAlertPresented.toggle()
     }
 }
 

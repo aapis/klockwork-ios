@@ -10,7 +10,8 @@ import SwiftUI
 
 struct TaskDetail: View {
     @EnvironmentObject private var state: AppState
-    public let task: LogTask
+    @Environment(\.dismiss) private var dismiss
+    public var task: LogTask?
     @State private var completedDate: Date = Date()
     @State private var cancelledDate: Date = Date()
     @State private var content: String = ""
@@ -21,6 +22,7 @@ struct TaskDetail: View {
     @State private var isCompleted: Bool = false
     @State private var isCancelled: Bool = false
     @State private var isJobSelectorPresented: Bool = false
+    @State private var isSaveAlertPresented: Bool = false
     public var page: PageConfiguration.AppPage = .create
     static public let defaultContent: String = "Sample task content"
 
@@ -48,7 +50,7 @@ struct TaskDetail: View {
                         )
                         .disabled(true)
 
-                        if task.completedDate != nil {
+                        if isCompleted {
                             DatePicker(
                                 "Completed on",
                                 selection: $completedDate,
@@ -59,7 +61,7 @@ struct TaskDetail: View {
                             Toggle("Completed", isOn: $isCompleted)
                         }
 
-                        if task.cancelledDate != nil {
+                        if isCancelled {
                             DatePicker(
                                 "Cancelled on",
                                 selection: $cancelledDate,
@@ -92,12 +94,20 @@ struct TaskDetail: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
+                    // Creates new entity on tap, then sends user back to Today
                     Button {
                         self.actionOnSave()
                     } label: {
                         Text("Save")
                     }
                     .foregroundStyle(self.state.theme.tint)
+                    .alert("Saved", isPresented: $isSaveAlertPresented) {
+                        Button("OK") {
+                            dismiss()
+                        }
+                    } message: {
+                        Text("\"\(self.content.prefix(25))\" saved")
+                    }
                 }
             }
             .sheet(isPresented: $isJobSelectorPresented) {
@@ -109,53 +119,56 @@ struct TaskDetail: View {
             }
         }
     }
-    
-    /// Default initializer
-    /// - Parameter task: LogTask
-    init(task: LogTask? = nil) {
-        if task == nil {
-            self.task = DefaultObjects.task
-        } else {
-            self.task = task!
-        }
-    }
 }
 
 extension TaskDetail {
     /// Onload handler, sets view data
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        if let coDate = task.completedDate {
-            completedDate = coDate
-            isCompleted = true
-        }
+        if let task = self.task {
+            if let coDate = task.completedDate {
+                completedDate = coDate
+                isCompleted = true
+            }
 
-        if let caDate = task.cancelledDate {
-            cancelledDate = caDate
-            isCancelled = true
-        }
+            if let caDate = task.cancelledDate {
+                cancelledDate = caDate
+                isCancelled = true
+            }
 
-        if let cDate = task.created {created = cDate}
-        if let dDate = task.due {due = dDate}
-        if let uDate = task.lastUpdate {lastUpdate = uDate}
-        if let co = task.content {content = co}
-        if let jo = task.owner {job = jo}
+            if let cDate = task.created {created = cDate}
+            if let dDate = task.due {due = dDate}
+            if let uDate = task.lastUpdate {lastUpdate = uDate}
+            if let co = task.content {content = co}
+            if let jo = task.owner {job = jo}
+        }
     }
     
     /// Save handler
     /// - Returns: Void
     private func actionOnSave() -> Void {
-        self.task.content = self.content
-        self.task.owner = self.job
-        self.task.lastUpdate = Date()
-        self.task.due = self.due
+        if self.task != nil {
+            self.task!.content = self.content
+            self.task!.owner = self.job
+            self.task!.lastUpdate = Date()
+            self.task!.due = self.due
 
-        if isCancelled {
-            self.task.cancelledDate = self.cancelledDate
-        } else if isCompleted {
-            self.task.completedDate = Date()
+            if isCancelled {
+                self.task!.cancelledDate = self.cancelledDate
+            } else if isCompleted {
+                self.task!.completedDate = Date()
+            }
+        } else {
+            CoreDataTasks(moc: self.state.moc).create(
+                content: self.content,
+                created: self.created,
+                due: self.due,
+                job: self.job,
+                saveByDefault: false
+            )
         }
 
+        isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
     }
 }

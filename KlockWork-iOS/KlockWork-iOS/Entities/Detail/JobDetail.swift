@@ -10,6 +10,7 @@ import SwiftUI
 
 struct JobDetail: View {
     @EnvironmentObject private var state: AppState
+    @Environment(\.dismiss) private var dismiss
     public var job: Job?
     public var page: PageConfiguration.AppPage = .create
     @State private var alive: Bool = true
@@ -25,10 +26,11 @@ struct JobDetail: View {
     @State private var project: Project? = nil
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isProjectSelectorPresented: Bool = false
+    @State private var isSaveAlertPresented: Bool = false
     static public let defaultTitle: String = "Descriptive job title"
 
     var body: some View {
-        VStack {
+        NavigationStack {
             List {
                 Section("Title") {
                     TextField("Title", text: $title)
@@ -81,7 +83,7 @@ struct JobDetail: View {
             .listStyle(.grouped)
         }
         .onAppear(perform: self.actionOnAppear)
-        .navigationTitle(self.jid == 0.0 ? "New Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")
+        .navigationTitle(self.jid == 0.0 ? "Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")
         .background(page.primaryColour)
         .scrollContentBackground(.hidden)
         .navigationBarTitleDisplayMode(.inline)
@@ -90,19 +92,20 @@ struct JobDetail: View {
         .scrollDismissesKeyboard(.immediately)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                // Creates new job on tap, then sends user back to Today
+                // Creates new entity on tap, then sends user back to Today
                 Button {
                     self.actionOnSave()
                 } label: {
-                    NavigationLink {
-                        Today(inSheet: false)
-                            .onAppear(perform: self.actionOnSave)
-                    } label: {
-                        Text("Save")
-                            .foregroundStyle(self.state.theme.tint)
-                    }
+                    Text("Save")
                 }
                 .foregroundStyle(self.state.theme.tint)
+                .alert("Saved", isPresented: $isSaveAlertPresented) {
+                    Button("OK") {
+                        dismiss()
+                    }
+                } message: {
+                    Text("\"\(self.title)\" saved")
+                }
             }
         }
         .sheet(isPresented: $isCompanySelectorPresented) {
@@ -186,7 +189,8 @@ extension JobDetail {
                 saveByDefault: false
             )
         }
-
+        
+        isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
     }
 }
