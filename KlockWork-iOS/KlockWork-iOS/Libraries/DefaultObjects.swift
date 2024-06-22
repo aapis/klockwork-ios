@@ -40,6 +40,7 @@ class DefaultObjects {
         return CoreDataTasks(moc: PersistenceController.shared.container.viewContext).createAndReturn(
             content: TaskDetail.defaultContent,
             created: Date(),
+            due: Date(),
             job: DefaultObjects.job,
             saveByDefault: false
         )

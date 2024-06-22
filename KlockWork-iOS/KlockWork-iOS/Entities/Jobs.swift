@@ -17,8 +17,6 @@ struct Jobs: View {
     @State private var isCreateEditorPresented: Bool = false
     private let page: PageConfiguration.AppPage = .create
 
-    @Environment(\.managedObjectContext) var moc
-
     var body: some View {
         NavigationStack {
             List {
@@ -32,18 +30,11 @@ struct Jobs: View {
                         ForEach(items) { item in
                             NavigationLink {
                                 JobDetail(job: item)
-                                    .toolbar {
-                                        ToolbarItem(placement: .topBarTrailing) {
-                                            Button("Save") {
-                                                PersistenceController.shared.save()
-                                            }
-                                        }
-                                    }
                             } label: {
                                 Text(item.title != nil ? item.title!.isEmpty ? item.jid.string : item.title!.capitalized : item.jid.string)
                             }
                         }
-                        .onDelete(perform: deleteItems)
+//                        .onDelete(perform: deleteItems)
                         .listRowBackground(Theme.textBackground)
                     } else {
                         Button(action: self.toggleCreateSheet) {
@@ -54,7 +45,7 @@ struct Jobs: View {
                 }
             }
             .onAppear(perform: {
-                items = CoreDataJob(moc: moc).all(true)
+                items = CoreDataJob(moc: self.state.moc).all(true)
             })
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)

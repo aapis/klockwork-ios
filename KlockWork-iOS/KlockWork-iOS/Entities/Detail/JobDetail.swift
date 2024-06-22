@@ -10,13 +10,14 @@ import SwiftUI
 
 struct JobDetail: View {
     @EnvironmentObject private var state: AppState
+    @Environment(\.dismiss) private var dismiss
     public var job: Job?
     public var page: PageConfiguration.AppPage = .create
     @State private var alive: Bool = true
     @State private var colour: Color = .clear
     @State private var company: Company? = nil
     @State private var created: Date = Date()
-    @State private var jid: Double = 0.0
+    @State private var jid: String = ""
     @State private var lastUpdate: Date = Date()
     @State private var overview: String = ""
     @State private var shredable: Bool = false
@@ -25,18 +26,55 @@ struct JobDetail: View {
     @State private var project: Project? = nil
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isProjectSelectorPresented: Bool = false
+    @State private var isSaveAlertPresented: Bool = false
     static public let defaultTitle: String = "Descriptive job title"
 
     var body: some View {
-        VStack {
+        NavigationStack {
             List {
-                Section("Title") {
-                    TextField("Title", text: $title)
-                }
-                .listRowBackground(Theme.textBackground)
+                Section {
+                    HStack {
+                        if !title.isEmpty {
+                            Text("Title")
+                                .foregroundStyle(.gray)
+                        }
+                        TextField("Title", text: $title)
+                        Spacer()
+                    }
 
-                Section("URL") {
-                    TextField("URL", text: $url)
+                    HStack {
+                        if !jid.isEmpty {
+                            Text("JID")
+                                .foregroundStyle(.gray)
+                        }
+                        TextField("Job ID", text: $jid)
+                        Spacer()
+                    }
+
+                    HStack {
+                        if !url.isEmpty {
+                            Text("URL")
+                                .foregroundStyle(.gray)
+                        }
+                        TextField("URL", text: $url)
+                        Spacer()
+                    }
+
+                    Widget.CompanySelector.FormField(
+                        company: $company,
+                        isCompanySelectorPresented: $isCompanySelectorPresented,
+                        orientation: .horizontal
+                    )
+
+                    // Evaluating self.company here seems to trigger a view refresh that we need to make this combo selector thing work
+                    if self.company != nil {
+                        Widget.ProjectSelector.FormField(
+                            project: $project,
+                            company: $company,
+                            isProjectSelectorPresented: $isProjectSelectorPresented,
+                            orientation: .horizontal
+                        )
+                    }
                 }
                 .listRowBackground(Theme.textBackground)
 
@@ -44,39 +82,6 @@ struct JobDetail: View {
                     TextEditor(text: $overview).lineLimit(3...)
                 }
                 .listRowBackground(Theme.textBackground)
-
-                Section("Company") {
-                    Button {
-                        self.isCompanySelectorPresented.toggle()
-                    } label: {
-                        if self.company == nil {
-                            Text("Select...")
-                        } else {
-                            Text(self.company!.name!)
-                                .padding(5)
-                                .background(Theme.base.opacity(0.2))
-                                .cornerRadius(5)
-                        }
-                    }
-                }
-                .listRowBackground(self.company == nil ? Theme.textBackground : Color.fromStored(self.company!.colour ?? Theme.rowColourAsDouble))
-
-                Section("Project") {
-                    Button {
-                        self.isProjectSelectorPresented.toggle()
-                    } label: {
-                        if self.project == nil {
-                            Text("Select...")
-                        } else {
-                            Text(self.project!.name!)
-                                .padding(5)
-                                .background(Theme.base.opacity(0.2))
-                                .cornerRadius(5)
-                        }
-                    }
-                    .disabled(self.company == nil)
-                }
-                .listRowBackground(self.project == nil ? Theme.textBackground : Color.fromStored(self.project!.colour ?? Theme.rowColourAsDouble))
 
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
@@ -100,7 +105,7 @@ struct JobDetail: View {
             .listStyle(.grouped)
         }
         .onAppear(perform: self.actionOnAppear)
-        .navigationTitle(self.jid == 0.0 ? "New Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")
+        .navigationTitle(self.jid.isEmpty ? "Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")
         .background(page.primaryColour)
         .scrollContentBackground(.hidden)
         .navigationBarTitleDisplayMode(.inline)
@@ -109,19 +114,20 @@ struct JobDetail: View {
         .scrollDismissesKeyboard(.immediately)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                // Creates new job on tap, then sends user back to Today
+                // Creates new entity on tap, then sends user back to Today
                 Button {
                     self.actionOnSave()
                 } label: {
-                    NavigationLink {
-                        Today(inSheet: false)
-                            .onAppear(perform: self.actionOnSave)
-                    } label: {
-                        Text("Save")
-                            .foregroundStyle(self.state.theme.tint)
-                    }
+                    Text("Save")
                 }
                 .foregroundStyle(self.state.theme.tint)
+                .alert("Saved", isPresented: $isSaveAlertPresented) {
+                    Button("OK") {
+                        dismiss()
+                    }
+                } message: {
+                    Text("\"\(self.title)\" saved")
+                }
             }
         }
         .sheet(isPresented: $isCompanySelectorPresented) {
@@ -156,7 +162,7 @@ extension JobDetail {
             if let cDate = self.job!.created {
                 self.created = cDate
             }
-            self.jid = self.job!.jid
+            self.jid = self.job!.jid.string
             if let uDate = self.job!.lastUpdate {
                 self.lastUpdate = uDate
             }
@@ -183,7 +189,7 @@ extension JobDetail {
         if self.job != nil {
             self.job!.alive = self.alive
             self.job!.colour = self.colour.toStored()
-            self.job!.jid = self.jid
+            self.job!.jid = Double(self.jid) ?? 0.0
             self.job!.lastUpdate = Date()
             self.job!.overview = self.overview
             self.job!.shredable = self.shredable
@@ -196,7 +202,7 @@ extension JobDetail {
             CoreDataJob(moc: self.state.moc).create(
                 alive: self.alive,
                 colour: self.colour.toStored(),
-                jid: self.jid,
+                jid: Double(self.jid) ?? 0.0,
                 overview: self.overview,
                 shredable: self.shredable,
                 title: self.title,
@@ -205,7 +211,8 @@ extension JobDetail {
                 saveByDefault: false
             )
         }
-
+        
+        isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
     }
 }

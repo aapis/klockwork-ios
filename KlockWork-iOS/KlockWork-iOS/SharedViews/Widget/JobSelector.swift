@@ -9,6 +9,30 @@ import SwiftUI
 
 extension Widget {
     struct JobSelector {
+        /// Selector view
+        struct FormField: View {
+            @Binding public var job: Job?
+            @Binding public var isJobSelectorPresented: Bool
+
+            var body: some View {
+                Section("Job") {
+                    Button {
+                        isJobSelectorPresented.toggle()
+                    } label: {
+                        if self.job == nil {
+                            Text("Select...")
+                        } else {
+                            Text(self.job!.title ?? self.job!.jid.string)
+                                .padding(5)
+                                .background(Theme.base.opacity(0.2))
+                                .cornerRadius(5)
+                        }
+                    }
+                }
+                .listRowBackground(self.job == nil ? Theme.textBackground : Color.fromStored(self.job!.colour ?? Theme.rowColourAsDouble))
+            }
+        }
+
         /// Allows selection of multiple jobs from the list
         struct Multi: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState

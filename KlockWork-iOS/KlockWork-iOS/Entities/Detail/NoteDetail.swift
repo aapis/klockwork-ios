@@ -10,6 +10,7 @@ import SwiftUI
 
 struct NoteDetail: View {
     @EnvironmentObject private var state: AppState
+    @Environment(\.dismiss) private var dismiss
     public var note: Note? = nil
     @State private var versions: [NoteVersion] = []
     @State private var current: NoteVersion? = nil
@@ -19,6 +20,7 @@ struct NoteDetail: View {
     @State private var starred: Bool = false
     @State private var postedDate: Date = Date()
     @State private var alive: Bool = true
+    @State private var isSaveAlertPresented: Bool = false
     public var page: PageConfiguration.AppPage = .create
     static public let defaultTitle: String = "Sample Note Title"
     @FocusState private var contentFieldFocused: Bool
@@ -65,6 +67,7 @@ struct NoteDetail: View {
         @Binding public var job: Job?
         @Binding public var title: String
         @FetchRequest private var recentJobs: FetchedResults<Job>
+        @FetchRequest private var mostCommonJobs: FetchedResults<Job>
         @State private var fromCurrentProject: [Job] = []
         @State private var fromCurrentCompany: [Job] = []
         @FocusState private var titleFieldFocused: Bool
@@ -82,7 +85,22 @@ struct NoteDetail: View {
                         if self.job != nil {
                             Text("Title: \((title).prefix(25))")
                             Text("ID: \(self.job!.jid.string)")
-                            Divider()
+                        } else {
+                            Text("Select a job")
+                        }
+
+                        Divider()
+                        
+                        if !self.mostCommonJobs.isEmpty {
+                            Menu("Popular", systemImage: "checkmark.seal") {
+                                ForEach(mostCommonJobs) { jerb in
+                                    Button {
+                                        job = jerb
+                                    } label: {
+                                        Text(jerb.title ?? jerb.jid.string)
+                                    }
+                                }
+                            }
                         }
 
                         if !self.recentJobs.isEmpty {
@@ -144,6 +162,7 @@ struct NoteDetail: View {
             _job = job
             _title = title
             _recentJobs = CoreDataJob.fetchRecent(numDaysPrior: 7, limit: 7)
+            _mostCommonJobs = CoreDataJob.fetchAll(limit: 7) // @TODO: use .fetchCommon instead
         }
     }
 
@@ -283,22 +302,29 @@ extension NoteDetail {
     /// - Returns: Void
     private func actionOnSave() -> Void {
         if self.note != nil {
-            self.note!.title = self.title
-            self.note!.starred = self.starred
-            self.note!.postedDate = self.postedDate
-            self.note!.alive = self.alive
-            self.note!.lastUpdate = Date()
-            self.note!.body = self.content
-            if let job = self.job {
-                self.note!.mJob = job
-            }
-
-            self.note!.addToVersions(
-                CoreDataNoteVersions(moc: self.state.moc).from(self.note!, source: .manual)
+            CoreDataNotes(moc: self.state.moc).update(
+                entity: self.note!,
+                alive: self.alive,
+                body: self.content,
+                lastUpdate: Date(),
+                postedDate: Date(),
+                starred: self.starred,
+                title: self.title,
+                job: self.job
             )
-
-            PersistenceController.shared.save()
+        } else {
+            CoreDataNotes(moc: self.state.moc).create(
+                alive: self.alive,
+                body: self.content,
+                lastUpdate: Date(),
+                postedDate: Date(),
+                starred: self.starred,
+                title: self.title,
+                job: self.job
+            )
         }
+
+        isSaveAlertPresented.toggle()
     }
 }
 

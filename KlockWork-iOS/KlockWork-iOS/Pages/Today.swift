@@ -18,20 +18,24 @@ struct Today: View {
     @State private var selected: EntityType = .records
     @State private var jobs: [Job] = []
     @State private var isPresented: Bool = false
+    @State private var path = NavigationPath()
     @FocusState private var textFieldActive: Bool
     private let page: PageConfiguration.AppPage = .today
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 0) {
                 if !inSheet {
-                    Header(page: self.page)
+                    Header(page: self.page, path: $path)
                 }
                 Divider().background(.white).frame(height: 1)
                 ZStack(alignment: .bottomLeading) {
                     Tabs(inSheet: inSheet, job: $job, selected: $selected)
                     if !inSheet {
-                        PageActionBar.Today(job: $job, isPresented: $isPresented)
+                        // @TODO: each one of these could include the create entity button, but for now it's only relevant to the Records tab
+                        if selected == .records {
+                            PageActionBar.Today(job: $job, isPresented: $isPresented)
+                        }
 
                         if job != nil {
                             LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
@@ -66,6 +70,7 @@ extension Today {
         @State public var date: Date = Date()
         @State private var isCreateSheetPresented: Bool = false
         public let page: PageConfiguration.AppPage
+        @Binding public var path: NavigationPath
 
         var body: some View {
             HStack(alignment: .center) {
@@ -86,7 +91,7 @@ extension Today {
                         }
                     Image(systemName: "chevron.right")
                     Spacer()
-                    AddButton()
+                    AddButton(/*path: $path*/)
                 }
                 Spacer()
             }
@@ -136,7 +141,7 @@ extension Today {
                     }
 
                     NavigationLink {
-                        TaskDetail.Sheet(isPresented: $isPresented)
+                        TaskDetail()
                     } label: {
                         Text(Entity.tasks.enSingular)
                         Entity.tasks.icon

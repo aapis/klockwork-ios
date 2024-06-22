@@ -7,8 +7,59 @@
 
 import SwiftUI
 
+enum FieldOrientation {
+    case horizontal, vertical
+}
+
 extension Widget {
     struct CompanySelector {
+        struct FormField: View {
+            @Binding public var company: Company?
+            @Binding public var isCompanySelectorPresented: Bool
+            public var orientation: FieldOrientation = .vertical
+
+            var body: some View {
+                if self.orientation == .vertical {
+                    Section("Company") {
+                        Button {
+                            isCompanySelectorPresented.toggle()
+                        } label: {
+                            if company == nil {
+                                Text("Select...")
+                            } else {
+                                Text(company!.name!)
+                                    .padding(5)
+                                    .background(Theme.base.opacity(0.2))
+                                    .cornerRadius(5)
+                            }
+                        }
+                    }
+                    .listRowBackground(self.company == nil ? Theme.textBackground : Color.fromStored(self.company!.colour ?? Theme.rowColourAsDouble))
+                } else if self.orientation == .horizontal {
+                    HStack(alignment: .center) {
+                        if company == nil {
+                            Text("Company")
+                                .foregroundStyle(.gray)
+                        }
+
+                        Button {
+                            isCompanySelectorPresented.toggle()
+                        } label: {
+                            if company == nil {
+                                Text("Select...")
+                            } else {
+                                Text(company!.name!)
+                                    .padding(5)
+                                    .background(Theme.base.opacity(0.2))
+                                    .cornerRadius(5)
+                            }
+                        }
+                    }
+                    .listRowBackground(self.company == nil ? Theme.textBackground : Color.fromStored(self.company!.colour ?? Theme.rowColourAsDouble))
+                }
+            }
+        }
+
         struct Single: View {
             typealias Row = Tabs.Content.Individual.SingleCompanyCustomButton
 

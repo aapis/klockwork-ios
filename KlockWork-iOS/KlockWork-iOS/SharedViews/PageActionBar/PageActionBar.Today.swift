@@ -50,7 +50,7 @@ extension PageActionBar {
                         Text("Choose a job to get started")
                             .fontWeight(.bold)
                     } else {
-                        Text("Selected: \(self.job!.title ?? self.job!.jid.string)")
+                        Text("Selected: \((self.job!.title ?? self.job!.jid.string).prefix(15))...")
                             .fontWeight(.bold)
                     }
                     Spacer()
