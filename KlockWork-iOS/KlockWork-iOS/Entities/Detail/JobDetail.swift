@@ -75,6 +75,11 @@ struct JobDetail: View {
                             orientation: .horizontal
                         )
                     }
+
+                    ColorPicker(selection: $colour) {
+                        Text("Colour")
+                    }
+                    .listRowBackground(colour)
                 }
                 .listRowBackground(Theme.textBackground)
 
@@ -96,9 +101,6 @@ struct JobDetail: View {
                         selection: $lastUpdate,
                         displayedComponents: [.date, .hourAndMinute]
                     )
-                    ColorPicker(selection: $colour) {
-                        Text("Colour")
-                    }
                 }
                 .listRowBackground(Theme.textBackground)
             }
