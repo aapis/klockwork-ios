@@ -13,24 +13,49 @@ extension Widget {
             @Binding public var project: Project?
             @Binding public var company: Company?
             @Binding public var isProjectSelectorPresented: Bool
+            public var orientation: FieldOrientation = .vertical
 
             var body: some View {
-                Section("Project") {
-                    Button {
-                        isProjectSelectorPresented.toggle()
-                    } label: {
-                        if project == nil {
-                            Text("Select...")
-                        } else {
-                            Text(project!.name!)
-                                .padding(5)
-                                .background(Theme.base.opacity(0.2))
-                                .cornerRadius(5)
+                if self.orientation == .vertical {
+                    Section("Project") {
+                        Button {
+                            isProjectSelectorPresented.toggle()
+                        } label: {
+                            if project == nil {
+                                Text("Select...")
+                            } else {
+                                Text(project!.name!)
+                                    .padding(5)
+                                    .background(Theme.base.opacity(0.2))
+                                    .cornerRadius(5)
+                            }
                         }
+                        .disabled(company == nil)
                     }
-                    .disabled(company == nil)
+                    .listRowBackground(project == nil ? Theme.textBackground : Color.fromStored(project!.colour ?? Theme.rowColourAsDouble))
+                } else if self.orientation == .horizontal {
+                    HStack(alignment: .center) {
+                        if project == nil {
+                            Text("Project")
+                                .foregroundStyle(.gray)
+                        }
+
+                        Button {
+                            isProjectSelectorPresented.toggle()
+                        } label: {
+                            if project == nil {
+                                Text("Select...")
+                            } else {
+                                Text(project!.name!)
+                                    .padding(5)
+                                    .background(Theme.base.opacity(0.2))
+                                    .cornerRadius(5)
+                            }
+                        }
+                        .disabled(company == nil)
+                    }
+                    .listRowBackground(self.project == nil ? Theme.textBackground : Color.fromStored(self.project!.colour ?? Theme.rowColourAsDouble))
                 }
-                .listRowBackground(project == nil ? Theme.textBackground : Color.fromStored(project!.colour ?? Theme.rowColourAsDouble))
             }
         }
 

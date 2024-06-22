@@ -17,7 +17,7 @@ struct JobDetail: View {
     @State private var colour: Color = .clear
     @State private var company: Company? = nil
     @State private var created: Date = Date()
-    @State private var jid: Double = 0.0
+    @State private var jid: String = ""
     @State private var lastUpdate: Date = Date()
     @State private var overview: String = ""
     @State private var shredable: Bool = false
@@ -32,13 +32,49 @@ struct JobDetail: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Title") {
-                    TextField("Title", text: $title)
-                }
-                .listRowBackground(Theme.textBackground)
+                Section {
+                    HStack {
+                        if !title.isEmpty {
+                            Text("Title")
+                                .foregroundStyle(.gray)
+                        }
+                        TextField("Title", text: $title)
+                        Spacer()
+                    }
 
-                Section("URL") {
-                    TextField("URL", text: $url)
+                    HStack {
+                        if !jid.isEmpty {
+                            Text("JID")
+                                .foregroundStyle(.gray)
+                        }
+                        TextField("Job ID", text: $jid)
+                        Spacer()
+                    }
+
+                    HStack {
+                        if !url.isEmpty {
+                            Text("URL")
+                                .foregroundStyle(.gray)
+                        }
+                        TextField("URL", text: $url)
+                        Spacer()
+                    }
+
+                    Widget.CompanySelector.FormField(
+                        company: $company,
+                        isCompanySelectorPresented: $isCompanySelectorPresented,
+                        orientation: .horizontal
+                    )
+
+                    // Evaluating self.company here seems to trigger a view refresh that we need to make this combo selector thing work
+                    if self.company != nil {
+                        Widget.ProjectSelector.FormField(
+                            project: $project,
+                            company: $company,
+                            isProjectSelectorPresented: $isProjectSelectorPresented,
+                            orientation: .horizontal
+                        )
+                    }
                 }
                 .listRowBackground(Theme.textBackground)
 
@@ -46,20 +82,6 @@ struct JobDetail: View {
                     TextEditor(text: $overview).lineLimit(3...)
                 }
                 .listRowBackground(Theme.textBackground)
-
-                Widget.CompanySelector.FormField(
-                    company: $company,
-                    isCompanySelectorPresented: $isCompanySelectorPresented
-                )
-
-                // Evaluating self.company here seems to trigger a view refresh that we need to make this combo selector thing work
-                if self.company != nil {
-                    Widget.ProjectSelector.FormField(
-                        project: $project,
-                        company: $company,
-                        isProjectSelectorPresented: $isProjectSelectorPresented
-                    )
-                }
 
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
@@ -83,7 +105,7 @@ struct JobDetail: View {
             .listStyle(.grouped)
         }
         .onAppear(perform: self.actionOnAppear)
-        .navigationTitle(self.jid == 0.0 ? "Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")
+        .navigationTitle(self.jid.isEmpty ? "Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")
         .background(page.primaryColour)
         .scrollContentBackground(.hidden)
         .navigationBarTitleDisplayMode(.inline)
@@ -140,7 +162,7 @@ extension JobDetail {
             if let cDate = self.job!.created {
                 self.created = cDate
             }
-            self.jid = self.job!.jid
+            self.jid = self.job!.jid.string
             if let uDate = self.job!.lastUpdate {
                 self.lastUpdate = uDate
             }
@@ -167,7 +189,7 @@ extension JobDetail {
         if self.job != nil {
             self.job!.alive = self.alive
             self.job!.colour = self.colour.toStored()
-            self.job!.jid = self.jid
+            self.job!.jid = Double(self.jid) ?? 0.0
             self.job!.lastUpdate = Date()
             self.job!.overview = self.overview
             self.job!.shredable = self.shredable
@@ -180,7 +202,7 @@ extension JobDetail {
             CoreDataJob(moc: self.state.moc).create(
                 alive: self.alive,
                 colour: self.colour.toStored(),
-                jid: self.jid,
+                jid: Double(self.jid) ?? 0.0,
                 overview: self.overview,
                 shredable: self.shredable,
                 title: self.title,
