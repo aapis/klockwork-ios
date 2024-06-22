@@ -78,8 +78,9 @@ struct JobDetail: View {
 
                     ColorPicker(selection: $colour) {
                         Text("Colour")
+                            .foregroundStyle(.gray)
                     }
-                    .listRowBackground(colour)
+                    .listRowBackground(colour == .clear ? Theme.textBackground : colour)
                 }
                 .listRowBackground(Theme.textBackground)
 
@@ -104,7 +105,6 @@ struct JobDetail: View {
                 }
                 .listRowBackground(Theme.textBackground)
             }
-            .listStyle(.grouped)
         }
         .onAppear(perform: self.actionOnAppear)
         .navigationTitle(self.jid.isEmpty ? "Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")

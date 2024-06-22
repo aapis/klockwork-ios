@@ -41,7 +41,9 @@ struct ProjectDetail: View {
                         )
                         ColorPicker(selection: $colour) {
                             Text("Colour")
+                                .foregroundStyle(.gray)
                         }
+                        .listRowBackground(colour == .clear ? Theme.textBackground : colour)
                     }
                     .listRowBackground(Theme.textBackground)
 
@@ -68,7 +70,6 @@ struct ProjectDetail: View {
                     }
                     .listRowBackground(Theme.textBackground)
                 }
-                .listStyle(.grouped)
             }
             .background(page.primaryColour)
             .onAppear(perform: actionOnAppear)

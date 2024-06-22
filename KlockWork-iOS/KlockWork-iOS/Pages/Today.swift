@@ -155,21 +155,21 @@ extension Today {
                     }
 
                     NavigationLink {
-                        NoteDetail.Sheet() // @TODO: change, obviously
+                        PersonDetail()
                     } label: {
                         Text(Entity.people.enSingular)
                         Entity.people.icon
                     }
 
                     NavigationLink {
-                        NoteDetail.Sheet() // @TODO: change, obviously
+                        CompanyDetail()
                     } label: {
                         Text(Entity.companies.enSingular)
                         Entity.companies.icon
                     }
 
                     NavigationLink {
-                        NoteDetail.Sheet() // @TODO: change, obviously
+//                        ProjectDetail()
                     } label: {
                         Text(Entity.projects.enSingular)
                         Entity.projects.icon
