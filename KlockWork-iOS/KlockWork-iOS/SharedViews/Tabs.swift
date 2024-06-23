@@ -91,11 +91,10 @@ extension Tabs {
 
         var body: some View {
             ZStack {
-                if state.today.mode == .create {
-                    Theme.cGreen
-                }
                 HStack(alignment: .center, spacing: 1) {
-                    ForEach(EntityType.allCases, id: \.self) { page in
+                    // @TODO: restore to original state (below)
+                    // ForEach(EntityType.allCases, id: \.self) { page in
+                    ForEach(EntityType.allCases.filter({$0 != .jobs}), id: \.self) { page in
                         VStack {
                             Button {
                                 withAnimation(.bouncy(duration: Tabs.animationDuration)) {
@@ -142,6 +141,8 @@ extension Tabs {
                 List.People(date: self.state.date, inSheet: inSheet)
             case .projects:
                 List.Projects(date: self.state.date, inSheet: inSheet)
+            case .omni:
+                List.HierarchyNavigator(date: self.state.date, inSheet: inSheet)
             }
         }
     }
@@ -271,6 +272,75 @@ extension Tabs.Content {
                 self.date = date
                 self.inSheet = inSheet
                 _items = CoreDataNotes.fetch(for: self.date)
+            }
+        }
+
+        struct HierarchyNavigator: View {
+            typealias CompanyRow = Tabs.Content.Individual.SingleCompanyCustomButton
+            typealias ProjectRow = Tabs.Content.Individual.SingleProjectCustomButton
+            typealias JobRow = Tabs.Content.Individual.SingleJobLink
+
+            public var inSheet: Bool
+            @FetchRequest private var items: FetchedResults<Company>
+            @State private var projects: [Project] = []
+            @State private var jobs: [Job] = []
+            @State private var isProjectListPresented: Bool = false
+            @State private var isJobListPresented: Bool = false
+            public var date: Date
+
+            var body: some View {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        if items.count > 0 {
+                            ForEach(items) { item in
+                                CompanyRow(company: item, callback: self.actionOnTap)
+
+                                if self.isProjectListPresented {
+                                    ForEach(self.projects) { project in
+                                        ProjectRow(entity: project, callback: self.actionOnProjectTap)
+
+                                        if self.isJobListPresented {
+                                            ForEach(self.jobs) { job in
+                                                JobRow(job: job)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            StatusMessage.Warning(message: "No companies updated within the last 7 days")
+                        }
+                    }
+                }
+                .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
+                .navigationTitle("Companies")
+            }
+
+            init(date: Date, inSheet: Bool) {
+                self.date = date
+                self.inSheet = inSheet
+                _items = CoreDataCompanies.fetch()
+            }
+            
+            /// Tap/click handler. Opens to show list of projects.
+            /// - Returns: Void
+            private func actionOnTap(_ company: Company) -> Void {
+                if let cProj = company.projects {
+                    self.projects = cProj.allObjects as! [Project]
+                }
+
+                self.isProjectListPresented.toggle()
+            }
+
+            /// Tap/click handler. Opens to show list of jobs.
+            /// - Returns: Void
+            private func actionOnProjectTap(_ project: Project) -> Void {
+                if let cJobs = project.jobs {
+                    self.jobs = cJobs.allObjects as! [Job]
+                }
+
+                self.isJobListPresented.toggle()
             }
         }
 

@@ -172,6 +172,8 @@ extension SearchBar {
                                     }
                                     .listRowBackground(Theme.textBackground)
                                 }
+                            case .omni:
+                                Spacer()
                             }
                         }
                     }
