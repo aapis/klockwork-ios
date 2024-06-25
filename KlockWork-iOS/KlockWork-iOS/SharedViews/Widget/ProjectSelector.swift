@@ -35,10 +35,8 @@ extension Widget {
                     .listRowBackground(project == nil ? Theme.textBackground : Color.fromStored(project!.colour ?? Theme.rowColourAsDouble))
                 } else if self.orientation == .horizontal {
                     HStack(alignment: .center) {
-                        if project == nil {
-                            Text("Project")
-                                .foregroundStyle(.gray)
-                        }
+                        Text("Project")
+                            .foregroundStyle(.gray)
 
                         Button {
                             isProjectSelectorPresented.toggle()
@@ -178,7 +176,7 @@ extension Widget {
             
             /// Selector for interacting with the multi-select field
             struct FormField: View {
-                typealias Row = Tabs.Content.Individual.SingleProjectCustomButtonTwoState
+                typealias Row = Tabs.Content.Individual.SingleProjectCustomButtonMultiSelectForm
 
                 @Binding public var projects: [Project]
                 @Binding public var company: Company?

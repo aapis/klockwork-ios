@@ -73,10 +73,10 @@ struct CompanyDetail: View {
                     .listRowBackground(Theme.textBackground)
 
                     if self.company != nil {
-                        Button("Delete Company", role: .destructive, action: self.actionOnDelete)
+                        Button("Delete Company", role: .destructive, action: self.actionInitiateDelete)
                             .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
                                 Button("Yes", role: .destructive) {
-                                    dismiss()
+                                    self.actionOnDelete()
                                 }
                             } message: {
                                 Text("\"\(self.name)\" will be deleted, but is recoverable.")
@@ -179,7 +179,13 @@ extension CompanyDetail {
             self.company!.alive = self.alive
         }
 
-        isDeleteAlertPresented.toggle()
         PersistenceController.shared.save()
+        dismiss()
+    }
+
+    /// Opens the delete object alert
+    /// - Returns: Void
+    private func actionInitiateDelete() -> Void {
+        self.isDeleteAlertPresented.toggle()
     }
 }

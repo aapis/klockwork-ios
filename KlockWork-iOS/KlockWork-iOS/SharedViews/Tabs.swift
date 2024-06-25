@@ -272,7 +272,7 @@ extension Tabs.Content {
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataNotes.fetch(for: self.date, daysPrior: 2)
+                _items = CoreDataNotes.fetch(for: self.date, daysPrior: 7)
             }
         }
 
@@ -547,10 +547,27 @@ extension Tabs.Content {
             }
         }
 
+        struct SingleJobCustomButtonMultiSelectForm: View {
+            public let job: Job
+            public var alreadySelected: Bool
+            public var callback: (Job, ButtonAction) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                SingleJobCustomButtonTwoState(
+                    job: self.job,
+                    alreadySelected: self.alreadySelected,
+                    callback: self.callback,
+                    padding: 0
+                )
+            }
+        }
+
         struct SingleJobCustomButtonTwoState: View {
             public let job: Job
             public var alreadySelected: Bool
             public var callback: (Job, ButtonAction) -> Void
+            public var padding: CGFloat = 8
             @State private var selected: Bool = false
 
             var body: some View {
@@ -563,9 +580,11 @@ extension Tabs.Content {
                         colour: job.backgroundColor,
                         iconOff: "square",
                         iconOn: "square.fill",
+                        padding: self.padding,
                         selected: $selected
                     )
                 }
+                .listRowBackground(Color.fromStored(job.colour ?? Theme.rowColourAsDouble))
                 .buttonStyle(.plain)
                 .onAppear(perform: {
                     selected = alreadySelected
@@ -859,6 +878,7 @@ extension Tabs.Content {
             public let entity: Project
             public var alreadySelected: Bool
             public var callback: (Project, ButtonAction) -> Void
+            public var padding: CGFloat = 8
             @State private var selected: Bool = false
 
             var body: some View {
@@ -871,6 +891,7 @@ extension Tabs.Content {
                         colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
                         iconOff: "square",
                         iconOn: "square.fill",
+                        padding: self.padding,
                         selected: $selected
                     )
                 }
@@ -879,6 +900,22 @@ extension Tabs.Content {
                 .onAppear(perform: {
                     selected = alreadySelected
                 })
+            }
+        }
+
+        struct SingleProjectCustomButtonMultiSelectForm: View {
+            public let entity: Project
+            public var alreadySelected: Bool
+            public var callback: (Project, ButtonAction) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                SingleProjectCustomButtonTwoState(
+                    entity: self.entity,
+                    alreadySelected: self.alreadySelected,
+                    callback: self.callback,
+                    padding: 0
+                )
             }
         }
 

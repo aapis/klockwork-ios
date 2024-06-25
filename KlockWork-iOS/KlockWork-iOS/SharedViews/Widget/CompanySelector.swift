@@ -37,10 +37,8 @@ extension Widget {
                     .listRowBackground(self.company == nil ? Theme.textBackground : Color.fromStored(self.company!.colour ?? Theme.rowColourAsDouble))
                 } else if self.orientation == .horizontal {
                     HStack(alignment: .center) {
-                        if company == nil {
-                            Text("Company")
-                                .foregroundStyle(.gray)
-                        }
+                        Text("Company")
+                            .foregroundStyle(.gray)
 
                         Button {
                             isCompanySelectorPresented.toggle()

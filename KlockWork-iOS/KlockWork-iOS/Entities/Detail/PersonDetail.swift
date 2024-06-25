@@ -19,6 +19,7 @@ struct PersonDetail: View {
     @State private var company: Company? = nil
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
+    @State private var isDeleteAlertPresented: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -42,17 +43,32 @@ struct PersonDetail: View {
                             displayedComponents: [.date, .hourAndMinute]
                         )
 
-                        DatePicker(
-                            "Last updated",
-                            selection: $lastUpdate,
-                            displayedComponents: [.date, .hourAndMinute]
-                        )
+                        if self.lastUpdate != self.created {
+                            DatePicker(
+                                "Last updated",
+                                selection: $lastUpdate,
+                                displayedComponents: [.date, .hourAndMinute]
+                            )
+                        }
                     }
                     .listRowBackground(Theme.textBackground)
+
+                    if self.person != nil {
+                        Button("Delete Person", role: .destructive, action: self.actionInitiateDelete)
+                            .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                                Button("Yes", role: .destructive) {
+                                    self.actionOnDelete()
+                                }
+                            } message: {
+                                Text("\"\(self.person?.name ?? "_NAME")\" will be permanently deleted")
+                            }
+                            .listRowBackground(Color.red)
+                            .foregroundStyle(.white)
+                    }
                 }
             }
             .onAppear(perform: self.actionOnAppear)
-            .navigationTitle(self.person != nil ? self.person!.name! : "New Person")
+            .navigationTitle(self.person != nil ? "Person" : "New Person")
             .background(self.page.primaryColour)
             .scrollContentBackground(.hidden)
             .navigationBarTitleDisplayMode(.inline)
@@ -105,17 +121,17 @@ extension PersonDetail {
     /// - Returns: Void
     private func actionOnSave() -> Void {
         if self.person != nil {
-            self.person!.name = self.name
+            self.person!.name = self.name.trimmingCharacters(in: .newlines)
             self.person!.company = self.company
             self.person!.created = self.created
             self.person!.lastUpdate = Date()
-            self.person!.title = self.title
+            self.person!.title = self.title.trimmingCharacters(in: .newlines)
         } else {
             CoreDataPerson(moc: self.state.moc).create(
                 created: self.created,
                 lastUpdate: self.lastUpdate,
-                name: self.name,
-                title: self.title,
+                name: self.name.trimmingCharacters(in: .newlines),
+                title: self.title.trimmingCharacters(in: .newlines),
                 company: self.company!, // @TODO: add form validation to prevent this from causing crashes
                 saveByDefault: false
            )
@@ -123,5 +139,22 @@ extension PersonDetail {
 
         isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
+    }
+
+    /// Hard delete a Person. Thought it would be morbid to have an "alive" property on a Person object
+    /// - Returns: Void
+    private func actionOnDelete() -> Void {
+        if self.person != nil {
+            self.state.moc.delete(self.person!)
+        }
+
+        PersistenceController.shared.save()
+        dismiss()
+    }
+    
+    /// Opens the delete object alert
+    /// - Returns: Void
+    private func actionInitiateDelete() -> Void {
+        self.isDeleteAlertPresented.toggle()
     }
 }

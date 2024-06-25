@@ -15,11 +15,13 @@ struct ProjectDetail: View {
     @State private var alive: Bool = false
     @State private var colour: Color = .clear
     @State private var company: Company?
+    @State private var jobs: [Job] = []
     @State private var createdDate: Date = Date()
     @State private var lastUpdate: Date = Date()
     @State private var name: String = ""
     @State private var pid: Int64 = 0
     @State private var isCompanySelectorPresent: Bool = false
+    @State private var isJobSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
     @State private var isDeleteAlertPresented: Bool = false
     static public let defaultName: String = "A Really Good Project Name"
@@ -38,6 +40,19 @@ struct ProjectDetail: View {
                             isCompanySelectorPresented: $isCompanySelectorPresent,
                             orientation: .horizontal
                         )
+                        ColorPicker(selection: $colour) {
+                            Text("Colour")
+                                .foregroundStyle(.gray)
+                        }
+                        .listRowBackground(colour == .clear ? Theme.textBackground : colour)
+                    }
+                    .listRowBackground(Theme.textBackground)
+
+                    Section("Jobs") {
+                        Widget.JobSelector.Multi.FormField(
+                            jobs: $jobs,
+                            isJobSelectorPresented: $isJobSelectorPresented
+                        )
                     }
                     .listRowBackground(Theme.textBackground)
 
@@ -53,19 +68,14 @@ struct ProjectDetail: View {
                             selection: $lastUpdate,
                             displayedComponents: [.date, .hourAndMinute]
                         )
-                        ColorPicker(selection: $colour) {
-                            Text("Colour")
-                                .foregroundStyle(.gray)
-                        }
-                        .listRowBackground(colour == .clear ? Theme.textBackground : colour)
                     }
                     .listRowBackground(Theme.textBackground)
 
                     if self.project != nil {
-                        Button("Delete Project", role: .destructive, action: self.actionOnDelete)
+                        Button("Delete Project", role: .destructive, action: self.actionInitiateDelete)
                             .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
                                 Button("Yes", role: .destructive) {
-                                    dismiss()
+                                    self.actionOnDelete()
                                 }
                             } message: {
                                 Text("\"\(self.name)\" will be deleted, but is recoverable.")
@@ -109,6 +119,14 @@ struct ProjectDetail: View {
                 )
                 .presentationBackground(self.page.primaryColour)
             }
+            .sheet(isPresented: $isJobSelectorPresented) {
+                Widget.JobSelector.Multi(
+                    title: "Assign jobs to this project",
+                    showing: $isJobSelectorPresented,
+                    selectedJobs: $jobs
+                )
+                .presentationBackground(self.page.primaryColour)
+            }
         }
     }
 }
@@ -126,6 +144,7 @@ extension ProjectDetail {
             if let comp = project.company {company = comp}
             self.alive = project.alive
             self.pid = project.pid
+            self.jobs = project.jobs?.allObjects as! [Job]
         }
     }
     
@@ -139,6 +158,7 @@ extension ProjectDetail {
             project!.company = self.company
             project!.lastUpdate = Date()
             project!.name = name
+            project!.jobs = NSSet(array: self.jobs)
         } else {
             CoreDataProjects(moc: self.state.moc).create(
                 name: self.name,
@@ -146,7 +166,9 @@ extension ProjectDetail {
                 colour: self.colour.toStored(),
                 created: self.createdDate,
                 pid: self.pid,
-                company: self.company
+                company: self.company,
+                jobs: NSSet(array: self.jobs),
+                saveByDefault: false
             )
         }
         
@@ -162,7 +184,13 @@ extension ProjectDetail {
             self.project!.alive = self.alive
         }
 
-        isDeleteAlertPresented.toggle()
         PersistenceController.shared.save()
+        dismiss()
+    }
+
+    /// Opens the delete object alert
+    /// - Returns: Void
+    private func actionInitiateDelete() -> Void {
+        self.isDeleteAlertPresented.toggle()
     }
 }

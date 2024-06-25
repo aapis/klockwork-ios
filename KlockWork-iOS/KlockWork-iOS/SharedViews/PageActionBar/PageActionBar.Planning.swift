@@ -18,13 +18,18 @@ extension PageActionBar {
         @Binding public var isPresented: Bool
         @State private var plan: Plan? = nil
         @State private var id: UUID = UUID()
+        private let page: PageConfiguration.AppPage = .planning
 
         var body: some View {
             PageActionBar(
                 groupView: AnyView(Group),
                 sheetView: AnyView(
-                    Widget.JobSelector.Multi(showing: $isPresented, selectedJobs: $selectedJobs)
-                        .presentationBackground(Theme.cOrange)
+                    Widget.JobSelector.Multi(
+                        title: "What's on your plate today?",
+                        showing: $isPresented,
+                        selectedJobs: $selectedJobs
+                    )
+                    .presentationBackground(self.page.primaryColour)
                 ),
                 isPresented: $isPresented
             )
