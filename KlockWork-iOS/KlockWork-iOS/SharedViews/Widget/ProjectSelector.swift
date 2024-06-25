@@ -143,8 +143,8 @@ extension Widget {
                         }
                         .padding()
 
-                        if items.count > 0 {
-                            ForEach(items) { entity in
+                        if items.filter({$0.alive == true}).count > 0 {
+                            ForEach(items.filter({$0.alive == true})) { entity in
                                 Row(entity: entity, alreadySelected: self.isSelected(entity), callback: { project, action in
                                     if action == .add {
                                         selected.append(project)
@@ -186,9 +186,9 @@ extension Widget {
                 public var orientation: FieldOrientation = .vertical
 
                 var body: some View {
-                    if projects.isEmpty {
+                    if projects.filter({$0.alive == true}).isEmpty {
                         Button {
-                            isProjectSelectorPresented.toggle()
+                            self.isProjectSelectorPresented.toggle()
                         } label: {
                             HStack {
                                 Text("Select...")
@@ -197,7 +197,7 @@ extension Widget {
                         }
                         .listRowBackground(Theme.textBackground)
                     } else {
-                        ForEach(projects) { project in
+                        ForEach(projects.filter({$0.alive == true})) { project in
                             Row(entity: project, alreadySelected: self.isSelected(project), callback: { project, action in
                                 if action == .add {
                                     projects.append(project)
@@ -208,6 +208,16 @@ extension Widget {
                                 }
                             })
                         }
+
+                        Button {
+                            self.isProjectSelectorPresented.toggle()
+                        } label: {
+                            HStack {
+                                Image(systemName: "plus")
+                                Text("Add")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
 

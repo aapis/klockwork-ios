@@ -62,7 +62,7 @@ extension Tabs {
     /// - Parameter swipe: Swipe
     /// - Returns: Void
     public func actionOnSwipe(_ swipe: Swipe) -> Void {
-        let tabs = EntityType.allCases
+        let tabs = EntityType.allCases.filter({![.jobs, .projects, .companies].contains($0)})
         if var selectedIndex = (tabs.firstIndex(of: self.selected)) {
             if swipe == .left {
                 if selectedIndex <= tabs.count - 2 {
@@ -243,7 +243,7 @@ extension Tabs.Content {
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataTasks.fetch(for: self.date, daysPrior: 2)
+                _items = CoreDataTasks.fetch(for: self.date)
             }
         }
 
@@ -284,7 +284,7 @@ extension Tabs.Content {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 1) {
                         if self.items.count > 0 {
-                            ForEach(self.items) { item in
+                            ForEach(self.items.filter({$0.alive == true})) { item in
                                 TopLevel(entity: item)
                             }
                         } else {
@@ -313,7 +313,7 @@ extension Tabs.Content {
 
                     if self.isPresented {
                         if let projects = entity.projects?.allObjects as? [Project] {
-                            ForEach(projects.sorted(by: {$0.name! < $1.name!})) { project in
+                            ForEach(projects.filter({$0.alive == true}).sorted(by: {$0.name! < $1.name!})) { project in
                                 SecondLevel(entity: project)
                             }
                         }
@@ -339,7 +339,7 @@ extension Tabs.Content {
                     if self.isPresented {
                         if let pJobs = self.entity.jobs {
                             if let jobs = pJobs.allObjects as? [Job] {
-                                ForEach(jobs.sorted(by: {
+                                ForEach(jobs.filter({$0.alive == true}).sorted(by: {
                                     if $0.title != nil && $1.title != nil {
                                         return $0.title! > $1.title!
                                     } else {
