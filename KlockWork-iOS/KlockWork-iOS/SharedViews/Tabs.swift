@@ -143,7 +143,7 @@ extension Tabs {
             case .projects:
                 List.Projects(date: self.state.date, inSheet: inSheet)
             case .omni:
-                List.HierarchyNavigator(date: self.state.date, inSheet: inSheet)
+                List.HierarchyNavigator(inSheet: inSheet)
             }
         }
     }
@@ -243,7 +243,7 @@ extension Tabs.Content {
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataTasks.fetch(for: self.date)
+                _items = CoreDataTasks.fetch(for: self.date, daysPrior: 2)
             }
         }
 
@@ -272,22 +272,20 @@ extension Tabs.Content {
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataNotes.fetch(for: self.date)
+                _items = CoreDataNotes.fetch(for: self.date, daysPrior: 2)
             }
         }
 
         struct HierarchyNavigator: View {
             public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Company>
-            @State private var isPresented: Bool = false
-            public var date: Date
 
             var body: some View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 1) {
                         if self.items.count > 0 {
                             ForEach(self.items) { item in
-                                TopLevel(entity: item, isParentOpen: $isPresented)
+                                TopLevel(entity: item)
                             }
                         } else {
                             StatusMessage.Warning(message: "No companies updated within the last 7 days")
@@ -299,8 +297,7 @@ extension Tabs.Content {
                 .navigationTitle("Hierarchy")
             }
 
-            init(date: Date, inSheet: Bool) {
-                self.date = date
+            init(inSheet: Bool) {
                 self.inSheet = inSheet
                 _items = CoreDataCompanies.fetch()
             }
@@ -309,17 +306,15 @@ extension Tabs.Content {
                 typealias Button = Tabs.Content.Individual.SingleCompanyHierarchical
 
                 public let entity: Company
-                @Binding public var isParentOpen: Bool
                 @State private var isPresented: Bool = false
 
                 var body: some View {
-                    Button(company: entity, callback: self.actionOnTap)
-                        .grayscale(self.isPresented ? 0.0 : 1.0)
+                    Button(entity: self.entity, callback: self.actionOnTap)
 
                     if self.isPresented {
                         if let projects = entity.projects?.allObjects as? [Project] {
-                            ForEach(projects) { project in
-                                SecondLevel(entity: project, isParentOpen: $isPresented)
+                            ForEach(projects.sorted(by: {$0.name! < $1.name!})) { project in
+                                SecondLevel(entity: project)
                             }
                         }
                     }
@@ -336,17 +331,21 @@ extension Tabs.Content {
                 typealias Button = Tabs.Content.Individual.SingleProjectHierarchical
 
                 public let entity: Project
-                @Binding public var isParentOpen: Bool
                 @State private var isPresented: Bool = false
 
                 var body: some View {
                     Button(entity: self.entity, callback: self.actionOnTap)
-                        .grayscale(self.isParentOpen ? 0.0 : 1.0)
 
                     if self.isPresented {
                         if let pJobs = self.entity.jobs {
                             if let jobs = pJobs.allObjects as? [Job] {
-                                ForEach(jobs) { job in
+                                ForEach(jobs.sorted(by: {
+                                    if $0.title != nil && $1.title != nil {
+                                        return $0.title! > $1.title!
+                                    } else {
+                                        return $0.jid < $1.jid
+                                    }
+                                })) { job in
                                     ThirdLevel(entity: job)
                                 }
                             } else {
@@ -370,7 +369,7 @@ extension Tabs.Content {
                 @State private var isPresented: Bool = false
 
                 var body: some View {
-                    Button(entity: self.entity, callback: self.actionOnTap)
+                    Button(entity: self.entity)
                 }
 
                 /// Tap/click handler. Opens to show list of jobs.
@@ -576,23 +575,19 @@ extension Tabs.Content {
 
         struct SingleJobHierarchical: View {
             public let entity: Job
-            public var callback: (Job) -> Void
             @State private var selected: Bool = false
 
             var body: some View {
-                Button {
-                    selected.toggle()
-                    callback(entity)
+                NavigationLink {
+                    JobDetail(job: self.entity)
                 } label: {
                     HStack(spacing: 0) {
                         Image(systemName: "hammer")
-                            .padding([.top, .bottom], 8)
-                            .padding(.trailing)
+                            .padding([.top, .bottom, .trailing], 8)
                             .padding(.leading, 16 * 3)
                         ListRow(
                             name: self.entity.title ?? self.entity.jid.string,
-                            colour: self.entity.backgroundColor,
-                            icon: selected ? "minus" : "plus"
+                            colour: self.entity.backgroundColor
                         )
                     }
                     .background(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
@@ -744,28 +739,46 @@ extension Tabs.Content {
         }
 
         struct SingleCompanyHierarchical: View {
-            public let company: Company
+            public let entity: Company
             public var callback: (Company) -> Void
             @State private var selected: Bool = false
 
             var body: some View {
-                Button {
-                    selected.toggle()
-                    callback(company)
-                } label: {
-                    HStack(spacing: 0) {
-                        Image(systemName: "building.2")
-                            .padding([.top, .bottom], 8)
-                            .padding([.leading, .trailing])
+                HStack(spacing: 0) {
+                    ZStack(alignment: .trailing) {
+                        LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .leading, endPoint: .trailing)
+                            .opacity(0.6)
+                            .blendMode(.softLight)
+                            .frame(width: 40)
+
+                        // Open company button
+                        Button {
+                            selected.toggle()
+                            callback(self.entity)
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(.black)
+                                    .opacity(0.4)
+                                Image(systemName: self.selected ? "minus" : "plus")
+                            }
+                        }
+                        .frame(width: 25)
+                        .padding([.top, .bottom], 8)
+                        .padding([.leading, .trailing], 16)
+                    }
+
+                    // Company link
+                    NavigationLink {
+                        CompanyDetail(company: self.entity)
+                    } label: {
                         ListRow(
-                            name: company.name ?? "[NO NAME]",
-                            colour: Color.fromStored(company.colour ?? Theme.rowColourAsDouble),
-                            icon: selected ? "minus" : "plus"
+                            name: entity.name ?? "[NO NAME]",
+                            colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
                         )
                     }
-                    .background(Color.fromStored(company.colour ?? Theme.rowColourAsDouble))
                 }
-                .buttonStyle(.plain)
+                .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
             }
         }
 
@@ -858,24 +871,41 @@ extension Tabs.Content {
             @State private var selected: Bool = false
 
             var body: some View {
-                Button {
-                    selected.toggle()
-                    callback(entity)
-                } label: {
-                    HStack(spacing: 0) {
-                        Image(systemName: "folder")
+                HStack(spacing: 0) {
+                    // Open folder button
+                    ZStack(alignment: .leading) {
+                        LinearGradient(gradient: Gradient(colors: [.white, .clear]), startPoint: .leading, endPoint: .trailing)
+                            .opacity(0.6)
+                            .blendMode(.softLight)
+                            .frame(width: 40)
+
+                        Button {
+                            selected.toggle()
+                            callback(entity)
+                        } label: {
+                            ZStack(alignment: .center) {
+                                Circle()
+                                    .fill(.black)
+                                    .opacity(0.4)
+                                Image(systemName: self.selected ? "minus" : "plus")
+                            }
+                            .frame(width: 25)
                             .padding([.top, .bottom], 8)
-                            .padding(.trailing)
-                            .padding(.leading, 16 * 2)
+                            .padding([.leading, .trailing], 25)
+                        }
+                    }
+
+                    // Project link
+                    NavigationLink {
+                        ProjectDetail(project: self.entity)
+                    } label: {
                         ListRow(
                             name: entity.name ?? "[NO NAME]",
-                            colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
-                            icon: selected ? "minus" : "plus"
+                            colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
                         )
                     }
-                    .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
                 }
-                .buttonStyle(.plain)
+                .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
             }
         }
     }

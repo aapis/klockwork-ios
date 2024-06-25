@@ -107,7 +107,7 @@ struct JobDetail: View {
             }
         }
         .onAppear(perform: self.actionOnAppear)
-        .navigationTitle(self.jid.isEmpty ? "Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")
+        .navigationTitle("Job")
         .background(page.primaryColour)
         .scrollContentBackground(.hidden)
         .navigationBarTitleDisplayMode(.inline)

@@ -15,7 +15,7 @@ struct ListRow: View {
     public var highlight: Bool = true
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 5) {
+        HStack(alignment: .center, spacing: 5) {
             Text(name)
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.leading)
