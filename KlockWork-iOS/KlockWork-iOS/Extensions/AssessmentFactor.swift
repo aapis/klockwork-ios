@@ -15,7 +15,11 @@ extension AssessmentFactor {
         if let type = self.getType() {
             if let action = self.getAction() {
                 if self.count > 0 {
-                    return "\(self.count) \(self.count > 1 ? type.label : type.enSingular) \(self.count > 1 ? action.enPlural : action.enSingular)"
+                    if action == .interaction {
+                        return "\(self.count) \(type.enSingular) \(self.count > 1 ? action.enPlural : action.enSingular)"
+                    } else {
+                        return "\(self.count) \(self.count > 1 ? type.label : type.enSingular) \(self.count > 1 ? action.enPlural : action.enSingular)"
+                    }
                 } else {
                     return "\(type.enSingular) \(action.enSingular)"
                 }

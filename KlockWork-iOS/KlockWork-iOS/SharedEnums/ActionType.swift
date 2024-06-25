@@ -22,7 +22,7 @@ public enum ActionType: CaseIterable {
     var enPlural: String {
         switch self {
         case .create: "created"
-        case .interaction: "interaction(s)"
+        case .interaction: "interactions"
         }
     }
 

@@ -13,21 +13,33 @@ struct ListRow: View {
     public var icon: String = "chevron.right"
     public var extraColumn: AnyView?
     public var highlight: Bool = true
+    public var gradientColours: (Color, Color) = (.clear, .clear) // (.clear, .black)
 
     var body: some View {
         HStack(alignment: .center, spacing: 5) {
-            Text(name)
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.leading)
-                .padding(6)
-                .background(highlight ? .black.opacity(0.2) : .clear)
-                .cornerRadius(5)
+            HStack {
+                Text(name)
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.leading)
+                    .padding(6)
+                    .background(highlight ? .black.opacity(0.2) : .clear)
+                    .cornerRadius(5)
+            }
+            .padding(8)
+
             Spacer()
-            extraColumn
-            Image(systemName: icon)
-                .foregroundStyle(.gray)
+            ZStack {
+                extraColumn
+                Image(systemName: icon)
+                    .foregroundStyle(.gray)
+                    .padding(8)
+                LinearGradient(gradient: Gradient(colors: [self.gradientColours.0, self.gradientColours.1]), startPoint: .trailing, endPoint: .leading)
+                    .opacity(0.3)
+                    .blendMode(.softLight)
+                    .frame(width: 40)
+            }
         }
-        .padding(8)
+//        .padding(8)
         .background(colour)
         .listRowBackground(colour)
     }
