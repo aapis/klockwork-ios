@@ -14,7 +14,7 @@ struct ProjectDetail: View {
     @State private var abbreviation: String = ""
     @State private var alive: Bool = false
     @State private var colour: Color = .clear
-    @State private var company: Company?
+    @State public var company: Company?
     @State private var jobs: [Job] = []
     @State private var createdDate: Date = Date()
     @State private var lastUpdate: Date = Date()

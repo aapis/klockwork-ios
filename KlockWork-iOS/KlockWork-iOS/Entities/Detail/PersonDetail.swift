@@ -16,7 +16,7 @@ struct PersonDetail: View {
     @State private var lastUpdate: Date = Date()
     @State private var name: String = ""
     @State private var title: String = ""
-    @State private var company: Company? = nil
+    @State public var company: Company? = nil
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
     @State private var isDeleteAlertPresented: Bool = false

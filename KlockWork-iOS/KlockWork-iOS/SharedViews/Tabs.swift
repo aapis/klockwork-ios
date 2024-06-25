@@ -799,20 +799,26 @@ extension Tabs.Content {
                         }
                     }
 
-//                    if self.selected {
-//                        HStack(spacing: 1) {
-//                            NavigationLink {
-//                                ProjectDetail()
-//                            } label: {
-//                                Image(systemName: "plus")
-//                                Text("Project")
-//                            }
-//                            .padding()
-//                            .background(.white)
-//                            .foregroundStyle(.black)
-//                            .frame(maxHeight: 40)
-//                        }
-//                    }
+                    if self.selected {
+                        HStack(spacing: 1) {
+                            ZStack(alignment: .trailing) {
+                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .top, endPoint: .bottom)
+                                    .opacity(0.8)
+                                    .blendMode(.softLight)
+                                    .frame(height: 50)
+
+                                NavigationLink {
+                                    ProjectDetail(company: self.entity)
+                                } label: {
+                                    Image(systemName: "folder.badge.plus")
+                                        .padding(8)
+                                        .foregroundStyle(.white)
+                                }
+                                .padding(.trailing)
+
+                            }
+                        }
+                    }
                 }
                 .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
             }
@@ -925,38 +931,83 @@ extension Tabs.Content {
             @State private var selected: Bool = false
 
             var body: some View {
-                HStack(spacing: 0) {
-                    // Open folder button
-                    ZStack(alignment: .leading) {
-                        LinearGradient(gradient: Gradient(colors: [.white, .clear]), startPoint: .leading, endPoint: .trailing)
-                            .opacity(0.6)
-                            .blendMode(.softLight)
-                            .frame(width: 40)
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(spacing: 0) {
+                        // Open folder button
+                        ZStack(alignment: .leading) {
+                            LinearGradient(gradient: Gradient(colors: [.white, .clear]), startPoint: .leading, endPoint: .trailing)
+                                .opacity(0.6)
+                                .blendMode(.softLight)
+                                .frame(width: 40)
 
-                        Button {
-                            selected.toggle()
-                            callback(entity)
-                        } label: {
-                            ZStack(alignment: .center) {
-                                Circle()
-                                    .fill(.black)
-                                    .opacity(0.4)
-                                Image(systemName: self.selected ? "minus" : "plus")
+                            Button {
+                                selected.toggle()
+                                callback(entity)
+                            } label: {
+                                ZStack(alignment: .center) {
+                                    Circle()
+                                        .fill(.black)
+                                        .opacity(0.4)
+                                    Image(systemName: self.selected ? "minus" : "plus")
+                                }
+                                .frame(width: 25)
+                                .padding([.top, .bottom, .trailing], 8)
+                                .padding([.leading], 25)
                             }
-                            .frame(width: 25)
-                            .padding([.top, .bottom, .trailing], 8)
-                            .padding([.leading], 25)
+                        }
+                        
+                        // Project link
+                        NavigationLink {
+                            ProjectDetail(project: self.entity)
+                        } label: {
+                            ListRow(
+                                name: entity.name ?? "[NO NAME]",
+                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
+                            )
                         }
                     }
 
-                    // Project link
-                    NavigationLink {
-                        ProjectDetail(project: self.entity)
-                    } label: {
-                        ListRow(
-                            name: entity.name ?? "[NO NAME]",
-                            colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
-                        )
+                    if self.selected {
+                        HStack(spacing: 1) {
+                            ZStack(alignment: .trailing) {
+                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .top, endPoint: .bottom)
+                                    .opacity(0.8)
+                                    .blendMode(.softLight)
+                                    .frame(height: 50)
+                                
+                                HStack {
+                                    NavigationLink {
+                                        TaskDetail()
+                                    } label: {
+                                        Image(systemName: "checklist")
+                                            .padding(8)
+                                            .foregroundStyle(.white)
+                                    }
+                                    NavigationLink {
+                                        NoteDetail()
+                                    } label: {
+                                        Image(systemName: "note.text")
+                                            .padding(8)
+                                            .foregroundStyle(.white)
+                                    }
+                                    NavigationLink {
+                                        PersonDetail(company: self.entity.company)
+                                    } label: {
+                                        Image(systemName: "person.2")
+                                            .padding(8)
+                                            .foregroundStyle(.white)
+                                    }
+                                    NavigationLink {
+                                        JobDetail(company: self.entity.company, project: self.entity)
+                                    } label: {
+                                        Image(systemName: "hammer")
+                                            .padding(8)
+                                            .foregroundStyle(.white)
+                                    }
+                                }
+                                .padding(.trailing)
+                            }
+                        }
                     }
                 }
                 .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))

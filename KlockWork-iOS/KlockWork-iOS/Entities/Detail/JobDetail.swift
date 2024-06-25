@@ -15,7 +15,7 @@ struct JobDetail: View {
     public var page: PageConfiguration.AppPage = .create
     @State private var alive: Bool = true
     @State private var colour: Color = .clear
-    @State private var company: Company? = nil
+    @State public var company: Company? = nil
     @State private var created: Date = Date()
     @State private var jid: String = ""
     @State private var lastUpdate: Date = Date()
@@ -23,7 +23,7 @@ struct JobDetail: View {
     @State private var shredable: Bool = false
     @State private var title: String = ""
     @State private var url: String = "https://"
-    @State private var project: Project? = nil
+    @State public var project: Project? = nil
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isProjectSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
