@@ -190,7 +190,7 @@ extension JobDetail {
     private func actionOnSave() -> Void {
         if self.job != nil {
             self.job!.alive = self.alive
-            self.job!.colour = self.colour.toStored()
+            self.job!.colour = self.colour == .clear ? Color.randomStorable() : self.colour.toStored()
             self.job!.jid = Double(self.jid) ?? 0.0
             self.job!.lastUpdate = Date()
             self.job!.overview = self.overview
@@ -203,7 +203,7 @@ extension JobDetail {
         } else {
             CoreDataJob(moc: self.state.moc).create(
                 alive: self.alive,
-                colour: self.colour.toStored(),
+                colour: self.colour == .clear ? Color.randomStorable() : self.colour.toStored(),
                 jid: Double(self.jid) ?? 0.0,
                 overview: self.overview,
                 shredable: self.shredable,
