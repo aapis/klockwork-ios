@@ -95,7 +95,7 @@ extension Tabs {
                 HStack(alignment: .center, spacing: 1) {
                     // @TODO: restore to original state (below)
                     // ForEach(EntityType.allCases, id: \.self) { page in
-                    ForEach(EntityType.allCases.filter({$0 != .jobs}), id: \.self) { page in
+                    ForEach(EntityType.allCases.filter({![.jobs, .projects, .companies].contains($0)}), id: \.self) { page in
                         VStack {
                             Button {
                                 withAnimation(.bouncy(duration: Tabs.animationDuration)) {
@@ -584,7 +584,7 @@ extension Tabs.Content {
                     HStack(spacing: 0) {
                         Image(systemName: "hammer")
                             .padding([.top, .bottom, .trailing], 8)
-                            .padding(.leading, 16 * 3)
+                            .padding(.leading, 25 + 12)
                         ListRow(
                             name: self.entity.title ?? self.entity.jid.string,
                             colour: self.entity.backgroundColor
@@ -744,39 +744,56 @@ extension Tabs.Content {
             @State private var selected: Bool = false
 
             var body: some View {
-                HStack(spacing: 0) {
-                    ZStack(alignment: .trailing) {
-                        LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .leading, endPoint: .trailing)
-                            .opacity(0.6)
-                            .blendMode(.softLight)
-                            .frame(width: 40)
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 0) {
+                        ZStack(alignment: .trailing) {
+                            LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .leading, endPoint: .trailing)
+                                .opacity(0.3)
+                                .blendMode(.softLight)
+                                .frame(width: 40)
 
-                        // Open company button
-                        Button {
-                            selected.toggle()
-                            callback(self.entity)
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(.black)
-                                    .opacity(0.4)
-                                Image(systemName: self.selected ? "minus" : "plus")
+                            // Open company button
+                            Button {
+                                selected.toggle()
+                                callback(self.entity)
+                            } label: {
+                                ZStack {
+                                    Circle()
+                                        .fill(.black)
+                                        .opacity(0.4)
+                                    Image(systemName: self.selected ? "minus" : "plus")
+                                }
                             }
+                            .frame(width: 25)
+                            .padding([.top, .bottom], 8)
+                            .padding([.leading, .trailing], 16)
                         }
-                        .frame(width: 25)
-                        .padding([.top, .bottom], 8)
-                        .padding([.leading, .trailing], 16)
+
+                        // Company link
+                        NavigationLink {
+                            CompanyDetail(company: self.entity)
+                        } label: {
+                            ListRow(
+                                name: entity.name ?? "[NO NAME]",
+                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
+                            )
+                        }
                     }
 
-                    // Company link
-                    NavigationLink {
-                        CompanyDetail(company: self.entity)
-                    } label: {
-                        ListRow(
-                            name: entity.name ?? "[NO NAME]",
-                            colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
-                        )
-                    }
+//                    if self.selected {
+//                        HStack(spacing: 1) {
+//                            NavigationLink {
+//                                ProjectDetail()
+//                            } label: {
+//                                Image(systemName: "plus")
+//                                Text("Project")
+//                            }
+//                            .padding()
+//                            .background(.white)
+//                            .foregroundStyle(.black)
+//                            .frame(maxHeight: 40)
+//                        }
+//                    }
                 }
                 .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
             }
@@ -890,8 +907,8 @@ extension Tabs.Content {
                                 Image(systemName: self.selected ? "minus" : "plus")
                             }
                             .frame(width: 25)
-                            .padding([.top, .bottom], 8)
-                            .padding([.leading, .trailing], 25)
+                            .padding([.top, .bottom, .trailing], 8)
+                            .padding([.leading], 25)
                         }
                     }
 
