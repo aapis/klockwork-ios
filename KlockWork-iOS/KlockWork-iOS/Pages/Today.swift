@@ -134,13 +134,6 @@ extension Today {
             NavigationStack {
                 Menu("", systemImage: "plus") {
                     NavigationLink {
-                        JobDetail()
-                    } label: {
-                        Text(Entity.jobs.enSingular)
-                        Entity.jobs.icon
-                    }
-
-                    NavigationLink {
                         TaskDetail()
                     } label: {
                         Text(Entity.tasks.enSingular)
@@ -173,6 +166,13 @@ extension Today {
                     } label: {
                         Text(Entity.projects.enSingular)
                         Entity.projects.icon
+                    }
+
+                    NavigationLink {
+                        JobDetail()
+                    } label: {
+                        Text(Entity.jobs.enSingular)
+                        Entity.jobs.icon
                     }
                 }
             }

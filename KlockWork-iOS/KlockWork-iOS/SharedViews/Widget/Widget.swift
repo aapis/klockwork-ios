@@ -8,5 +8,7 @@
 import SwiftUI
 
 struct Widget {
-    
+    enum ResultsFilter: CaseIterable {
+        case recent, owned, unowned, all
+    }
 }

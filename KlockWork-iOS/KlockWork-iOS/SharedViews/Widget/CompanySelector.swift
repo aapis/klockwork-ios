@@ -37,10 +37,8 @@ extension Widget {
                     .listRowBackground(self.company == nil ? Theme.textBackground : Color.fromStored(self.company!.colour ?? Theme.rowColourAsDouble))
                 } else if self.orientation == .horizontal {
                     HStack(alignment: .center) {
-                        if company == nil {
-                            Text("Company")
-                                .foregroundStyle(.gray)
-                        }
+                        Text("Company")
+                            .foregroundStyle(.gray)
 
                         Button {
                             isCompanySelectorPresented.toggle()
@@ -86,8 +84,8 @@ extension Widget {
                         }
                         .padding()
 
-                        if items.count > 0 {
-                            ForEach(items) { corpo in
+                        if items.filter({$0.alive == true}).count > 0 {
+                            ForEach(items.filter({$0.alive == true})) { corpo in
                                 Row(company: corpo, callback: { company in
                                     self.entity = company
                                     self.showing.toggle()

@@ -37,6 +37,8 @@ extension Widget {
         struct Multi: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState
 
+            public let title: String
+            public let filter: ResultsFilter
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var showing: Bool
             @Binding private var selectedJobs: [Job]
@@ -49,7 +51,7 @@ extension Widget {
                 ScrollView(showsIndicators: false) {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         HStack(alignment: .center, spacing: 0) {
-                            Text("What's on your plate today?")
+                            Text(self.title)
                                 .font(.title2)
                             Spacer()
                             Button {
@@ -86,10 +88,20 @@ extension Widget {
                 .scrollContentBackground(.hidden)
             }
 
-            init(showing: Binding<Bool>, selectedJobs: Binding<[Job]>) {
+            init(title: String, filter: ResultsFilter, showing: Binding<Bool>, selectedJobs: Binding<[Job]>) {
+                self.title = title
+                self.filter = filter
                 _showing = showing
                 _selectedJobs = selectedJobs
-                _items = CoreDataJob.fetchAll()
+
+                switch self.filter {
+                case .unowned:
+                    _items = CoreDataJob.fetchUnowned()
+                case .recent:
+                    _items = CoreDataJob.fetchRecent()
+                default:
+                    _items = CoreDataJob.fetchAll()
+                }
             }
 
             /// Determine if a given job is already within the selectedJobs list
@@ -97,6 +109,58 @@ extension Widget {
             /// - Returns: Bool
             private func jobIsSelected(_ job: Job) -> Bool {
                 return selectedJobs.firstIndex(where: {$0 == job}) != nil
+            }
+
+            /// Selector for interacting with the multi-select field
+            struct FormField: View {
+                typealias Row = Tabs.Content.Individual.SingleJobCustomButtonMultiSelectForm
+
+                @Binding public var jobs: [Job]
+                @Binding public var isJobSelectorPresented: Bool
+                public var orientation: FieldOrientation = .vertical
+
+                var body: some View {
+                    if jobs.filter({$0.alive == true}).isEmpty {
+                        Button {
+                            self.isJobSelectorPresented.toggle()
+                        } label: {
+                            HStack {
+                                Text("Select...")
+                                Spacer()
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
+                    } else {
+                        ForEach(jobs.filter({$0.alive == true})) { entity in
+                            Row(job: entity, alreadySelected: self.isSelected(entity), callback: { job, action in
+                                if action == .add {
+                                    self.jobs.append(job)
+                                } else if action == .remove {
+                                    if let index = self.jobs.firstIndex(where: {$0 == job}) {
+                                        self.jobs.remove(at: index)
+                                    }
+                                }
+                            })
+                        }
+
+                        Button {
+                            self.isJobSelectorPresented.toggle()
+                        } label: {
+                            HStack {
+                                Image(systemName: "plus")
+                                Text("Add")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
+                    }
+                }
+
+                /// Determine if a given project has been selected
+                /// - Parameter project: Project
+                /// - Returns: Bool
+                private func isSelected(_ job: Job) -> Bool {
+                    return self.jobs.firstIndex(where: {$0 == job}) != nil
+                }
             }
         }
 

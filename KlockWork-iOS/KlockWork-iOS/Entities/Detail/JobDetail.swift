@@ -15,7 +15,7 @@ struct JobDetail: View {
     public var page: PageConfiguration.AppPage = .create
     @State private var alive: Bool = true
     @State private var colour: Color = .clear
-    @State private var company: Company? = nil
+    @State public var company: Company? = nil
     @State private var created: Date = Date()
     @State private var jid: String = ""
     @State private var lastUpdate: Date = Date()
@@ -23,10 +23,11 @@ struct JobDetail: View {
     @State private var shredable: Bool = false
     @State private var title: String = ""
     @State private var url: String = "https://"
-    @State private var project: Project? = nil
+    @State public var project: Project? = nil
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isProjectSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
+    @State private var isDeleteAlertPresented: Bool = false
     static public let defaultTitle: String = "Descriptive job title"
 
     var body: some View {
@@ -85,7 +86,7 @@ struct JobDetail: View {
                 .listRowBackground(Theme.textBackground)
 
                 Section("Overview") {
-                    TextEditor(text: $overview).lineLimit(3...)
+                    TextField("Overview", text: $overview, axis: .vertical).lineLimit(5...10)
                 }
                 .listRowBackground(Theme.textBackground)
 
@@ -104,10 +105,23 @@ struct JobDetail: View {
                     )
                 }
                 .listRowBackground(Theme.textBackground)
+
+                if self.job != nil {
+                    Button("Delete Job", role: .destructive, action: self.actionInitiateDelete)
+                        .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                            Button("Yes", role: .destructive) {
+                                self.actionOnDelete()
+                            }
+                        } message: {
+                            Text("\"\(self.title)\" will be deleted, but is recoverable.")
+                        }
+                        .listRowBackground(Color.red)
+                        .foregroundStyle(.white)
+                }
             }
         }
         .onAppear(perform: self.actionOnAppear)
-        .navigationTitle(self.jid.isEmpty ? "Job" : self.job!.title != nil ? self.job!.title!.capitalized : "Job #\(self.job!.jid.string)")
+        .navigationTitle("Job")
         .background(page.primaryColour)
         .scrollContentBackground(.hidden)
         .navigationBarTitleDisplayMode(.inline)
@@ -190,7 +204,7 @@ extension JobDetail {
     private func actionOnSave() -> Void {
         if self.job != nil {
             self.job!.alive = self.alive
-            self.job!.colour = self.colour.toStored()
+            self.job!.colour = self.colour == .clear ? Color.randomStorable() : self.colour.toStored()
             self.job!.jid = Double(self.jid) ?? 0.0
             self.job!.lastUpdate = Date()
             self.job!.overview = self.overview
@@ -203,7 +217,7 @@ extension JobDetail {
         } else {
             CoreDataJob(moc: self.state.moc).create(
                 alive: self.alive,
-                colour: self.colour.toStored(),
+                colour: self.colour == .clear ? Color.randomStorable() : self.colour.toStored(),
                 jid: Double(self.jid) ?? 0.0,
                 overview: self.overview,
                 shredable: self.shredable,
@@ -216,5 +230,22 @@ extension JobDetail {
         
         isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
+    }
+
+    /// Hard delete a Job
+    /// - Returns: Void
+    private func actionOnDelete() -> Void {
+        if self.job != nil {
+            self.state.moc.delete(self.job!)
+        }
+
+        PersistenceController.shared.save()
+        dismiss()
+    }
+
+    /// Opens the delete object alert
+    /// - Returns: Void
+    private func actionInitiateDelete() -> Void {
+        self.isDeleteAlertPresented.toggle()
     }
 }

@@ -18,11 +18,12 @@ struct TaskDetail: View {
     @State private var created: Date = Date()
     @State private var due: Date = Date()
     @State private var lastUpdate: Date = Date()
-    @State private var job: Job?
+    @State public var job: Job?
     @State private var isCompleted: Bool = false
     @State private var isCancelled: Bool = false
     @State private var isJobSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
+    @State private var isDeleteAlertPresented: Bool = false
     public var page: PageConfiguration.AppPage = .create
     static public let defaultContent: String = "Sample task content"
 
@@ -169,5 +170,22 @@ extension TaskDetail {
 
         isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
+    }
+
+    /// Soft delete a Task
+    /// - Returns: Void
+    private func actionOnDelete() -> Void {
+        if self.task != nil {
+            self.state.moc.delete(self.task!)
+        }
+
+        PersistenceController.shared.save()
+        dismiss()
+    }
+
+    /// Opens the delete object alert
+    /// - Returns: Void
+    private func actionInitiateDelete() -> Void {
+        self.isDeleteAlertPresented.toggle()
     }
 }
