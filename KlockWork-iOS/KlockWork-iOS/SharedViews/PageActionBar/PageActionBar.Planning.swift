@@ -26,6 +26,7 @@ extension PageActionBar {
                 sheetView: AnyView(
                     Widget.JobSelector.Multi(
                         title: "What's on your plate today?",
+                        filter: .owned,
                         showing: $isPresented,
                         selectedJobs: $selectedJobs
                     )

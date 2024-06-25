@@ -122,6 +122,7 @@ struct ProjectDetail: View {
             .sheet(isPresented: $isJobSelectorPresented) {
                 Widget.JobSelector.Multi(
                     title: "Assign jobs to this project",
+                    filter: .unowned,
                     showing: $isJobSelectorPresented,
                     selectedJobs: $jobs
                 )

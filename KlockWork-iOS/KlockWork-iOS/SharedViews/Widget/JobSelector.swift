@@ -38,6 +38,7 @@ extension Widget {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState
 
             public let title: String
+            public let filter: ResultsFilter
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var showing: Bool
             @Binding private var selectedJobs: [Job]
@@ -87,11 +88,20 @@ extension Widget {
                 .scrollContentBackground(.hidden)
             }
 
-            init(title: String, showing: Binding<Bool>, selectedJobs: Binding<[Job]>) {
+            init(title: String, filter: ResultsFilter, showing: Binding<Bool>, selectedJobs: Binding<[Job]>) {
                 self.title = title
+                self.filter = filter
                 _showing = showing
                 _selectedJobs = selectedJobs
-                _items = CoreDataJob.fetchUnowned()
+
+                switch self.filter {
+                case .unowned:
+                    _items = CoreDataJob.fetchUnowned()
+                case .recent:
+                    _items = CoreDataJob.fetchRecent()
+                default:
+                    _items = CoreDataJob.fetchAll()
+                }
             }
 
             /// Determine if a given job is already within the selectedJobs list
