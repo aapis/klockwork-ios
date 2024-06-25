@@ -24,6 +24,7 @@ struct CompanyDetail: View {
     @State private var colour: Color = .clear
     @State private var isProjectSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
+    @State private var isDeleteAlertPresented: Bool = false
     @State private var selectedCompany: Company? = nil
     private let page: PageConfiguration.AppPage = .create
     static public let defaultName: String = "Initech Inc"
@@ -70,6 +71,19 @@ struct CompanyDetail: View {
                         )
                     }
                     .listRowBackground(Theme.textBackground)
+
+                    if self.company != nil {
+                        Button("Delete Company", role: .destructive, action: self.actionOnDelete)
+                            .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                                Button("Yes", role: .destructive) {
+                                    dismiss()
+                                }
+                            } message: {
+                                Text("\"\(self.name)\" will be deleted, but is recoverable.")
+                            }
+                            .listRowBackground(Color.red)
+                            .foregroundStyle(.white)
+                    }
                 }
             }
             .background(self.page.primaryColour)
@@ -154,6 +168,18 @@ extension CompanyDetail {
         }
 
         isSaveAlertPresented.toggle()
+        PersistenceController.shared.save()
+    }
+
+    /// Soft delete a Company
+    /// - Returns: Void
+    private func actionOnDelete() -> Void {
+        self.alive = false
+        if self.company != nil {
+            self.company!.alive = self.alive
+        }
+
+        isDeleteAlertPresented.toggle()
         PersistenceController.shared.save()
     }
 }

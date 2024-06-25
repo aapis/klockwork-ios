@@ -27,6 +27,7 @@ struct JobDetail: View {
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isProjectSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
+    @State private var isDeleteAlertPresented: Bool = false
     static public let defaultTitle: String = "Descriptive job title"
 
     var body: some View {
@@ -104,6 +105,19 @@ struct JobDetail: View {
                     )
                 }
                 .listRowBackground(Theme.textBackground)
+
+                if self.job != nil {
+                    Button("Delete Job", role: .destructive, action: self.actionOnDelete)
+                        .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                            Button("Yes", role: .destructive) {
+                                dismiss()
+                            }
+                        } message: {
+                            Text("\"\(self.title)\" will be deleted, but is recoverable.")
+                        }
+                        .listRowBackground(Color.red)
+                        .foregroundStyle(.white)
+                }
             }
         }
         .onAppear(perform: self.actionOnAppear)
@@ -215,6 +229,18 @@ extension JobDetail {
         }
         
         isSaveAlertPresented.toggle()
+        PersistenceController.shared.save()
+    }
+
+    /// Soft delete a Job
+    /// - Returns: Void
+    private func actionOnDelete() -> Void {
+        self.alive = false
+        if self.job != nil {
+            self.job!.alive = self.alive
+        }
+
+        isDeleteAlertPresented.toggle()
         PersistenceController.shared.save()
     }
 }
