@@ -31,7 +31,7 @@ struct Tasks: View {
                                     .background(Theme.cGreen)
                                     .scrollContentBackground(.hidden)
                             } label: {
-                                Text(item.content!)
+                                Text(item.content ?? "_NO_CONTENT")
                             }
                         }
                         .onDelete(perform: deleteItems)

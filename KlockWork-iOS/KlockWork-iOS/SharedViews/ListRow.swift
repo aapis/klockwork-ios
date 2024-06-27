@@ -14,16 +14,16 @@ struct ListRow: View {
     public var extraColumn: AnyView?
     public var highlight: Bool = true
     public var gradientColours: (Color, Color) = (.clear, .clear) // (.clear, .black)
-    public var page: PageConfiguration.AppPage = .create
 
     var body: some View {
         HStack(alignment: .center, spacing: 5) {
             HStack {
                 Text(name)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(self.highlight ? .white : self.colour!.isBright() ? Theme.base : .white)
                     .multilineTextAlignment(.leading)
-                    .padding(6)
-                    .background(highlight ? .black.opacity(0.2) : .clear)
+                    .padding([.top, .bottom], 6)
+                    .padding([.leading, .trailing], self.highlight ? 6 : 0)
+                    .background(self.highlight ? .black.opacity(0.2) : .clear)
                     .cornerRadius(5)
             }
             .padding(8)
@@ -32,7 +32,7 @@ struct ListRow: View {
             extraColumn
             ZStack {
                 Image(systemName: icon)
-                    .foregroundStyle(self.colour!.isBright() ? self.page.primaryColour : .white)
+                    .foregroundStyle(self.highlight ? .white : self.colour!.isBright() ? Theme.base : .white)
                     .padding(8)
                 LinearGradient(gradient: Gradient(colors: [self.gradientColours.0, self.gradientColours.1]), startPoint: .trailing, endPoint: .leading)
                     .opacity(0.3)
@@ -40,7 +40,6 @@ struct ListRow: View {
                     .frame(width: 40)
             }
         }
-//        .padding(8)
         .background(colour)
         .listRowBackground(colour)
     }

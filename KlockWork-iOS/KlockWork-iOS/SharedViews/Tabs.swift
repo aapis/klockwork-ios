@@ -281,6 +281,7 @@ extension Tabs.Content {
 
             var body: some View {
                 ScrollView {
+                    Divider().background(.gray)
                     VStack(alignment: .leading, spacing: 0) {
                         if self.items.count > 0 {
                             ForEach(self.items.filter({$0.alive == true})) { item in
@@ -291,10 +292,13 @@ extension Tabs.Content {
                         }
                     }
                 }
+                .navigationTitle("Hierarchy")
                 .background(self.page.primaryColour)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
-                .navigationTitle("Hierarchy")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
             }
 
             init(inSheet: Bool) {
@@ -390,9 +394,19 @@ extension Tabs.Content {
                                     Rectangle()
                                         .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                         .frame(width: 15)
-                                    Image(systemName: "checklist")
-                                        .padding(8)
-                                    Text("\(self.tasks.count) Incomplete Tasks")
+                                    Rectangle()
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                        .frame(width: 15)
+
+                                    HStack(spacing: 0) {
+                                        if self.tasks.isEmpty {
+                                            Text("No Tasks")
+                                        } else {
+                                            Text("\(self.tasks.count) Tasks")
+                                        }
+                                    }
+                                    .padding(.leading, 8)
+
                                     Spacer()
                                     NavigationLink {
                                         TaskDetail(job: self.entity)
@@ -401,7 +415,6 @@ extension Tabs.Content {
                                             .padding(8)
                                     }
                                 }
-                                .foregroundStyle(.white)
                             }
 
                             if !self.tasks.isEmpty {
@@ -424,9 +437,18 @@ extension Tabs.Content {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
-                                        Image(systemName: "note.text")
-                                            .padding(8)
-                                        Text("\(self.notes.count) Notes")
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+
+                                        if self.notes.isEmpty {
+                                            Text("No Notes")
+                                                .padding(.leading, 8)
+                                        } else {
+                                            Text("\(self.notes.count) Notes")
+                                                .padding(.leading, 8)
+                                        }
+
                                         Spacer()
                                         NavigationLink {
                                             NoteDetail(job: self.entity)
@@ -444,6 +466,7 @@ extension Tabs.Content {
                             }
                         }
                         .onAppear(perform: self.actionOnAppear)
+                        .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : .white)
                     }
                 }
 
@@ -490,7 +513,8 @@ extension Tabs.Content {
                             .foregroundStyle(self.entity.owner?.backgroundColor ?? Theme.rowColour)
                             .frame(width: 15)
 
-                        Button(task: self.entity)
+                        Button(task: self.entity, highlight: false)
+                            .border(width: 1, edges: [.bottom], color: .gray)
                     }
                 }
 
@@ -783,7 +807,8 @@ extension Tabs.Content {
                         } label: {
                             ListRow(
                                 name: self.entity.title ?? self.entity.jid.string,
-                                colour: self.entity.backgroundColor
+                                colour: self.entity.backgroundColor,
+                                highlight: false
                             )
                         }
                     }
@@ -812,6 +837,7 @@ extension Tabs.Content {
 
         struct SingleTaskChecklistItem: View {
             public let task: LogTask
+            public var highlight: Bool = true
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
 
@@ -834,7 +860,8 @@ extension Tabs.Content {
                     } label: {
                         ListRow(
                             name: task.content ?? "_TASK_CONTENT",
-                            colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour
+                            colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour,
+                            highlight: self.highlight
                         )
                         .opacity(isCompleted ? 0.5 : 1.0)
                     }
@@ -937,7 +964,6 @@ extension Tabs.Content {
         struct SingleCompanyHierarchical: View {
             public let entity: Company
             public var callback: (Company) -> Void
-            public var page: PageConfiguration.AppPage = .create
             @State private var selected: Bool = false
 
             var body: some View {
@@ -966,7 +992,8 @@ extension Tabs.Content {
                         } label: {
                             ListRow(
                                 name: entity.name ?? "[NO NAME]",
-                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
+                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
+                                highlight: false
                             )
                         }
                     }
@@ -979,21 +1006,21 @@ extension Tabs.Content {
                                 .frame(height: 50)
                             HStack {
                                 Text(self.entity.abbreviation ?? "_DEFAULT")
-                                    .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? self.page.primaryColour : .white)
+                                    .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                 Spacer()
                                 NavigationLink {
                                     PersonDetail(company: self.entity)
                                 } label: {
                                     Image(systemName: "person.2")
                                         .padding(8)
-                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? self.page.primaryColour : .white)
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                 }
                                 NavigationLink {
                                     ProjectDetail(company: self.entity)
                                 } label: {
                                     Image(systemName: "folder.badge.plus")
                                         .padding(8)
-                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? self.page.primaryColour : .white)
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                 }
                             }
                             .padding(.leading, 8)
@@ -1143,7 +1170,8 @@ extension Tabs.Content {
                         } label: {
                             ListRow(
                                 name: entity.name ?? "[NO NAME]",
-                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
+                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
+                                highlight: false
                             )
                         }
                     }
