@@ -62,7 +62,7 @@ extension Tabs {
     /// - Parameter swipe: Swipe
     /// - Returns: Void
     public func actionOnSwipe(_ swipe: Swipe) -> Void {
-        let tabs = EntityType.allCases.filter({![.jobs, .projects, .companies].contains($0)})
+        let tabs = EntityType.allCases
         if var selectedIndex = (tabs.firstIndex(of: self.selected)) {
             if swipe == .left {
                 if selectedIndex <= tabs.count - 2 {
@@ -95,7 +95,7 @@ extension Tabs {
                 HStack(alignment: .center, spacing: 1) {
                     // @TODO: restore to original state (below)
                     // ForEach(EntityType.allCases, id: \.self) { page in
-                    ForEach(EntityType.allCases.filter({![.jobs, .projects, .companies].contains($0)}), id: \.self) { page in
+                    ForEach(EntityType.allCases, id: \.self) { page in
                         VStack {
                             Button {
                                 withAnimation(.bouncy(duration: Tabs.animationDuration)) {
@@ -142,8 +142,6 @@ extension Tabs {
                 List.People(date: self.state.date, inSheet: inSheet)
             case .projects:
                 List.Projects(date: self.state.date, inSheet: inSheet)
-            case .omni:
-                List.HierarchyNavigator(inSheet: inSheet)
             }
         }
     }
@@ -276,13 +274,14 @@ extension Tabs.Content {
             }
         }
 
-        struct HierarchyNavigator: View {
+        struct HierarchyExplorer: View {
             public var inSheet: Bool
+            public var page: PageConfiguration.AppPage = .explore
             @FetchRequest private var items: FetchedResults<Company>
 
             var body: some View {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if self.items.count > 0 {
                             ForEach(self.items.filter({$0.alive == true})) { item in
                                 TopLevel(entity: item)
@@ -290,11 +289,16 @@ extension Tabs.Content {
                         } else {
                             StatusMessage.Warning(message: "No companies updated within the last 7 days")
                         }
+                        Spacer()
                     }
                 }
+                .navigationTitle("Hierarchy Explorer")
+                .background(self.page.primaryColour)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
-                .navigationTitle("Hierarchy")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
             }
 
             init(inSheet: Bool) {
@@ -366,15 +370,187 @@ extension Tabs.Content {
                 typealias Button = Tabs.Content.Individual.SingleJobHierarchical
 
                 public let entity: Job
+                public var page: PageConfiguration.AppPage = .create
                 @State private var isPresented: Bool = false
+                @State private var tasks: [LogTask] = []
+                @State private var notes: [Note] = []
+                @State private var colour: Color = .clear
 
                 var body: some View {
-                    Button(entity: self.entity)
+                    Button(entity: self.entity, callback: self.actionOnTap)
+                    // @TODO: refactor to follow the pattern set in previous levels
+                    if self.isPresented {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ZStack(alignment: .leading) {
+                                self.entity.backgroundColor
+                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                    .opacity(0.6)
+                                    .blendMode(.softLight)
+                                    .frame(height: 50)
+                                HStack(alignment: .center, spacing: 0) {
+                                    Rectangle()
+                                        .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                        .frame(width: 15)
+                                    Rectangle()
+                                        .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                        .frame(width: 15)
+                                    Rectangle()
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                        .frame(width: 15)
+
+                                    HStack(spacing: 0) {
+                                        if self.tasks.isEmpty {
+                                            Text("No Tasks")
+                                        } else {
+                                            Text("\(self.tasks.count) Tasks")
+                                        }
+                                    }
+                                    .padding(.leading, 8)
+
+                                    Spacer()
+                                    NavigationLink {
+                                        TaskDetail(job: self.entity)
+                                    } label: {
+                                        Image(systemName: "plus")
+                                            .padding(8)
+                                    }
+                                }
+                            }
+
+                            if !self.tasks.isEmpty {
+                                ForEach(self.tasks) { task in
+                                    FourthLevel(entity: task)
+                                }
+                            }
+
+                            ZStack(alignment: .leading) {
+                                self.entity.backgroundColor
+                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                    .opacity(0.6)
+                                    .blendMode(.softLight)
+                                    .frame(height: 50)
+
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+
+                                        if self.notes.isEmpty {
+                                            Text("No Notes")
+                                                .padding(.leading, 8)
+                                        } else {
+                                            Text("\(self.notes.count) Notes")
+                                                .padding(.leading, 8)
+                                        }
+
+                                        Spacer()
+                                        NavigationLink {
+                                            NoteDetail(job: self.entity)
+                                        } label: {
+                                            Image(systemName: "plus")
+                                                .padding(8)
+                                        }
+                                    }
+                                }
+
+                            if !self.notes.isEmpty {
+                                ForEach(self.notes) { note in
+                                    FourthLevelNotes(entity: note)
+                                }
+                            }
+                        }
+                        .onAppear(perform: self.actionOnAppear)
+                        .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : .white)
+                    }
+                }
+
+                init(entity: Job) {
+                    self.entity = entity
+                }
+                
+                /// Onload handler. Populates task and note lists
+                /// - Returns: Void
+                private func actionOnAppear() -> Void {
+                    if let tasks = self.entity.tasks?.allObjects as? [LogTask] {
+                        self.tasks = tasks.filter({$0.completedDate == nil && $0.cancelledDate == nil}).sorted(by: {$0.due != nil && $1.due != nil ? $0.due! > $1.due! : false})
+                    }
+
+                    if let notes = self.entity.mNotes?.allObjects as? [Note] {
+                        self.notes = notes.filter({$0.alive == true}).sorted(by: {$0.title != nil && $1.title != nil ? $0.title! > $1.title! : false})
+                    }
+
+                    self.colour = Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble)
                 }
 
                 /// Tap/click handler. Opens to show list of jobs.
                 /// - Returns: Void
                 private func actionOnTap(_ job: Job) -> Void {
+                    self.isPresented.toggle()
+                }
+            }
+
+            struct FourthLevel: View {
+                typealias Button = Tabs.Content.Individual.SingleTaskChecklistItem
+
+                public let entity: LogTask
+                @State private var isPresented: Bool = false
+
+                var body: some View {
+                    HStack(spacing: 0) {
+                        Rectangle()
+                            .foregroundStyle(Color.fromStored(self.entity.owner?.project?.company?.colour ?? Theme.rowColourAsDouble))
+                            .frame(width: 15)
+                        Rectangle()
+                            .foregroundStyle(Color.fromStored(self.entity.owner?.project?.colour ?? Theme.rowColourAsDouble))
+                            .frame(width: 15)
+                        Rectangle()
+                            .foregroundStyle(self.entity.owner?.backgroundColor ?? Theme.rowColour)
+                            .frame(width: 15)
+
+                        Button(task: self.entity, highlight: false)
+                            .border(width: 1, edges: [.bottom], color: .gray)
+                    }
+                }
+
+                /// Tap/click handler. Opens to show list of projects.
+                /// - Returns: Void
+                private func actionOnTap(_ company: Company) -> Void {
+                    self.isPresented.toggle()
+                }
+            }
+
+            // @TODO: refactor + remove in favour of pattern defined in previous steps
+            struct FourthLevelNotes: View {
+                typealias Button = Tabs.Content.Individual.SingleNote
+
+                public let entity: Note
+                @State private var isPresented: Bool = false
+
+                var body: some View {
+                    HStack(spacing: 0) {
+                        Rectangle()
+                            .foregroundStyle(Color.fromStored(self.entity.mJob?.project?.company?.colour ?? Theme.rowColourAsDouble))
+                            .frame(width: 15)
+                        Rectangle()
+                            .foregroundStyle(Color.fromStored(self.entity.mJob?.project?.colour ?? Theme.rowColourAsDouble))
+                            .frame(width: 15)
+                        Rectangle()
+                            .foregroundStyle(self.entity.mJob?.backgroundColor ?? Theme.rowColour)
+                            .frame(width: 15)
+
+                        Button(note: self.entity)
+                    }
+                }
+
+                /// Tap/click handler. Opens to show list of projects.
+                /// - Returns: Void
+                private func actionOnTap(_ company: Company) -> Void {
                     self.isPresented.toggle()
                 }
             }
@@ -594,24 +770,50 @@ extension Tabs.Content {
 
         struct SingleJobHierarchical: View {
             public let entity: Job
+            public var callback: (Job) -> Void
+            public var page: PageConfiguration.AppPage = .create
             @State private var selected: Bool = false
 
             var body: some View {
-                NavigationLink {
-                    JobDetail(job: self.entity)
-                } label: {
+                VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 0) {
-                        Image(systemName: "hammer")
-                            .padding([.top, .bottom, .trailing], 8)
-                            .padding(.leading, 25 + 12)
-                        ListRow(
-                            name: self.entity.title ?? self.entity.jid.string,
-                            colour: self.entity.backgroundColor
-                        )
+                        Rectangle()
+                            .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                            .frame(width: 15)
+                        Rectangle()
+                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                            .frame(width: 15)
+
+                        Spacer()
+
+                        // Open Job button
+                        Button {
+                            selected.toggle()
+                            callback(self.entity)
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(.black)
+                                    .opacity(0.4)
+                                Image(systemName: self.selected ? "minus" : "plus")
+                            }
+                        }
+                        .frame(width: 25)
+                        .padding([.leading, .trailing], 8)
+
+                        // Entity creation buttons
+                        NavigationLink {
+                            JobDetail(job: self.entity)
+                        } label: {
+                            ListRow(
+                                name: self.entity.title ?? self.entity.jid.string,
+                                colour: self.entity.backgroundColor,
+                                highlight: false
+                            )
+                        }
                     }
-                    .background(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
                 }
-                .buttonStyle(.plain)
+                .background(self.entity.colour_from_stored())
             }
         }
 
@@ -635,6 +837,7 @@ extension Tabs.Content {
 
         struct SingleTaskChecklistItem: View {
             public let task: LogTask
+            public var highlight: Bool = true
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
 
@@ -657,7 +860,8 @@ extension Tabs.Content {
                     } label: {
                         ListRow(
                             name: task.content ?? "_TASK_CONTENT",
-                            colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour
+                            colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour,
+                            highlight: self.highlight
                         )
                         .opacity(isCompleted ? 0.5 : 1.0)
                     }
@@ -705,7 +909,8 @@ extension Tabs.Content {
                     ListRow(
                         name: note.title ?? "",
                         colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour,
-                        extraColumn: AnyView(VersionCountBadge)
+                        extraColumn: AnyView(VersionCountBadge),
+                        highlight: false
                     )
                 }
             }
@@ -765,28 +970,22 @@ extension Tabs.Content {
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(spacing: 0) {
-                        ZStack(alignment: .trailing) {
-                            LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .leading, endPoint: .trailing)
-                                .opacity(0.3)
-                                .blendMode(.softLight)
-                                .frame(width: 40)
-
-                            // Open company button
-                            Button {
-                                selected.toggle()
-                                callback(self.entity)
-                            } label: {
-                                ZStack {
-                                    Circle()
-                                        .fill(.black)
-                                        .opacity(0.4)
-                                    Image(systemName: self.selected ? "minus" : "plus")
-                                }
+                        // Open company button
+                        Button {
+                            selected.toggle()
+                            callback(self.entity)
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(.black)
+                                    .opacity(0.4)
+                                Image(systemName: self.selected ? "minus" : "plus")
                             }
-                            .frame(width: 25)
-                            .padding([.top, .bottom], 8)
-                            .padding([.leading, .trailing], 16)
                         }
+                        .frame(width: 25)
+                        .padding(.leading)
+
+                        Spacer()
 
                         // Company link
                         NavigationLink {
@@ -794,29 +993,38 @@ extension Tabs.Content {
                         } label: {
                             ListRow(
                                 name: entity.name ?? "[NO NAME]",
-                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
+                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
+                                highlight: false
                             )
                         }
                     }
 
                     if self.selected {
-                        HStack(spacing: 1) {
-                            ZStack(alignment: .trailing) {
-                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .top, endPoint: .bottom)
-                                    .opacity(0.8)
-                                    .blendMode(.softLight)
-                                    .frame(height: 50)
-
+                        ZStack(alignment: .leading) {
+                            LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .top, endPoint: .bottom)
+                                .opacity(0.8)
+                                .blendMode(.softLight)
+                                .frame(height: 50)
+                            HStack {
+                                Text(self.entity.abbreviation ?? "_DEFAULT")
+                                    .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
+                                Spacer()
+                                NavigationLink {
+                                    PersonDetail(company: self.entity)
+                                } label: {
+                                    Image(systemName: "person.2")
+                                        .padding(8)
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
+                                }
                                 NavigationLink {
                                     ProjectDetail(company: self.entity)
                                 } label: {
                                     Image(systemName: "folder.badge.plus")
                                         .padding(8)
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                 }
-                                .padding(.trailing)
-
                             }
+                            .padding(.leading, 8)
                         }
                     }
                 }
@@ -928,32 +1136,32 @@ extension Tabs.Content {
         struct SingleProjectHierarchical: View {
             public let entity: Project
             public var callback: (Project) -> Void
+            public var page: PageConfiguration.AppPage = .create
             @State private var selected: Bool = false
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 0) {
-                        // Open folder button
-                        ZStack(alignment: .leading) {
-                            LinearGradient(gradient: Gradient(colors: [.white, .clear]), startPoint: .leading, endPoint: .trailing)
-                                .opacity(0.6)
-                                .blendMode(.softLight)
-                                .frame(width: 40)
+                        Rectangle()
+                            .foregroundStyle(Color.fromStored(self.entity.company?.colour ?? Theme.rowColourAsDouble))
+                            .frame(width: 15)
+                        Rectangle()
+                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                            .frame(width: 15)
 
-                            Button {
-                                selected.toggle()
-                                callback(entity)
-                            } label: {
-                                ZStack(alignment: .center) {
-                                    Circle()
-                                        .fill(.black)
-                                        .opacity(0.4)
-                                    Image(systemName: self.selected ? "minus" : "plus")
-                                }
-                                .frame(width: 25)
-                                .padding([.top, .bottom, .trailing], 8)
-                                .padding([.leading], 25)
+                        // Open folder button
+                        Button {
+                            selected.toggle()
+                            callback(entity)
+                        } label: {
+                            ZStack(alignment: .center) {
+                                Circle()
+                                    .fill(.black)
+                                    .opacity(0.4)
+                                Image(systemName: self.selected ? "minus" : "plus")
                             }
+                            .frame(width: 25)
+                            .padding(.trailing, 8)
                         }
                         
                         // Project link
@@ -962,50 +1170,44 @@ extension Tabs.Content {
                         } label: {
                             ListRow(
                                 name: entity.name ?? "[NO NAME]",
-                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble)
+                                colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
+                                highlight: false
                             )
                         }
                     }
 
                     if self.selected {
-                        HStack(spacing: 1) {
-                            ZStack(alignment: .trailing) {
-                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .top, endPoint: .bottom)
-                                    .opacity(0.8)
-                                    .blendMode(.softLight)
-                                    .frame(height: 50)
-                                
-                                HStack {
-                                    NavigationLink {
-                                        TaskDetail()
-                                    } label: {
-                                        Image(systemName: "checklist")
-                                            .padding(8)
-                                            .foregroundStyle(.white)
+                        ZStack(alignment: .leading) {
+                            LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .top, endPoint: .bottom)
+                                .opacity(0.8)
+                                .blendMode(.softLight)
+                                .frame(height: 50)
+
+                            HStack(spacing: 0) {
+                                if let company = self.entity.company {
+                                    Rectangle()
+                                        .foregroundStyle(Color.fromStored(company.colour ?? Theme.rowColourAsDouble))
+                                        .frame(width: 15)
+
+                                    HStack {
+                                        if company.abbreviation != nil {
+                                            Text("\(company.abbreviation!).\(self.entity.abbreviation ?? "DE")")
+                                        } else {
+                                            Text("\(self.entity.abbreviation ?? "DE")")
+                                        }
                                     }
-                                    NavigationLink {
-                                        NoteDetail()
-                                    } label: {
-                                        Image(systemName: "note.text")
-                                            .padding(8)
-                                            .foregroundStyle(.white)
-                                    }
-                                    NavigationLink {
-                                        PersonDetail(company: self.entity.company)
-                                    } label: {
-                                        Image(systemName: "person.2")
-                                            .padding(8)
-                                            .foregroundStyle(.white)
-                                    }
-                                    NavigationLink {
-                                        JobDetail(company: self.entity.company, project: self.entity)
-                                    } label: {
-                                        Image(systemName: "hammer")
-                                            .padding(8)
-                                            .foregroundStyle(.white)
-                                    }
+                                    .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
+                                    .padding(.leading, 8)
                                 }
-                                .padding(.trailing)
+
+                                Spacer()
+                                NavigationLink {
+                                    JobDetail(company: self.entity.company, project: self.entity)
+                                } label: {
+                                    Image(systemName: "plus")
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
+                                        .padding(8)
+                                }
                             }
                         }
                     }

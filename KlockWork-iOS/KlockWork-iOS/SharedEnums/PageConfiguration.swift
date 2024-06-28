@@ -46,7 +46,7 @@ extension PageConfiguration {
     }
 
     enum EntityType: CaseIterable, Equatable {
-        case records, tasks, notes, people, companies, projects, jobs, omni
+        case records, tasks, notes, people, companies, projects, jobs
 
         /// Interface-friendly representation
         var label: String {
@@ -58,7 +58,6 @@ extension PageConfiguration {
             case .companies: "Companies"
             case .people: "People"
             case .projects: "Projects"
-            case .omni: "Hierarchy"
             }
         }
 
@@ -72,7 +71,6 @@ extension PageConfiguration {
             case .companies: "Company"
             case .people: "Person"
             case .projects: "Project"
-            case .omni: "Hierarchy"
             }
         }
 
@@ -86,7 +84,6 @@ extension PageConfiguration {
             case .companies: Image(systemName: "building.2")
             case .people: Image(systemName: "person.2")
             case .projects: Image(systemName: "folder")
-            case .omni: Image(systemName: "slowmo")
             }
         }
 
@@ -99,7 +96,6 @@ extension PageConfiguration {
             case .companies: Image(systemName: "building.2.fill")
             case .people: Image(systemName: "person.2.fill")
             case .projects: Image(systemName: "folder.fill")
-            case .omni: Image(systemName: "timelapse")
             }
         }
     }

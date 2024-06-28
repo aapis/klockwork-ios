@@ -22,7 +22,6 @@ struct Explore: View {
     @State private var entityCounts: [EntityTypePair] = []
     @State private var searchText: String = ""
 
-
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
@@ -84,6 +83,17 @@ struct Explore: View {
                                 Image(systemName: "globe")
                                     .foregroundStyle(self.state.theme.tint)
                                 Text("Data Explorer")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
+
+                        NavigationLink {
+                            Tabs.Content.List.HierarchyExplorer(inSheet: false)
+                        } label: {
+                            HStack {
+                                Image(systemName: "list.number")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Hierarchy Explorer")
                             }
                         }
                         .listRowBackground(Theme.textBackground)

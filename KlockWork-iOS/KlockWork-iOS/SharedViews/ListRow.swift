@@ -19,19 +19,20 @@ struct ListRow: View {
         HStack(alignment: .center, spacing: 5) {
             HStack {
                 Text(name)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(self.highlight ? .white : self.colour!.isBright() ? Theme.base : .white)
                     .multilineTextAlignment(.leading)
-                    .padding(6)
-                    .background(highlight ? .black.opacity(0.2) : .clear)
+                    .padding([.top, .bottom], 6)
+                    .padding([.leading, .trailing], self.highlight ? 6 : 0)
+                    .background(self.highlight ? .black.opacity(0.2) : .clear)
                     .cornerRadius(5)
             }
             .padding(8)
 
             Spacer()
+            extraColumn
             ZStack {
-                extraColumn
                 Image(systemName: icon)
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(self.highlight ? .white : self.colour!.isBright() ? Theme.base : .white)
                     .padding(8)
                 LinearGradient(gradient: Gradient(colors: [self.gradientColours.0, self.gradientColours.1]), startPoint: .trailing, endPoint: .leading)
                     .opacity(0.3)
@@ -39,7 +40,6 @@ struct ListRow: View {
                     .frame(width: 40)
             }
         }
-//        .padding(8)
         .background(colour)
         .listRowBackground(colour)
     }

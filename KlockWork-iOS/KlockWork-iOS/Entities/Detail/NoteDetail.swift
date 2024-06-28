@@ -16,7 +16,7 @@ struct NoteDetail: View {
     @State private var current: NoteVersion? = nil
     @State private var content: String = ""
     @State private var title: String = ""
-    @State private var job: Job? = nil
+    @State public var job: Job? = nil
     @State private var starred: Bool = false
     @State private var postedDate: Date = Date()
     @State private var alive: Bool = true
