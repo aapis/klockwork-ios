@@ -274,14 +274,13 @@ extension Tabs.Content {
             }
         }
 
-        struct HierarchyNavigator: View {
+        struct HierarchyExplorer: View {
             public var inSheet: Bool
             public var page: PageConfiguration.AppPage = .explore
             @FetchRequest private var items: FetchedResults<Company>
 
             var body: some View {
                 ScrollView {
-                    Divider().background(.gray)
                     VStack(alignment: .leading, spacing: 0) {
                         if self.items.count > 0 {
                             ForEach(self.items.filter({$0.alive == true})) { item in
@@ -290,9 +289,10 @@ extension Tabs.Content {
                         } else {
                             StatusMessage.Warning(message: "No companies updated within the last 7 days")
                         }
+                        Spacer()
                     }
                 }
-                .navigationTitle("Hierarchy")
+                .navigationTitle("Hierarchy Explorer")
                 .background(self.page.primaryColour)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
@@ -909,7 +909,8 @@ extension Tabs.Content {
                     ListRow(
                         name: note.title ?? "",
                         colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour,
-                        extraColumn: AnyView(VersionCountBadge)
+                        extraColumn: AnyView(VersionCountBadge),
+                        highlight: false
                     )
                 }
             }
@@ -1025,7 +1026,6 @@ extension Tabs.Content {
                             }
                             .padding(.leading, 8)
                         }
-
                     }
                 }
                 .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
@@ -1196,6 +1196,7 @@ extension Tabs.Content {
                                             Text("\(self.entity.abbreviation ?? "DE")")
                                         }
                                     }
+                                    .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                     .padding(.leading, 8)
                                 }
 
@@ -1204,6 +1205,7 @@ extension Tabs.Content {
                                     JobDetail(company: self.entity.company, project: self.entity)
                                 } label: {
                                     Image(systemName: "plus")
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                         .padding(8)
                                 }
                             }

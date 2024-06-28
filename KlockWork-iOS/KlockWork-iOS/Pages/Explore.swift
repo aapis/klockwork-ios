@@ -88,7 +88,7 @@ struct Explore: View {
                         .listRowBackground(Theme.textBackground)
 
                         NavigationLink {
-                            Tabs.Content.List.HierarchyNavigator(inSheet: false)
+                            Tabs.Content.List.HierarchyExplorer(inSheet: false)
                         } label: {
                             HStack {
                                 Image(systemName: "list.number")
