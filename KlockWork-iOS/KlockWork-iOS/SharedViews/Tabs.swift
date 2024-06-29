@@ -401,6 +401,7 @@ extension Tabs.Content {
                                     HStack(spacing: 0) {
                                         if self.tasks.isEmpty {
                                             Text("No Tasks")
+                                                .opacity(0.5)
                                         } else {
                                             Text("\(self.tasks.count) Tasks")
                                         }
@@ -441,13 +442,15 @@ extension Tabs.Content {
                                             .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
 
-                                        if self.notes.isEmpty {
-                                            Text("No Notes")
-                                                .padding(.leading, 8)
-                                        } else {
-                                            Text("\(self.notes.count) Notes")
-                                                .padding(.leading, 8)
+                                        HStack(spacing: 0) {
+                                            if self.notes.isEmpty {
+                                                Text("No Notes")
+                                                    .opacity(0.5)
+                                            } else {
+                                                Text("\(self.notes.count) Notes")
+                                            }
                                         }
+                                        .padding(.leading, 8)
 
                                         Spacer()
                                         NavigationLink {
@@ -514,7 +517,7 @@ extension Tabs.Content {
                             .frame(width: 15)
 
                         Button(task: self.entity, highlight: false)
-                            .border(width: 1, edges: [.bottom], color: .gray)
+                            .border(width: 1, edges: [.bottom], color: Theme.cPurple.opacity(0.6))
                     }
                 }
 
@@ -545,6 +548,7 @@ extension Tabs.Content {
                             .frame(width: 15)
 
                         Button(note: self.entity)
+                            .border(width: 1, edges: [.bottom], color: Theme.cPurple.opacity(0.6))
                     }
                 }
 
@@ -1012,7 +1016,7 @@ extension Tabs.Content {
                                 NavigationLink {
                                     PersonDetail(company: self.entity)
                                 } label: {
-                                    Image(systemName: "person.2")
+                                    Image(systemName: "person.badge.plus")
                                         .padding(8)
                                         .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                 }

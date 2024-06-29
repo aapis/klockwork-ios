@@ -34,11 +34,11 @@ extension Widget {
                             }
                         }
                     }
-                    .listRowBackground(self.company == nil ? Theme.textBackground : Color.fromStored(self.company!.colour ?? Theme.rowColourAsDouble))
+                    .listRowBackground(self.company == nil ? Theme.textBackground : Color.fromStored(self.company?.colour ?? Theme.rowColourAsDouble))
                 } else if self.orientation == .horizontal {
                     HStack(alignment: .center) {
                         Text("Company")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(.white)
 
                         Button {
                             isCompanySelectorPresented.toggle()
