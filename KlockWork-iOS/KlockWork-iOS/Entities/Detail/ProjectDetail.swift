@@ -42,7 +42,7 @@ struct ProjectDetail: View {
                         )
                         ColorPicker(selection: $colour) {
                             Text("Colour")
-                                .foregroundStyle(.gray)
+                                .foregroundStyle(colour == .clear ? .gray : .white)
                         }
                         .listRowBackground(colour == .clear ? Theme.textBackground : colour)
                     }

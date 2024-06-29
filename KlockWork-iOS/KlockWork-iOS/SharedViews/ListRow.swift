@@ -32,7 +32,7 @@ struct ListRow: View {
             extraColumn
             ZStack {
                 Image(systemName: icon)
-                    .foregroundStyle(self.highlight ? .white : self.colour!.isBright() ? Theme.base : .white)
+                    .foregroundStyle(self.highlight ? .white : self.colour!.isBright() ? Theme.base.opacity(0.6) : .white)
                     .padding(8)
                 LinearGradient(gradient: Gradient(colors: [self.gradientColours.0, self.gradientColours.1]), startPoint: .trailing, endPoint: .leading)
                     .opacity(0.3)

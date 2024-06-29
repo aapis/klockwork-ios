@@ -36,7 +36,7 @@ extension Widget {
                 } else if self.orientation == .horizontal {
                     HStack(alignment: .center) {
                         Text("Project")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(.white)
 
                         Button {
                             isProjectSelectorPresented.toggle()
@@ -195,7 +195,7 @@ extension Widget {
                         }
                         .listRowBackground(Theme.textBackground)
                     } else {
-                        ForEach(projects.filter({$0.alive == true})) { project in
+                        ForEach(projects.filter({$0.alive == true}).sorted(by: {$0.name! < $1.name!})) { project in
                             Row(entity: project, alreadySelected: self.isSelected(project), callback: { project, action in
                                 if action == .add {
                                     projects.append(project)
