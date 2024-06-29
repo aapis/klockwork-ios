@@ -19,6 +19,8 @@ struct TaskDetail: View {
     @State private var due: Date = Date()
     @State private var lastUpdate: Date = Date()
     @State public var job: Job?
+    @State private var company: Company?
+    @State private var project: Project?
     @State private var isCompleted: Bool = false
     @State private var isCancelled: Bool = false
     @State private var isJobSelectorPresented: Bool = false
@@ -31,25 +33,38 @@ struct TaskDetail: View {
         NavigationStack {
             VStack {
                 List {
+                    Widget.JobSelector.FormField(
+                        job: $job,
+                        isJobSelectorPresented: $isJobSelectorPresented
+                    )
+
+                    Section("What needs to be done?") {
+                        TextField("Task content", text: $content, axis: .vertical)
+                    }
+                    .listRowBackground(Theme.textBackground)
+
                     Section("Settings") {
                         DatePicker(
                             "Created",
                             selection: $created,
                             displayedComponents: [.date, .hourAndMinute]
                         )
-                        
+
                         DatePicker(
                             "Due",
                             selection: $due,
                             displayedComponents: [.date, .hourAndMinute]
                         )
-
-                        DatePicker(
-                            "Last updated",
-                            selection: $lastUpdate,
-                            displayedComponents: [.date, .hourAndMinute]
-                        )
-                        .disabled(true)
+                        
+                        // Show last updated when editing
+                        if self.job != nil {
+                            DatePicker(
+                                "Last updated",
+                                selection: $lastUpdate,
+                                displayedComponents: [.date, .hourAndMinute]
+                            )
+                            .disabled(true)
+                        }
 
                         if isCompleted {
                             DatePicker(
@@ -73,16 +88,19 @@ struct TaskDetail: View {
                         }
                     }
                     .listRowBackground(Theme.textBackground)
-                    
-                    Widget.JobSelector.FormField(
-                        job: $job,
-                        isJobSelectorPresented: $isJobSelectorPresented
-                    )
 
-                    Section("What needs to be done?") {
-                        TextField("Task content", text: $content, axis: .vertical)
+                    if self.task != nil {
+                        Button("Delete Task", role: .destructive, action: self.actionInitiateDelete)
+                            .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                                Button("Yes", role: .destructive) {
+                                    self.actionOnDelete()
+                                }
+                            } message: {
+                                Text("\"\(self.content)\" will be deleted, but is recoverable.")
+                            }
+                            .listRowBackground(Color.red)
+                            .foregroundStyle(.white)
                     }
-                    .listRowBackground(Theme.textBackground)
                 }
             }
             .onAppear(perform: self.actionOnAppear)
