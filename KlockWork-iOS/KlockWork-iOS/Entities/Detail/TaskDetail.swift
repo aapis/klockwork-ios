@@ -96,7 +96,7 @@ struct TaskDetail: View {
                                     self.actionOnDelete()
                                 }
                             } message: {
-                                Text("\"\(self.content)\" will be deleted, but is recoverable.")
+                                Text("\"\(self.content)\" will be permanently deleted.")
                             }
                             .listRowBackground(Color.red)
                             .foregroundStyle(.white)
