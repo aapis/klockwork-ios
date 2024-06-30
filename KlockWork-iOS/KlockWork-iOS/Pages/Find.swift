@@ -117,6 +117,14 @@ extension Find {
                             .fontWeight(.bold)
                     }
                 }
+
+                Spacer()
+//                NavigationLink {
+//                    AppSettings()
+//                } label: {
+//                    Image(systemName: "gearshape")
+//                        .font(.title)
+//                }
             }
             .padding()
         }
