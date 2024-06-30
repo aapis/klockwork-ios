@@ -367,69 +367,104 @@ extension Tabs.Content {
             }
 
             struct ThirdLevel: View {
-                typealias Button = Tabs.Content.Individual.SingleJobHierarchical
-
+                typealias JobButton = Tabs.Content.Individual.SingleJobHierarchical
+                
+                @EnvironmentObject private var state: AppState
                 public let entity: Job
                 public var page: PageConfiguration.AppPage = .create
                 @State private var isPresented: Bool = false
+                @State private var isCreateTaskPanelPresented: Bool = false // @TODO: move this to a new struct
+                @State private var isCreateNotePanelPresented: Bool = false // @TODO: move this to a new struct
                 @State private var tasks: [LogTask] = []
                 @State private var notes: [Note] = []
                 @State private var colour: Color = .clear
+                @State private var newTaskContent: String = "" // @TODO: move this to a new struct
+                @State private var newNoteTitle: String = "" // @TODO: move this to a new struct
+                @State private var id: UUID = UUID()
 
                 var body: some View {
-                    Button(entity: self.entity, callback: self.actionOnTap)
-                    // @TODO: refactor to follow the pattern set in previous levels
-                    if self.isPresented {
-                        VStack(alignment: .leading, spacing: 0) {
-                            ZStack(alignment: .leading) {
-                                self.entity.backgroundColor
-                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
-                                    .opacity(0.6)
-                                    .blendMode(.softLight)
-                                    .frame(height: 50)
-                                HStack(alignment: .center, spacing: 0) {
-                                    Rectangle()
-                                        .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
-                                        .frame(width: 15)
-                                    Rectangle()
-                                        .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
-                                        .frame(width: 15)
-                                    Rectangle()
-                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
-                                        .frame(width: 15)
+                    VStack(alignment: .leading, spacing: 0) {
+                        JobButton(entity: self.entity, callback: self.actionOnTap)
+                        // @TODO: refactor to follow the pattern set in previous levels
+                        if self.isPresented {
+                            VStack(alignment: .leading, spacing: 0) {
+                                ZStack(alignment: .leading) {
+                                    self.entity.backgroundColor
+                                    LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                        .opacity(0.6)
+                                        .blendMode(.softLight)
+                                        .frame(height: 50)
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
 
-                                    HStack(spacing: 0) {
-                                        if self.tasks.isEmpty {
-                                            Text("No Tasks")
-                                                .opacity(0.5)
-                                        } else {
-                                            Text("\(self.tasks.count) Tasks")
+                                        HStack(spacing: 0) {
+                                            if self.tasks.isEmpty {
+                                                Text("No Tasks")
+                                                    .opacity(0.5)
+                                            } else {
+                                                Text("\(self.tasks.count) Tasks")
+                                            }
+                                        }
+                                        .padding(.leading, 8)
+
+                                        Spacer()
+                                        Button {
+                                            withAnimation(.linear(duration: 0.2)) {
+                                                self.isCreateTaskPanelPresented.toggle()
+                                            }
+                                        } label: {
+                                            Image(systemName: "plus")
+                                                .padding(8)
                                         }
                                     }
-                                    .padding(.leading, 8)
+                                }
 
-                                    Spacer()
-                                    NavigationLink {
-                                        TaskDetail(job: self.entity)
-                                    } label: {
-                                        Image(systemName: "plus")
-                                            .padding(8)
+                                // Quick task creator
+                                if self.isCreateTaskPanelPresented {
+                                    VStack {
+                                        HStack(alignment: .center, spacing: 0) {
+                                            Rectangle()
+                                                .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                                .frame(width: 15)
+                                            Rectangle()
+                                                .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                                .frame(width: 15)
+                                            TextField("", text: $newTaskContent, prompt: Text("What needs to be done?").foregroundStyle(Theme.base.opacity(0.5)), axis: .horizontal)
+                                                .submitLabel(.go)
+                                                .onSubmit {
+                                                    self.actionOnCreateTask()
+                                                    self.newTaskContent = ""
+                                                    withAnimation(.linear(duration: 0.2)) {
+                                                        self.isCreateTaskPanelPresented.toggle()
+                                                    }
+                                                }
+                                                .padding()
+                                        }
+                                    }
+                                    .background(.orange)
+                                    .onDisappear(perform: self.actionPostSave)
+                                }
+
+                                if !self.tasks.isEmpty {
+                                    ForEach(self.tasks) { task in
+                                        FourthLevel(entity: task)
                                     }
                                 }
-                            }
 
-                            if !self.tasks.isEmpty {
-                                ForEach(self.tasks) { task in
-                                    FourthLevel(entity: task)
-                                }
-                            }
-
-                            ZStack(alignment: .leading) {
-                                self.entity.backgroundColor
-                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
-                                    .opacity(0.6)
-                                    .blendMode(.softLight)
-                                    .frame(height: 50)
+                                ZStack(alignment: .leading) {
+                                    self.entity.backgroundColor
+                                    LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                        .opacity(0.6)
+                                        .blendMode(.softLight)
+                                        .frame(height: 50)
 
                                     HStack(alignment: .center, spacing: 0) {
                                         Rectangle()
@@ -453,8 +488,10 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        NavigationLink {
-                                            NoteDetail(job: self.entity)
+                                        Button {
+                                            withAnimation(.linear(duration: 0.2)) {
+                                                self.isCreateNotePanelPresented.toggle()
+                                            }
                                         } label: {
                                             Image(systemName: "plus")
                                                 .padding(8)
@@ -462,15 +499,43 @@ extension Tabs.Content {
                                     }
                                 }
 
-                            if !self.notes.isEmpty {
-                                ForEach(self.notes) { note in
-                                    FourthLevelNotes(entity: note)
+                                // Quick note creator
+                                if self.isCreateNotePanelPresented {
+                                    VStack {
+                                        HStack(alignment: .center, spacing: 0) {
+                                            Rectangle()
+                                                .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                                .frame(width: 15)
+                                            Rectangle()
+                                                .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                                .frame(width: 15)
+                                            TextField("", text: $newNoteTitle, prompt: Text("Note title").foregroundStyle(Theme.base.opacity(0.5)), axis: .horizontal)
+                                                .submitLabel(.go)
+                                                .onSubmit {
+                                                    self.actionOnCreateNote()
+                                                    self.newNoteTitle = ""
+                                                    withAnimation(.linear(duration: 0.2)) {
+                                                        self.isCreateNotePanelPresented.toggle()
+                                                    }
+                                                }
+                                                .padding()
+                                        }
+                                    }
+                                    .background(.orange)
+                                    .onDisappear(perform: self.actionPostSave)
+                                }
+
+                                if !self.notes.isEmpty {
+                                    ForEach(self.notes) { note in
+                                        FourthLevelNotes(entity: note)
+                                    }
                                 }
                             }
+                            .onAppear(perform: self.actionOnAppear)
+                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : .white)
                         }
-                        .onAppear(perform: self.actionOnAppear)
-                        .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : .white)
                     }
+                    .id(self.id)
                 }
 
                 init(entity: Job) {
@@ -496,6 +561,38 @@ extension Tabs.Content {
                 private func actionOnTap(_ job: Job) -> Void {
                     self.isPresented.toggle()
                 }
+                
+                /// Fires when creating a task using the quick creator
+                /// - Returns: Void
+                private func actionOnCreateTask() -> Void {
+                    CoreDataTasks(moc: self.state.moc).create(
+                        content: self.newTaskContent,
+                        created: Date(),
+                        due: Date(),
+                        job: self.entity
+                    )
+                }
+
+                /// Fires when creating a note using the quick creator
+                /// - Returns: Void
+                private func actionOnCreateNote() -> Void {
+                    CoreDataNotes(moc: self.state.moc).create(
+                        alive: true,
+                        body: "",
+                        lastUpdate: Date(),
+                        postedDate: Date(),
+                        starred: false,
+                        title: self.newNoteTitle,
+                        job: self.entity
+                    )
+                }
+                
+                /// Force view refresh
+                /// @TODO: may be unnecessary in later versions, confirm this still works
+                /// - Returns: Void
+                private func actionPostSave() -> Void {
+                    self.id = UUID()
+                }
             }
 
             struct FourthLevel: View {
@@ -516,7 +613,7 @@ extension Tabs.Content {
                             .foregroundStyle(self.entity.owner?.backgroundColor ?? Theme.rowColour)
                             .frame(width: 15)
 
-                        Button(task: self.entity, highlight: false)
+                        Button(task: self.entity)
                             .border(width: 1, edges: [.bottom], color: Theme.cPurple.opacity(0.6))
                     }
                 }
@@ -788,8 +885,6 @@ extension Tabs.Content {
                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                             .frame(width: 15)
 
-                        Spacer()
-
                         // Open Job button
                         Button {
                             selected.toggle()
@@ -803,7 +898,7 @@ extension Tabs.Content {
                             }
                         }
                         .frame(width: 25)
-                        .padding([.leading, .trailing], 8)
+                        .padding([.leading, .trailing])
 
                         // Entity creation buttons
                         NavigationLink {
@@ -812,7 +907,7 @@ extension Tabs.Content {
                             ListRow(
                                 name: self.entity.title ?? self.entity.jid.string,
                                 colour: self.entity.backgroundColor,
-                                highlight: false
+                                padding: (14, 14, 14, 0)
                             )
                         }
                     }
@@ -841,7 +936,6 @@ extension Tabs.Content {
 
         struct SingleTaskChecklistItem: View {
             public let task: LogTask
-            public var highlight: Bool = true
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
 
@@ -865,7 +959,7 @@ extension Tabs.Content {
                         ListRow(
                             name: task.content ?? "_TASK_CONTENT",
                             colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour,
-                            highlight: self.highlight
+                            padding: (14, 14, 14, 0)
                         )
                         .opacity(isCompleted ? 0.5 : 1.0)
                     }
@@ -987,7 +1081,7 @@ extension Tabs.Content {
                             }
                         }
                         .frame(width: 25)
-                        .padding(.leading)
+                        .padding([.leading, .trailing])
 
                         Spacer()
 
@@ -998,7 +1092,7 @@ extension Tabs.Content {
                             ListRow(
                                 name: entity.name ?? "[NO NAME]",
                                 colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
-                                highlight: false
+                                padding: (14, 14, 14, 0)
                             )
                         }
                     }
@@ -1012,6 +1106,8 @@ extension Tabs.Content {
                             HStack {
                                 Text(self.entity.abbreviation ?? "_DEFAULT")
                                     .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
+                                    .opacity(0.7)
+                                    .padding(.leading, 8)
                                 Spacer()
                                 NavigationLink {
                                     PersonDetail(company: self.entity)
@@ -1047,7 +1143,7 @@ extension Tabs.Content {
                 } label: {
                     ListRow(
                         name: person.name ?? "_PERSON_NAME",
-                        colour: Color.fromStored(person.company != nil ? person.company!.colour! : Theme.rowColourAsDouble)
+                        colour: Color.fromStored(person.company?.colour ?? Theme.rowColourAsDouble)
                     )
                 }
                 .buttonStyle(.plain)
@@ -1149,9 +1245,6 @@ extension Tabs.Content {
                         Rectangle()
                             .foregroundStyle(Color.fromStored(self.entity.company?.colour ?? Theme.rowColourAsDouble))
                             .frame(width: 15)
-                        Rectangle()
-                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
-                            .frame(width: 15)
 
                         // Open folder button
                         Button {
@@ -1164,10 +1257,10 @@ extension Tabs.Content {
                                     .opacity(0.4)
                                 Image(systemName: self.selected ? "minus" : "plus")
                             }
-                            .frame(width: 25)
-                            .padding(.trailing, 8)
                         }
-                        
+                        .frame(width: 25)
+                        .padding([.leading, .trailing])
+
                         // Project link
                         NavigationLink {
                             ProjectDetail(project: self.entity)
@@ -1175,7 +1268,7 @@ extension Tabs.Content {
                             ListRow(
                                 name: entity.name ?? "[NO NAME]",
                                 colour: Color.fromStored(entity.colour ?? Theme.rowColourAsDouble),
-                                highlight: false
+                                padding: (14, 14, 14, 0)
                             )
                         }
                     }
@@ -1201,7 +1294,8 @@ extension Tabs.Content {
                                         }
                                     }
                                     .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
-                                    .padding(.leading, 8)
+                                    .opacity(0.7)
+                                    .padding(.leading)
                                 }
 
                                 Spacer()

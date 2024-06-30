@@ -33,6 +33,8 @@ extension Widget {
             }
         }
 
+        // @TODO: implement a Hierarchical selector, where jobs are grouped with their companies and projects
+
         /// Allows selection of multiple jobs from the list
         struct Multi: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState

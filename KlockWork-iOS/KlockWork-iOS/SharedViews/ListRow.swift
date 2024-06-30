@@ -12,21 +12,19 @@ struct ListRow: View {
     public var colour: Color? = .clear
     public var icon: String = "chevron.right"
     public var extraColumn: AnyView?
-    public var highlight: Bool = true
+    public var highlight: Bool = false // @TODO: highlight is deprecated and unused
     public var gradientColours: (Color, Color) = (.clear, .clear) // (.clear, .black)
+    public var padding: (CGFloat, CGFloat, CGFloat, CGFloat) = (14, 14, 14, 14)
 
     var body: some View {
         HStack(alignment: .center, spacing: 5) {
-            HStack {
-                Text(name)
-                    .foregroundStyle(self.highlight ? .white : self.colour!.isBright() ? Theme.base : .white)
-                    .multilineTextAlignment(.leading)
-                    .padding([.top, .bottom], 6)
-                    .padding([.leading, .trailing], self.highlight ? 6 : 0)
-                    .background(self.highlight ? .black.opacity(0.2) : .clear)
-                    .cornerRadius(5)
-            }
-            .padding(8)
+            Text(name)
+                .foregroundStyle(self.colour!.isBright() ? Theme.base : .white)
+                .multilineTextAlignment(.leading)
+                .padding(.top, self.padding.0)
+                .padding(.trailing, self.padding.1)
+                .padding(.bottom, self.padding.2)
+                .padding(.leading, self.padding.3)
 
             Spacer()
             extraColumn
@@ -51,7 +49,7 @@ struct ToggleableListRow: View {
     public var iconOff: String = "square"
     public var iconOn: String = "square.fill"
     public var extraColumn: AnyView?
-    public var highlight: Bool = true
+    public var highlight: Bool = false // @TODO: highlight is deprecated and unused
     public var padding: CGFloat = 8
     @Binding public var selected: Bool
 
@@ -62,7 +60,7 @@ struct ToggleableListRow: View {
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.leading)
                     .padding(6)
-                    .background(highlight ? .black.opacity(0.2) : .clear)
+                    .background(.clear)
                     .cornerRadius(5)
                 Spacer()
                 extraColumn
