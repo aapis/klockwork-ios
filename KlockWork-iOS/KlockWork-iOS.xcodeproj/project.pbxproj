@@ -35,6 +35,7 @@
 		538328682C1BE8B900105B14 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538328672C1BE8B000105B14 /* ErrorView.swift */; };
 		5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5387AE882C0143D100EEC581 /* SearchBar.swift */; };
 		538A10312C30FB600028B785 /* ViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A10302C30FB5E0028B785 /* ViewMode.swift */; };
+		538A10332C31C7D70028B785 /* RowAddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A10322C31C7CC0028B785 /* RowAddButton.swift */; };
 		53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53911FC42C19E87300B77DAB /* ActivityWeight.swift */; };
 		539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134E92C0269B600B48494 /* PageConfiguration.swift */; };
 		539134EC2C02883000B48494 /* PersonDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EB2C02883000B48494 /* PersonDetail.swift */; };
@@ -145,6 +146,7 @@
 		538328672C1BE8B000105B14 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		5387AE882C0143D100EEC581 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		538A10302C30FB5E0028B785 /* ViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewMode.swift; sourceTree = "<group>"; };
+		538A10322C31C7CC0028B785 /* RowAddButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowAddButton.swift; sourceTree = "<group>"; };
 		53911FC42C19E87300B77DAB /* ActivityWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ActivityWeight.swift; path = ../../DLPrototype/DLPrototype/Enums/ActivityWeight.swift; sourceTree = "<group>"; };
 		539134E92C0269B600B48494 /* PageConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageConfiguration.swift; sourceTree = "<group>"; };
 		539134EB2C02883000B48494 /* PersonDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonDetail.swift; sourceTree = "<group>"; };
@@ -283,6 +285,7 @@
 		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
+				538A10322C31C7CC0028B785 /* RowAddButton.swift */,
 				530C8D1F2C1BE87600ED3AD1 /* Error */,
 				53E33F842C1B8D2D001191ED /* LargeDateIndicator.swift */,
 				5311F3FE2C17A03500FB3071 /* Widget */,
@@ -579,6 +582,7 @@
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
 				537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */,
 				5380795F2C1CF6B100B97D55 /* PageActionBar.Create.swift in Sources */,
+				538A10332C31C7D70028B785 /* RowAddButton.swift in Sources */,
 				539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */,
 				53F926292BFEA00E00948076 /* Project.swift in Sources */,
 				53F9262A2BFEA00E00948076 /* Job.swift in Sources */,
