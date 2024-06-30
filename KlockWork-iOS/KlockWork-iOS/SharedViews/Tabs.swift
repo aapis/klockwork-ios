@@ -310,7 +310,7 @@ extension Tabs.Content {
                 typealias Button = Tabs.Content.Individual.SingleCompanyHierarchical
 
                 public let entity: Company
-                @State private var isPresented: Bool = false
+                @AppStorage("today.hierarchy.company") private var isPresented: Bool = false
 
                 var body: some View {
                     Button(entity: self.entity, callback: self.actionOnTap)
@@ -335,7 +335,7 @@ extension Tabs.Content {
                 typealias Button = Tabs.Content.Individual.SingleProjectHierarchical
 
                 public let entity: Project
-                @State private var isPresented: Bool = false
+                @AppStorage("today.hierarchy.project") private var isPresented: Bool = false
 
                 var body: some View {
                     Button(entity: self.entity, callback: self.actionOnTap)
@@ -372,7 +372,7 @@ extension Tabs.Content {
                 @EnvironmentObject private var state: AppState
                 public let entity: Job
                 public var page: PageConfiguration.AppPage = .create
-                @State private var isPresented: Bool = false
+                @AppStorage("today.hierarchy.job") private var isPresented: Bool = false
                 @State private var isCreateTaskPanelPresented: Bool = false // @TODO: move this to a new struct
                 @State private var isCreateNotePanelPresented: Bool = false // @TODO: move this to a new struct
                 @State private var tasks: [LogTask] = []
