@@ -19,9 +19,10 @@ struct Today: View {
     @State private var jobs: [Job] = []
     @State private var isPresented: Bool = false
     @State private var path = NavigationPath()
+    @AppStorage("today.viewMode") private var viewMode: Int = 0
     @FocusState private var textFieldActive: Bool
     private let page: PageConfiguration.AppPage = .today
-
+    
     var body: some View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 0) {
@@ -29,28 +30,12 @@ struct Today: View {
                     Header(page: self.page, path: $path)
                 }
                 Divider().background(.white).frame(height: 1)
-                ZStack(alignment: .bottomLeading) {
-                    Tabs(inSheet: inSheet, job: $job, selected: $selected)
-                    if !inSheet {
-                        // @TODO: each one of these could include the create entity button, but for now it's only relevant to the Records tab
-                        if selected == .records {
-                            PageActionBar.Today(job: $job, isPresented: $isPresented)
-                        }
-
-                        if job != nil {
-                            LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
-                                .frame(height: 50)
-                                .opacity(0.1)
-                        }
-                    }
-                }
-
-                if !inSheet {
-                    if selected == .records {
-                        Editor(job: $job, entityType: $selected, focused: _textFieldActive)
-                    }
-
-                    Spacer().frame(height: 1)
+                
+                switch(self.viewMode) {
+                case 1:
+                    Tabs.Content.List.HierarchyExplorer(inSheet: false)
+                default:
+                    main
                 }
             }
             .background(page.primaryColour)
@@ -60,6 +45,34 @@ struct Today: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
             .onChange(of: self.job) {self.actionOnJobChange()}
+        }
+    }
+
+    var main: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .bottomLeading) {
+                Tabs(inSheet: inSheet, job: $job, selected: $selected)
+                if !inSheet {
+                    // @TODO: each one of these could include the create entity button, but for now it's only relevant to the Records tab
+                    if selected == .records {
+                        PageActionBar.Today(job: $job, isPresented: $isPresented)
+                    }
+
+                    if job != nil {
+                        LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
+                            .frame(height: 50)
+                            .opacity(0.1)
+                    }
+                }
+            }
+
+            if !inSheet {
+                if selected == .records {
+                    Editor(job: $job, entityType: $selected, focused: _textFieldActive)
+                }
+
+                Spacer().frame(height: 1)
+            }
         }
     }
 }
@@ -91,9 +104,20 @@ extension Today {
                         }
                     Image(systemName: "chevron.right")
                     Spacer()
-                    AddButton(/*path: $path*/)
+
+                    HStack(alignment: .center, spacing: 8) {
+                        AddButton()
+                        ViewModeSelector()
+                    }
+                    .padding(10)
+                    .background(
+                        LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .leading, endPoint: .trailing)
+                            .opacity(0.4)
+                            .blendMode(.softLight)
+                            .frame(height: 50)
+                    )
+                    .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 16))
                 }
-                Spacer()
             }
             .onAppear(perform: {
                 self.date = self.state.date
@@ -178,6 +202,43 @@ extension Today {
             }
             .font(.title2)
             .foregroundStyle(self.state.theme.tint)
+        }
+    }
+
+    struct ViewModeSelector: View {
+        @AppStorage("today.viewMode") private var storedVm: Int = 0
+        @State private var viewMode: ViewMode = .tabular
+
+        var body: some View {
+            Menu("", systemImage: self.viewMode.icon) {
+                Button {
+                    self.viewMode = .tabular
+                    self.storedVm = self.viewMode.id
+                } label: {
+                    Text("Tabular")
+                    Image(systemName: "tablecells")
+                }
+                .disabled(self.storedVm == 0)
+
+                Button {
+                    self.viewMode = .hierarchical
+                    self.storedVm = self.viewMode.id
+                } label: {
+                    Text("Hierarchical")
+                    Image(systemName: "list.bullet.indent")
+                }
+                .disabled(self.storedVm == 1)
+            }
+            .opacity(0.5)
+            .onAppear(perform: self.actionOnAppear)
+        }
+        
+        /// Onload handler. Sets the viewMode to the stored value.
+        /// - Returns: Void
+        private func actionOnAppear() -> Void {
+            if let fromStored = ViewMode.by(id: storedVm) {
+                self.viewMode = fromStored
+            }
         }
     }
 }

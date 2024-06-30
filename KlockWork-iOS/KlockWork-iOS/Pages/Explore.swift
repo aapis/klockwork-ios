@@ -86,17 +86,6 @@ struct Explore: View {
                             }
                         }
                         .listRowBackground(Theme.textBackground)
-
-                        NavigationLink {
-                            Tabs.Content.List.HierarchyExplorer(inSheet: false)
-                        } label: {
-                            HStack {
-                                Image(systemName: "list.number")
-                                    .foregroundStyle(self.state.theme.tint)
-                                Text("Hierarchy Explorer")
-                            }
-                        }
-                        .listRowBackground(Theme.textBackground)
                     }
                 }
                 Spacer()

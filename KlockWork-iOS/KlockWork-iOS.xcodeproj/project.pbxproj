@@ -34,6 +34,7 @@
 		5380795F2C1CF6B100B97D55 /* PageActionBar.Create.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5380795E2C1CF6AA00B97D55 /* PageActionBar.Create.swift */; };
 		538328682C1BE8B900105B14 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538328672C1BE8B000105B14 /* ErrorView.swift */; };
 		5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5387AE882C0143D100EEC581 /* SearchBar.swift */; };
+		538A10312C30FB600028B785 /* ViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A10302C30FB5E0028B785 /* ViewMode.swift */; };
 		53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53911FC42C19E87300B77DAB /* ActivityWeight.swift */; };
 		539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134E92C0269B600B48494 /* PageConfiguration.swift */; };
 		539134EC2C02883000B48494 /* PersonDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EB2C02883000B48494 /* PersonDetail.swift */; };
@@ -143,6 +144,7 @@
 		5380795E2C1CF6AA00B97D55 /* PageActionBar.Create.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.Create.swift; sourceTree = "<group>"; };
 		538328672C1BE8B000105B14 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		5387AE882C0143D100EEC581 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
+		538A10302C30FB5E0028B785 /* ViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewMode.swift; sourceTree = "<group>"; };
 		53911FC42C19E87300B77DAB /* ActivityWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ActivityWeight.swift; path = ../../DLPrototype/DLPrototype/Enums/ActivityWeight.swift; sourceTree = "<group>"; };
 		539134E92C0269B600B48494 /* PageConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageConfiguration.swift; sourceTree = "<group>"; };
 		539134EB2C02883000B48494 /* PersonDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonDetail.swift; sourceTree = "<group>"; };
@@ -304,6 +306,7 @@
 		539134E82C0269A200B48494 /* SharedEnums */ = {
 			isa = PBXGroup;
 			children = (
+				538A10302C30FB5E0028B785 /* ViewMode.swift */,
 				53B2C36A2C22708A003507CE /* PageMode.swift */,
 				539134E92C0269B600B48494 /* PageConfiguration.swift */,
 				536E4F682C0D77A600FDC1F4 /* ActionType.swift */,
@@ -619,6 +622,7 @@
 				5311F3FB2C17953A00FB3071 /* PageActionBar.Today.swift in Sources */,
 				53E3A26E2C098DA8004A85C3 /* AssessmentFactorForm.swift in Sources */,
 				537582D52C0033B800CB528C /* Tabs.swift in Sources */,
+				538A10312C30FB600028B785 /* ViewMode.swift in Sources */,
 				53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */,
 				539134F02C02C44000B48494 /* Swipe.swift in Sources */,
 				53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */,
@@ -797,7 +801,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 6DT7L2N5X6;
@@ -839,7 +843,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 6DT7L2N5X6;

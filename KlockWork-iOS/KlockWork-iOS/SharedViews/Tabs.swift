@@ -276,7 +276,7 @@ extension Tabs.Content {
 
         struct HierarchyExplorer: View {
             public var inSheet: Bool
-            public var page: PageConfiguration.AppPage = .explore
+            public var page: PageConfiguration.AppPage = .today
             @FetchRequest private var items: FetchedResults<Company>
 
             var body: some View {
@@ -949,7 +949,6 @@ extension Tabs.Content {
                             .font(.title2)
                     }
                     .padding(8)
-                    .opacity(isCompleted ? 0.5 : 1.0)
 
                     NavigationLink {
                         TaskDetail(task: task)
@@ -961,11 +960,10 @@ extension Tabs.Content {
                             colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour,
                             padding: (14, 14, 14, 0)
                         )
-                        .opacity(isCompleted ? 0.5 : 1.0)
                     }
-                    .buttonStyle(.plain)
                 }
                 .background(self.task.owner!.backgroundColor)
+                .opacity(isCompleted ? 0.5 : 1.0)
                 .onAppear(perform: self.actionOnAppear)
             }
             

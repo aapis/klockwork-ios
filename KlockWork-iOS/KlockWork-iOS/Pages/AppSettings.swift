@@ -9,7 +9,15 @@
 import SwiftUI
 
 struct AppSettings: View {
+    private let page: PageConfiguration.AppPage = .settings
     var body: some View {
-        Text("Coming soon!")
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 0) {
+                List {
+
+                }
+            }
+        }
+        .background(self.page.primaryColour)
     }
 }
