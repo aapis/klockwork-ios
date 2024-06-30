@@ -375,6 +375,7 @@ extension Tabs.Content {
                 @State private var isPresented: Bool = false
                 @State private var isCreateTaskPanelPresented: Bool = false // @TODO: move this to a new struct
                 @State private var isCreateNotePanelPresented: Bool = false // @TODO: move this to a new struct
+                @State private var didSave: Bool = false
                 @State private var tasks: [LogTask] = []
                 @State private var notes: [Note] = []
                 @State private var colour: Color = .clear
@@ -416,14 +417,7 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        Button {
-                                            withAnimation(.linear(duration: 0.2)) {
-                                                self.isCreateTaskPanelPresented.toggle()
-                                            }
-                                        } label: {
-                                            Image(systemName: "plus")
-                                                .padding(8)
-                                        }
+                                        RowAddButton(isPresented: $isCreateTaskPanelPresented)
                                     }
                                 }
 
@@ -488,14 +482,7 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        Button {
-                                            withAnimation(.linear(duration: 0.2)) {
-                                                self.isCreateNotePanelPresented.toggle()
-                                            }
-                                        } label: {
-                                            Image(systemName: "plus")
-                                                .padding(8)
-                                        }
+                                        RowAddButton(isPresented: $isCreateNotePanelPresented)
                                     }
                                 }
 
@@ -509,7 +496,7 @@ extension Tabs.Content {
                                             Rectangle()
                                                 .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                                 .frame(width: 15)
-                                            TextField("", text: $newNoteTitle, prompt: Text("Note title").foregroundStyle(Theme.base.opacity(0.5)), axis: .horizontal)
+                                            TextField("", text: $newNoteTitle, prompt: Text("Untitled Note").foregroundStyle(Theme.base.opacity(0.5)), axis: .horizontal)
                                                 .submitLabel(.go)
                                                 .onSubmit {
                                                     self.actionOnCreateNote()
@@ -571,6 +558,8 @@ extension Tabs.Content {
                         due: Date(),
                         job: self.entity
                     )
+
+                    self.didSave = true
                 }
 
                 /// Fires when creating a note using the quick creator
@@ -585,13 +574,20 @@ extension Tabs.Content {
                         title: self.newNoteTitle,
                         job: self.entity
                     )
+
+                    self.didSave = true
                 }
                 
                 /// Force view refresh
                 /// @TODO: may be unnecessary in later versions, confirm this still works
                 /// - Returns: Void
                 private func actionPostSave() -> Void {
-                    self.id = UUID()
+                    if self.didSave {
+                        self.id = UUID()
+                        self.isPresented.toggle()
+                    }
+
+                    self.didSave = false
                 }
             }
 
@@ -1101,26 +1097,25 @@ extension Tabs.Content {
                                 .opacity(0.8)
                                 .blendMode(.softLight)
                                 .frame(height: 50)
-                            HStack {
+                            HStack(spacing: 0) {
                                 Text(self.entity.abbreviation ?? "_DEFAULT")
                                     .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                     .opacity(0.7)
                                     .padding(.leading, 8)
                                 Spacer()
-                                NavigationLink {
-                                    PersonDetail(company: self.entity)
-                                } label: {
-                                    Image(systemName: "person.badge.plus")
-                                        .padding(8)
-                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
-                                }
-                                NavigationLink {
-                                    ProjectDetail(company: self.entity)
-                                } label: {
-                                    Image(systemName: "folder.badge.plus")
-                                        .padding(8)
-                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
-                                }
+                                RowAddNavLink(
+                                    title: "+ Person",
+                                    target: AnyView(
+                                        PersonDetail(company: self.entity)
+                                    )
+                                )
+                                RowAddNavLink(
+                                    title: "+ Project",
+                                    target: AnyView(
+                                        ProjectDetail(company: self.entity)
+                                    )
+                                )
+                                .padding(.trailing, 8)
                             }
                             .padding(.leading, 8)
                         }
@@ -1297,13 +1292,12 @@ extension Tabs.Content {
                                 }
 
                                 Spacer()
-                                NavigationLink {
-                                    JobDetail(company: self.entity.company, project: self.entity)
-                                } label: {
-                                    Image(systemName: "plus")
-                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
-                                        .padding(8)
-                                }
+                                RowAddNavLink(
+                                    title: "+ Job",
+                                    target: AnyView(
+                                        JobDetail(company: self.entity.company, project: self.entity)
+                                    )
+                                )
                             }
                         }
                     }
