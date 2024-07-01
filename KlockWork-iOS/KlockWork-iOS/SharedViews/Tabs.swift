@@ -275,6 +275,7 @@ extension Tabs.Content {
         }
 
         struct HierarchyExplorer: View {
+            @EnvironmentObject private var state: AppState
             public var inSheet: Bool
             public var page: PageConfiguration.AppPage = .today
             @FetchRequest private var items: FetchedResults<Company>
@@ -283,7 +284,7 @@ extension Tabs.Content {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         if self.items.count > 0 {
-                            ForEach(self.items.filter({$0.alive == true})) { item in
+                            ForEach(items) { item in
                                 TopLevel(entity: item)
                             }
                         } else {
@@ -1103,12 +1104,13 @@ extension Tabs.Content {
                                     .opacity(0.7)
                                     .padding(.leading, 8)
                                 Spacer()
-                                RowAddNavLink(
-                                    title: "+ Person",
-                                    target: AnyView(
-                                        PersonDetail(company: self.entity)
-                                    )
-                                )
+                                // @TODO: uncomment after we list out people under projects
+//                                RowAddNavLink(
+//                                    title: "+ Person",
+//                                    target: AnyView(
+//                                        PersonDetail(company: self.entity)
+//                                    )
+//                                )
                                 RowAddNavLink(
                                     title: "+ Project",
                                     target: AnyView(

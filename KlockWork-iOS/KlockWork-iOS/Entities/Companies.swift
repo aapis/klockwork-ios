@@ -11,10 +11,9 @@ import SwiftUI
 struct Companies: View {
     typealias EntityType = PageConfiguration.EntityType
 
+    @EnvironmentObject private var state: AppState
     private let entityType: EntityType = .companies
     @State public var items: [Company] = []
-
-    @Environment(\.managedObjectContext) var moc
     
     var body: some View {
         NavigationStack {
@@ -47,7 +46,7 @@ struct Companies: View {
 
             }
             .onAppear(perform: {
-                items = CoreDataCompanies(moc: moc).alive()
+                items = CoreDataCompanies(moc: self.state.moc).alive()
             })
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)
