@@ -1104,12 +1104,13 @@ extension Tabs.Content {
                                     .opacity(0.7)
                                     .padding(.leading, 8)
                                 Spacer()
-                                RowAddNavLink(
-                                    title: "+ Person",
-                                    target: AnyView(
-                                        PersonDetail(company: self.entity)
-                                    )
-                                )
+                                // @TODO: uncomment after we list out people under projects
+//                                RowAddNavLink(
+//                                    title: "+ Person",
+//                                    target: AnyView(
+//                                        PersonDetail(company: self.entity)
+//                                    )
+//                                )
                                 RowAddNavLink(
                                     title: "+ Project",
                                     target: AnyView(
