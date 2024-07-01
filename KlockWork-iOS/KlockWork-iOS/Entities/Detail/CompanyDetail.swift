@@ -18,7 +18,7 @@ struct CompanyDetail: View {
     @State private var createdDate: Date = Date()
     @State private var lastUpdate: Date = Date()
     @State private var name: String = ""
-    @State private var pid: Int64 = 0
+    @State private var pid: Int64 = Int64.random(in: 99999...99999999)
     @State private var abbreviation: String = ""
     @State private var hidden: Bool = false
     @State private var colour: Color = .clear

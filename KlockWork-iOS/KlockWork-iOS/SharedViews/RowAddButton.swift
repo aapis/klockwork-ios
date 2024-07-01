@@ -21,12 +21,12 @@ struct RowAddButton: View {
             ZStack(alignment: .center) {
                 RadialGradient(colors: [Theme.base, .clear], center: .center, startRadius: 0, endRadius: 40)
                     .blendMode(.softLight)
-                    .opacity(0.6)
+                    .opacity(0.8)
                 Text(self.title)
                     .font(.caption)
                     .padding(6)
                     .padding([.leading, .trailing], 8)
-                    .background(self.isPresented ? .orange : .white.opacity(0.4))
+                    .background(self.isPresented ? .orange : .white)
                     .foregroundStyle(Theme.base)
                     .clipShape(.capsule(style: .continuous))
             }
@@ -46,7 +46,7 @@ struct RowAddNavLink: View {
             ZStack(alignment: .center) {
                 RadialGradient(colors: [Theme.base, .clear], center: .center, startRadius: 0, endRadius: 40)
                     .blendMode(.softLight)
-                    .opacity(0.6)
+                    .opacity(0.8)
                 Text(self.title)
                     .font(.caption)
                     .padding(6)
