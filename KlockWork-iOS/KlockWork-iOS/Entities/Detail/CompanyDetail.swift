@@ -89,7 +89,6 @@ struct CompanyDetail: View {
             .background(self.page.primaryColour)
             .onAppear(perform: self.actionOnAppear)
             .navigationTitle(self.company != nil ? "Company" : "New Company")
-            .background(self.page.primaryColour)
             .scrollContentBackground(.hidden)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)

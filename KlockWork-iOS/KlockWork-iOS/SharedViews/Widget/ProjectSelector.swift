@@ -57,7 +57,7 @@ extension Widget {
             }
         }
 
-        // Select a single job from the list
+        // Select a single Project from the list
         struct Single: View {
             typealias Row = Tabs.Content.Individual.SingleProjectCustomButton
 
