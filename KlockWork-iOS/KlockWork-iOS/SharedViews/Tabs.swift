@@ -369,16 +369,18 @@ extension Tabs.Content {
 
             struct ThirdLevel: View {
                 typealias JobButton = Tabs.Content.Individual.SingleJobHierarchical
-                
+
                 @EnvironmentObject private var state: AppState
                 public let entity: Job
                 public var page: PageConfiguration.AppPage = .create
                 @State private var isPresented: Bool = false
                 @State private var isCreateTaskPanelPresented: Bool = false // @TODO: move this to a new struct
                 @State private var isCreateNotePanelPresented: Bool = false // @TODO: move this to a new struct
+                @State private var isCreateRecordPanelPresented: Bool = false // @TODO: move this to a new struct
                 @State private var didSave: Bool = false
                 @State private var tasks: [LogTask] = []
                 @State private var notes: [Note] = []
+                @State private var records: [LogRecord] = []
                 @State private var colour: Color = .clear
                 @State private var newTaskContent: String = "" // @TODO: move this to a new struct
                 @State private var newNoteTitle: String = "" // @TODO: move this to a new struct
@@ -390,6 +392,7 @@ extension Tabs.Content {
                         // @TODO: refactor to follow the pattern set in previous levels
                         if self.isPresented {
                             VStack(alignment: .leading, spacing: 0) {
+                                /// Tasks
                                 ZStack(alignment: .leading) {
                                     self.entity.backgroundColor
                                     LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
@@ -422,7 +425,7 @@ extension Tabs.Content {
                                     }
                                 }
 
-                                // Quick task creator
+                                /// Quick task creator
                                 if self.isCreateTaskPanelPresented {
                                     VStack {
                                         HStack(alignment: .center, spacing: 0) {
@@ -487,7 +490,7 @@ extension Tabs.Content {
                                     }
                                 }
 
-                                // Quick note creator
+                                /// Quick note creator
                                 if self.isCreateNotePanelPresented {
                                     VStack {
                                         HStack(alignment: .center, spacing: 0) {
@@ -518,6 +521,41 @@ extension Tabs.Content {
                                         FourthLevelNotes(entity: note)
                                     }
                                 }
+
+                                /// Record view link
+                                ZStack(alignment: .leading) {
+                                    self.entity.backgroundColor
+                                    LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                        .opacity(0.6)
+                                        .blendMode(.softLight)
+                                        .frame(height: 50)
+
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+
+                                        HStack(spacing: 0) {
+                                            if self.records.isEmpty {
+                                                Text("No Records")
+                                                    .opacity(0.5)
+                                            } else {
+                                                NavigationLink {
+                                                    RecordFilter(job: self.entity)
+                                                } label: {
+                                                    ListRow(name: "\(self.records.count) Records", colour: self.entity.backgroundColor)
+                                                }
+                                            }
+                                        }
+                                        .padding(.leading, 8)
+                                    }
+                                }
                             }
                             .onAppear(perform: self.actionOnAppear)
                             .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : .white)
@@ -539,6 +577,10 @@ extension Tabs.Content {
 
                     if let notes = self.entity.mNotes?.allObjects as? [Note] {
                         self.notes = notes.filter({$0.alive == true}).sorted(by: {$0.title != nil && $1.title != nil ? $0.title! > $1.title! : false})
+                    }
+
+                    if let records = self.entity.records?.allObjects as? [LogRecord] {
+                        self.records = records.filter({$0.alive == true}).sorted(by: {$0.timestamp! > $1.timestamp!})
                     }
 
                     self.colour = Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble)
@@ -765,6 +807,26 @@ extension Tabs.Content {
                     )
                 }
                 // @TODO: use .onLongPressGesture to open record inspector view, allowing job selection and other functions
+            }
+        }
+
+        struct SingleRecordCustomButton: View {
+            public let entity: LogRecord
+            public var callback: (LogRecord) -> Void
+            @State private var selected: Bool = false
+
+            var body: some View {
+                Button {
+                    selected.toggle()
+                    callback(entity)
+                } label: {
+                    ListRow(
+                        name: entity.message ?? "NOT_FOUND",
+                        colour: Color.fromStored(self.entity.job?.colour ?? Theme.rowColourAsDouble),
+                        icon: selected ? "minus" : "plus"
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
 
