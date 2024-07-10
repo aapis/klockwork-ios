@@ -13,6 +13,19 @@ struct RecordsGroupedByDate: Identifiable {
     var records: [LogRecord]
 }
 
+struct GroupedRecordDateRow: View {
+    public let date: Date
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 5) {
+            Image(systemName: "calendar")
+            Text(date.formatted(date: .abbreviated, time: .omitted))
+            Spacer()
+        }
+        .padding(8)
+    }
+}
+
 struct RecordFilter: View {
     typealias Button = Tabs.Content.Individual.SingleRecord
     public let job: Job
@@ -25,14 +38,9 @@ struct RecordFilter: View {
             ScrollView(showsIndicators: false) {
                 ForEach(groupedRecords) { group in
                     VStack(alignment: .leading, spacing: 1) {
-                        HStack(alignment: .center, spacing: 5) {
-                            Image(systemName: "calendar")
-                            Text(group.date.formatted(date: .abbreviated, time: .omitted))
-                            Spacer()
-                        }
-                        .padding(8)
+                        GroupedRecordDateRow(date: group.date)
 
-                        ForEach(records) { record in
+                        ForEach(group.records) { record in
                             Button(record: record)
                         }
                     }
@@ -61,13 +69,14 @@ extension RecordFilter {
     private func actionOnAppear() -> Void {
         self.groupedRecords = []
         if self.records.count > 0 {
-            let grouped = Array(self.records)
+            let sortedRecords = Array(self.records)
                 .sliced(by: [.year, .month, .day], for: \.timestamp!)
-                .sorted(by: {$0.key > $1.key})
+                .sorted(by: {$0.key < $1.key})
+            let grouped = Dictionary(grouping: sortedRecords, by: {$0.key})
 
             for group in grouped {
                 self.groupedRecords.append(
-                    RecordsGroupedByDate(date: group.key, records: group.value)
+                    RecordsGroupedByDate(date: group.key, records: group.value.first?.value ?? [])
                 )
             }
         }
