@@ -1050,6 +1050,9 @@ extension Tabs.Content {
 
                 if self.isCancelled {
                     self.task.cancelledDate = Date()
+
+                    // Create a record indicating when the task was cancelled
+                    CoreDataTasks(moc: self.state.moc).cancel(self.task)
                 } else {
                     self.task.cancelledDate = nil
                 }
