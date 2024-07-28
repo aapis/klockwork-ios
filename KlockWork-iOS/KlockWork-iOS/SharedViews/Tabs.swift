@@ -537,9 +537,11 @@ extension Tabs.Content {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
-                                        Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
-                                            .frame(width: 15)
+                                        if self.records.isEmpty {
+                                            Rectangle()
+                                                .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                                .frame(width: 15)
+                                        }
 
                                         HStack(spacing: 0) {
                                             if self.records.isEmpty {
@@ -994,6 +996,7 @@ extension Tabs.Content {
         }
 
         struct SingleTaskChecklistItem: View {
+            @EnvironmentObject private var state: AppState
             public let task: LogTask
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
@@ -1038,12 +1041,18 @@ extension Tabs.Content {
             private func actionOnSave() -> Void {
                 if self.isCompleted {
                     self.task.completedDate = Date()
+
+                    // Create a record indicating when the task was completed
+                    CoreDataTasks(moc: self.state.moc).complete(self.task)
                 } else {
                     self.task.completedDate = nil
                 }
 
                 if self.isCancelled {
                     self.task.cancelledDate = Date()
+
+                    // Create a record indicating when the task was cancelled
+                    CoreDataTasks(moc: self.state.moc).cancel(self.task)
                 } else {
                     self.task.cancelledDate = nil
                 }

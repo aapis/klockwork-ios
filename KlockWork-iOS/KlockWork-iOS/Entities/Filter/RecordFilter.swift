@@ -71,7 +71,7 @@ extension RecordFilter {
         if self.records.count > 0 {
             let sortedRecords = Array(self.records)
                 .sliced(by: [.year, .month, .day], for: \.timestamp!)
-                .sorted(by: {$0.key < $1.key})
+                .sorted(by: {$0.key > $1.key})
             let grouped = Dictionary(grouping: sortedRecords, by: {$0.key})
 
             for group in grouped {
