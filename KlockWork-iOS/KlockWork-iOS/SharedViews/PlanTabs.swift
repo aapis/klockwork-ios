@@ -373,7 +373,7 @@ extension PlanTabs {
                     }
                 } else {
                     NavigationLink {
-
+                        TaskDetail()
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "plus")
