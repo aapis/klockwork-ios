@@ -149,6 +149,8 @@ extension PlanTabs {
                 )
             case .feature:
                 Feature()
+            case .upcoming:
+                Upcoming()
             }
         }
     }
@@ -373,7 +375,7 @@ extension PlanTabs {
                     }
                 } else {
                     NavigationLink {
-
+                        TaskDetail()
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "plus")
@@ -398,7 +400,7 @@ extension PlanTabs {
                     }
                 } else {
                     NavigationLink {
-
+                        NoteDetail.Sheet()
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "plus")
@@ -539,6 +541,70 @@ extension PlanTabs {
                 Spacer()
             }
             .padding()
+        }
+    }
+
+    struct Upcoming: View {
+        typealias Row = Tabs.Content.Individual.SingleTaskChecklistItem
+
+        @FetchRequest private var tasks: FetchedResults<LogTask>
+        @State private var upcoming: [UpcomingRow] = []
+
+        var body: some View {
+            NavigationStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 1) {
+                        if !tasks.isEmpty {
+                            ForEach(self.upcoming, id: \.self) { row in
+                                HStack {
+                                    Spacer()
+                                    Text(row.date)
+                                        .padding(5)
+                                        .font(.caption)
+                                }
+                                .background(.black.opacity(0.2))
+
+                                ForEach(row.tasks) { task in
+                                    Row(task: task)
+                                }
+                            }
+                        } else {
+                            HStack {
+                                Text("No upcoming due dates")
+                                Spacer()
+                            }
+                            .padding()
+                            .background(Theme.textBackground)
+                            .clipShape(.rect(cornerRadius: 16))
+                            Spacer()
+                        }
+                    }
+                }
+            }
+            .onAppear(perform: self.actionOnAppear)
+        }
+
+        init() {
+            _tasks = CoreDataTasks.fetchUpcoming()
+        }
+
+        /// Onload handler
+        /// - Returns: Void
+        private func actionOnAppear() -> Void {
+            self.upcoming = []
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
+            let sorted = Array(grouped)
+                .sorted(by: {$0.key < $1.key})
+
+            for group in sorted {
+                self.upcoming.append(UpcomingRow(date: group.key, tasks: group.value))
+            }
+        }
+
+        struct UpcomingRow: Identifiable, Hashable {
+            var id: UUID = UUID()
+            var date: String
+            var tasks: [LogTask]
         }
     }
 }
