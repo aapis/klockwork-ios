@@ -284,7 +284,7 @@ extension Tabs.Content {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         if self.items.count > 0 {
-                            ForEach(items) { item in
+                            ForEach(self.items, id: \Company.objectID) { item in
                                 TopLevel(entity: item)
                             }
                         } else {
@@ -317,8 +317,8 @@ extension Tabs.Content {
                     Button(entity: self.entity, callback: self.actionOnTap)
 
                     if self.isPresented {
-                        if let projects = entity.projects?.allObjects as? [Project] {
-                            ForEach(projects.filter({$0.alive == true}).sorted(by: {$0.name! < $1.name!})) { project in
+                        if let projects = self.entity.projects?.allObjects as? [Project] {
+                            ForEach(projects.filter({$0.alive == true}).sorted(by: {$0.name! < $1.name!}), id: \Project.objectID) { project in
                                 SecondLevel(entity: project)
                             }
                         }
@@ -350,7 +350,7 @@ extension Tabs.Content {
                                     } else {
                                         return $0.jid < $1.jid
                                     }
-                                })) { job in
+                                }), id: \Job.objectID) { job in
                                     ThirdLevel(entity: job)
                                 }
                             } else {
@@ -452,7 +452,7 @@ extension Tabs.Content {
                                 }
 
                                 if !self.tasks.isEmpty {
-                                    ForEach(self.tasks) { task in
+                                    ForEach(self.tasks, id: \LogTask.objectID) { task in
                                         FourthLevel(entity: task)
                                     }
                                 }
@@ -517,7 +517,7 @@ extension Tabs.Content {
                                 }
 
                                 if !self.notes.isEmpty {
-                                    ForEach(self.notes) { note in
+                                    ForEach(self.notes, id: \Note.objectID) { note in
                                         FourthLevelNotes(entity: note)
                                     }
                                 }
@@ -707,7 +707,7 @@ extension Tabs.Content {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 1) {
                         if items.count > 0 {
-                            ForEach(items) { item in
+                            ForEach(items, id: \Company.objectID) { item in
                                 Individual.SingleCompany(company: item)
                             }
                         } else {
@@ -736,7 +736,7 @@ extension Tabs.Content {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 1) {
                         if items.count > 0 {
-                            ForEach(items) { item in
+                            ForEach(items, id: \Person.objectID) { item in
                                 Individual.SinglePerson(person: item)
                             }
                         } else {
@@ -765,7 +765,7 @@ extension Tabs.Content {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 1) {
                         if items.count > 0 {
-                            ForEach(items) { item in
+                            ForEach(items, id: \Project.objectID) { item in
                                 Individual.SingleProject(project: item)
                             }
                         } else {
