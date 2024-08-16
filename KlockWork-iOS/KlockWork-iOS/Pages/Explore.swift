@@ -29,8 +29,10 @@ struct Explore: View {
                 Divider().background(.white).frame(height: 1)
                 Widgets(text: $searchText)
             }
-            .navigationBarTitleDisplayMode(.inline)
             .background(page.primaryColour)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
         }

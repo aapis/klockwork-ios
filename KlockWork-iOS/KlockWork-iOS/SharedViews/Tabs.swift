@@ -427,7 +427,7 @@ extension Tabs.Content {
 
                                 /// Quick task creator
                                 if self.isCreateTaskPanelPresented {
-                                    VStack {
+                                    VStack(alignment: .leading, spacing: 0) {
                                         HStack(alignment: .center, spacing: 0) {
                                             Rectangle()
                                                 .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
@@ -492,7 +492,7 @@ extension Tabs.Content {
 
                                 /// Quick note creator
                                 if self.isCreateNotePanelPresented {
-                                    VStack {
+                                    VStack(alignment: .leading, spacing: 0) {
                                         HStack(alignment: .center, spacing: 0) {
                                             Rectangle()
                                                 .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
@@ -521,6 +521,9 @@ extension Tabs.Content {
                                         FourthLevelNotes(entity: note)
                                     }
                                 }
+
+                                // Terms
+                                Terms(inSheet: false, entity: self.entity)
 
                                 /// Record view link
                                 ZStack(alignment: .leading) {
@@ -698,6 +701,83 @@ extension Tabs.Content {
             }
         }
 
+        struct Terms: View {
+            public var inSheet: Bool
+            public let entity: Job
+            @State private var isCreateTaskPanelPresented: Bool = false
+            @State private var items: [TaxonomyTerm] = [] // @TODO: we maaaaay only use this to determine term count
+            @State private var newTermName: String = ""
+            @State private var newTermDefinition: String = ""
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 0) {
+                    ZStack(alignment: .leading) {
+                        self.entity.backgroundColor
+                        LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                            .opacity(0.6)
+                            .blendMode(.softLight)
+                            .frame(height: 50)
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack(alignment: .center, spacing: 0) {
+                                Rectangle()
+                                    .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                    .frame(width: 15)
+                                Rectangle()
+                                    .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                    .frame(width: 15)
+                                if self.items.isEmpty {
+                                    Rectangle()
+                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                        .frame(width: 15)
+                                }
+
+                                HStack(spacing: 0) {
+                                    if self.items.isEmpty {
+                                        Text("No Terms")
+                                            .opacity(0.5)
+                                    } else {
+                                        NavigationLink {
+                                            TermFilter(job: self.entity)
+                                        } label: {
+                                            ListRow(name: "\(self.items.count) Terms", colour: self.entity.backgroundColor)
+                                        }
+                                    }
+                                }
+                                .padding(.leading, 8)
+                            }
+                        }
+                    }
+                }
+                .onAppear(perform: self.actionOnAppear)
+            }
+
+            private func actionOnAppear() -> Void {
+                self.items = []
+                if let records = self.entity.records {
+                    if let recs = records.allObjects as? [LogRecord] {
+                        for record in recs {
+                            if let terms = record.terms {
+                                if terms.count > 0 {
+                                    let taxonomyTerms = terms.allObjects as! [TaxonomyTerm]
+                                    for t in taxonomyTerms {
+                                        self.items.append(t)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            private func actionOnCreateTerm() -> Void {
+
+            }
+
+            private func actionPostSave() -> Void {
+
+            }
+        }
+
         struct Companies: View {
             public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Company>
@@ -829,6 +909,48 @@ extension Tabs.Content {
                     )
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleTerm: View {
+            @EnvironmentObject private var state: AppState
+            public let term: TaxonomyTerm
+            @State private var colour: Color = Theme.rowColour
+
+            var body: some View {
+                NavigationLink {
+                    TermDetail(term: self.term)
+                } label: {
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Text(term.name ?? "_TERM_NAME")
+                                .font(.title3)
+                                .bold()
+                            Spacer()
+                        }
+                        .padding(.bottom, 10)
+
+                        HStack {
+                            Text("1. ")
+                            Text(term.definition ?? "_TERM_DEFINITION")
+                            Spacer()
+                        }
+                        .padding(.leading, 10)
+                    }
+                    .padding(8)
+                    .background(self.colour)
+                    .foregroundStyle(self.colour.isBright() ? .black : .white)
+                }
+                .onAppear(perform: self.actionOnAppear)
+                // @TODO: use .onLongPressGesture to open record inspector view, allowing job selection and other functions
+            }
+            
+            /// Onload handler
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+                if let job = term.source?.job {
+                    self.colour = job.backgroundColor
+                }
             }
         }
 
