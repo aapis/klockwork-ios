@@ -39,6 +39,7 @@
 		538A534C2C6FE8DA00711639 /* TermFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A534B2C6FE8D600711639 /* TermFilter.swift */; };
 		538A53502C6FEA6600711639 /* CoreDataTaxonomyTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A534F2C6FEA6600711639 /* CoreDataTaxonomyTerms.swift */; };
 		538A53522C6FF1C400711639 /* TermDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A53512C6FF1C200711639 /* TermDetail.swift */; };
+		538A53562C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A53552C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift */; };
 		53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53911FC42C19E87300B77DAB /* ActivityWeight.swift */; };
 		539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134E92C0269B600B48494 /* PageConfiguration.swift */; };
 		539134EC2C02883000B48494 /* PersonDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EB2C02883000B48494 /* PersonDetail.swift */; };
@@ -153,6 +154,7 @@
 		538A534B2C6FE8D600711639 /* TermFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermFilter.swift; sourceTree = "<group>"; };
 		538A534F2C6FEA6600711639 /* CoreDataTaxonomyTerms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataTaxonomyTerms.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataTaxonomyTerms.swift; sourceTree = "<group>"; };
 		538A53512C6FF1C200711639 /* TermDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermDetail.swift; sourceTree = "<group>"; };
+		538A53552C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataTaxonomyTermDefinitions.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataTaxonomyTermDefinitions.swift; sourceTree = "<group>"; };
 		53911FC42C19E87300B77DAB /* ActivityWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ActivityWeight.swift; path = ../../DLPrototype/DLPrototype/Enums/ActivityWeight.swift; sourceTree = "<group>"; };
 		539134E92C0269B600B48494 /* PageConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageConfiguration.swift; sourceTree = "<group>"; };
 		539134EB2C02883000B48494 /* PersonDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonDetail.swift; sourceTree = "<group>"; };
@@ -348,6 +350,7 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				538A53552C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift */,
 				538A534F2C6FEA6600711639 /* CoreDataTaxonomyTerms.swift */,
 				53911FC42C19E87300B77DAB /* ActivityWeight.swift */,
 				5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */,
@@ -589,6 +592,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				538A53562C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift in Sources */,
 				538A53502C6FEA6600711639 /* CoreDataTaxonomyTerms.swift in Sources */,
 				53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */,
 				5311F4062C17C66900FB3071 /* CDAssessmentThreshold.swift in Sources */,
