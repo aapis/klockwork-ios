@@ -70,7 +70,7 @@ struct Tasks: View {
 extension Tasks {
     private func addItem() {
         withAnimation {
-            let newItem = Item(timestamp: Date())
+//            let newItem = Item(timestamp: Date())
 //            modelContext.insert(newItem)
         }
     }
