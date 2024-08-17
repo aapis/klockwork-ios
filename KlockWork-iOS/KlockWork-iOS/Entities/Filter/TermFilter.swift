@@ -10,7 +10,7 @@ import SwiftUI
 struct TermsGroupedByDate: Identifiable {
     var id: UUID = UUID()
     var date: Date
-    var terms: [TaxonomyTerm]
+    var definitions: [TaxonomyTermDefinitions]
 }
 
 struct GroupedTermDateRow: View {
@@ -30,7 +30,7 @@ struct TermFilter: View {
     typealias Button = Tabs.Content.Individual.SingleTerm
     public let job: Job
     public var page: PageConfiguration.AppPage = .create
-    @FetchRequest private var terms: FetchedResults<TaxonomyTerm>
+    @FetchRequest private var definitions: FetchedResults<TaxonomyTermDefinitions>
     @State private var grouped: [TermsGroupedByDate] = []
 
     var body: some View {
@@ -40,8 +40,10 @@ struct TermFilter: View {
                     VStack(alignment: .leading, spacing: 1) {
                         GroupedTermDateRow(date: group.date)
 
-                        ForEach(group.terms) { term in
-                            Button(term: term)
+                        ForEach(group.definitions) { definition in
+                            if definition.term != nil {
+                                Button(term: definition.term!)
+                            }
                         }
                     }
                 }
@@ -59,7 +61,7 @@ struct TermFilter: View {
 
     init(job: Job) {
         self.job = job
-        _terms = CoreDataTaxonomyTerms.fetchTerms(job: self.job)
+        _definitions = CoreDataTaxonomyTerms.fetchDefinitions(job: self.job)
     }
 }
 
@@ -68,15 +70,15 @@ extension TermFilter {
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.grouped = []
-        if self.terms.count > 0 {
-            let sortedRecords = Array(self.terms)
+        if self.definitions.count > 0 {
+            let sortedRecords = Array(self.definitions)
                 .sliced(by: [.year, .month, .day], for: \.created!)
                 .sorted(by: {$0.key > $1.key})
             let grouped = Dictionary(grouping: sortedRecords, by: {$0.key})
 
             for group in grouped {
                 self.grouped.append(
-                    TermsGroupedByDate(date: group.key, terms: group.value.first?.value ?? [])
+                    TermsGroupedByDate(date: group.key, definitions: group.value.first?.value ?? [])
                 )
             }
         }

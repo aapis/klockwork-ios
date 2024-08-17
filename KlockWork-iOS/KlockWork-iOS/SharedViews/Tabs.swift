@@ -739,7 +739,7 @@ extension Tabs.Content {
                                         NavigationLink {
                                             TermFilter(job: self.entity)
                                         } label: {
-                                            ListRow(name: "\(self.items.count) Terms", colour: self.entity.backgroundColor)
+                                            ListRow(name: self.items.count == 1 ? "1 Term" : "\(self.items.count) Terms", colour: self.entity.backgroundColor)
                                         }
                                     }
                                 }
@@ -750,29 +750,28 @@ extension Tabs.Content {
                 }
                 .onAppear(perform: self.actionOnAppear)
             }
-
+            
+            /// Onload handler
+            /// - Returns: Void
             private func actionOnAppear() -> Void {
                 self.items = []
-                if let records = self.entity.records {
-                    if let recs = records.allObjects as? [LogRecord] {
-                        for record in recs {
-                            if let terms = record.terms {
-                                if terms.count > 0 {
-                                    let taxonomyTerms = terms.allObjects as! [TaxonomyTerm]
-                                    for t in taxonomyTerms {
-                                        self.items.append(t)
-                                    }
-                                }
-                            }
+                if let definitions = self.entity.definitions?.allObjects as? [TaxonomyTermDefinitions] {
+                    for definition in definitions {
+                        if let term = definition.term {
+                            self.items.append(term)
                         }
                     }
                 }
             }
-
+            
+            /// OnCreate handler
+            /// - Returns: Void
             private func actionOnCreateTerm() -> Void {
 
             }
-
+            
+            /// Post-save handler
+            /// - Returns: Void
             private func actionPostSave() -> Void {
 
             }
@@ -915,6 +914,7 @@ extension Tabs.Content {
         struct SingleTerm: View {
             @EnvironmentObject private var state: AppState
             public let term: TaxonomyTerm
+            @State private var definitions: [TaxonomyTermDefinitions] = []
             @State private var colour: Color = Theme.rowColour
 
             var body: some View {
@@ -922,24 +922,32 @@ extension Tabs.Content {
                     TermDetail(term: self.term)
                 } label: {
                     VStack(alignment: .leading, spacing: 0) {
-                        HStack {
+                        HStack(spacing: 0) {
                             Text(term.name ?? "_TERM_NAME")
                                 .font(.title3)
-                                .bold()
+                                .fontWeight(.heavy)
+                                .multilineTextAlignment(.leading)
                             Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.gray)
                         }
-                        .padding(.bottom, 10)
+                        .padding(10)
 
-                        HStack {
-                            Text("1. ")
-                            Text(term.definition ?? "_TERM_DEFINITION")
-                            Spacer()
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { term in
+                                HStack(alignment: .top) {
+                                    Text("1. ")
+                                    Text(term.definition ?? "_TERM_DEFINITION")
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
+                                .padding(8)
+                                .background(term.job?.backgroundColor)
+                                .foregroundStyle(term.job != nil ? term.job!.backgroundColor.isBright() ? .black : .white : .white)
+                            }
                         }
-                        .padding(.leading, 10)
                     }
-                    .padding(8)
-                    .background(self.colour)
-                    .foregroundStyle(self.colour.isBright() ? .black : .white)
+                    .background(Theme.rowColour)
                 }
                 .onAppear(perform: self.actionOnAppear)
                 // @TODO: use .onLongPressGesture to open record inspector view, allowing job selection and other functions
@@ -948,9 +956,7 @@ extension Tabs.Content {
             /// Onload handler
             /// - Returns: Void
             private func actionOnAppear() -> Void {
-                if let job = term.source?.job {
-                    self.colour = job.backgroundColor
-                }
+                self.definitions = self.term.definitions?.allObjects as! [TaxonomyTermDefinitions]
             }
         }
 
@@ -1296,6 +1302,7 @@ extension Tabs.Content {
                                     .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                     .opacity(0.7)
                                     .padding(.leading, 8)
+                                    .multilineTextAlignment(.leading)
                                 Spacer()
                                 // @TODO: uncomment after we list out people under projects
 //                                RowAddNavLink(
