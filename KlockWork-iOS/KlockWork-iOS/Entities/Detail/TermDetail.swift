@@ -8,12 +8,14 @@
 import SwiftUI
 
 struct TermDetail: View {
+    typealias DefinitionLink = Tabs.Content.Individual.SingleJobLink
+
     @EnvironmentObject private var state: AppState
     @Environment(\.dismiss) private var dismiss
     public var term: TaxonomyTerm?
     @State private var created: Date = Date()
     @State private var name: String = ""
-    @State private var definition: String = ""
+    @State private var definitions: [TaxonomyTermDefinitions] = []
     @State private var alive: Bool = false
     @State private var isSaveAlertPresented: Bool = false
     @State private var isDeleteAlertPresented: Bool = false
@@ -24,7 +26,15 @@ struct TermDetail: View {
             List {
                 Section("Term") {
                     TextField("Name", text: $name, axis: .vertical)
-                    TextField("Definition", text: $definition, axis: .vertical)
+                }
+                .listRowBackground(Theme.textBackground)
+
+                Section("Definitions") {
+                    ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { definition in
+                        if definition.job != nil {
+                            DefinitionLink(job: definition.job!)
+                        }
+                    }
                 }
                 .listRowBackground(Theme.textBackground)
 
@@ -56,9 +66,9 @@ struct TermDetail: View {
         }
         .background(self.page.primaryColour)
         .onAppear(perform: actionOnAppear)
-        .navigationTitle(self.term != nil ? "Term" : "New Term")
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+        .scrollContentBackground(.hidden)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 // Creates new entity on tap, then sends user back to Today
@@ -93,8 +103,8 @@ extension TermDetail {
                 self.name = name
             }
 
-            if let def = self.term!.definition {
-                self.definition = def
+            if let def = self.term!.definitions {
+                self.definitions = def.allObjects as! [TaxonomyTermDefinitions]
             }
 
             self.alive = self.term!.alive
@@ -106,7 +116,7 @@ extension TermDetail {
     private func actionOnSave() -> Void {
         if self.term != nil {
             self.term!.name = self.name
-            self.term!.definition = self.definition
+//            self.term!.definitions = self.definition
             self.term!.alive = self.alive
         } else {
 //            CoreDataTaxonomyTerms(moc: self.state.moc).create(

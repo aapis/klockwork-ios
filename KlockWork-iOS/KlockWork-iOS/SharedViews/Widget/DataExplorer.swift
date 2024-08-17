@@ -77,6 +77,9 @@ extension Widget.DataExplorer {
                 case .projects:
                     Projects()
                         .navigationTitle(type.label)
+                case .terms:
+                    EmptyView() // @TODO: implement
+                        .navigationTitle(type.label)
                 }
             } label: {
                 HStack {
@@ -114,6 +117,8 @@ extension Widget.DataExplorer {
                     count = CoreDataTasks(moc: self.state.moc).countAllTime()
                 case .projects:
                     count = CoreDataProjects(moc: self.state.moc).countAll()
+                case .terms:
+                    count = CoreDataTaxonomyTerms(moc: self.state.moc).countAll()
                 }
 
                 entityCounts.append(EntityTypePair(key: type, value: count))
