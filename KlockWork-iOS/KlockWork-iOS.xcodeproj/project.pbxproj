@@ -36,6 +36,10 @@
 		5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5387AE882C0143D100EEC581 /* SearchBar.swift */; };
 		538A10312C30FB600028B785 /* ViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A10302C30FB5E0028B785 /* ViewMode.swift */; };
 		538A10332C31C7D70028B785 /* RowAddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A10322C31C7CC0028B785 /* RowAddButton.swift */; };
+		538A534C2C6FE8DA00711639 /* TermFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A534B2C6FE8D600711639 /* TermFilter.swift */; };
+		538A53502C6FEA6600711639 /* CoreDataTaxonomyTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A534F2C6FEA6600711639 /* CoreDataTaxonomyTerms.swift */; };
+		538A53522C6FF1C400711639 /* TermDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A53512C6FF1C200711639 /* TermDetail.swift */; };
+		538A53562C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538A53552C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift */; };
 		53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53911FC42C19E87300B77DAB /* ActivityWeight.swift */; };
 		539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134E92C0269B600B48494 /* PageConfiguration.swift */; };
 		539134EC2C02883000B48494 /* PersonDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134EB2C02883000B48494 /* PersonDetail.swift */; };
@@ -62,7 +66,6 @@
 		53D4CB7E2BFE93B000AFEDEA /* Planning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6D2BFE93B000AFEDEA /* Planning.swift */; };
 		53D4CB7F2BFE93B000AFEDEA /* Today.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6E2BFE93B000AFEDEA /* Today.swift */; };
 		53D4CB802BFE93B000AFEDEA /* CompanyDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB702BFE93B000AFEDEA /* CompanyDetail.swift */; };
-		53D4CB812BFE93B000AFEDEA /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB712BFE93B000AFEDEA /* Item.swift */; };
 		53D4CB822BFE93B000AFEDEA /* JobDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB722BFE93B000AFEDEA /* JobDetail.swift */; };
 		53D4CB832BFE93B000AFEDEA /* NoteDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB732BFE93B000AFEDEA /* NoteDetail.swift */; };
 		53D4CB842BFE93B000AFEDEA /* TaskDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB742BFE93B000AFEDEA /* TaskDetail.swift */; };
@@ -148,6 +151,10 @@
 		5387AE882C0143D100EEC581 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		538A10302C30FB5E0028B785 /* ViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewMode.swift; sourceTree = "<group>"; };
 		538A10322C31C7CC0028B785 /* RowAddButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowAddButton.swift; sourceTree = "<group>"; };
+		538A534B2C6FE8D600711639 /* TermFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermFilter.swift; sourceTree = "<group>"; };
+		538A534F2C6FEA6600711639 /* CoreDataTaxonomyTerms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataTaxonomyTerms.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataTaxonomyTerms.swift; sourceTree = "<group>"; };
+		538A53512C6FF1C200711639 /* TermDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermDetail.swift; sourceTree = "<group>"; };
+		538A53552C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataTaxonomyTermDefinitions.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CoreDataTaxonomyTermDefinitions.swift; sourceTree = "<group>"; };
 		53911FC42C19E87300B77DAB /* ActivityWeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ActivityWeight.swift; path = ../../DLPrototype/DLPrototype/Enums/ActivityWeight.swift; sourceTree = "<group>"; };
 		539134E92C0269B600B48494 /* PageConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageConfiguration.swift; sourceTree = "<group>"; };
 		539134EB2C02883000B48494 /* PersonDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonDetail.swift; sourceTree = "<group>"; };
@@ -176,7 +183,6 @@
 		53D4CB6D2BFE93B000AFEDEA /* Planning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Planning.swift; sourceTree = "<group>"; };
 		53D4CB6E2BFE93B000AFEDEA /* Today.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Today.swift; sourceTree = "<group>"; };
 		53D4CB702BFE93B000AFEDEA /* CompanyDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompanyDetail.swift; sourceTree = "<group>"; };
-		53D4CB712BFE93B000AFEDEA /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		53D4CB722BFE93B000AFEDEA /* JobDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JobDetail.swift; sourceTree = "<group>"; };
 		53D4CB732BFE93B000AFEDEA /* NoteDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteDetail.swift; sourceTree = "<group>"; };
 		53D4CB742BFE93B000AFEDEA /* TaskDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskDetail.swift; sourceTree = "<group>"; };
@@ -335,6 +341,7 @@
 		53C059B92C33BCB20066111C /* Filter */ = {
 			isa = PBXGroup;
 			children = (
+				538A534B2C6FE8D600711639 /* TermFilter.swift */,
 				53C059B72C33BCAA0066111C /* RecordFilter.swift */,
 			);
 			path = Filter;
@@ -343,6 +350,8 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				538A53552C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift */,
+				538A534F2C6FEA6600711639 /* CoreDataTaxonomyTerms.swift */,
 				53911FC42C19E87300B77DAB /* ActivityWeight.swift */,
 				5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */,
 				53E3A26A2C098A50004A85C3 /* CDAssessmentFactor.swift */,
@@ -432,8 +441,8 @@
 		53D4CB752BFE93B000AFEDEA /* Detail */ = {
 			isa = PBXGroup;
 			children = (
+				538A53512C6FF1C200711639 /* TermDetail.swift */,
 				53D4CB702BFE93B000AFEDEA /* CompanyDetail.swift */,
-				53D4CB712BFE93B000AFEDEA /* Item.swift */,
 				53D4CB722BFE93B000AFEDEA /* JobDetail.swift */,
 				53D4CB732BFE93B000AFEDEA /* NoteDetail.swift */,
 				53D4CB742BFE93B000AFEDEA /* TaskDetail.swift */,
@@ -583,6 +592,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				538A53562C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift in Sources */,
+				538A53502C6FEA6600711639 /* CoreDataTaxonomyTerms.swift in Sources */,
 				53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */,
 				5311F4062C17C66900FB3071 /* CDAssessmentThreshold.swift in Sources */,
 				53E3A26B2C098A50004A85C3 /* CDAssessmentFactor.swift in Sources */,
@@ -612,6 +623,7 @@
 				53F926322BFEA00E00948076 /* String.swift in Sources */,
 				53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */,
 				53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */,
+				538A53522C6FF1C400711639 /* TermDetail.swift in Sources */,
 				539134EC2C02883000B48494 /* PersonDetail.swift in Sources */,
 				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
 				532441662C04428700659F14 /* Titlebar.swift in Sources */,
@@ -673,11 +685,11 @@
 				53D4CB842BFE93B000AFEDEA /* TaskDetail.swift in Sources */,
 				53E50C172C0E619C00A85FDC /* OverviewWidget.swift in Sources */,
 				53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */,
-				53D4CB812BFE93B000AFEDEA /* Item.swift in Sources */,
 				53D4CB7D2BFE93B000AFEDEA /* Explore.swift in Sources */,
 				53E50C192C0E61DB00A85FDC /* Legend.swift in Sources */,
 				539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */,
 				539134F82C039F3100B48494 /* Records.swift in Sources */,
+				538A534C2C6FE8DA00711639 /* TermFilter.swift in Sources */,
 				53E6974C2C23ABA7005A7375 /* CompanySelector.swift in Sources */,
 				537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */,
 				5311F3F92C1794FD00FB3071 /* PageActionBar.Planning.swift in Sources */,
@@ -817,7 +829,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 6DT7L2N5X6;
@@ -859,7 +871,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 18;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 6DT7L2N5X6;

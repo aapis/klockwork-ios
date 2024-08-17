@@ -70,7 +70,7 @@ struct Projects: View {
 extension Projects {
     private func addItem() {
         withAnimation {
-            let newItem = Item(timestamp: Date())
+//            let newItem = Item(timestamp: Date())
 //            modelContext.insert(newItem)
         }
     }

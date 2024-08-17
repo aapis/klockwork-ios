@@ -73,6 +73,7 @@ extension SearchLibrary.SearchEngine {
         results.add(await ProjectsEntityView(entityType: .projects, term: self.term!))
         results.add(await RecordsEntityView(entityType: .records, term: self.term!))
         results.add(await TasksEntityView(entityType: .tasks, term: self.term!))
+        results.add(await TermEntityView(entityType: .terms, term: self.term!))
         return results
     }
 
@@ -290,6 +291,36 @@ extension SearchLibrary.SearchEngine {
         init(entityType: EntityType, term: String) {
             self.entityType = entityType
             _results = CoreDataTasks.fetchMatching(term: term)
+        }
+    }
+
+    fileprivate struct TermEntityView: View {
+        typealias Row = Tabs.Content.Individual.SingleTerm
+        typealias EntityType = PageConfiguration.EntityType
+
+        @State public var entityType: EntityType
+        @State private var open: Bool = true
+        @FetchRequest public var results: FetchedResults<TaxonomyTerm>
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 1) {
+                TitleBar(selected: $entityType, open: $open, count: results.count)
+
+                if open {
+                    if !results.isEmpty {
+                        ForEach(results) { entity in
+                            Row(term: entity)
+                        }
+                    } else {
+                        StatusMessage.Warning(message: "No tasks matched")
+                    }
+                }
+            }
+        }
+
+        init(entityType: EntityType, term: String) {
+            self.entityType = entityType
+            _results = CoreDataTaxonomyTerms.fetchMatching(term: term)
         }
     }
 }

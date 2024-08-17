@@ -172,6 +172,18 @@ extension SearchBar {
                                     }
                                     .listRowBackground(Theme.textBackground)
                                 }
+                            case .terms:
+                                let group = items as! [TaxonomyTerm]
+                                ForEach(group.filter {
+                                    $0.alive == true && $0.name!.lowercased().contains(text.lowercased())
+                                }) { row in
+                                    NavigationLink {
+                                        TermDetail(term: row)
+                                    } label: {
+                                        Text(row.name!)
+                                    }
+                                    .listRowBackground(Theme.textBackground)
+                                }
                             }
                         }
                     }
