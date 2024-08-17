@@ -83,4 +83,52 @@ extension Main {
         self.state.activities.statuses = allStatuses
         self.state.activities.assess()
     }
+    
+    /// Rebuilds terms and definitions
+    /// - Returns: Void
+    private func recreateTermsAndDefinitionsFromRecords() -> Void {
+        let records = CoreDataRecords(moc: self.moc).matching(/(.*) == (.*)/)
+        var terms = CoreDataTaxonomyTerms(moc: self.moc).all()
+        var definitions = CoreDataTaxonomyTermDefinitions(moc: self.moc).all()
+
+        // reset taxonomy terms
+        for term in terms {
+            self.moc.delete(term)
+        }
+
+        for definition in definitions {
+            self.moc.delete(definition)
+        }
+
+        for record in records {
+            if let matches = record.message?.matches(of: /(.*) == (.*)/) {
+                for match in matches {
+                    let def = TaxonomyTermDefinitions(context: self.moc)
+                    def.alive = true
+                    def.created = record.timestamp
+                    def.job = record.job
+                    def.definition = String(match.2)
+
+                    if let foundTerm = CoreDataTaxonomyTerms(moc: self.moc).byName(String(match.1)) {
+                        if let foundDefs = foundTerm.definitions?.allObjects as? [TaxonomyTermDefinitions] {
+                            for fDef in foundDefs {
+                                if def.definition != fDef.definition {
+                                    foundTerm.addToDefinitions(def)
+                                }
+                            }
+                        }
+                    } else {
+                        let term = TaxonomyTerm(context: moc)
+                        term.alive = true
+                        term.created = record.timestamp
+                        term.lastUpdate = record.timestamp
+                        term.name = String(match.1)
+                        term.addToDefinitions(def)
+                    }
+                }
+            }
+        }
+
+        PersistenceController.shared.save()
+    }
 }
