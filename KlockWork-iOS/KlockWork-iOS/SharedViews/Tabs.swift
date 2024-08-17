@@ -95,7 +95,7 @@ extension Tabs {
                 HStack(alignment: .center, spacing: 1) {
                     // @TODO: restore to original state (below)
                     // ForEach(EntityType.allCases, id: \.self) { page in
-                    ForEach(EntityType.allCases, id: \.self) { page in
+                    ForEach(EntityType.allCases.filter({$0 != .terms}), id: \.self) { page in
                         VStack {
                             Button {
                                 withAnimation(.bouncy(duration: Tabs.animationDuration)) {
@@ -129,19 +129,21 @@ extension Tabs {
         var body: some View {
             switch selected {
             case .records:
-                List.Records(job: $job, date: self.state.date, inSheet: inSheet)
+                List.Records(job: $job, date: self.state.date, inSheet: self.inSheet)
             case .jobs:
-                List.Jobs(job: $job, date: self.state.date, inSheet: inSheet)
+                List.Jobs(job: $job, date: self.state.date, inSheet: self.inSheet)
             case .tasks:
-                List.Tasks(date: self.state.date, inSheet: inSheet)
+                List.Tasks(date: self.state.date, inSheet: self.inSheet)
             case .notes:
-                List.Notes(date: self.state.date, inSheet: inSheet)
+                List.Notes(date: self.state.date, inSheet: self.inSheet)
             case .companies:
-                List.Companies(date: self.state.date, inSheet: inSheet)
+                List.Companies(date: self.state.date, inSheet: self.inSheet)
             case .people:
-                List.People(date: self.state.date, inSheet: inSheet)
+                List.People(date: self.state.date, inSheet: self.inSheet)
             case .projects:
-                List.Projects(date: self.state.date, inSheet: inSheet)
+                List.Projects(date: self.state.date, inSheet: self.inSheet)
+            case .terms:
+                List.Terms(inSheet: self.inSheet, entity: $job.wrappedValue!)
             }
         }
     }
