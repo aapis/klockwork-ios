@@ -90,6 +90,19 @@ struct Explore: View {
                         .listRowBackground(Theme.textBackground)
                     }
 
+                    Section("Activities") {
+                        NavigationLink {
+                            FlashcardActivity()
+                        } label: {
+                            HStack {
+                                Image(systemName: "person.text.rectangle")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Flashcards")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
+                    }
+
                     Section("Utilities") {
                         NavigationLink {
                             GlasgowComaScaleCalculator()
