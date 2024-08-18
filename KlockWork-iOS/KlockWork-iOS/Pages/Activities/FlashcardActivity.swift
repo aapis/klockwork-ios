@@ -11,6 +11,7 @@ struct FlashcardActivity: View {
     private var page: PageConfiguration.AppPage = .intersitial
     @State private var isJobSelectorPresented: Bool = true
     @State private var job: Job?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if self.job == nil {
@@ -25,11 +26,9 @@ struct FlashcardActivity: View {
         }
         .foregroundStyle(Theme.base)
         .background(.gray)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden)
-        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+        .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Flashcard")
+        .toolbarBackground(job != nil ? self.job!.backgroundColor : Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        .scrollDismissesKeyboard(.immediately)
     }
 
     struct FlashcardDeck: View {
@@ -41,7 +40,7 @@ struct FlashcardActivity: View {
 
         var body: some View {
             VStack(alignment: .center, spacing: 0) {
-                JobIndicator(job: self.job)
+//                JobIndicator(job: self.job)
                 ZStack(alignment: .center) {
                     LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .bottom)
                     HStack(alignment: .center) {
@@ -49,17 +48,18 @@ struct FlashcardActivity: View {
                             Button {
                                 self.isAnswerCardShowing.toggle()
                             } label: {
-                                TextField("Clue", text: $clue)
+                                Text(self.clue)
                                     .multilineTextAlignment(.center)
-                                    .padding(100)
-                                    .disabled(true)
+                                    .padding(50)
                             }
-                            .frame(maxWidth: 300, maxHeight: 200)
-                            .background(.white.opacity(0.8))
-                            .cornerRadius(5)
-                            .shadow(color: .black.opacity(0.2), radius: 2, x: 3, y: 3)
+
+
                         }
                     }
+                    .frame(maxWidth: 300, maxHeight: 200)
+                    .background(.white.opacity(0.8))
+                    .cornerRadius(5)
+                    .shadow(color: .black.opacity(0.2), radius: 2, x: 3, y: 3)
                 }
                 Divider()
 
