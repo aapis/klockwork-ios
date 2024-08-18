@@ -31,7 +31,7 @@ struct QueryField: View {
                     "",
                     text: $text,
                     prompt: Text(prompt).foregroundStyle(.gray),
-                    axis: .horizontal
+                    axis: .vertical
                 )
                 .disableAutocorrection(false)
                 .focused($focused, equals: .organizationName)
