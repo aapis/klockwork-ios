@@ -16,6 +16,7 @@
 		5311F4022C17BFFF00FB3071 /* AssessmentThresholdForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4012C17BFFF00FB3071 /* AssessmentThresholdForm.swift */; };
 		5311F4062C17C66900FB3071 /* CDAssessmentThreshold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */; };
 		5311F4082C17E86500FB3071 /* AssessmentTypeMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4072C17E86500FB3071 /* AssessmentTypeMenu.swift */; };
+		53147EBE2C72A53A008850A9 /* FlashcardActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53147EBD2C72A536008850A9 /* FlashcardActivity.swift */; };
 		532441662C04428700659F14 /* Titlebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441652C04428700659F14 /* Titlebar.swift */; };
 		532441682C0531C800659F14 /* Rollups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441672C0531C800659F14 /* Rollups.swift */; };
 		5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416C2C06485800659F14 /* ActivityCalendar.swift */; };
@@ -130,6 +131,7 @@
 		5311F4012C17BFFF00FB3071 /* AssessmentThresholdForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentThresholdForm.swift; sourceTree = "<group>"; };
 		5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CDAssessmentThreshold.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CDAssessmentThreshold.swift; sourceTree = "<group>"; };
 		5311F4072C17E86500FB3071 /* AssessmentTypeMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentTypeMenu.swift; sourceTree = "<group>"; };
+		53147EBD2C72A536008850A9 /* FlashcardActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashcardActivity.swift; sourceTree = "<group>"; };
 		532441652C04428700659F14 /* Titlebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Titlebar.swift; sourceTree = "<group>"; };
 		532441672C0531C800659F14 /* Rollups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rollups.swift; sourceTree = "<group>"; };
 		5324416C2C06485800659F14 /* ActivityCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCalendar.swift; sourceTree = "<group>"; };
@@ -282,6 +284,14 @@
 				53E3A2662C06B4DA004A85C3 /* Trends.swift */,
 			);
 			path = Widget;
+			sourceTree = "<group>";
+		};
+		53147EBC2C72A52F008850A9 /* Activities */ = {
+			isa = PBXGroup;
+			children = (
+				53147EBD2C72A536008850A9 /* FlashcardActivity.swift */,
+			);
+			path = Activities;
 			sourceTree = "<group>";
 		};
 		53274B3A2C13C7DB008387BF /* Extensions */ = {
@@ -440,6 +450,7 @@
 		53D4CB6F2BFE93B000AFEDEA /* Pages */ = {
 			isa = PBXGroup;
 			children = (
+				53147EBC2C72A52F008850A9 /* Activities */,
 				538A535F2C72765F00711639 /* Explore */,
 				53D4CB6B2BFE93B000AFEDEA /* AppSettings.swift */,
 				53D4CB6D2BFE93B000AFEDEA /* Planning.swift */,
@@ -628,6 +639,7 @@
 				53F9262E2BFEA00E00948076 /* Color.swift in Sources */,
 				53F9262F2BFEA00E00948076 /* DispatchQueue.swift in Sources */,
 				53F926302BFEA00E00948076 /* View.swift in Sources */,
+				53147EBE2C72A53A008850A9 /* FlashcardActivity.swift in Sources */,
 				53E50C1D2C0E638100A85FDC /* Factor.swift in Sources */,
 				53F926312BFEA00E00948076 /* Date.swift in Sources */,
 				53E50C232C0FED0800A85FDC /* PlanTabs.swift in Sources */,
