@@ -71,7 +71,7 @@ extension Widget {
                         .padding()
 
                         if items.count > 0 {
-                            ForEach(items) { jerb in
+                            ForEach(items, id: \.objectID) { jerb in
                                 Row(job: jerb, alreadySelected: self.jobIsSelected(jerb), callback: { job, action in
                                     if action == .add {
                                         selectedJobs.append(job)
@@ -133,7 +133,7 @@ extension Widget {
                         }
                         .listRowBackground(Theme.textBackground)
                     } else {
-                        ForEach(jobs.filter({$0.alive == true})) { entity in
+                        ForEach(jobs.filter({$0.alive == true}), id: \.objectID) { entity in
                             Row(job: entity, alreadySelected: self.isSelected(entity), callback: { job, action in
                                 if action == .add {
                                     self.jobs.append(job)
@@ -194,7 +194,7 @@ extension Widget {
                         .padding()
 
                         if items.count > 0 {
-                            ForEach(items) { jerb in
+                            ForEach(items, id: \.objectID) { jerb in
                                 Row(job: jerb, callback: { job in
                                     self.job = job
                                     self.showing.toggle()
