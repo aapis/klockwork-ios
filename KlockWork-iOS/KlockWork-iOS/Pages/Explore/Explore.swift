@@ -89,6 +89,15 @@ struct Explore: View {
                         }
                         .listRowBackground(Theme.textBackground)
                     }
+
+                    Section("Utilities") {
+                        NavigationLink {
+                            GlasgowComaScaleCalculator()
+                        } label: {
+                            Text("GCS Calculator")
+                        }
+                        .listRowBackground(Theme.textBackground)
+                    }
                 }
                 Spacer()
             }
