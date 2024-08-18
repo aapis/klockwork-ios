@@ -198,6 +198,13 @@ extension Today {
                         Text(Entity.jobs.enSingular)
                         Entity.jobs.icon
                     }
+
+                    NavigationLink {
+                        TermDetail()
+                    } label: {
+                        Text(Entity.terms.enSingular)
+                        Entity.terms.icon
+                    }
                 }
             }
             .font(.title2)
