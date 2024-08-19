@@ -8,72 +8,95 @@
 import SwiftUI
 
 struct FlashcardActivity: View {
-    private var page: PageConfiguration.AppPage = .intersitial
-    @State private var isJobSelectorPresented: Bool = true
+    private var page: PageConfiguration.AppPage = .explore
+    @State private var isJobSelectorPresented: Bool = false
     @State private var job: Job?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if self.job == nil {
-                Widget.JobSelector.Single(
-                    showing: $isJobSelectorPresented,
-                    job: $job
-                )
-            } else {
-//                FlashcardList(job: self.job!)
-                FlashcardDeck(job: self.job!)
+
+            FlashcardDeck(job: $job)
+
+            VStack(alignment: .center, spacing: 0) {
+                HStack(alignment: .center) {
+                    PageActionBar.Today(job: $job, isPresented: $isJobSelectorPresented)
+                }
             }
+            Spacer()
         }
-        .foregroundStyle(Theme.base)
-        .background(.gray)
-        .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Flashcard")
+        .background(self.page.primaryColour)
+        .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Choose a topic")
         .toolbarBackground(job != nil ? self.job!.backgroundColor : Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
     }
 
     struct FlashcardDeck: View {
-        public var job: Job
-        @FetchRequest private var terms: FetchedResults<TaxonomyTerm>
+        @EnvironmentObject private var state: AppState
+        @Binding public var job: Job?
+        @State private var terms: Array<TaxonomyTerm> = []
         @State private var current: TaxonomyTerm? = nil
         @State private var isAnswerCardShowing: Bool = false
         @State private var clue: String = ""
+        @State private var viewed: Set<TaxonomyTerm> = []
 
         var body: some View {
             VStack(alignment: .center, spacing: 0) {
-//                JobIndicator(job: self.job)
                 ZStack(alignment: .center) {
                     LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .bottom)
-                    HStack(alignment: .center) {
-                        if self.current != nil {
-                            Button {
-                                self.isAnswerCardShowing.toggle()
-                            } label: {
-                                Text(self.clue)
-                                    .multilineTextAlignment(.center)
-                                    .padding(50)
+                    VStack(alignment: .center, spacing: 0) {
+                        VStack(alignment: .center, spacing: 0) {
+                            ZStack {
+                                // Line grid
+                                VStack(spacing: 13) {
+                                    Divider().background(.red)
+                                    ForEach(1...10, id: \.self) { _ in
+                                        Divider().background(.blue)
+                                    }
+                                }
+
+                                // Answer
+                                HStack(alignment: .center) {
+                                    if self.current != nil {
+                                        Button {
+                                            self.isAnswerCardShowing.toggle()
+                                        } label: {
+                                            Text(self.clue)
+                                                .font(.title2)
+                                                .bold()
+                                                .foregroundStyle(Theme.base)
+                                                .multilineTextAlignment(.center)
+                                                .padding(50)
+                                        }
+                                    }
+                                }
                             }
-
-
                         }
+                        .frame(maxHeight: 180)
+                        .background(.white.opacity(0.95))
+                        .cornerRadius(3)
+                        .shadow(color: .black.opacity(0.2), radius: 2, x: 3, y: 3)
                     }
-                    .frame(maxWidth: 300, maxHeight: 200)
-                    .background(.white.opacity(0.8))
-                    .cornerRadius(5)
-                    .shadow(color: .black.opacity(0.2), radius: 2, x: 3, y: 3)
-                }
-                Divider()
-
-                VStack(alignment: .leading, spacing: 8) {
-                    if self.isAnswerCardShowing && self.current != nil {
-                        ForEach(self.current!.definitions!.allObjects as! [TaxonomyTermDefinitions], id: \.objectID) { term in
-                            Text("1. \(term.definition ?? "Definition not found")")
-                        }
-                    } else {
-                        Text("Tap card to reveal")
-                    }
+                    .padding()
                 }
 
                 Divider()
+
+                VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading) {
+                        ScrollView(showsIndicators: false) {
+                            if self.isAnswerCardShowing && self.current != nil {
+                                ForEach(self.current!.definitions!.allObjects as! [TaxonomyTermDefinitions], id: \.objectID) { term in
+                                    Text("1. \(term.definition ?? "Definition not found")")
+                                }
+                            } else {
+                                Text("Tap card to reveal")
+                            }
+                        }
+                    }
+                    .background(.white.opacity(0.2))
+                    .cornerRadius(3)
+                }
+
                 HStack(alignment: .center) {
                     Button {
                         self.isAnswerCardShowing = false
@@ -112,10 +135,21 @@ struct FlashcardActivity: View {
                         self.isAnswerCardShowing = false
                         
                         // @TODO: delete the randomly selected item from self.terms
-                        let next = self.terms.randomElement()
-                        if next != current {
-                            current = next
-                            clue = current!.name ?? "_TERM_NAME"
+                        if let next = self.terms.randomElement() {
+                            if next != current {
+                                // Pick another random element if we've seen the next item already
+                                if !self.viewed.contains(next) {
+                                    current = next
+                                } else {
+                                    current = self.terms.randomElement()
+                                }
+
+                                clue = current!.name ?? "_TERM_NAME"
+                            }
+                        }
+
+                        if self.current != nil {
+                            viewed.insert(self.current!)
                         }
                     } label: {
                         ZStack(alignment: .center) {
@@ -130,59 +164,31 @@ struct FlashcardActivity: View {
                 Spacer()
             }
             .onAppear(perform: self.actionOnAppear)
-        }
-
-        init(job: Job) {
-            self.job = job
-            _terms = CoreDataTaxonomyTerms.fetch(job: self.job)
-        }
-    }
-
-    struct FlashcardList: View {
-        public var job: Job
-        @FetchRequest private var terms: FetchedResults<TaxonomyTerm>
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                ForEach(self.terms) { term in
-                    VStack {
-                        Text(term.name ?? "_NAME")
-                    }
-                }
+            .onChange(of: job) {
+                self.actionOnAppear()
             }
-        }
-
-        init(job: Job) {
-            self.job = job
-            _terms = CoreDataTaxonomyTerms.fetch(job: self.job)
         }
     }
 
     struct Flashcard {
         var term: TaxonomyTerm
     }
-
-    struct JobIndicator: View {
-        public var job: Job
-
-        var body: some View {
-            HStack(alignment: .center, spacing: 10) {
-                Image(systemName: "chevron.right")
-                Text(self.job.title ?? self.job.jid.string)
-                Spacer()
-            }
-            .padding()
-            .background(self.job.backgroundColor)
-            .foregroundStyle(self.job.backgroundColor.isBright() ? .black : .white)
-        }
-    }
 }
 
 extension FlashcardActivity.FlashcardDeck {
-    /// Onload handler
+    /// Onload/onChangeJob handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        self.current = self.terms.randomElement()
-        self.clue = self.current!.name ?? "_TERM_NAME"
+        if self.job != nil {
+            if let termsForJob = CoreDataTaxonomyTerms(moc: self.state.moc).byJob(self.job!) {
+                terms = termsForJob
+            }
+        }
+
+        if !self.terms.isEmpty {
+            self.current = self.terms.randomElement()
+            self.clue = self.current?.name ?? "_TERM_NAME"
+            self.viewed.insert(self.current!)
+        }
     }
 }
