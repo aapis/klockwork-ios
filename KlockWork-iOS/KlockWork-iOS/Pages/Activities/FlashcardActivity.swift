@@ -9,20 +9,18 @@ import SwiftUI
 
 struct FlashcardActivity: View {
     private var page: PageConfiguration.AppPage = .explore
-    @State private var isJobSelectorPresented: Bool = false
+    @State private var isJobSelectorPresented: Bool = true
     @State private var job: Job?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-
             FlashcardDeck(job: $job)
 
             VStack(alignment: .center, spacing: 0) {
                 HStack(alignment: .center) {
-                    PageActionBar.Today(job: $job, isPresented: $isJobSelectorPresented)
+                    PageActionBar.Today(title: "Flashcard topic:", job: $job, isPresented: $isJobSelectorPresented)
                 }
             }
-            Spacer()
         }
         .background(self.page.primaryColour)
         .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Choose a topic")
@@ -38,72 +36,45 @@ struct FlashcardActivity: View {
         @State private var isAnswerCardShowing: Bool = false
         @State private var clue: String = ""
         @State private var viewed: Set<TaxonomyTerm> = []
+        @State private var definitions: [TaxonomyTermDefinitions] = []
 
         var body: some View {
             VStack(alignment: .center, spacing: 0) {
-                ZStack(alignment: .center) {
-                    LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .bottom)
-                    VStack(alignment: .center, spacing: 0) {
-                        VStack(alignment: .center, spacing: 0) {
-                            ZStack {
-                                // Line grid
-                                VStack(spacing: 13) {
-                                    Divider().background(.red)
-                                    ForEach(1...10, id: \.self) { _ in
-                                        Divider().background(.blue)
-                                    }
-                                }
-
-                                // Answer
-                                HStack(alignment: .center) {
-                                    if self.current != nil {
-                                        Button {
-                                            self.isAnswerCardShowing.toggle()
-                                        } label: {
-                                            Text(self.clue)
-                                                .font(.title2)
-                                                .bold()
-                                                .foregroundStyle(Theme.base)
-                                                .multilineTextAlignment(.center)
-                                                .padding(50)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .frame(maxHeight: 180)
-                        .background(.white.opacity(0.95))
-                        .cornerRadius(3)
-                        .shadow(color: .black.opacity(0.2), radius: 2, x: 3, y: 3)
-                    }
-                    .padding()
-                }
-
+                Card(
+                    isAnswerCardShowing: $isAnswerCardShowing,
+                    definitions: $definitions,
+                    current: $current
+                )
                 Divider()
+                Actions(
+                    isAnswerCardShowing: $isAnswerCardShowing,
+                    definitions: $definitions,
+                    current: $current,
+                    terms: $terms,
+                    viewed: $viewed
+                )
+            }
+            .onAppear(perform: self.actionOnAppear)
+            .onChange(of: job) {
+                self.actionOnAppear()
+            }
+        }
 
-                VStack(alignment: .leading, spacing: 0) {
-                    VStack(alignment: .leading) {
-                        ScrollView(showsIndicators: false) {
-                            if self.isAnswerCardShowing && self.current != nil {
-                                ForEach(self.current!.definitions!.allObjects as! [TaxonomyTermDefinitions], id: \.objectID) { term in
-                                    Text("1. \(term.definition ?? "Definition not found")")
-                                }
-                            } else {
-                                Text("Tap card to reveal")
-                            }
-                        }
-                    }
-                    .background(.white.opacity(0.2))
-                    .cornerRadius(3)
-                }
+        struct Actions: View {
+            @Binding public var isAnswerCardShowing: Bool
+            @Binding public var definitions: [TaxonomyTermDefinitions]
+            @Binding public var current: TaxonomyTerm?
+            @Binding public var terms: [TaxonomyTerm]
+            @Binding public var viewed: Set<TaxonomyTerm>
 
+            var body: some View {
                 HStack(alignment: .center) {
                     Button {
-                        self.isAnswerCardShowing = false
+                        self.isAnswerCardShowing.toggle()
                     } label: {
                         ZStack(alignment: .center) {
                             LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .bottom)
-                            Image(systemName: "hand.thumbsup.fill")
+                            Image(systemName: "rectangle.landscape.rotate")
                         }
                     }
                     .padding()
@@ -114,7 +85,7 @@ struct FlashcardActivity: View {
                     } label: {
                         ZStack(alignment: .center) {
                             LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .bottom)
-                            Image(systemName: "sparkle")
+                            Image(systemName: "hand.thumbsup.fill")
                         }
                     }
                     .padding()
@@ -133,7 +104,7 @@ struct FlashcardActivity: View {
 
                     Button {
                         self.isAnswerCardShowing = false
-                        
+
                         // @TODO: delete the randomly selected item from self.terms
                         if let next = self.terms.randomElement() {
                             if next != current {
@@ -143,8 +114,6 @@ struct FlashcardActivity: View {
                                 } else {
                                     current = self.terms.randomElement()
                                 }
-
-                                clue = current!.name ?? "_TERM_NAME"
                             }
                         }
 
@@ -160,12 +129,76 @@ struct FlashcardActivity: View {
                     .padding()
                     .mask(Circle().frame(width: 50, height: 50))
                 }
-
-                Spacer()
+                .frame(height: 100)
             }
-            .onAppear(perform: self.actionOnAppear)
-            .onChange(of: job) {
-                self.actionOnAppear()
+        }
+
+        struct Card: View {
+            @Binding public var isAnswerCardShowing: Bool
+            @Binding public var definitions: [TaxonomyTermDefinitions]
+            @Binding public var current: TaxonomyTerm?
+            @State private var clue: String = ""
+            @State private var initialDefinitionIndex: Int = 1
+
+            var body: some View {
+                ZStack(alignment: .center) {
+                    LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .bottom)
+                    VStack(alignment: .center, spacing: 0) {
+                        VStack(alignment: .center, spacing: 0) {
+                            ZStack {
+                                // Line grid
+                                VStack(spacing: 13) {
+                                    Divider().background(.red)
+                                    ForEach(1...10, id: \.self) { _ in
+                                        Divider().background(.blue)
+                                    }
+                                }
+
+                                if self.isAnswerCardShowing {
+                                    VStack(alignment: .leading) {
+                                        // Definitions
+                                        ScrollView(showsIndicators: false) {
+                                            ForEach(Array(definitions.enumerated()), id: \.element) { idx, term in
+                                                HStack(alignment: .center) {
+                                                    Text("\(idx). \(term.definition ?? "Definition not found")")
+                                                        .foregroundStyle(Theme.base)
+                                                    Spacer()
+                                                }
+                                                .padding([.leading, .trailing], 10)
+                                            }
+                                        }
+                                    }
+                                    .padding(.top, 30)
+                                } else {
+                                    // Answer
+                                    HStack(alignment: .center) {
+                                        if self.current != nil {
+                                            Text(clue)
+                                                .font(.title2)
+                                                .bold()
+                                                .foregroundStyle(Theme.base)
+                                                .multilineTextAlignment(.center)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .frame(maxHeight: 200)
+                        .background(.white.opacity(0.95))
+                        .cornerRadius(3)
+                        .shadow(color: .black.opacity(0.2), radius: 2, x: 3, y: 3)
+                    }
+                    .padding()
+                }
+                .onChange(of: current) {
+                    clue = current?.name ?? "Clue"
+
+                    if let defs = self.current!.definitions {
+                        if let ttds = defs.allObjects as? [TaxonomyTermDefinitions] {
+                            definitions = ttds
+                        }
+                    }
+                }
             }
         }
     }
@@ -189,6 +222,13 @@ extension FlashcardActivity.FlashcardDeck {
             self.current = self.terms.randomElement()
             self.clue = self.current?.name ?? "_TERM_NAME"
             self.viewed.insert(self.current!)
+            self.definitions = []
+
+            if let defs = self.current!.definitions {
+                if let ttds = defs.allObjects as? [TaxonomyTermDefinitions] {
+                    self.definitions = ttds
+                }
+            }
         }
     }
 }
