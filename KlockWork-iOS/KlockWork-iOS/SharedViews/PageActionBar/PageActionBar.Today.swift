@@ -10,6 +10,7 @@ import SwiftUI
 extension PageActionBar {
     struct Today: View {
         @Environment(\.managedObjectContext) var moc
+        public var title: String = "What are you working on now?"
         @Binding public var job: Job?
         @State private var selectedJobs: [Job] = []
         @State private var id: UUID = UUID()
@@ -19,7 +20,7 @@ extension PageActionBar {
             PageActionBar(
                 groupView: AnyView(Group),
                 sheetView: AnyView(
-                    Widget.JobSelector.Single(showing: $isPresented, job: $job)
+                    Widget.JobSelector.Single(title: self.title, showing: $isPresented, job: $job)
                         .presentationBackground(Theme.cPurple)
                 ),
                 isPresented: $isPresented
