@@ -55,8 +55,8 @@ struct Find: View {
                                                 Image(systemName: "xmark")
                                             }
                                         }
-                                        .listRowBackground(Theme.rowColour)
-                                        .foregroundStyle(.red)
+                                        .listRowBackground(Color.red)
+                                        .foregroundStyle(.white)
                                     } else {
                                         Text("None found")
                                             .listRowBackground(Theme.textBackground)
