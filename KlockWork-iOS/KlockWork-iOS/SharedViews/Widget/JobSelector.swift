@@ -169,7 +169,8 @@ extension Widget {
         /// Allows selection of a single job from the list
         struct Single: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButton
-
+            
+            public var title: String?
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var showing: Bool
             @Binding public var job: Job?
@@ -182,7 +183,7 @@ extension Widget {
                 ScrollView(showsIndicators: false) {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         HStack(alignment: .center, spacing: 0) {
-                            Text("What are you working on now?")
+                            Text(self.title!)
                                 .font(.title2)
                             Spacer()
                             Button {
@@ -208,7 +209,8 @@ extension Widget {
                 .scrollContentBackground(.hidden)
             }
 
-            init(showing: Binding<Bool>, job: Binding<Job?>) {
+            init(title: String? = "What are you working on now?", showing: Binding<Bool>, job: Binding<Job?>) {
+                self.title = title
                 _showing = showing
                 _job = job
                 _items = CoreDataJob.fetchAll()
