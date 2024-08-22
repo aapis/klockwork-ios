@@ -23,9 +23,7 @@ extension Widget {
                             Text("Select...")
                         } else {
                             Text(self.job!.title ?? self.job!.jid.string)
-                                .padding(5)
-                                .background(Theme.base.opacity(0.2))
-                                .cornerRadius(5)
+                                .foregroundStyle(self.job!.backgroundColor.isBright() ? Theme.base : .white)
                         }
                     }
                 }
