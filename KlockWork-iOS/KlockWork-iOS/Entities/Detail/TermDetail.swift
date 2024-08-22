@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TermDetail: View {
-    typealias DefinitionLink = Tabs.Content.Individual.SingleJobLink
+    typealias DefinitionLink = Tabs.Content.Individual.SingleDefinitionLink
 
     @EnvironmentObject private var state: AppState
     @Environment(\.dismiss) private var dismiss
@@ -32,7 +32,7 @@ struct TermDetail: View {
                 Section("Definitions") {
                     ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { definition in
                         if definition.job != nil {
-                            DefinitionLink(job: definition.job!)
+                            DefinitionLink(definition: definition)
                         }
                     }
                 }
@@ -78,13 +78,6 @@ struct TermDetail: View {
                     Text("Save")
                 }
                 .foregroundStyle(self.state.theme.tint)
-                .alert("Saved", isPresented: $isSaveAlertPresented) {
-                    Button("OK") {
-                        dismiss()
-                    }
-                } message: {
-                    Text("It is done.")
-                }
             }
         }
     }
@@ -127,8 +120,8 @@ extension TermDetail {
 //            )
         }
 
-        isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
+        dismiss()
     }
 
     /// Soft delete a Task

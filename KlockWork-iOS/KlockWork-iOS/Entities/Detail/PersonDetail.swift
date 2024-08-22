@@ -84,13 +84,6 @@ struct PersonDetail: View {
                         Text("Save")
                     }
                     .foregroundStyle(self.state.theme.tint)
-                    .alert("Saved", isPresented: $isSaveAlertPresented) {
-                        Button("OK") {
-                            dismiss()
-                        }
-                    } message: {
-                        Text("\"\(self.name)\" saved")
-                    }
                 }
             }
             .sheet(isPresented: $isCompanySelectorPresented) {
@@ -137,8 +130,8 @@ extension PersonDetail {
            )
         }
 
-        isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
+        dismiss()
     }
 
     /// Hard delete a Person. Thought it would be morbid to have an "alive" property on a Person object

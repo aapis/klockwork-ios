@@ -103,13 +103,6 @@ struct CompanyDetail: View {
                         Text("Save")
                     }
                     .foregroundStyle(self.state.theme.tint)
-                    .alert("Saved", isPresented: $isSaveAlertPresented) {
-                        Button("OK") {
-                            dismiss()
-                        }
-                    } message: {
-                        Text("\"\(self.name)\" saved")
-                    }
                 }
             }
             .sheet(isPresented: $isProjectSelectorPresented) {
@@ -166,8 +159,8 @@ extension CompanyDetail {
            )
         }
 
-        isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
+        dismiss()
     }
 
     /// Soft delete a Company
