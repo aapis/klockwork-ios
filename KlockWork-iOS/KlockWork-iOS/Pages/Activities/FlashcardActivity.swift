@@ -18,12 +18,17 @@ struct FlashcardActivity: View {
 
             VStack(alignment: .center, spacing: 0) {
                 HStack(alignment: .center) {
-                    PageActionBar.Today(title: "Flashcard topic:", job: $job, isPresented: $isJobSelectorPresented)
+                    PageActionBar.Today(
+                        title: "Flashcard topic",
+                        prompt: "Choose a topic",
+                        job: $job,
+                        isPresented: $isJobSelectorPresented
+                    )
                 }
             }
         }
         .background(self.page.primaryColour)
-        .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Choose a topic")
+        .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Activity: Flashcard")
         .toolbarBackground(job != nil ? self.job!.backgroundColor : Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
     }
@@ -43,9 +48,9 @@ struct FlashcardActivity: View {
                 Card(
                     isAnswerCardShowing: $isAnswerCardShowing,
                     definitions: $definitions,
-                    current: $current
+                    current: $current,
+                    job: $job
                 )
-                Divider()
                 Actions(
                     isAnswerCardShowing: $isAnswerCardShowing,
                     definitions: $definitions,
@@ -68,6 +73,16 @@ struct FlashcardActivity: View {
             @Binding public var viewed: Set<TaxonomyTerm>
 
             var body: some View {
+                ZStack(alignment: .topLeading) {
+                    LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                        .frame(height: 50)
+                        .opacity(0.06)
+
+                    Buttons
+                }
+            }
+
+            var Buttons: some View {
                 HStack(alignment: .center) {
                     Button {
                         self.isAnswerCardShowing.toggle()
@@ -105,7 +120,6 @@ struct FlashcardActivity: View {
                     Button {
                         self.isAnswerCardShowing = false
 
-                        // @TODO: delete the randomly selected item from self.terms
                         if let next = self.terms.randomElement() {
                             if next != current {
                                 // Pick another random element if we've seen the next item already
@@ -129,66 +143,87 @@ struct FlashcardActivity: View {
                     .padding()
                     .mask(Circle().frame(width: 50, height: 50))
                 }
-                .frame(height: 100)
+                .frame(height: 90)
+                .border(width: 1, edges: [.top], color: .yellow)
             }
         }
 
         struct Card: View {
             @Binding public var isAnswerCardShowing: Bool
-            @Binding public var definitions: [TaxonomyTermDefinitions]
+            @Binding public var definitions: [TaxonomyTermDefinitions] // @TODO: convert this to dict grouped by job
             @Binding public var current: TaxonomyTerm?
+            @Binding public var job: Job?
             @State private var clue: String = ""
-            @State private var initialDefinitionIndex: Int = 1
 
             var body: some View {
-                ZStack(alignment: .center) {
-                    LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .bottom)
-                    VStack(alignment: .center, spacing: 0) {
-                        VStack(alignment: .center, spacing: 0) {
-                            ZStack {
-                                // Line grid
-                                VStack(spacing: 13) {
-                                    Divider().background(.red)
-                                    ForEach(1...10, id: \.self) { _ in
-                                        Divider().background(.blue)
-                                    }
-                                }
+                VStack(alignment: .leading, spacing: 0) {
+                    if self.isAnswerCardShowing {
+                        // Definitions
+                        HStack(alignment: .center, spacing: 0) {
+                            Text("\(self.definitions.count) Jobs define \"\(self.clue)\"")
+                                .textCase(.uppercase)
+                                .font(.caption)
+                                .padding(5)
+                            Spacer()
+                        }
+                        .background(self.job?.backgroundColor ?? Theme.rowColour)
 
-                                if self.isAnswerCardShowing {
-                                    VStack(alignment: .leading) {
-                                        // Definitions
-                                        ScrollView(showsIndicators: false) {
-                                            ForEach(Array(definitions.enumerated()), id: \.element) { idx, term in
-                                                HStack(alignment: .center) {
-                                                    Text("\(idx). \(term.definition ?? "Definition not found")")
-                                                        .foregroundStyle(Theme.base)
-                                                    Spacer()
+                        VStack(alignment: .leading, spacing: 0) {
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 1) {
+                                    ForEach(Array(definitions.enumerated()), id: \.element) { idx, term in
+                                        VStack(alignment: .leading, spacing: 0) {
+                                            HStack(alignment: .top) {
+                                                Text((term.job?.title ?? term.job?.jid.string) ?? "_JOB_NAME")
+                                                    .multilineTextAlignment(.leading)
+                                                    .padding(14)
+                                                    .foregroundStyle((term.job?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
+                                                Spacer()
+                                            }
+
+
+                                            ZStack(alignment: .topLeading) {
+                                                LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                                                    .frame(height: 50)
+                                                    .opacity(0.1)
+
+                                                NavigationLink {
+                                                    TermDetail(term: self.current)
+                                                } label: {
+                                                    HStack(alignment: .center) {
+                                                        Text(term.definition ?? "Definition not found")
+                                                            .multilineTextAlignment(.leading)
+                                                        Spacer()
+                                                        Image(systemName: "chevron.right")
+                                                    }
+                                                    .padding(14)
                                                 }
-                                                .padding([.leading, .trailing], 10)
                                             }
                                         }
-                                    }
-                                    .padding(.top, 30)
-                                } else {
-                                    // Answer
-                                    HStack(alignment: .center) {
-                                        if self.current != nil {
-                                            Text(clue)
-                                                .font(.title2)
-                                                .bold()
-                                                .foregroundStyle(Theme.base)
-                                                .multilineTextAlignment(.center)
-                                        }
+                                        .background(term.job?.backgroundColor)
+                                        .foregroundStyle((term.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                                     }
                                 }
                             }
                         }
-                        .frame(maxHeight: 200)
-                        .background(.white.opacity(0.95))
-                        .cornerRadius(3)
-                        .shadow(color: .black.opacity(0.2), radius: 2, x: 3, y: 3)
+                    } else {
+                        // Answer
+                        if self.current != nil {
+                            VStack(alignment: .leading, spacing: 0) {
+                                Spacer()
+                                HStack(alignment: .center) {
+                                    Text("Clue:")
+                                        .foregroundStyle((self.job?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
+                                    Text(clue)
+                                        .font(.title2)
+                                        .bold()
+                                        .multilineTextAlignment(.center)
+                                }
+                                Spacer()
+                            }
+                        }
                     }
-                    .padding()
+                    Spacer()
                 }
                 .onChange(of: current) {
                     clue = current?.name ?? "Clue"
@@ -200,6 +235,7 @@ struct FlashcardActivity: View {
                     }
                 }
             }
+
         }
     }
 
