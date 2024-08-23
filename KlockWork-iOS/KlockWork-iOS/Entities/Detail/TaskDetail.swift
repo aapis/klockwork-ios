@@ -119,13 +119,6 @@ struct TaskDetail: View {
                         Text("Save")
                     }
                     .foregroundStyle(self.state.theme.tint)
-                    .alert("Saved", isPresented: $isSaveAlertPresented) {
-                        Button("OK") {
-                            dismiss()
-                        }
-                    } message: {
-                        Text("\"\(self.content.prefix(25))\" saved")
-                    }
                 }
             }
             .sheet(isPresented: $isJobSelectorPresented) {
@@ -186,8 +179,8 @@ extension TaskDetail {
             )
         }
 
-        isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
+        dismiss()
     }
 
     /// Soft delete a Task

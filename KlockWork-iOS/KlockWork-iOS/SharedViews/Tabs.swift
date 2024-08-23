@@ -1509,5 +1509,21 @@ extension Tabs.Content {
                 .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
             }
         }
+
+        struct SingleDefinitionLink: View {
+            public let definition: TaxonomyTermDefinitions
+
+            var body: some View {
+                NavigationLink {
+                    DefinitionDetail(definition: self.definition)
+                } label: {
+                    ListRow(
+                        name: (self.definition.job?.title ?? self.definition.job?.jid.string) ?? "_DEFINITION",
+                        colour: self.definition.job?.backgroundColor ?? Theme.rowColour
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 }

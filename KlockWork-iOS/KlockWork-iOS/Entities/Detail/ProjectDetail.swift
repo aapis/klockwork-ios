@@ -103,13 +103,6 @@ struct ProjectDetail: View {
                         Text("Save")
                     }
                     .foregroundStyle(self.state.theme.tint)
-                    .alert("Saved", isPresented: $isSaveAlertPresented) {
-                        Button("OK") {
-                            dismiss()
-                        }
-                    } message: {
-                        Text("\"\(self.name)\" saved")
-                    }
                 }
             }
             .sheet(isPresented: $isCompanySelectorPresent) {
@@ -172,9 +165,9 @@ extension ProjectDetail {
                 saveByDefault: false
             )
         }
-        
-        isSaveAlertPresented.toggle()
+
         PersistenceController.shared.save()
+        dismiss()
     }
     
     /// Soft delete a Project

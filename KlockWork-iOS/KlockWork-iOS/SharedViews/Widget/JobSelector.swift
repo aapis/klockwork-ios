@@ -23,9 +23,7 @@ extension Widget {
                             Text("Select...")
                         } else {
                             Text(self.job!.title ?? self.job!.jid.string)
-                                .padding(5)
-                                .background(Theme.base.opacity(0.2))
-                                .cornerRadius(5)
+                                .foregroundStyle(self.job!.backgroundColor.isBright() ? Theme.base : .white)
                         }
                     }
                 }
@@ -71,7 +69,7 @@ extension Widget {
                         .padding()
 
                         if items.count > 0 {
-                            ForEach(items) { jerb in
+                            ForEach(items, id: \.objectID) { jerb in
                                 Row(job: jerb, alreadySelected: self.jobIsSelected(jerb), callback: { job, action in
                                     if action == .add {
                                         selectedJobs.append(job)
@@ -133,7 +131,7 @@ extension Widget {
                         }
                         .listRowBackground(Theme.textBackground)
                     } else {
-                        ForEach(jobs.filter({$0.alive == true})) { entity in
+                        ForEach(jobs.filter({$0.alive == true}), id: \.objectID) { entity in
                             Row(job: entity, alreadySelected: self.isSelected(entity), callback: { job, action in
                                 if action == .add {
                                     self.jobs.append(job)
@@ -169,7 +167,8 @@ extension Widget {
         /// Allows selection of a single job from the list
         struct Single: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButton
-
+            
+            public var title: String?
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var showing: Bool
             @Binding public var job: Job?
@@ -182,7 +181,7 @@ extension Widget {
                 ScrollView(showsIndicators: false) {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         HStack(alignment: .center, spacing: 0) {
-                            Text("What are you working on now?")
+                            Text(self.title!)
                                 .font(.title2)
                             Spacer()
                             Button {
@@ -194,7 +193,7 @@ extension Widget {
                         .padding()
 
                         if items.count > 0 {
-                            ForEach(items) { jerb in
+                            ForEach(items, id: \.objectID) { jerb in
                                 Row(job: jerb, callback: { job in
                                     self.job = job
                                     self.showing.toggle()
@@ -208,7 +207,8 @@ extension Widget {
                 .scrollContentBackground(.hidden)
             }
 
-            init(showing: Binding<Bool>, job: Binding<Job?>) {
+            init(title: String? = "What are you working on now?", showing: Binding<Bool>, job: Binding<Job?>) {
+                self.title = title
                 _showing = showing
                 _job = job
                 _items = CoreDataJob.fetchAll()

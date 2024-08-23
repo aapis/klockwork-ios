@@ -86,7 +86,7 @@ extension Widget {
                         .padding()
 
                         if items.count > 0 {
-                            ForEach(items) { item in
+                            ForEach(items, id: \.objectID) { item in
                                 Row(entity: item, callback: { project  in
                                     self.entity = project
                                     self.showing.toggle()
@@ -142,7 +142,7 @@ extension Widget {
                         .padding()
 
                         if items.filter({$0.alive == true}).count > 0 {
-                            ForEach(items.filter({$0.alive == true})) { entity in
+                            ForEach(items.filter({$0.alive == true}), id: \.objectID) { entity in
                                 Row(entity: entity, alreadySelected: self.isSelected(entity), callback: { project, action in
                                     if action == .add {
                                         selected.append(project)
@@ -195,7 +195,7 @@ extension Widget {
                         }
                         .listRowBackground(Theme.textBackground)
                     } else {
-                        ForEach(projects.filter({$0.alive == true}).sorted(by: {$0.name! < $1.name!})) { project in
+                        ForEach(projects.filter({$0.alive == true}).sorted(by: {$0.name! < $1.name!}), id: \.objectID) { project in
                             Row(entity: project, alreadySelected: self.isSelected(project), callback: { project, action in
                                 if action == .add {
                                     projects.append(project)

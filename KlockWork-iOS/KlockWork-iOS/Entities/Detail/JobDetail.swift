@@ -137,13 +137,6 @@ struct JobDetail: View {
                     Text("Save")
                 }
                 .foregroundStyle(self.state.theme.tint)
-                .alert("Saved", isPresented: $isSaveAlertPresented) {
-                    Button("OK") {
-                        dismiss()
-                    }
-                } message: {
-                    Text("\"\(self.title)\" saved")
-                }
             }
         }
         .sheet(isPresented: $isCompanySelectorPresented) {
@@ -227,9 +220,9 @@ extension JobDetail {
                 saveByDefault: false
             )
         }
-        
-        isSaveAlertPresented.toggle()
+
         PersistenceController.shared.save()
+        dismiss()
     }
 
     /// Hard delete a Job

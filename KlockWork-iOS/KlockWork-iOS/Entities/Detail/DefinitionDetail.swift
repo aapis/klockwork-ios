@@ -1,40 +1,35 @@
 //
-//  TermDetail.swift
+//  DefinitionDetail.swift
 //  KlockWork-iOS
 //
-//  Created by Ryan Priebe on 2024-08-16.
+//  Created by Ryan Priebe on 2024-08-22.
 //
 
 import SwiftUI
 
-struct TermDetail: View {
-    typealias DefinitionLink = Tabs.Content.Individual.SingleDefinitionLink
-
+struct DefinitionDetail: View {
     @EnvironmentObject private var state: AppState
     @Environment(\.dismiss) private var dismiss
-    public var term: TaxonomyTerm?
+    public var definition: TaxonomyTermDefinitions?
     @State private var created: Date = Date()
-    @State private var name: String = ""
-    @State private var definitions: [TaxonomyTermDefinitions] = []
+    @State private var job: Job?
+    @State private var title: String = ""
     @State private var alive: Bool = false
     @State private var isSaveAlertPresented: Bool = false
     @State private var isDeleteAlertPresented: Bool = false
+    @State private var isJobSelectorPresented: Bool = false
     public var page: PageConfiguration.AppPage = .create
 
     var body: some View {
         VStack {
             List {
-                Section("Term") {
-                    TextField("Name", text: $name, axis: .vertical)
-                }
-                .listRowBackground(Theme.textBackground)
+                Widget.JobSelector.FormField(
+                    job: $job,
+                    isJobSelectorPresented: $isJobSelectorPresented
+                )
 
-                Section("Definitions") {
-                    ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { definition in
-                        if definition.job != nil {
-                            DefinitionLink(definition: definition)
-                        }
-                    }
+                Section("Definition") {
+                    TextField("Definition", text: $title, axis: .vertical)
                 }
                 .listRowBackground(Theme.textBackground)
 
@@ -49,14 +44,14 @@ struct TermDetail: View {
                 }
                 .listRowBackground(Theme.textBackground)
 
-                if self.term != nil {
-                    Button("Delete Term", role: .destructive, action: self.actionInitiateDelete)
+                if self.definition != nil {
+                    Button("Delete Definition", role: .destructive, action: self.actionInitiateDelete)
                         .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
                             Button("Yes", role: .destructive) {
                                 self.actionOnDelete()
                             }
                         } message: {
-                            Text("This term will be permanently deleted.")
+                            Text("This definition will be permanently deleted.")
                         }
                         .listRowBackground(Color.red)
                         .foregroundStyle(.white)
@@ -65,7 +60,7 @@ struct TermDetail: View {
             Spacer()
         }
         .background(self.page.primaryColour)
-        .onAppear(perform: actionOnAppear)
+        .onAppear(perform: self.actionOnAppear)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .scrollContentBackground(.hidden)
@@ -80,44 +75,41 @@ struct TermDetail: View {
                 .foregroundStyle(self.state.theme.tint)
             }
         }
+        .sheet(isPresented: $isJobSelectorPresented) {
+            Widget.JobSelector.Single(
+                showing: $isJobSelectorPresented,
+                job: $job
+            )
+            .presentationBackground(self.page.primaryColour)
+        }
     }
 }
 
-extension TermDetail {
+extension DefinitionDetail {
     /// Onload handler. Sets timestamp and message fields.
     /// - Returns: Void
     private func actionOnAppear() -> Void {
-        if self.term != nil {
-            if let tmstmp = self.term!.created {
-                self.created = tmstmp
-            }
+        var dc = DateComponents()
+        dc.year = 1969
+        dc.month = 12
+        dc.day = 31
 
-            if let name = self.term!.name {
-                self.name = name
-            }
-
-            if let def = self.term!.definitions {
-                self.definitions = def.allObjects as! [TaxonomyTermDefinitions]
-            }
-
-            self.alive = self.term!.alive
-        }
+        title = self.definition?.definition ?? "_DEFINITION_TITLE"
+        alive = self.definition?.alive ?? false
+        created = self.definition?.created ?? Calendar.autoupdatingCurrent.date(from: dc)!
+        job = self.definition?.job
     }
 
     /// Save handler
     /// - Returns: Void
     private func actionOnSave() -> Void {
-        if self.term != nil {
-            self.term!.name = self.name
-//            self.term!.definitions = self.definition
-            self.term!.alive = self.alive
+        if self.definition != nil {
+            self.definition!.alive = alive
+            self.definition!.lastUpdate = Date()
+            self.definition!.definition = title
+            self.definition!.job = job
         } else {
-//            CoreDataTaxonomyTerms(moc: self.state.moc).create(
-//                message: self.message,
-//                timestamp: self.timestamp,
-//                job: self.job,
-//                saveByDefault: false
-//            )
+            // Create a new one
         }
 
         PersistenceController.shared.save()
@@ -127,8 +119,8 @@ extension TermDetail {
     /// Soft delete a Task
     /// - Returns: Void
     private func actionOnDelete() -> Void {
-        if self.term != nil {
-            self.state.moc.delete(self.term!)
+        if self.definition != nil {
+            self.state.moc.delete(self.definition!)
         }
 
         PersistenceController.shared.save()

@@ -324,6 +324,7 @@ extension NoteDetail {
         }
 
         isSaveAlertPresented.toggle()
+//        dismiss() // @TODO: this is what we want, but test it
     }
 }
 
