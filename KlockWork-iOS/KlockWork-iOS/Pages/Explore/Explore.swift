@@ -107,7 +107,11 @@ struct Explore: View {
                         NavigationLink {
                             GlasgowComaScaleCalculator()
                         } label: {
-                            Text("GCS Calculator")
+                            HStack {
+                                Image(systemName: "function")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("GCS Calculator")
+                            }
                         }
                         .listRowBackground(Theme.textBackground)
                     }
