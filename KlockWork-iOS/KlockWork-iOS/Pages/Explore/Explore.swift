@@ -114,6 +114,17 @@ struct Explore: View {
                             }
                         }
                         .listRowBackground(Theme.textBackground)
+
+                        NavigationLink {
+                            PrimaryAssessmentGuide()
+                        } label: {
+                            HStack {
+                                Image(systemName: "stethoscope")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Primary Assessment Guide")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
                 Spacer()

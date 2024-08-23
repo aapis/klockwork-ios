@@ -109,8 +109,8 @@ extension TermDetail {
     private func actionOnSave() -> Void {
         if self.term != nil {
             self.term!.name = self.name
-//            self.term!.definitions = self.definition
             self.term!.alive = self.alive
+            self.term!.definitions = NSSet(array: self.definitions)
         } else {
 //            CoreDataTaxonomyTerms(moc: self.state.moc).create(
 //                message: self.message,

@@ -60,6 +60,7 @@
 		53B2C3692C1F7D65003507CE /* DefaultObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B2C3682C1F7D59003507CE /* DefaultObjects.swift */; };
 		53B2C36B2C22708D003507CE /* PageMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B2C36A2C22708A003507CE /* PageMode.swift */; };
 		53B72B5C2C77DDE900324E15 /* DefinitionDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B72B5B2C77DDE600324E15 /* DefinitionDetail.swift */; };
+		53B72B5E2C78193100324E15 /* PrimaryAssessmentGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B72B5D2C78192A00324E15 /* PrimaryAssessmentGuide.swift */; };
 		53C059B82C33BCAE0066111C /* RecordFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C059B72C33BCAA0066111C /* RecordFilter.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
@@ -178,6 +179,7 @@
 		53B2C3682C1F7D59003507CE /* DefaultObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultObjects.swift; sourceTree = "<group>"; };
 		53B2C36A2C22708A003507CE /* PageMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageMode.swift; sourceTree = "<group>"; };
 		53B72B5B2C77DDE600324E15 /* DefinitionDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionDetail.swift; sourceTree = "<group>"; };
+		53B72B5D2C78192A00324E15 /* PrimaryAssessmentGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryAssessmentGuide.swift; sourceTree = "<group>"; };
 		53C059B72C33BCAA0066111C /* RecordFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordFilter.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
@@ -331,6 +333,7 @@
 		538A535F2C72765F00711639 /* Explore */ = {
 			isa = PBXGroup;
 			children = (
+				53B72B5D2C78192A00324E15 /* PrimaryAssessmentGuide.swift */,
 				538A53602C72766900711639 /* GlasgowComaScaleCalculator.swift */,
 				53D4CB6C2BFE93B000AFEDEA /* Explore.swift */,
 			);
@@ -632,6 +635,7 @@
 				538A10332C31C7D70028B785 /* RowAddButton.swift in Sources */,
 				539134EA2C0269B600B48494 /* PageConfiguration.swift in Sources */,
 				53F926292BFEA00E00948076 /* Project.swift in Sources */,
+				53B72B5E2C78193100324E15 /* PrimaryAssessmentGuide.swift in Sources */,
 				53F9262A2BFEA00E00948076 /* Job.swift in Sources */,
 				53E50C112C0E60A800A85FDC /* Month.swift in Sources */,
 				53F9262B2BFEA00E00948076 /* EKEvent.swift in Sources */,
