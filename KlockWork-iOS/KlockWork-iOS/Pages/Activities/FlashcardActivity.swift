@@ -188,7 +188,7 @@ struct FlashcardActivity: View {
                                                     .opacity(0.1)
 
                                                 NavigationLink {
-                                                    TermDetail(term: self.current)
+                                                    DefinitionDetail(definition: term)
                                                 } label: {
                                                     HStack(alignment: .center) {
                                                         Text(term.definition ?? "Definition not found")
@@ -248,6 +248,7 @@ extension FlashcardActivity.FlashcardDeck {
     /// Onload/onChangeJob handler
     /// - Returns: Void
     private func actionOnAppear() -> Void {
+        self.isAnswerCardShowing = false
         if self.job != nil {
             if let termsForJob = CoreDataTaxonomyTerms(moc: self.state.moc).byJob(self.job!) {
                 terms = termsForJob
