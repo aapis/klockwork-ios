@@ -16,6 +16,7 @@
 		5311F4022C17BFFF00FB3071 /* AssessmentThresholdForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4012C17BFFF00FB3071 /* AssessmentThresholdForm.swift */; };
 		5311F4062C17C66900FB3071 /* CDAssessmentThreshold.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */; };
 		5311F4082C17E86500FB3071 /* AssessmentTypeMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5311F4072C17E86500FB3071 /* AssessmentTypeMenu.swift */; };
+		53147EBE2C72A53A008850A9 /* FlashcardActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53147EBD2C72A536008850A9 /* FlashcardActivity.swift */; };
 		532441662C04428700659F14 /* Titlebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441652C04428700659F14 /* Titlebar.swift */; };
 		532441682C0531C800659F14 /* Rollups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532441672C0531C800659F14 /* Rollups.swift */; };
 		5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5324416C2C06485800659F14 /* ActivityCalendar.swift */; };
@@ -58,6 +59,7 @@
 		539135052C040D7500B48494 /* MiniTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539135042C040D7500B48494 /* MiniTitleBar.swift */; };
 		53B2C3692C1F7D65003507CE /* DefaultObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B2C3682C1F7D59003507CE /* DefaultObjects.swift */; };
 		53B2C36B2C22708D003507CE /* PageMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B2C36A2C22708A003507CE /* PageMode.swift */; };
+		53B72B5C2C77DDE900324E15 /* DefinitionDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B72B5B2C77DDE600324E15 /* DefinitionDetail.swift */; };
 		53C059B82C33BCAE0066111C /* RecordFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C059B72C33BCAA0066111C /* RecordFilter.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
@@ -130,6 +132,7 @@
 		5311F4012C17BFFF00FB3071 /* AssessmentThresholdForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentThresholdForm.swift; sourceTree = "<group>"; };
 		5311F4052C17C66900FB3071 /* CDAssessmentThreshold.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CDAssessmentThreshold.swift; path = ../../DLPrototype/DLPrototype/Models/CoreData/CDAssessmentThreshold.swift; sourceTree = "<group>"; };
 		5311F4072C17E86500FB3071 /* AssessmentTypeMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentTypeMenu.swift; sourceTree = "<group>"; };
+		53147EBD2C72A536008850A9 /* FlashcardActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashcardActivity.swift; sourceTree = "<group>"; };
 		532441652C04428700659F14 /* Titlebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Titlebar.swift; sourceTree = "<group>"; };
 		532441672C0531C800659F14 /* Rollups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rollups.swift; sourceTree = "<group>"; };
 		5324416C2C06485800659F14 /* ActivityCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCalendar.swift; sourceTree = "<group>"; };
@@ -174,6 +177,7 @@
 		539135042C040D7500B48494 /* MiniTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniTitleBar.swift; sourceTree = "<group>"; };
 		53B2C3682C1F7D59003507CE /* DefaultObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultObjects.swift; sourceTree = "<group>"; };
 		53B2C36A2C22708A003507CE /* PageMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageMode.swift; sourceTree = "<group>"; };
+		53B72B5B2C77DDE600324E15 /* DefinitionDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionDetail.swift; sourceTree = "<group>"; };
 		53C059B72C33BCAA0066111C /* RecordFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordFilter.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
@@ -282,6 +286,14 @@
 				53E3A2662C06B4DA004A85C3 /* Trends.swift */,
 			);
 			path = Widget;
+			sourceTree = "<group>";
+		};
+		53147EBC2C72A52F008850A9 /* Activities */ = {
+			isa = PBXGroup;
+			children = (
+				53147EBD2C72A536008850A9 /* FlashcardActivity.swift */,
+			);
+			path = Activities;
 			sourceTree = "<group>";
 		};
 		53274B3A2C13C7DB008387BF /* Extensions */ = {
@@ -440,6 +452,7 @@
 		53D4CB6F2BFE93B000AFEDEA /* Pages */ = {
 			isa = PBXGroup;
 			children = (
+				53147EBC2C72A52F008850A9 /* Activities */,
 				538A535F2C72765F00711639 /* Explore */,
 				53D4CB6B2BFE93B000AFEDEA /* AppSettings.swift */,
 				53D4CB6D2BFE93B000AFEDEA /* Planning.swift */,
@@ -452,6 +465,7 @@
 		53D4CB752BFE93B000AFEDEA /* Detail */ = {
 			isa = PBXGroup;
 			children = (
+				53B72B5B2C77DDE600324E15 /* DefinitionDetail.swift */,
 				538A53512C6FF1C200711639 /* TermDetail.swift */,
 				53D4CB702BFE93B000AFEDEA /* CompanyDetail.swift */,
 				53D4CB722BFE93B000AFEDEA /* JobDetail.swift */,
@@ -628,6 +642,7 @@
 				53F9262E2BFEA00E00948076 /* Color.swift in Sources */,
 				53F9262F2BFEA00E00948076 /* DispatchQueue.swift in Sources */,
 				53F926302BFEA00E00948076 /* View.swift in Sources */,
+				53147EBE2C72A53A008850A9 /* FlashcardActivity.swift in Sources */,
 				53E50C1D2C0E638100A85FDC /* Factor.swift in Sources */,
 				53F926312BFEA00E00948076 /* Date.swift in Sources */,
 				53E50C232C0FED0800A85FDC /* PlanTabs.swift in Sources */,
@@ -704,6 +719,7 @@
 				538A534C2C6FE8DA00711639 /* TermFilter.swift in Sources */,
 				53E6974C2C23ABA7005A7375 /* CompanySelector.swift in Sources */,
 				537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */,
+				53B72B5C2C77DDE900324E15 /* DefinitionDetail.swift in Sources */,
 				5311F3F92C1794FD00FB3071 /* PageActionBar.Planning.swift in Sources */,
 				539134F42C0391F000B48494 /* Projects.swift in Sources */,
 				53D4CB7C2BFE93B000AFEDEA /* AppSettings.swift in Sources */,

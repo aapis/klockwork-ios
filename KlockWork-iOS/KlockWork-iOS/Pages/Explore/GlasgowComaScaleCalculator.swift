@@ -34,10 +34,10 @@ struct GlasgowComaScaleCalculator: View {
                 name: "Eye opening response",
                 type: .eye,
                 responses: [
-                    GCSBehaviourResponse(response: "Spontaneously", score: 4, type: .eye),
-                    GCSBehaviourResponse(response: "To speech", score: 3, type: .eye),
-                    GCSBehaviourResponse(response: "To pain", score: 2, type: .eye),
-                    GCSBehaviourResponse(response: "No response", score: 1, type: .eye),
+                    GCSBehaviourResponse(response: "Spontaneously", helperAcronym: "A", score: 4, type: .eye),
+                    GCSBehaviourResponse(response: "To speech", helperAcronym: "V", score: 3, type: .eye),
+                    GCSBehaviourResponse(response: "To pain", helperAcronym: "P", score: 2, type: .eye),
+                    GCSBehaviourResponse(response: "No response", helperAcronym: "U", score: 1, type: .eye),
                 ]
             ),
             GCSBehaviour(
@@ -85,15 +85,32 @@ struct GlasgowComaScaleCalculator: View {
                             self.selected.append(GCSSelectedBehaviour(key: resp.id, value: resp.type, score: resp.score))
                             self.calculateScore()
                         } label: {
-                            HStack {
-                                Text(resp.response)
-                                Spacer()
-                                Text(String(resp.score))
+                            HStack(spacing: 0) {
+                                ZStack(alignment: .leading) {
+                                    LinearGradient(colors: [self.isSelected(resp) ? .blue : .black, .clear], startPoint: .trailing, endPoint: .leading)
+                                        .opacity(0.1)
+                                    HStack(spacing: 0) {
+                                        if resp.helperAcronym != nil {
+                                            Text(resp.helperAcronym!)
+                                                .font(.caption)
+                                                .foregroundStyle(self.isSelected(resp) ? .white : .gray)
+                                        }
+                                    }
+                                    .padding(8)
+                                }
+                                .frame(width: 30)
+
+                                HStack(spacing: 0) {
+                                    Text(resp.response)
+                                    Spacer()
+                                    Text(String(resp.score))
+                                }
+                                .padding(8)
+                                .foregroundStyle(self.isSelected(resp) ? .white : .gray)
+                                .background(self.isSelected(resp) ? .blue : Theme.rowColour)
                             }
-                            .padding(8)
-                            .foregroundStyle(self.selected.contains(where: {$0.key == resp.id}) ? .white : .gray)
-                            .background(self.selected.contains(where: {$0.key == resp.id}) ? .blue : Theme.rowColour)
                         }
+
                     }
                     Divider().background(.clear).frame(height: 8)
                 }
@@ -147,6 +164,7 @@ struct GlasgowComaScaleCalculator: View {
     struct GCSBehaviourResponse: Identifiable {
         var id: UUID = UUID()
         var response: String
+        var helperAcronym: String?
         var score: Int
         var type: GCSBehaviourType
     }
@@ -160,5 +178,12 @@ extension GlasgowComaScaleCalculator.Rulesboard {
         for chosen in selected {
             self.score += chosen.score
         }
+    }
+    
+    /// Determines which response is selected in each group
+    /// - Parameter resp: GlasgowComaScaleCalculator.GCSBehaviourResponse
+    /// - Returns: Bool
+    private func isSelected(_ resp: GlasgowComaScaleCalculator.GCSBehaviourResponse) -> Bool {
+        return self.selected.contains(where: {$0.key == resp.id})
     }
 }

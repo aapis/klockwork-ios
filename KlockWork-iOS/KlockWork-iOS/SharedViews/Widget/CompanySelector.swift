@@ -85,7 +85,7 @@ extension Widget {
                         .padding()
 
                         if items.filter({$0.alive == true}).count > 0 {
-                            ForEach(items.filter({$0.alive == true})) { corpo in
+                            ForEach(items.filter({$0.alive == true}), id: \.objectID) { corpo in
                                 Row(company: corpo, callback: { company in
                                     self.entity = company
                                     self.showing.toggle()

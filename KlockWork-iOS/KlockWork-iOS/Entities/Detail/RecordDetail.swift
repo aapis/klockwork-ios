@@ -72,13 +72,6 @@ struct RecordDetail: View {
                     Text("Save")
                 }
                 .foregroundStyle(self.state.theme.tint)
-                .alert("Saved", isPresented: $isSaveAlertPresented) {
-                    Button("OK") {
-                        dismiss()
-                    }
-                } message: {
-                    Text("It is done.")
-                }
             }
         }
         .sheet(isPresented: $isJobSelectorPresented) {
@@ -125,8 +118,8 @@ extension RecordDetail {
             )
         }
 
-        isSaveAlertPresented.toggle()
         PersistenceController.shared.save()
+        dismiss()
     }
 
     /// Soft delete a Task
