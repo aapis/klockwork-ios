@@ -11,7 +11,7 @@ import SwiftUI
 struct TaskDetail: View {
     @EnvironmentObject private var state: AppState
     @Environment(\.dismiss) private var dismiss
-    public var task: LogTask?
+    @State public var task: LogTask?
     @State private var completedDate: Date = Date()
     @State private var cancelledDate: Date = Date()
     @State private var content: String = ""
@@ -165,7 +165,7 @@ extension TaskDetail {
             self.task!.due = self.due
 
             if isCancelled {
-                self.task!.cancelledDate = self.cancelledDate
+                self.task!.cancelledDate = Date()
             } else if isCompleted {
                 self.task!.completedDate = Date()
             }

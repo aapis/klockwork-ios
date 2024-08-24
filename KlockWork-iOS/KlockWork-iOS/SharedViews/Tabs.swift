@@ -1199,15 +1199,20 @@ extension Tabs.Content {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
-                    HStack(alignment: .firstTextBaseline, spacing: 0) {
+                    HStack(alignment: .top, spacing: 0) {
                         Button {
                             isCompleted.toggle()
                             self.actionOnSave()
                         } label: {
-                            Image(systemName: isCompleted ? "square.fill" : "square")
-                                .font(.title2)
+                            VStack(alignment: .center, spacing: 0) {
+                                Spacer()
+                                Image(systemName: isCompleted ? "square.fill" : "square")
+                                    .font(.title2)
+                                Spacer()
+                            }
+                            .frame(width: 50)
+                            .background(.black.opacity(0.1))
                         }
-                        .padding(.trailing, 8)
 
                         NavigationLink {
                             TaskDetail(task: task)
@@ -1218,25 +1223,32 @@ extension Tabs.Content {
                                 Spacer()
                                 Image(systemName: "chevron.right")
                             }
+                            .padding(12)
                         }
                         .background(task.owner?.backgroundColor ?? Theme.rowColour)
                     }
                     .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
-                    .padding(12)
 
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         ZStack(alignment: .topLeading) {
                             LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                                .frame(height: 40)
                                 .opacity(0.1)
 
-                            HStack(alignment: .center) {
-                                Text("\(task.owner?.project?.company?.abbreviation ?? "DEF").\(task.owner?.project?.abbreviation ?? "DEF") > \(task.owner?.title ?? "_TASK_OWNER")")
-                                    .multilineTextAlignment(.leading)
-                                Spacer()
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(alignment: .center) {
+                                    Text("\(task.owner?.project?.company?.abbreviation ?? "DEF").\(task.owner?.project?.abbreviation ?? "DEF") > \(task.owner?.title ?? "_TASK_OWNER")")
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
+                                HStack(alignment: .center) {
+                                    Text("Due: \(task.due!.formatted(date: .abbreviated, time: .complete))")
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
                             }
-                            .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
                             .padding(8)
+                            .font(.caption)
+                            .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                         }
                     }
                 }

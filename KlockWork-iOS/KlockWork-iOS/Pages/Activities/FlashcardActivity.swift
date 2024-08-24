@@ -211,8 +211,8 @@ struct FlashcardActivity: View {
                         if self.current != nil {
                             VStack(alignment: .leading, spacing: 0) {
                                 Spacer()
-                                HStack(alignment: .center) {
-                                    Text("Clue:")
+                                VStack(alignment: .center) {
+                                    Text("Clue")
                                         .foregroundStyle((self.job?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
                                     Text(clue)
                                         .font(.title2)

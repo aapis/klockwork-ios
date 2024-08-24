@@ -563,6 +563,7 @@ extension PlanTabs {
                                         .font(.caption)
                                 }
                                 .background(.black.opacity(0.2))
+                                .border(width: 1, edges: [.bottom], color: .yellow)
 
                                 ForEach(row.tasks) { task in
                                     Row(task: task)
