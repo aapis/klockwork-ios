@@ -1191,6 +1191,92 @@ extension Tabs.Content {
             }
         }
 
+        struct SingleTaskDetailedChecklistItem: View {
+            @EnvironmentObject private var state: AppState
+            public let task: LogTask
+            @State private var isCompleted: Bool = false
+            @State private var isCancelled: Bool = false
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(alignment: .firstTextBaseline, spacing: 0) {
+                        Button {
+                            isCompleted.toggle()
+                            self.actionOnSave()
+                        } label: {
+                            Image(systemName: isCompleted ? "square.fill" : "square")
+                                .font(.title2)
+                        }
+                        .padding(.trailing, 8)
+
+                        NavigationLink {
+                            TaskDetail(task: task)
+                        } label: {
+                            HStack(alignment: .center) {
+                                Text(task.content ?? "_TASK_CONTENT")
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                            }
+                        }
+                        .background(task.owner?.backgroundColor ?? Theme.rowColour)
+                    }
+                    .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
+                    .padding(12)
+
+                    HStack(alignment: .firstTextBaseline, spacing: 0) {
+                        ZStack(alignment: .topLeading) {
+                            LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                                .frame(height: 40)
+                                .opacity(0.1)
+
+                            HStack(alignment: .center) {
+                                Text("\(task.owner?.project?.company?.abbreviation ?? "DEF").\(task.owner?.project?.abbreviation ?? "DEF") > \(task.owner?.title ?? "_TASK_OWNER")")
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                            }
+                            .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
+                            .padding(8)
+                        }
+                    }
+                }
+                .background(self.task.owner?.backgroundColor ?? Theme.rowColour)
+                .opacity(isCompleted ? 0.5 : 1.0)
+                .onAppear(perform: self.actionOnAppear)
+            }
+
+            /// Onload handler. Sets state vars isCompleted and isCancelled to default state
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+                self.isCompleted = self.task.completedDate != nil
+                self.isCancelled = self.task.cancelledDate != nil
+            }
+
+            /// Save handler. Saves completed or cancelled status for the given task.
+            /// - Returns: Void
+            private func actionOnSave() -> Void {
+                if self.isCompleted {
+                    self.task.completedDate = Date()
+
+                    // Create a record indicating when the task was completed
+                    CoreDataTasks(moc: self.state.moc).complete(self.task)
+                } else {
+                    self.task.completedDate = nil
+                }
+
+                if self.isCancelled {
+                    self.task.cancelledDate = Date()
+
+                    // Create a record indicating when the task was cancelled
+                    CoreDataTasks(moc: self.state.moc).cancel(self.task)
+                } else {
+                    self.task.cancelledDate = nil
+                }
+
+                PersistenceController.shared.save()
+            }
+        }
+
         struct SingleNote: View {
             public let note: Note
             private let page: PageConfiguration.AppPage = .modify

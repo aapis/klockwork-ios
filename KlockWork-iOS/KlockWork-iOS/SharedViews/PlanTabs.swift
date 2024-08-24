@@ -545,7 +545,7 @@ extension PlanTabs {
     }
 
     struct Upcoming: View {
-        typealias Row = Tabs.Content.Individual.SingleTaskChecklistItem
+        typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
 
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var upcoming: [UpcomingRow] = []
