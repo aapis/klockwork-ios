@@ -16,7 +16,7 @@ struct TaskDetail: View {
     @State private var cancelledDate: Date = Date()
     @State private var content: String = ""
     @State private var created: Date = Date()
-    @State private var due: Date = Date()
+    @State private var due: Date = DateHelper.endOfDay() ?? Date()
     @State private var lastUpdate: Date = Date()
     @State public var job: Job?
     @State private var company: Company?
