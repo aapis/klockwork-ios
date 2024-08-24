@@ -208,11 +208,13 @@ struct PrimaryAssessment {
         // @TODO: some kind of boolean selection method (i.e. Unconscious? tap here, Conscious? tap here)
     }
 
-    struct ScenarioRequirement: Identifiable {
+    struct ScenarioRequirement: Identifiable, Equatable {
         var id: UUID = UUID()
         var description: String
         var importance: Importance
         var notes: String?
+
+        // shim
 
         enum Importance {
             case normal, critical
@@ -270,8 +272,8 @@ struct PrimaryAssessment {
                                     Spacer()
                                 }
                                 .padding(5)
-                                .foregroundStyle(.gray)
-                                .background(Theme.rowColour)
+                                .foregroundStyle(current.requirement == req.id ? .white : .gray)
+                                .background(current.requirement == req.id ? .blue : Theme.rowColour)
                             }
                         }
                     }
@@ -284,11 +286,29 @@ struct PrimaryAssessment {
 extension PrimaryAssessment.Views.Progress {
     private func actionOnNext() -> Void {
         if let currentIndex = self.pa.sections.firstIndex(where: {$0.id == current.section}) {
-            let nextSection = self.pa.sections.index(after: currentIndex)
-            current.section = self.pa.sections[nextSection]
-                //            current.requirement =
-//                print("DERPO current.section=\(nextSection.name)")
-//            }
+            let nextIndex = self.pa.sections.index(after: currentIndex)
+            if let nextSection = self.pa.sections.enumerated().filter({$0.offset == nextIndex}).first {
+                if let currentSection = self.pa.sections.enumerated().filter({$0.offset == currentIndex}).first {
+                    let lastRequirementInSection = currentSection.element.requirements.last
+                    let currentRequirementIndex = currentSection.element.requirements.firstIndex(where: {$0.id == current.requirement}) ?? 0
+                    let currentRequirement = currentSection.element.requirements.enumerated().filter({$0.offset == currentRequirementIndex}).first
+                    let nextRequirementIndex = currentSection.element.requirements.index(after: currentRequirementIndex)
+                    let nextRequirement = currentSection.element.requirements.enumerated().filter({$0.offset == nextRequirementIndex}).first
+                    let nextSectionFirstRequirement = nextSection.element.requirements.first
+
+                    if let nReq = nextRequirement?.element {
+                        if nReq.id == lastRequirementInSection?.id {
+                            current.section = nextSection.element.id
+                            current.requirement = nextSectionFirstRequirement?.id
+                            print("DERPO changed sections to \(current.section!)")
+                            print("DERPO changed requirement to \(current.requirement!)")
+                        } else {
+                            current.requirement = nextRequirement?.element.id
+                            print("DERPO changed requirement to \(current.requirement!)")
+                        }
+                    }
+                }
+            }
         }
     }
 }
