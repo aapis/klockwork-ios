@@ -1240,10 +1240,12 @@ extension Tabs.Content {
                                         .multilineTextAlignment(.leading)
                                     Spacer()
                                 }
-                                HStack(alignment: .center) {
-                                    Text("Due: \(task.due!.formatted(date: .abbreviated, time: .complete))")
-                                        .multilineTextAlignment(.leading)
-                                    Spacer()
+                                if task.due != nil {
+                                    HStack(alignment: .center) {
+                                        Text("Due: \(task.due!.formatted(date: .abbreviated, time: .complete))")
+                                            .multilineTextAlignment(.leading)
+                                        Spacer()
+                                    }
                                 }
                             }
                             .padding(8)
