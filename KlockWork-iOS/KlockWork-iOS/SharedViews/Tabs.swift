@@ -228,7 +228,7 @@ extension Tabs.Content {
                     VStack(alignment: .leading, spacing: 1) {
                         if items.count > 0 {
                             ForEach(items) { task in
-                                Individual.SingleTaskChecklistItem(task: task)
+                                Individual.SingleTaskDetailedChecklistItem(task: task)
                             }
                         } else {
                             StatusMessage.Warning(message: "No tasks modified within the last 7 days")
