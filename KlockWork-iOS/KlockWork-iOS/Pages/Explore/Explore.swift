@@ -43,14 +43,13 @@ struct Explore: View {
         @EnvironmentObject private var state: AppState
 
         var body: some View {
-            HStack(alignment: .center) {
-                HStack(alignment: .center, spacing: 8) {
-                    Text("Explore")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding([.leading, .top, .bottom])
-                }
+            HStack(alignment: .center, spacing: 8) {
+                Text("Explore")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding([.leading, .top, .bottom])
                 Spacer()
+                CreateEntitiesButton(isViewModeSelectorVisible: false)
             }
         }
     }

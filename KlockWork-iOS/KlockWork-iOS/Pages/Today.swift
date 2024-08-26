@@ -8,6 +8,26 @@
 
 import SwiftUI
 
+struct CreateEntitiesButton: View {
+    public var isViewModeSelectorVisible: Bool = true
+    var body: some View {
+        HStack(alignment: .center, spacing: 8) {
+            Today.AddButton()
+            if isViewModeSelectorVisible {
+                Today.ViewModeSelector()
+            }
+        }
+        .padding(10)
+        .background(
+            LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .leading, endPoint: .trailing)
+                .opacity(0.4)
+                .blendMode(.softLight)
+                .frame(height: 50)
+        )
+        .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 16))
+    }
+}
+
 struct Today: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias PlanType = PageConfiguration.PlanType
@@ -104,19 +124,7 @@ extension Today {
                         }
                     Image(systemName: "chevron.right")
                     Spacer()
-
-                    HStack(alignment: .center, spacing: 8) {
-                        AddButton()
-                        ViewModeSelector()
-                    }
-                    .padding(10)
-                    .background(
-                        LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .leading, endPoint: .trailing)
-                            .opacity(0.4)
-                            .blendMode(.softLight)
-                            .frame(height: 50)
-                    )
-                    .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 16))
+                    CreateEntitiesButton()
                 }
             }
             .onAppear(perform: {

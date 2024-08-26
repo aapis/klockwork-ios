@@ -106,19 +106,24 @@ extension Find {
                     Text("Find")
                         .font(.largeTitle)
                         .fontWeight(.bold)
+                        .padding([.leading, .top, .bottom])
                 } else {
                     if text.count < 10 {
                         Text("Find: \(text.prefix(10))")
                             .font(.largeTitle)
                             .fontWeight(.bold)
+                            .padding([.leading, .top, .bottom])
                     } else {
                         Text("Find: \(text.prefix(10))...")
                             .font(.largeTitle)
                             .fontWeight(.bold)
+                            .padding([.leading, .top, .bottom])
                     }
                 }
 
                 Spacer()
+                CreateEntitiesButton(isViewModeSelectorVisible: false)
+                // @TODO: move to CreateEntitiesButton
 //                NavigationLink {
 //                    AppSettings()
 //                } label: {
@@ -126,7 +131,6 @@ extension Find {
 //                        .font(.title)
 //                }
             }
-            .padding()
         }
     }
 

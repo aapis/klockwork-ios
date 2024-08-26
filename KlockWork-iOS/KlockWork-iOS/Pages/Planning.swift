@@ -47,27 +47,24 @@ extension Planning {
         public let page: PageConfiguration.AppPage
 
         var body: some View {
-            HStack(alignment: .center) {
-                HStack(alignment: .center, spacing: 8) {
-                    Text("Planning")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding([.leading, .top, .bottom])
-                        .overlay {
-                            DatePicker(
-                                "Date picker",
-                                selection: $date,
-                                displayedComponents: [.date]
-                            )
-                            .labelsHidden()
-                            .contentShape(Rectangle())
-                            .opacity(0.011)
-                        }
-                    Image(systemName: "chevron.right")
-                    Spacer()
-                    LargeDateIndicator(page: self.page)
-                }
+            HStack(alignment: .center, spacing: 8) {
+                Text("Planning")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .padding([.leading, .top, .bottom])
+                    .overlay {
+                        DatePicker(
+                            "Date picker",
+                            selection: $date,
+                            displayedComponents: [.date]
+                        )
+                        .labelsHidden()
+                        .contentShape(Rectangle())
+                        .opacity(0.011)
+                    }
+                Image(systemName: "chevron.right")
                 Spacer()
+                CreateEntitiesButton(isViewModeSelectorVisible: false)
             }
             .onAppear(perform: {
                 date = self.state.date
