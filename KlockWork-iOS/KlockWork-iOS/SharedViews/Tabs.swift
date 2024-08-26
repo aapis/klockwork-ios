@@ -605,7 +605,7 @@ extension Tabs.Content {
                     CoreDataTasks(moc: self.state.moc).create(
                         content: self.newTaskContent,
                         created: Date(),
-                        due: Date(),
+                        due: DateHelper.endOfDay() ?? Date(),
                         job: self.entity
                     )
 
