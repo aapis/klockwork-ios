@@ -186,7 +186,9 @@ struct NoteDetail: View {
                                 starred: $starred,
                                 alive: $alive,
                                 lastUpdate: $lastUpdate,
-                                created: $versionCreatedDate
+                                created: $versionCreatedDate,
+                                title: $versionTitle,
+                                note: note
                             )
                         } label: {
                             HStack(spacing: 5) {
@@ -227,11 +229,16 @@ struct NoteDetail: View {
     }
 
     struct MetaData: View {
+        @EnvironmentObject private var state: AppState
+        @Environment(\.dismiss) private var dismiss
         private let page: PageConfiguration.AppPage = .create
         @Binding public var starred: Bool
         @Binding public var alive: Bool
         @Binding public var lastUpdate: Date
         @Binding public var created: Date
+        @Binding public var title: String
+        public var note: Note?
+        @State private var isDeleteAlertPresented: Bool = false
 
         var body: some View {
             VStack {
@@ -253,6 +260,19 @@ struct NoteDetail: View {
                         )
                     }
                     .listRowBackground(Theme.textBackground)
+
+                    if self.note != nil {
+                        Button("Delete Note", role: .destructive, action: self.actionInitiateDelete)
+                            .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                                Button("Yes", role: .destructive) {
+                                    self.actionOnDelete()
+                                }
+                            } message: {
+                                Text("\"\(self.note!.title ?? "_NOTE_TITLE")\" will be permanently deleted.")
+                            }
+                            .listRowBackground(Color.red)
+                            .foregroundStyle(.white)
+                    }
                 }
             }
             .navigationTitle("Metadata")
@@ -323,8 +343,7 @@ extension NoteDetail {
             )
         }
 
-        isSaveAlertPresented.toggle()
-//        dismiss() // @TODO: this is what we want, but test it
+        dismiss()
     }
 }
 
@@ -348,5 +367,32 @@ extension NoteDetail.Editor {
                 }
             }
         }
+    }
+}
+
+extension NoteDetail.MetaData {
+    /// Soft delete a Task
+    /// - Returns: Void
+    private func actionOnDelete() -> Void {
+        if self.note != nil {
+            self.state.moc.delete(self.note!)
+
+            if let job = self.note!.mJob {
+                CoreDataRecords(moc: self.state.moc).createWithJob(
+                    job: job,
+                    date: self.note!.lastUpdate!,
+                    text: "Deleted note: \(self.note!.title ?? "_NOTE_NOT_FOUND")"
+                )
+            }
+        }
+
+        PersistenceController.shared.save()
+        dismiss()
+    }
+
+    /// Opens the delete object alert
+    /// - Returns: Void
+    private func actionInitiateDelete() -> Void {
+        self.isDeleteAlertPresented.toggle()
     }
 }
