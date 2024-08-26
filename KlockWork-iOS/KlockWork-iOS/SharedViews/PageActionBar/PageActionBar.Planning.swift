@@ -57,12 +57,12 @@ extension PageActionBar {
                 self.isPresented.toggle()
             } label: {
                 HStack(alignment: .center) {
-                    Image(systemName: "chevron.up.circle.fill")
+                    Image(systemName: "hammer.circle.fill")
                         .fontWeight(.bold)
                         .font(.largeTitle)
 
                     if self.selectedJobs.count == 0 {
-                        Text("Add jobs to get started")
+                        Text("Choose jobs to get started")
                             .fontWeight(.bold)
                     }
                     Spacer()

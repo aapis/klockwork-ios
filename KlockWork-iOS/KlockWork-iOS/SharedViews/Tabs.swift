@@ -283,16 +283,19 @@ extension Tabs.Content {
             @FetchRequest private var items: FetchedResults<Company>
 
             var body: some View {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        if self.items.count > 0 {
-                            ForEach(self.items, id: \Company.objectID) { item in
-                                TopLevel(entity: item)
+                VStack(alignment: .leading, spacing: 0) {
+                    Divider().background(.white).frame(height: 1)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            if self.items.count > 0 {
+                                ForEach(self.items, id: \Company.objectID) { item in
+                                    TopLevel(entity: item)
+                                }
+                            } else {
+                                StatusMessage.Warning(message: "No companies updated within the last 7 days")
                             }
-                        } else {
-                            StatusMessage.Warning(message: "No companies updated within the last 7 days")
+                            Spacer()
                         }
-                        Spacer()
                     }
                 }
                 .navigationTitle("Hierarchy Explorer")

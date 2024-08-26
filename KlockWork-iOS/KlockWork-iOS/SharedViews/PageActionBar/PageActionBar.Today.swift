@@ -45,7 +45,7 @@ extension PageActionBar {
                 self.isPresented.toggle()
             } label: {
                 HStack(alignment: .center, spacing: 10) {
-                    Image(systemName: "chevron.up.circle.fill")
+                    Image(systemName: "hammer.circle.fill")
                         .fontWeight(.bold)
                         .font(.largeTitle)
                     if job == nil {
