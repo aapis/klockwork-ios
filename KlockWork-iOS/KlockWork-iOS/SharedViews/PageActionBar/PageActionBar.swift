@@ -42,7 +42,6 @@ struct PageActionBarSingleAction: View {
         VStack {
             Button {
                 self.onSave()
-                isSaveAlertPresented.toggle()
             } label: {
                 HStack(alignment: .center) {
                     Image(systemName: "plus.circle.fill")
@@ -52,13 +51,6 @@ struct PageActionBarSingleAction: View {
                         .bold()
                     Spacer()
                 }
-            }
-            .alert("Saved", isPresented: $isSaveAlertPresented) {
-                Button("OK") {
-                    dismiss()
-                }
-            } message: {
-                Text("Save was successful")
             }
             .padding(8)
             .background((job?.backgroundColor ?? self.page.primaryColour).opacity(0.4))
