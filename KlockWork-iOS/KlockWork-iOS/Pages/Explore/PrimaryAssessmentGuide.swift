@@ -11,6 +11,7 @@ struct PrimaryAssessmentGuide: View {
     typealias Coordinates = PrimaryAssessment.ScenarioCoordinates
     typealias PAType = PrimaryAssessment.ScenarioType
 
+    @Environment(\.colorScheme) var colorScheme
     private let page: PageConfiguration.AppPage = .explore
     private let pa: PrimaryAssessment = PrimaryAssessment()
     @State private var current: Coordinates// = Coordinates()
@@ -20,7 +21,7 @@ struct PrimaryAssessmentGuide: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Image(systemName: "stethoscope")
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.gray)
                 Text("PA Guide")
                 Spacer()
             }
@@ -44,24 +45,21 @@ struct PrimaryAssessmentGuide: View {
                 }
             }
 
-            ZStack {
-                LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
-                    .opacity(0.8)
-                VStack(alignment: .leading, spacing: 0) {
-                    PrimaryAssessment.Views.SectionList(pa: self.pa, current: $current, type: $type)
-                    PrimaryAssessment.Views.Progress(pa: self.pa, current: $current)
-                        .background(type.colour)
-                }
+            VStack(alignment: .leading, spacing: 0) {
+                PrimaryAssessment.Views.SectionList(pa: self.pa, current: $current, type: $type)
+//                    PrimaryAssessment.Views.Progress(pa: self.pa, current: $current)
+//                        .background(type.colour)
             }
         }
-        .background(self.page.primaryColour)
+        .foregroundStyle(.black)
+        .background(.white)
         .scrollDismissesKeyboard(.immediately)
         .navigationTitle("Primary Assessment Guide")
         .toolbar(.hidden)
     }
 
     init() {
-        self.current = Coordinates()//Coordinates(section: self.pa.sections.first!.id, requirement: self.pa.sections.first!.requirements.first!.id, type: .medical)
+        self.current = Coordinates()
     }
 }
 
@@ -246,7 +244,7 @@ struct PrimaryAssessment {
                         ScenarioRequirement(description: "Hazard assessment (see/hear/smell)", importance: .critical),
                         ScenarioRequirement(description: "How many patients?", importance: .normal),
                         ScenarioRequirement(description: "Request backup", importance: .normal),
-                        ScenarioRequirement(description: "MOI?", importance: .normal)
+                        ScenarioRequirement(description: "MOI?", importance: .critical)
                     ]
                 ),
                 ScenarioSection(
@@ -276,9 +274,6 @@ struct PrimaryAssessment {
                     ]
                 ),
                 ScenarioSection(
-                    name: "ABCs"
-                ),
-                ScenarioSection(
                     name: "Airway",
                     requirements: [
                         ScenarioRequirement(description: "Patent?", importance: .critical),
@@ -306,182 +301,219 @@ struct PrimaryAssessment {
                     name: "Interventions?"
                 ),
                 ScenarioSection(
-                    name: "Focused OR Rapid assessment?"
-                ),
-                ScenarioSection(
-                    name: "Rapid trauma survey"
-                ),
-                ScenarioSection(
-                    name: "Head & Neck",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC (deformity, contustion, abrasion, penetration, burns, lacerations, swelling, tenderness, instability, crepitus)", importance: .critical),
-                        ScenarioRequirement(description: "JVD?", importance: .normal),
-                        ScenarioRequirement(description: "Trachea midline?", importance: .normal),
-                        ScenarioRequirement(description: "ACTION apply c-spine", importance: .critical)
+                    name: "MOI indicates which survey?",
+                    decisionPointRapidOrFocusedChoices: ITLSAssessmentType.allCases,
+                    subSections: [
+                        ScenarioSection(
+                            name: "Rapid Trauma Survey",
+                            decisionPointRapidOrFocused: .rapid,
+                            subSections: [
+                                ScenarioSection(
+                                    name: "Head & Neck",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC (deformity, contustion, abrasion, penetration, burns, lacerations, swelling, tenderness, instability, crepitus)", importance: .critical),
+                                        ScenarioRequirement(description: "JVD?", importance: .normal),
+                                        ScenarioRequirement(description: "Trachea midline?", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION apply c-spine", importance: .critical)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Chest",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
+                                        ScenarioRequirement(description: "Chest asymmetrical?", importance: .normal),
+                                        ScenarioRequirement(description: "SQ emphysema?", importance: .normal),
+                                        ScenarioRequirement(description: "Paradoxical motion?", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION Auscultate for lung/heart sounds", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION if decreased, percuss", importance: .normal)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Abdomen",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DRT (distension, rigidity, tenderness)", importance: .critical),
+                                        ScenarioRequirement(description: "Evisceration, bruising, penetration?", importance: .normal)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Pelvis",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for TIC", importance: .critical),
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Lower/upper extremities",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
+                                        ScenarioRequirement(description: "ACTION check CMS x4", importance: .normal),
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Back",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
+                                    ]
+                                ),
+                            ]
+                        ),
+                        ScenarioSection(
+                            name: "Focused Exam",
+                            decisionPointRapidOrFocused: .focused,
+                            subSections: [
+                                ScenarioSection(
+                                    name: "Area of injury",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Vitals",
+                                    requirements: [
+                                        ScenarioRequirement(description: "Pulse?", importance: .normal),
+                                        ScenarioRequirement(description: "BP?", importance: .normal),
+                                        ScenarioRequirement(description: "RR?", importance: .normal),
+                                        ScenarioRequirement(description: "GCS?", importance: .normal),
+                                        ScenarioRequirement(description: "Pupils PERL?", importance: .normal)
+                                    ]
+                                ),
+                            ]
+                        ),
                     ]
                 ),
                 ScenarioSection(
-                    name: "Chest",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
-                        ScenarioRequirement(description: "Chest asymmetrical?", importance: .normal),
-                        ScenarioRequirement(description: "SQ emphysema?", importance: .normal),
-                        ScenarioRequirement(description: "Paradoxical motion?", importance: .normal),
-                        ScenarioRequirement(description: "ACTION Auscultate for lung/heart sounds", importance: .normal),
-                        ScenarioRequirement(description: "ACTION if decreased, percuss", importance: .normal)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Abdomen",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for DRT (distension, rigidity, tenderness)", importance: .critical),
-                        ScenarioRequirement(description: "Evisceration, bruising, penetration?", importance: .normal)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Pelvis",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for TIC", importance: .critical),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Lower/upper extremities",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
-                        ScenarioRequirement(description: "ACTION check CMS x4", importance: .normal),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Back",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "ACTION Pt critical? ONGOING EXAM. Pt stable? SECONDARY SURVEY"
-                ),
-                ScenarioSection(
-                    name: "Ongoing exam"
-                ),
-                ScenarioSection(
-                    name: "Hx",
-                    requirements: [
-                        ScenarioRequirement(description: "SAMPLE?", importance: .critical),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "LOC",
-                    requirements: [
-                        ScenarioRequirement(description: "AVPU?", importance: .normal),
-                        ScenarioRequirement(description: "Pupils PERL?", importance: .normal)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Vitals",
-                    requirements: [
-                        ScenarioRequirement(description: "BGL?", importance: .normal),
-                        ScenarioRequirement(description: "Sp02?", importance: .normal),
-                        ScenarioRequirement(description: "Pulse?", importance: .normal),
-                        ScenarioRequirement(description: "BP?", importance: .normal),
-                        ScenarioRequirement(description: "RR?", importance: .normal),
-                        ScenarioRequirement(description: "Temp?", importance: .normal),
-                        ScenarioRequirement(description: "Skin?", importance: .normal),
-                        ScenarioRequirement(description: "GCS?", importance: .normal)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Airway",
-                    requirements: [
-                        ScenarioRequirement(description: "Patent?", importance: .normal),
-                        ScenarioRequirement(description: "Snoring, gurgling, stridor, or silence?", importance: .normal),
-                        ScenarioRequirement(description: "Signs of inhalation injury?", importance: .normal),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Breathing",
-                    requirements: [
-                        ScenarioRequirement(description: "RDE?", importance: .normal),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Circulation",
-                    requirements: [
-                        ScenarioRequirement(description: "RRQ @ radial & carotid?", importance: .normal),
-                        ScenarioRequirement(description: "Skin colour, condition, temperature, cap refill?", importance: .normal),
-                        ScenarioRequirement(description: "Is bleeding still controlled?", importance: .critical)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Physical exam"
-                ),
-                ScenarioSection(
-                    name: "Neck",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .normal),
-                        ScenarioRequirement(description: "JVD?", importance: .normal),
-                        ScenarioRequirement(description: "Trachea midline?", importance: .normal),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Chest",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
-                        ScenarioRequirement(description: "Chest asymmetrical?", importance: .normal),
-                        ScenarioRequirement(description: "SQ emphysema?", importance: .normal),
-                        ScenarioRequirement(description: "Paradoxical motion?", importance: .normal),
-                        ScenarioRequirement(description: "ACTION Auscultate for lung/heart sounds", importance: .normal),
-                        ScenarioRequirement(description: "ACTION if decreased, percuss", importance: .normal)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Abdomen",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION Looking/feeling for DRT (distension, rigidity, tenderness)", importance: .critical),
-                        ScenarioRequirement(description: "Evisceration, bruising, penetration?", importance: .normal)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Every 5 mins",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION reassess LOC", importance: .normal),
-                        ScenarioRequirement(description: "ACTION reassess ABCs", importance: .normal),
-                        ScenarioRequirement(description: "ACTION reassess all interventions", importance: .normal),
-                        ScenarioRequirement(description: "ACTION reassess vitals", importance: .normal)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "ITLS Secondary Survey",
-                    requirements: [
-                        ScenarioRequirement(description: "Reassess LOC", importance: .normal),
-                        ScenarioRequirement(description: "Reassess ABCs", importance: .normal),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Hx",
-                    requirements: [
-                        ScenarioRequirement(description: "SAMPLE?", importance: .critical),
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Vitals",
-                    requirements: [
-                        ScenarioRequirement(description: "BGL?", importance: .normal),
-                        ScenarioRequirement(description: "Sp02?", importance: .normal),
-                        ScenarioRequirement(description: "Pulse?", importance: .normal),
-                        ScenarioRequirement(description: "BP?", importance: .normal),
-                        ScenarioRequirement(description: "RR?", importance: .normal),
-                        ScenarioRequirement(description: "Temp?", importance: .normal),
-                        ScenarioRequirement(description: "Skin?", importance: .normal),
-                        ScenarioRequirement(description: "GCS?", importance: .normal)
-                    ]
-                ),
-                ScenarioSection(
-                    name: "Every 15 mins",
-                    requirements: [
-                        ScenarioRequirement(description: "ACTION reassess LOC", importance: .normal),
-                        ScenarioRequirement(description: "ACTION reassess ABCs", importance: .normal),
-                        ScenarioRequirement(description: "ACTION reassess all interventions", importance: .normal),
-                        ScenarioRequirement(description: "ACTION reassess vitals", importance: .normal)
+                    name: "Patient stability",
+                    decisionPointOngoingOrSecondaryChoices: ITLSSecondarySurveyType.allCases,
+                    subSections: [
+                        ScenarioSection(
+                            name: "Ongoing exam",
+                            decisionPointOngoingOrSecondary: .ongoing,
+                            subSections: [
+                                ScenarioSection(
+                                    name: "Hx",
+                                    requirements: [
+                                        ScenarioRequirement(description: "SAMPLE?", importance: .critical),
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "LOC",
+                                    requirements: [
+                                        ScenarioRequirement(description: "AVPU?", importance: .normal),
+                                        ScenarioRequirement(description: "Pupils PERL?", importance: .normal)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Vitals",
+                                    requirements: [
+                                        ScenarioRequirement(description: "BGL?", importance: .normal),
+                                        ScenarioRequirement(description: "Sp02?", importance: .normal),
+                                        ScenarioRequirement(description: "Pulse?", importance: .normal),
+                                        ScenarioRequirement(description: "BP?", importance: .normal),
+                                        ScenarioRequirement(description: "RR?", importance: .normal),
+                                        ScenarioRequirement(description: "Temp?", importance: .normal),
+                                        ScenarioRequirement(description: "Skin?", importance: .normal),
+                                        ScenarioRequirement(description: "GCS?", importance: .normal)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Airway",
+                                    requirements: [
+                                        ScenarioRequirement(description: "Patent?", importance: .normal),
+                                        ScenarioRequirement(description: "Snoring, gurgling, stridor, or silence?", importance: .normal),
+                                        ScenarioRequirement(description: "Signs of inhalation injury?", importance: .normal),
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Breathing",
+                                    requirements: [
+                                        ScenarioRequirement(description: "RDE?", importance: .normal),
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Circulation",
+                                    requirements: [
+                                        ScenarioRequirement(description: "RRQ @ radial & carotid?", importance: .normal),
+                                        ScenarioRequirement(description: "Skin colour, condition, temperature, cap refill?", importance: .normal),
+                                        ScenarioRequirement(description: "Is bleeding still controlled?", importance: .critical)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Physical exam"
+                                ),
+                                ScenarioSection(
+                                    name: "Neck",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .normal),
+                                        ScenarioRequirement(description: "JVD?", importance: .normal),
+                                        ScenarioRequirement(description: "Trachea midline?", importance: .normal),
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Chest",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
+                                        ScenarioRequirement(description: "Chest asymmetrical?", importance: .normal),
+                                        ScenarioRequirement(description: "SQ emphysema?", importance: .normal),
+                                        ScenarioRequirement(description: "Paradoxical motion?", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION Auscultate for lung/heart sounds", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION if decreased, percuss", importance: .normal)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Abdomen",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION Looking/feeling for DRT (distension, rigidity, tenderness)", importance: .critical),
+                                        ScenarioRequirement(description: "Evisceration, bruising, penetration?", importance: .normal)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Every 5 mins",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION reassess LOC", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION reassess ABCs", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION reassess all interventions", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION reassess vitals", importance: .normal)
+                                    ]
+                                ),
+                            ]
+                        ),
+                        ScenarioSection(
+                            name: "ITLS Secondary Survey",
+                            requirements: [
+                                ScenarioRequirement(description: "Reassess LOC", importance: .normal),
+                                ScenarioRequirement(description: "Reassess ABCs", importance: .normal),
+                            ],
+                            decisionPointOngoingOrSecondary: .secondary,
+                            subSections: [
+                                ScenarioSection(
+                                    name: "Hx",
+                                    requirements: [
+                                        ScenarioRequirement(description: "SAMPLE?", importance: .critical),
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Vitals",
+                                    requirements: [
+                                        ScenarioRequirement(description: "BGL?", importance: .normal),
+                                        ScenarioRequirement(description: "Sp02?", importance: .normal),
+                                        ScenarioRequirement(description: "Pulse?", importance: .normal),
+                                        ScenarioRequirement(description: "BP?", importance: .normal),
+                                        ScenarioRequirement(description: "RR?", importance: .normal),
+                                        ScenarioRequirement(description: "Temp?", importance: .normal),
+                                        ScenarioRequirement(description: "Skin?", importance: .normal),
+                                        ScenarioRequirement(description: "GCS?", importance: .normal)
+                                    ]
+                                ),
+                                ScenarioSection(
+                                    name: "Every 15 mins",
+                                    requirements: [
+                                        ScenarioRequirement(description: "ACTION reassess LOC", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION reassess ABCs", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION reassess all interventions", importance: .normal),
+                                        ScenarioRequirement(description: "ACTION reassess vitals", importance: .normal)
+                                    ]
+                                ),
+                            ]
+                        )
                     ]
                 ),
                 ScenarioSection(
@@ -519,10 +551,38 @@ struct PrimaryAssessment {
         }
     }
 
+    enum ITLSAssessmentType: CaseIterable {
+        case rapid, focused
+
+        var label: String {
+            switch self {
+            case .rapid: "Rapid"
+            case .focused: "Focused"
+            }
+        }
+    }
+
+    enum ITLSSecondarySurveyType: CaseIterable {
+        case ongoing, secondary
+
+        var label: String {
+            switch self {
+            case .ongoing: "Ongoing"
+            case .secondary: "Secondary"
+            }
+        }
+    }
+
     struct ScenarioSection: Identifiable {
         var id: UUID = UUID()
         var name: String
         var requirements: [ScenarioRequirement] = []
+        var decisionPointRapidOrFocusedChoices: [ITLSAssessmentType]?
+        var decisionPointRapidOrFocused: ITLSAssessmentType?
+        var decisionPointOngoingOrSecondaryChoices: [ITLSSecondarySurveyType]?
+        var decisionPointOngoingOrSecondary: ITLSSecondarySurveyType?
+        var action: AnyView?
+        var subSections: [ScenarioSection] = []
         // @TODO: some kind of boolean selection method (i.e. Unconscious? tap here, Conscious? tap here)
     }
 
@@ -531,8 +591,6 @@ struct PrimaryAssessment {
         var description: String
         var importance: Importance
         var notes: String?
-
-        // shim
 
         enum Importance {
             case normal, critical
@@ -543,6 +601,8 @@ struct PrimaryAssessment {
         var section: UUID?
         var requirement: UUID?
         var type: ScenarioType?
+        var decisionPointRapidOrFocused: ITLSAssessmentType?
+        var decisionPointOngoingOrSecondary: ITLSSecondarySurveyType?
     }
 
     struct Views {
@@ -579,27 +639,139 @@ struct PrimaryAssessment {
                     ForEach(self.pa.scenarios, id: \.id) { scenario in
                         if scenario.type == self.type {
                             ForEach(scenario.sections, id: \.id) { section in
-                                VStack(alignment: .leading, spacing: 1) {
-                                    HStack(alignment: .center) {
-                                        Text(section.name)
-                                            .font(.title2)
-                                            .bold()
-                                        Spacer()
-                                    }
-                                    .padding(8)
-                                    .foregroundStyle(current.section == section.id ? .white : .gray)
-                                    .background(current.section == section.id ? .blue : Theme.rowColour)
+                                if !section.subSections.isEmpty {
+                                    DecisionPoint(section: section, current: $current, type: $type)
+                                } else {
+                                    SingleSection(section: section, current: $current)
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(8)
+            }
 
-                                    ForEach(section.requirements) { req in
-                                        HStack(alignment: .center) {
-                                            Text(req.description)
-                                            Spacer()
+            struct DecisionPoint: View {
+                @State public var section: ScenarioSection
+                @Binding public var current: Coordinates
+                @Binding public var type: PrimaryAssessment.ScenarioType
+
+                var body: some View {
+                    VStack(alignment: .leading, spacing: 1) {
+                        HStack(alignment: .center) {
+                            Image(systemName: "stethoscope")
+                                .foregroundStyle(.gray)
+                            Text(section.name)
+                            Spacer()
+                        }
+                        .font(.title2)
+                        .bold()
+                        .padding()
+                        .background(.gray.opacity(0.6))
+
+                        if section.decisionPointRapidOrFocusedChoices != nil {
+                            HStack(alignment: .center, spacing: 0) {
+                                ForEach(section.decisionPointRapidOrFocusedChoices!, id: \.self) { iType in
+                                    Button {
+                                        current.decisionPointRapidOrFocused = iType
+                                    } label: {
+                                        HStack(alignment: .center, spacing: 0) {
+                                            HStack {
+                                                Spacer()
+                                                Text(iType.label)
+                                                    .padding()
+                                                Spacer()
+                                            }
                                         }
-                                        .padding(8)
-                                        .foregroundStyle(current.requirement == req.id ? .white : .gray)
-                                        .background(current.requirement == req.id ? .blue : req.importance == .critical ? .yellow : Theme.rowColour)
+                                        .background(iType == current.decisionPointRapidOrFocused ? type.colour : .black.opacity(0.4))
                                     }
                                 }
+                            }
+                            .foregroundStyle(.white)
+                            .background(.gray)
+
+                            if current.decisionPointRapidOrFocused != nil {
+                                ForEach(section.subSections, id: \.id) { subSection in
+                                    if current.decisionPointRapidOrFocused == subSection.decisionPointRapidOrFocused {
+                                        SingleSection(section: subSection, current: $current)
+                                    }
+                                }
+                            }
+
+                        } else if section.decisionPointOngoingOrSecondaryChoices != nil {
+                            HStack(alignment: .center, spacing: 0) {
+                                ForEach(section.decisionPointOngoingOrSecondaryChoices!, id: \.self) { iType in
+                                    Button {
+                                        current.decisionPointOngoingOrSecondary = iType
+                                    } label: {
+                                        HStack(alignment: .center, spacing: 0) {
+                                            HStack {
+                                                Spacer()
+                                                Text(iType.label)
+                                                    .padding()
+                                                Spacer()
+                                            }
+                                        }
+                                        .background(iType == current.decisionPointOngoingOrSecondary ? type.colour : .black.opacity(0.4))
+                                    }
+                                }
+                            }
+                            .foregroundStyle(.white)
+                            .background(.gray)
+
+                            if current.decisionPointOngoingOrSecondary != nil {
+                                ForEach(section.subSections, id: \.id) { subSection in
+                                    if current.decisionPointOngoingOrSecondary == subSection.decisionPointOngoingOrSecondary {
+                                        SingleSection(section: subSection, current: $current)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            struct SingleSection: View {
+                typealias Coordinates = PrimaryAssessment.ScenarioCoordinates
+
+                public var section: ScenarioSection
+                @Binding public var current: Coordinates
+                @State private var completed: Bool = false
+
+                var body: some View {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Button {
+                            self.completed.toggle()
+                        } label: {
+                            HStack(alignment: .center) {
+                                Text(section.name)
+                                    .font(.title2)
+                                    .bold()
+                                Spacer()
+
+                                if self.completed {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                            .padding(8)
+                            //                        .foregroundStyle(current.section == section.id ? .white : .gray)
+                            .background(current.section == section.id ? .blue : .gray.opacity(0.6))
+                        }
+
+                        ForEach(section.requirements) { req in
+                            HStack(alignment: .center) {
+                                Text(req.description)
+                                Spacer()
+                            }
+                            .padding(8)
+//                            .foregroundStyle(current.requirement == req.id ? .white : .gray)
+                            .background(current.requirement == req.id ? .blue : req.importance == .critical ? .yellow : .gray.opacity(0.4))
+                        }
+                        .opacity(self.completed ? 0.5 : 1)
+
+                        if !section.subSections.isEmpty {
+                            ForEach(section.subSections, id: \.id) { subSection in
+                                SingleSection(section: subSection, current: $current)
                             }
                         }
                     }
