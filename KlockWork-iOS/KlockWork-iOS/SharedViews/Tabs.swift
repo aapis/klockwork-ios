@@ -1197,6 +1197,7 @@ extension Tabs.Content {
         struct SingleTaskDetailedChecklistItem: View {
             @EnvironmentObject private var state: AppState
             public let task: LogTask
+            public var callback: (() -> Void)? = nil
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
 
@@ -1206,6 +1207,7 @@ extension Tabs.Content {
                         Button {
                             isCompleted.toggle()
                             self.actionOnSave()
+                            if let cb = callback { cb() }
                         } label: {
                             VStack(alignment: .center, spacing: 0) {
                                 Spacer()
