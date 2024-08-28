@@ -313,8 +313,9 @@ extension NoteDetail {
                     self.content = current.content ?? ""
                 }
             }
+        } else {
+            self.job = self.state.job
         }
-
     }
     
     /// Save a new version

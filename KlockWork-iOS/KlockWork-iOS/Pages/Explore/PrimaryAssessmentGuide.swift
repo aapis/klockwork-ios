@@ -218,14 +218,14 @@ struct PrimaryAssessment {
                 ScenarioSection(
                     name: "Vitals",
                     requirements: [
-                        ScenarioRequirement(description: "BGL?", importance: .critical),
-                        ScenarioRequirement(description: "Sp02?", importance: .critical),
-                        ScenarioRequirement(description: "Pulse?", importance: .critical),
-                        ScenarioRequirement(description: "BP?", importance: .critical),
-                        ScenarioRequirement(description: "RR?", importance: .critical),
-                        ScenarioRequirement(description: "Temp?", importance: .critical),
-                        ScenarioRequirement(description: "Skin?", importance: .critical),
-                        ScenarioRequirement(description: "GCS?", importance: .critical)
+                        ScenarioRequirement(description: "BGL?", importance: .normal),
+                        ScenarioRequirement(description: "Sp02?", importance: .normal),
+                        ScenarioRequirement(description: "Pulse?", importance: .normal),
+                        ScenarioRequirement(description: "BP?", importance: .normal),
+                        ScenarioRequirement(description: "RR?", importance: .normal),
+                        ScenarioRequirement(description: "Temp?", importance: .normal),
+                        ScenarioRequirement(description: "Skin?", importance: .normal),
+                        ScenarioRequirement(description: "GCS?", importance: .normal)
                     ]
                 ),
                 ScenarioSection(
@@ -273,7 +273,6 @@ struct PrimaryAssessment {
                     requirements: [
                         ScenarioRequirement(description: "AVPU?", importance: .normal),
                         ScenarioRequirement(description: "C/C?", importance: .normal),
-                        ScenarioRequirement(description: "Signs/symptoms?", importance: .normal),
                     ]
                 ),
                 ScenarioSection(
@@ -327,6 +326,7 @@ struct PrimaryAssessment {
                         ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
                         ScenarioRequirement(description: "Chest asymmetrical?", importance: .normal),
                         ScenarioRequirement(description: "SQ emphysema?", importance: .normal),
+                        ScenarioRequirement(description: "Paradoxical motion?", importance: .normal),
                         ScenarioRequirement(description: "ACTION Auscultate for lung/heart sounds", importance: .normal),
                         ScenarioRequirement(description: "ACTION if decreased, percuss", importance: .normal)
                     ]
@@ -352,7 +352,7 @@ struct PrimaryAssessment {
                     ]
                 ),
                 ScenarioSection(
-                    name: "Pelvis",
+                    name: "Back",
                     requirements: [
                         ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
                     ]
@@ -361,7 +361,128 @@ struct PrimaryAssessment {
                     name: "ACTION Pt critical? ONGOING EXAM. Pt stable? SECONDARY SURVEY"
                 ),
                 ScenarioSection(
-                    name: "<<missing content>>"
+                    name: "Ongoing exam"
+                ),
+                ScenarioSection(
+                    name: "Hx",
+                    requirements: [
+                        ScenarioRequirement(description: "SAMPLE?", importance: .critical),
+                    ]
+                ),
+                ScenarioSection(
+                    name: "LOC",
+                    requirements: [
+                        ScenarioRequirement(description: "AVPU?", importance: .normal),
+                        ScenarioRequirement(description: "Pupils PERL?", importance: .normal)
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Vitals",
+                    requirements: [
+                        ScenarioRequirement(description: "BGL?", importance: .normal),
+                        ScenarioRequirement(description: "Sp02?", importance: .normal),
+                        ScenarioRequirement(description: "Pulse?", importance: .normal),
+                        ScenarioRequirement(description: "BP?", importance: .normal),
+                        ScenarioRequirement(description: "RR?", importance: .normal),
+                        ScenarioRequirement(description: "Temp?", importance: .normal),
+                        ScenarioRequirement(description: "Skin?", importance: .normal),
+                        ScenarioRequirement(description: "GCS?", importance: .normal)
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Airway",
+                    requirements: [
+                        ScenarioRequirement(description: "Patent?", importance: .normal),
+                        ScenarioRequirement(description: "Snoring, gurgling, stridor, or silence?", importance: .normal),
+                        ScenarioRequirement(description: "Signs of inhalation injury?", importance: .normal),
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Breathing",
+                    requirements: [
+                        ScenarioRequirement(description: "RDE?", importance: .normal),
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Circulation",
+                    requirements: [
+                        ScenarioRequirement(description: "RRQ @ radial & carotid?", importance: .normal),
+                        ScenarioRequirement(description: "Skin colour, condition, temperature, cap refill?", importance: .normal),
+                        ScenarioRequirement(description: "Is bleeding still controlled?", importance: .critical)
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Physical exam"
+                ),
+                ScenarioSection(
+                    name: "Neck",
+                    requirements: [
+                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .normal),
+                        ScenarioRequirement(description: "JVD?", importance: .normal),
+                        ScenarioRequirement(description: "Trachea midline?", importance: .normal),
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Chest",
+                    requirements: [
+                        ScenarioRequirement(description: "ACTION Looking/feeling for DCAP-BLS TIC", importance: .critical),
+                        ScenarioRequirement(description: "Chest asymmetrical?", importance: .normal),
+                        ScenarioRequirement(description: "SQ emphysema?", importance: .normal),
+                        ScenarioRequirement(description: "Paradoxical motion?", importance: .normal),
+                        ScenarioRequirement(description: "ACTION Auscultate for lung/heart sounds", importance: .normal),
+                        ScenarioRequirement(description: "ACTION if decreased, percuss", importance: .normal)
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Abdomen",
+                    requirements: [
+                        ScenarioRequirement(description: "ACTION Looking/feeling for DRT (distension, rigidity, tenderness)", importance: .critical),
+                        ScenarioRequirement(description: "Evisceration, bruising, penetration?", importance: .normal)
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Every 5 mins",
+                    requirements: [
+                        ScenarioRequirement(description: "ACTION reassess LOC", importance: .normal),
+                        ScenarioRequirement(description: "ACTION reassess ABCs", importance: .normal),
+                        ScenarioRequirement(description: "ACTION reassess all interventions", importance: .normal),
+                        ScenarioRequirement(description: "ACTION reassess vitals", importance: .normal)
+                    ]
+                ),
+                ScenarioSection(
+                    name: "ITLS Secondary Survey",
+                    requirements: [
+                        ScenarioRequirement(description: "Reassess LOC", importance: .normal),
+                        ScenarioRequirement(description: "Reassess ABCs", importance: .normal),
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Hx",
+                    requirements: [
+                        ScenarioRequirement(description: "SAMPLE?", importance: .critical),
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Vitals",
+                    requirements: [
+                        ScenarioRequirement(description: "BGL?", importance: .normal),
+                        ScenarioRequirement(description: "Sp02?", importance: .normal),
+                        ScenarioRequirement(description: "Pulse?", importance: .normal),
+                        ScenarioRequirement(description: "BP?", importance: .normal),
+                        ScenarioRequirement(description: "RR?", importance: .normal),
+                        ScenarioRequirement(description: "Temp?", importance: .normal),
+                        ScenarioRequirement(description: "Skin?", importance: .normal),
+                        ScenarioRequirement(description: "GCS?", importance: .normal)
+                    ]
+                ),
+                ScenarioSection(
+                    name: "Every 15 mins",
+                    requirements: [
+                        ScenarioRequirement(description: "ACTION reassess LOC", importance: .normal),
+                        ScenarioRequirement(description: "ACTION reassess ABCs", importance: .normal),
+                        ScenarioRequirement(description: "ACTION reassess all interventions", importance: .normal),
+                        ScenarioRequirement(description: "ACTION reassess vitals", importance: .normal)
+                    ]
                 ),
                 ScenarioSection(
                     name: "Complete"

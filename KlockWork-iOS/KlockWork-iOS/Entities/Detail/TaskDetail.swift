@@ -152,6 +152,8 @@ extension TaskDetail {
             if let uDate = task.lastUpdate {lastUpdate = uDate}
             if let co = task.content {content = co}
             if let jo = task.owner {job = jo}
+        } else {
+            self.job = self.state.job
         }
     }
     
