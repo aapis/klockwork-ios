@@ -11,12 +11,12 @@ import SwiftUI
 struct TaskDetail: View {
     @EnvironmentObject private var state: AppState
     @Environment(\.dismiss) private var dismiss
-    public var task: LogTask?
+    @State public var task: LogTask?
     @State private var completedDate: Date = Date()
     @State private var cancelledDate: Date = Date()
     @State private var content: String = ""
     @State private var created: Date = Date()
-    @State private var due: Date = Date()
+    @State private var due: Date = DateHelper.endOfDay() ?? Date()
     @State private var lastUpdate: Date = Date()
     @State public var job: Job?
     @State private var company: Company?
@@ -152,6 +152,8 @@ extension TaskDetail {
             if let uDate = task.lastUpdate {lastUpdate = uDate}
             if let co = task.content {content = co}
             if let jo = task.owner {job = jo}
+        } else {
+            self.job = self.state.job
         }
     }
     
@@ -165,7 +167,7 @@ extension TaskDetail {
             self.task!.due = self.due
 
             if isCancelled {
-                self.task!.cancelledDate = self.cancelledDate
+                self.task!.cancelledDate = Date()
             } else if isCompleted {
                 self.task!.completedDate = Date()
             }

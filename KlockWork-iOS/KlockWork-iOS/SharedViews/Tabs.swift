@@ -228,7 +228,7 @@ extension Tabs.Content {
                     VStack(alignment: .leading, spacing: 1) {
                         if items.count > 0 {
                             ForEach(items) { task in
-                                Individual.SingleTaskChecklistItem(task: task)
+                                Individual.SingleTaskDetailedChecklistItem(task: task)
                             }
                         } else {
                             StatusMessage.Warning(message: "No tasks modified within the last 7 days")
@@ -283,16 +283,19 @@ extension Tabs.Content {
             @FetchRequest private var items: FetchedResults<Company>
 
             var body: some View {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        if self.items.count > 0 {
-                            ForEach(self.items, id: \Company.objectID) { item in
-                                TopLevel(entity: item)
+                VStack(alignment: .leading, spacing: 0) {
+                    Divider().background(.white).frame(height: 1)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            if self.items.count > 0 {
+                                ForEach(self.items, id: \Company.objectID) { item in
+                                    TopLevel(entity: item)
+                                }
+                            } else {
+                                StatusMessage.Warning(message: "No companies updated within the last 7 days")
                             }
-                        } else {
-                            StatusMessage.Warning(message: "No companies updated within the last 7 days")
+                            Spacer()
                         }
-                        Spacer()
                     }
                 }
                 .navigationTitle("Hierarchy Explorer")
@@ -605,7 +608,7 @@ extension Tabs.Content {
                     CoreDataTasks(moc: self.state.moc).create(
                         content: self.newTaskContent,
                         created: Date(),
-                        due: Date(),
+                        due: DateHelper.endOfDay() ?? Date(),
                         job: self.entity
                     )
 
@@ -1194,20 +1197,27 @@ extension Tabs.Content {
         struct SingleTaskDetailedChecklistItem: View {
             @EnvironmentObject private var state: AppState
             public let task: LogTask
+            public var callback: (() -> Void)? = nil
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
-                    HStack(alignment: .firstTextBaseline, spacing: 0) {
+                    HStack(alignment: .top, spacing: 0) {
                         Button {
                             isCompleted.toggle()
                             self.actionOnSave()
+                            if let cb = callback { cb() }
                         } label: {
-                            Image(systemName: isCompleted ? "square.fill" : "square")
-                                .font(.title2)
+                            VStack(alignment: .center, spacing: 0) {
+                                Spacer()
+                                Image(systemName: isCompleted ? "square.fill" : "square")
+                                    .font(.title2)
+                                Spacer()
+                            }
+                            .frame(width: 50)
+                            .background(.black.opacity(0.1))
                         }
-                        .padding(.trailing, 8)
 
                         NavigationLink {
                             TaskDetail(task: task)
@@ -1218,25 +1228,34 @@ extension Tabs.Content {
                                 Spacer()
                                 Image(systemName: "chevron.right")
                             }
+                            .padding(12)
                         }
                         .background(task.owner?.backgroundColor ?? Theme.rowColour)
                     }
                     .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
-                    .padding(12)
 
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         ZStack(alignment: .topLeading) {
                             LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                                .frame(height: 40)
                                 .opacity(0.1)
 
-                            HStack(alignment: .center) {
-                                Text("\(task.owner?.project?.company?.abbreviation ?? "DEF").\(task.owner?.project?.abbreviation ?? "DEF") > \(task.owner?.title ?? "_TASK_OWNER")")
-                                    .multilineTextAlignment(.leading)
-                                Spacer()
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(alignment: .center) {
+                                    Text("\(task.owner?.project?.company?.abbreviation ?? "DEF").\(task.owner?.project?.abbreviation ?? "DEF") > \(task.owner?.title ?? "_TASK_OWNER")")
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
+                                if task.due != nil {
+                                    HStack(alignment: .center) {
+                                        Text("Due: \(task.due!.formatted(date: .abbreviated, time: .complete))")
+                                            .multilineTextAlignment(.leading)
+                                        Spacer()
+                                    }
+                                }
                             }
-                            .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
                             .padding(8)
+                            .font(.caption)
+                            .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                         }
                     }
                 }

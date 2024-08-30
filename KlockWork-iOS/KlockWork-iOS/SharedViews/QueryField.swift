@@ -53,14 +53,20 @@ struct QueryField: View {
                         }
                     }
                 } label: {
-                    if action == .search {
+                    HStack(alignment: .center, spacing: 0) {
                         if !text.isEmpty {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.yellow)
+                            if action == .search {
+                                Image(systemName: "xmark.circle.fill")
+                                    .fontWeight(.bold)
+                                    .font(.title)
+                                    .foregroundStyle(.yellow)
+                            } else {
+                                Image(systemName: "chevron.up.circle.fill")
+                                    .fontWeight(.bold)
+                                    .font(.title)
+                                    .foregroundStyle(text.isEmpty ? .gray : .yellow)
+                            }
                         }
-                    } else {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .foregroundStyle(text.isEmpty ? .gray : .yellow)
                     }
                 }
                 .padding(.trailing)

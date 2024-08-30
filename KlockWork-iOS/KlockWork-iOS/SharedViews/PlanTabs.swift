@@ -554,8 +554,8 @@ extension PlanTabs {
             NavigationStack {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 1) {
-                        if !tasks.isEmpty {
-                            ForEach(self.upcoming, id: \.self) { row in
+                        if !self.tasks.isEmpty {
+                            ForEach(self.upcoming, id: \.id) { row in
                                 HStack {
                                     Spacer()
                                     Text(row.date)
@@ -563,9 +563,10 @@ extension PlanTabs {
                                         .font(.caption)
                                 }
                                 .background(.black.opacity(0.2))
+                                .border(width: 1, edges: [.bottom], color: .yellow)
 
                                 ForEach(row.tasks) { task in
-                                    Row(task: task)
+                                    Row(task: task, callback: self.actionOnAppear)
                                 }
                             }
                         } else {

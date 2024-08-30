@@ -94,7 +94,7 @@ extension SearchBar {
                                 let group = items as! [LogRecord]
                                 ForEach(group.filter {
                                     $0.alive == true && $0.message!.lowercased().contains(text.lowercased())
-                                }) { row in
+                                }, id: \.objectID) { row in
                                     NavigationLink {
                                         RecordDetail(record: row)
                                     } label: {
@@ -106,7 +106,7 @@ extension SearchBar {
                                 let group = items as! [Job]
                                 ForEach(group.filter {
                                     $0.alive == true && ($0.jid.string.starts(with: text.lowercased()) || (($0.title?.lowercased().contains(text.lowercased())) != nil))
-                                }) { row in
+                                }, id: \.objectID) { row in
                                     NavigationLink {
                                         JobDetail(job: row)
                                     } label: {
@@ -118,7 +118,7 @@ extension SearchBar {
                                 let group = items as! [LogTask]
                                 ForEach(group.filter {
                                     $0.content!.lowercased().contains(text.lowercased())
-                                }) { row in
+                                }, id: \.objectID) { row in
                                     NavigationLink {
                                         TaskDetail(task: row)
                                     } label: {
@@ -130,7 +130,7 @@ extension SearchBar {
                                 let group = items as! [Note]
                                 ForEach(group.filter {
                                     $0.alive == true && ($0.title!.lowercased().contains(text.lowercased()) || $0.body!.lowercased().contains(text.lowercased()))
-                                }) { row in
+                                }, id: \.objectID) { row in
                                     NavigationLink {
                                         NoteDetail.Sheet(note: row, page: .modify)
                                     } label: {
@@ -140,7 +140,7 @@ extension SearchBar {
                                 }
                             case .companies:
                                 let group = items as! [Company]
-                                ForEach(group.filter {$0.alive == true && $0.name!.lowercased().contains(text.lowercased())}) { row in
+                                ForEach(group.filter {$0.alive == true && $0.name!.lowercased().contains(text.lowercased())}, id: \.objectID) { row in
                                     NavigationLink {
                                         CompanyDetail(company: row)
                                     } label: {
@@ -152,7 +152,7 @@ extension SearchBar {
                                 let group = items as! [Person]
                                 ForEach(group.filter {
                                     $0.name!.lowercased().contains(text.lowercased())
-                                }) { row in
+                                }, id: \.objectID) { row in
                                     NavigationLink {
                                         PersonDetail(person: row)
                                     } label: {
@@ -164,7 +164,7 @@ extension SearchBar {
                                 let group = items as! [Project]
                                 ForEach(group.filter {
                                     $0.alive == true && $0.name!.lowercased().contains(text.lowercased())
-                                }) { row in
+                                }, id: \.objectID) { row in
                                     NavigationLink {
                                         ProjectDetail(project: row)
                                     } label: {
@@ -176,7 +176,7 @@ extension SearchBar {
                                 let group = items as! [TaxonomyTerm]
                                 ForEach(group.filter {
                                     $0.alive == true && $0.name!.lowercased().contains(text.lowercased())
-                                }) { row in
+                                }, id: \.objectID) { row in
                                     NavigationLink {
                                         TermDetail(term: row)
                                     } label: {

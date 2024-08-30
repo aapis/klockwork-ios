@@ -168,6 +168,7 @@ extension Widget {
         struct Single: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButton
             
+            @EnvironmentObject private var state: AppState
             public var title: String?
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var showing: Bool
@@ -196,6 +197,7 @@ extension Widget {
                             ForEach(items, id: \.objectID) { jerb in
                                 Row(job: jerb, callback: { job in
                                     self.job = job
+                                    self.state.job = job
                                     self.showing.toggle()
                                 })
                             }

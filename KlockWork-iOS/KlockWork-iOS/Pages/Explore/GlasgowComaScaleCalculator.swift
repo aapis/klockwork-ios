@@ -22,7 +22,6 @@ struct GlasgowComaScaleCalculator: View {
             }
             .padding()
         }
-        .toolbar(.hidden)
         .background(self.page.primaryColour)
         .scrollDismissesKeyboard(.immediately)
         .navigationTitle("GCS Calculator")
