@@ -118,8 +118,9 @@ extension Today {
                                 selection: $date,
                                 displayedComponents: [.date]
                             )
+//                            .labelStyle(DatePickerDateAwareTitle())
                             .labelsHidden()
-                            .contentShape(Rectangle())
+//                            .contentShape(Rectangle())
                             .opacity(0.011)
                         }
                     Image(systemName: "chevron.right")
@@ -282,6 +283,17 @@ extension Today.Editor {
                 )
                 text = ""
             }
+        }
+    }
+}
+
+struct DatePickerDateAwareTitle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(alignment: .center, spacing: 0) {
+            Label(configuration)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .padding([.leading, .top, .bottom])
         }
     }
 }
