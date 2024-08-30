@@ -43,6 +43,33 @@ struct TaskDetail: View {
                     }
                     .listRowBackground(Theme.textBackground)
 
+                    Section {
+                        HStack(alignment: .center, spacing: 1) {
+                            if self.isCompleted || self.isCancelled {
+                                Button {
+                                    self.isCompleted = false
+                                    self.isCancelled = false
+                                    self.task!.completedDate = nil
+                                    self.task!.cancelledDate = nil
+
+                                    self.actionOnSave()
+                                } label: {
+                                    Text("Reopen")
+                                }
+                                .padding()
+                            }
+                            Button {
+                                var dc = DateComponents()
+                                dc.day = +1
+                                self.due = Calendar.autoupdatingCurrent.date(byAdding: dc, to: self.due) ?? DateHelper.endOfDay() ?? Date()
+                            } label: {
+                                Text("+1 Due")
+                            }
+                            .padding()
+                        }
+                    }
+                    .listRowBackground(Theme.textBackground)
+
                     Section("Settings") {
                         DatePicker(
                             "Created",

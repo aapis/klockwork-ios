@@ -219,29 +219,36 @@ extension Today {
         @State private var viewMode: ViewMode = .tabular
 
         var body: some View {
-            Menu("", systemImage: self.viewMode.icon) {
-                Button {
-                    self.viewMode = .tabular
-                    self.storedVm = self.viewMode.id
-                } label: {
-                    Text("Tabular")
-                    Image(systemName: "tablecells")
-                }
-                .disabled(self.storedVm == 0)
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center, spacing: 0) {
+                    Button {
+                        self.viewMode = .tabular
+                        self.storedVm = self.viewMode.id
+                    } label: {
+                        Image(systemName: "tablecells")
+                    }
+                    .disabled(self.storedVm == 0)
+                    .padding(5)
+                    .background(self.storedVm == 0 ? .yellow : .black.opacity(0.1))
+                    .foregroundStyle(self.storedVm == 0 ? Theme.cPurple : .yellow )
+                    .clipShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
 
-                Button {
-                    self.viewMode = .hierarchical
-                    self.storedVm = self.viewMode.id
-                } label: {
-                    Text("Hierarchical")
-                    Image(systemName: "list.bullet.indent")
+                    Button {
+                        self.viewMode = .hierarchical
+                        self.storedVm = self.viewMode.id
+                    } label: {
+                        Image(systemName: "list.bullet")
+                    }
+                    .disabled(self.storedVm == 1)
+                    .padding(5)
+                    .background(self.storedVm == 1 ? .yellow : .black.opacity(0.1))
+                    .foregroundStyle(self.storedVm == 1 ? Theme.cPurple : .yellow)
+                    .clipShape(.rect(bottomTrailingRadius: 6, topTrailingRadius: 6))
                 }
-                .disabled(self.storedVm == 1)
             }
-            .opacity(0.5)
             .onAppear(perform: self.actionOnAppear)
         }
-        
+
         /// Onload handler. Sets the viewMode to the stored value.
         /// - Returns: Void
         private func actionOnAppear() -> Void {
