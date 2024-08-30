@@ -44,31 +44,44 @@ struct TaskDetail: View {
                     .listRowBackground(Theme.textBackground)
 
                     Section {
-                        HStack(alignment: .center, spacing: 1) {
-                            if self.isCompleted || self.isCancelled {
-                                Button {
-                                    self.isCompleted = false
-                                    self.isCancelled = false
-                                    self.task!.completedDate = nil
-                                    self.task!.cancelledDate = nil
-
-                                    self.actionOnSave()
-                                } label: {
-                                    Text("Reopen")
-                                }
-                                .padding()
-                            }
+                        if self.isCompleted || self.isCancelled {
                             Button {
-                                var dc = DateComponents()
-                                dc.day = +1
-                                self.due = Calendar.autoupdatingCurrent.date(byAdding: dc, to: self.due) ?? DateHelper.endOfDay() ?? Date()
+                                self.isCompleted = false
+                                self.isCancelled = false
+                                self.task!.completedDate = nil
+                                self.task!.cancelledDate = nil
+
+                                self.actionOnSave()
                             } label: {
-                                Text("+1 Due")
+                                Text("Reopen")
                             }
-                            .padding()
+                            .listRowBackground(Theme.textBackground)
+                        }
+                        
+                        Button {
+                            var dc = DateComponents()
+                            dc.day = +1
+                            self.due = Calendar.autoupdatingCurrent.date(byAdding: dc, to: self.due) ?? DateHelper.endOfDay() ?? Date()
+                        } label: {
+                            Text("+1 Due")
+                        }
+                        .listRowBackground(Theme.textBackground)
+                        
+                        if self.task != nil {
+                            Button {
+                                CoreDataTasks(moc: self.state.moc).create(
+                                    content: self.content,
+                                    created: Date(),
+                                    due: self.due,
+                                    job: self.job
+                                )
+                                dismiss()
+                            } label: {
+                                Text("Duplicate")
+                            }
+                            .listRowBackground(Theme.textBackground)
                         }
                     }
-                    .listRowBackground(Theme.textBackground)
 
                     Section("Settings") {
                         DatePicker(
