@@ -18,7 +18,7 @@ struct PageConfiguration {
 
 extension PageConfiguration {
     enum PlanType: CaseIterable, Equatable {
-        case daily, feature, upcoming
+        case daily, feature, upcoming, overdue
 
         /// Interface-friendly representation
         var label: String {
@@ -26,6 +26,7 @@ extension PageConfiguration {
             case .daily: "Daily"
             case .feature: "Feature"
             case .upcoming: "Upcoming"
+            case .overdue: "Overdue"
             }
         }
 
@@ -35,6 +36,7 @@ extension PageConfiguration {
             case .daily: "Day"
             case .feature: "Feature"
             case .upcoming: "Upcoming"
+            case .overdue: "Overdue"
             }
         }
 
@@ -44,6 +46,7 @@ extension PageConfiguration {
             case .daily: Image(systemName: "calendar")
             case .feature: Image(systemName: "list.bullet.below.rectangle")
             case .upcoming: Image(systemName: "hourglass")
+            case .overdue: Image(systemName: "alarm")
             }
         }
     }
