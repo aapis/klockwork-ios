@@ -151,6 +151,8 @@ extension PlanTabs {
                 Feature()
             case .upcoming:
                 Upcoming()
+            case .overdue:
+                Overdue()
             }
         }
     }
@@ -544,6 +546,12 @@ extension PlanTabs {
         }
     }
 
+    struct UpcomingRow: Identifiable, Hashable {
+        var id: UUID = UUID()
+        var date: String
+        var tasks: [LogTask]
+    }
+
     struct Upcoming: View {
         typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
 
@@ -599,6 +607,65 @@ extension PlanTabs {
 
             for group in sorted {
                 self.upcoming.append(UpcomingRow(date: group.key, tasks: group.value))
+            }
+        }
+    }
+
+    struct Overdue: View {
+        typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
+
+        @FetchRequest private var tasks: FetchedResults<LogTask>
+        @State private var overdue: [UpcomingRow] = []
+
+        var body: some View {
+            NavigationStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 1) {
+                        if !self.tasks.isEmpty {
+                            ForEach(self.overdue, id: \.id) { row in
+                                HStack {
+                                    Spacer()
+                                    Text(row.date)
+                                        .padding(5)
+                                        .font(.caption)
+                                }
+                                .background(.black.opacity(0.2))
+                                .border(width: 1, edges: [.bottom], color: .yellow)
+
+                                ForEach(row.tasks) { task in
+                                    Row(task: task, callback: self.actionOnAppear)
+                                }
+                            }
+                        } else {
+                            HStack {
+                                Text("No overdue tasks!")
+                                Spacer()
+                            }
+                            .padding()
+                            .background(Theme.textBackground)
+                            .clipShape(.rect(cornerRadius: 16))
+                            Spacer()
+                        }
+                    }
+                }
+            }
+            .onAppear(perform: self.actionOnAppear)
+        }
+
+        init() {
+            _tasks = CoreDataTasks.fetchOverdue()
+        }
+
+        /// Onload handler
+        /// - Returns: Void
+        private func actionOnAppear() -> Void {
+            self.overdue = []
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
+            let sorted = Array(grouped)
+                .sorted(by: {$0.key < $1.key})
+
+            for group in sorted {
+                self.overdue.append(UpcomingRow(date: group.key, tasks: group.value))
             }
         }
 
