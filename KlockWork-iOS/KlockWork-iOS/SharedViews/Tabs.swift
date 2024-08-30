@@ -315,7 +315,7 @@ extension Tabs.Content {
             struct TopLevel: View {
                 typealias Button = Tabs.Content.Individual.SingleCompanyHierarchical
 
-                public let entity: Company
+                @State public var entity: Company
                 @State private var isPresented: Bool = false
 
                 var body: some View {
@@ -340,7 +340,7 @@ extension Tabs.Content {
             struct SecondLevel: View {
                 typealias Button = Tabs.Content.Individual.SingleProjectHierarchical
 
-                public let entity: Project
+                @State public var entity: Project
                 @State private var isPresented: Bool = false
 
                 var body: some View {
@@ -376,7 +376,7 @@ extension Tabs.Content {
                 typealias JobButton = Tabs.Content.Individual.SingleJobHierarchical
 
                 @EnvironmentObject private var state: AppState
-                public let entity: Job
+                @State public var entity: Job
                 public var page: PageConfiguration.AppPage = .create
                 @State private var isPresented: Bool = false
                 @State private var isCreateTaskPanelPresented: Bool = false // @TODO: move this to a new struct
@@ -1085,13 +1085,13 @@ extension Tabs.Content {
                             callback(self.entity)
                         } label: {
                             ZStack {
-                                Circle()
+                                RoundedRectangle(cornerRadius: 3)
                                     .fill(.black)
                                     .opacity(0.4)
                                 Image(systemName: self.selected ? "minus" : "plus")
                             }
                         }
-                        .frame(width: 25)
+                        .frame(width: 25, height: 25)
                         .padding([.leading, .trailing])
 
                         // Entity creation buttons
@@ -1375,16 +1375,14 @@ extension Tabs.Content {
                             callback(self.entity)
                         } label: {
                             ZStack {
-                                Circle()
+                                RoundedRectangle(cornerRadius: 3)
                                     .fill(.black)
                                     .opacity(0.4)
                                 Image(systemName: self.selected ? "minus" : "plus")
                             }
                         }
-                        .frame(width: 25)
+                        .frame(width: 25, height: 25)
                         .padding([.leading, .trailing])
-
-                        Spacer()
 
                         // Company link
                         NavigationLink {
@@ -1551,16 +1549,16 @@ extension Tabs.Content {
                         // Open folder button
                         Button {
                             selected.toggle()
-                            callback(entity)
+                            callback(self.entity)
                         } label: {
-                            ZStack(alignment: .center) {
-                                Circle()
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 3)
                                     .fill(.black)
                                     .opacity(0.4)
                                 Image(systemName: self.selected ? "minus" : "plus")
                             }
                         }
-                        .frame(width: 25)
+                        .frame(width: 25, height: 25)
                         .padding([.leading, .trailing])
 
                         // Project link
