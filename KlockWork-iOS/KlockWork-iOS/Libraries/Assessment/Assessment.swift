@@ -58,7 +58,7 @@ class Assessment {
         }
 
         if self.isToday {
-            return .yellow
+            return .yellow // leave this .yellow so we don't need to pass in state.theme.tint
         } else if self.isSelected {
             return .blue
         } else {

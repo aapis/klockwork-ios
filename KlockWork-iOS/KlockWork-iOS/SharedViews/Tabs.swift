@@ -34,7 +34,7 @@ struct Tabs: View {
 
             if title == nil {
                 MiniTitleBar(selected: $selected)
-                    .border(width: 1, edges: [.bottom], color: .yellow)
+                    .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
             } else {
                 title
             }
@@ -91,12 +91,10 @@ extension Tabs {
         @Binding public var selected: EntityType
 
         var body: some View {
-            ZStack {
-                HStack(alignment: .center, spacing: 1) {
-                    // @TODO: restore to original state (below)
-                    // ForEach(EntityType.allCases, id: \.self) { page in
-                    ForEach(EntityType.allCases.filter({$0 != .terms}), id: \.self) { page in
-                        VStack {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .center, spacing: 0) {
+                    ForEach(EntityType.allCases, id: \.self) { page in
+                        VStack(spacing: 0) {
                             Button {
                                 withAnimation(.bouncy(duration: Tabs.animationDuration)) {
                                     selected = page
@@ -105,16 +103,14 @@ extension Tabs {
                                 (page == selected ? page.selectedIcon : page.icon)
                                     .frame(maxHeight: 20)
                                     .padding(14)
-                                    .background(page == selected ? .white : .clear)
-                                    .foregroundStyle(page == selected ? Theme.cPurple : .gray)
+                                    .background(page == selected ? Theme.darkBtnColour : .clear)
+                                    .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
                             }
                             .buttonStyle(.plain)
                         }
                     }
                     Spacer()
                 }
-                .background(Theme.textBackground)
-
             }
             .frame(height: 50)
         }
@@ -143,7 +139,7 @@ extension Tabs {
             case .projects:
                 List.Projects(date: self.state.date, inSheet: self.inSheet)
             case .terms:
-                List.Terms(inSheet: self.inSheet, entity: $job.wrappedValue!)
+                List.Terms(inSheet: self.inSheet, entity: $job)
             }
         }
     }
@@ -376,7 +372,7 @@ extension Tabs.Content {
                 typealias JobButton = Tabs.Content.Individual.SingleJobHierarchical
 
                 @EnvironmentObject private var state: AppState
-                @State public var entity: Job
+                @State public var entity: Job?
                 public var page: PageConfiguration.AppPage = .create
                 @State private var isPresented: Bool = false
                 @State private var isCreateTaskPanelPresented: Bool = false // @TODO: move this to a new struct
@@ -393,26 +389,26 @@ extension Tabs.Content {
 
                 var body: some View {
                     VStack(alignment: .leading, spacing: 0) {
-                        JobButton(entity: self.entity, callback: self.actionOnTap)
+                        JobButton(entity: self.entity!, callback: self.actionOnTap)
                         // @TODO: refactor to follow the pattern set in previous levels
                         if self.isPresented {
                             VStack(alignment: .leading, spacing: 0) {
                                 /// Tasks
                                 ZStack(alignment: .leading) {
-                                    self.entity.backgroundColor
+                                    self.entity?.backgroundColor ?? Theme.rowColour
                                     LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
                                         .opacity(0.6)
                                         .blendMode(.softLight)
                                         .frame(height: 50)
                                     HStack(alignment: .center, spacing: 0) {
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(Color.fromStored(self.entity?.project?.company?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(Color.fromStored(self.entity?.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(Color.fromStored(self.entity?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
 
                                         HStack(spacing: 0) {
@@ -435,10 +431,10 @@ extension Tabs.Content {
                                     VStack(alignment: .leading, spacing: 0) {
                                         HStack(alignment: .center, spacing: 0) {
                                             Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                                .foregroundStyle(Color.fromStored(self.entity?.project?.company?.colour ?? Theme.rowColourAsDouble))
                                                 .frame(width: 15)
                                             Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                                .foregroundStyle(Color.fromStored(self.entity?.project?.colour ?? Theme.rowColourAsDouble))
                                                 .frame(width: 15)
                                             TextField("", text: $newTaskContent, prompt: Text("What needs to be done?").foregroundStyle(Theme.base.opacity(0.5)), axis: .horizontal)
                                                 .submitLabel(.go)
@@ -463,7 +459,7 @@ extension Tabs.Content {
                                 }
 
                                 ZStack(alignment: .leading) {
-                                    self.entity.backgroundColor
+                                    self.entity?.backgroundColor ?? Theme.rowColour
                                     LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
                                         .opacity(0.6)
                                         .blendMode(.softLight)
@@ -471,13 +467,13 @@ extension Tabs.Content {
 
                                     HStack(alignment: .center, spacing: 0) {
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(Color.fromStored(self.entity?.project?.company?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(Color.fromStored(self.entity?.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(Color.fromStored(self.entity?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
 
                                         HStack(spacing: 0) {
@@ -500,10 +496,10 @@ extension Tabs.Content {
                                     VStack(alignment: .leading, spacing: 0) {
                                         HStack(alignment: .center, spacing: 0) {
                                             Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                                .foregroundStyle(Color.fromStored(self.entity?.project?.company?.colour ?? Theme.rowColourAsDouble))
                                                 .frame(width: 15)
                                             Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                                .foregroundStyle(Color.fromStored(self.entity?.project?.colour ?? Theme.rowColourAsDouble))
                                                 .frame(width: 15)
                                             TextField("", text: $newNoteTitle, prompt: Text("Untitled Note").foregroundStyle(Theme.base.opacity(0.5)), axis: .horizontal)
                                                 .submitLabel(.go)
@@ -528,11 +524,11 @@ extension Tabs.Content {
                                 }
 
                                 // Terms
-                                Terms(inSheet: false, entity: self.entity)
+                                Terms(inSheet: false, entity: $entity)
 
                                 /// Record view link
                                 ZStack(alignment: .leading) {
-                                    self.entity.backgroundColor
+                                    self.entity?.backgroundColor ?? Theme.rowColour
                                     LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
                                         .opacity(0.6)
                                         .blendMode(.softLight)
@@ -540,14 +536,14 @@ extension Tabs.Content {
 
                                     HStack(alignment: .center, spacing: 0) {
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(Color.fromStored(self.entity?.project?.company?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(Color.fromStored(self.entity?.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         if self.records.isEmpty {
                                             Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                                .foregroundStyle(Color.fromStored(self.entity?.colour ?? Theme.rowColourAsDouble))
                                                 .frame(width: 15)
                                         }
 
@@ -559,7 +555,7 @@ extension Tabs.Content {
                                                 NavigationLink {
                                                     RecordFilter(job: self.entity)
                                                 } label: {
-                                                    ListRow(name: "\(self.records.count) Records", colour: self.entity.backgroundColor)
+                                                    ListRow(name: "\(self.records.count) Records", colour: self.entity?.backgroundColor ?? Theme.rowColour)
                                                 }
                                             }
                                         }
@@ -568,7 +564,7 @@ extension Tabs.Content {
                                 }
                             }
                             .onAppear(perform: self.actionOnAppear)
-                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : .white)
+                            .foregroundStyle((self.entity?.backgroundColor ?? Theme.rowColour).isBright() ? Theme.base : .white)
                         }
                     }
                     .id(self.id)
@@ -581,19 +577,19 @@ extension Tabs.Content {
                 /// Onload handler. Populates task and note lists
                 /// - Returns: Void
                 private func actionOnAppear() -> Void {
-                    if let tasks = self.entity.tasks?.allObjects as? [LogTask] {
+                    if let tasks = self.entity?.tasks?.allObjects as? [LogTask] {
                         self.tasks = tasks.filter({$0.completedDate == nil && $0.cancelledDate == nil}).sorted(by: {$0.due != nil && $1.due != nil ? $0.due! > $1.due! : false})
                     }
 
-                    if let notes = self.entity.mNotes?.allObjects as? [Note] {
+                    if let notes = self.entity?.mNotes?.allObjects as? [Note] {
                         self.notes = notes.filter({$0.alive == true}).sorted(by: {$0.title != nil && $1.title != nil ? $0.title! > $1.title! : false})
                     }
 
-                    if let records = self.entity.records?.allObjects as? [LogRecord] {
+                    if let records = self.entity?.records?.allObjects as? [LogRecord] {
                         self.records = records.filter({$0.alive == true}).sorted(by: {$0.timestamp! > $1.timestamp!})
                     }
 
-                    self.colour = Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble)
+                    self.colour = Color.fromStored(self.entity?.colour ?? Theme.rowColourAsDouble)
                 }
 
                 /// Tap/click handler. Opens to show list of jobs.
@@ -708,7 +704,7 @@ extension Tabs.Content {
 
         struct Terms: View {
             public var inSheet: Bool
-            public let entity: Job
+            @Binding public var entity: Job?
             @State private var isCreateTaskPanelPresented: Bool = false
             @State private var items: [TaxonomyTerm] = [] // @TODO: we maaaaay only use this to determine term count
             @State private var newTermName: String = ""
@@ -717,7 +713,7 @@ extension Tabs.Content {
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
                     ZStack(alignment: .leading) {
-                        self.entity.backgroundColor
+                        self.entity?.backgroundColor ?? Theme.rowColour
                         LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
                             .opacity(0.6)
                             .blendMode(.softLight)
@@ -725,14 +721,14 @@ extension Tabs.Content {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack(alignment: .center, spacing: 0) {
                                 Rectangle()
-                                    .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                    .foregroundStyle(Color.fromStored(self.entity?.project?.company?.colour ?? Theme.rowColourAsDouble))
                                     .frame(width: 15)
                                 Rectangle()
-                                    .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                    .foregroundStyle(Color.fromStored(self.entity?.project?.colour ?? Theme.rowColourAsDouble))
                                     .frame(width: 15)
                                 if self.items.isEmpty {
                                     Rectangle()
-                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                        .foregroundStyle(Color.fromStored(self.entity?.colour ?? Theme.rowColourAsDouble))
                                         .frame(width: 15)
                                 }
 
@@ -742,9 +738,9 @@ extension Tabs.Content {
                                             .opacity(0.5)
                                     } else {
                                         NavigationLink {
-                                            TermFilter(job: self.entity)
+                                            TermFilter(job: self.entity!)
                                         } label: {
-                                            ListRow(name: self.items.count == 1 ? "1 Term" : "\(self.items.count) Terms", colour: self.entity.backgroundColor)
+                                            ListRow(name: self.items.count == 1 ? "1 Term" : "\(self.items.count) Terms", colour: self.entity?.backgroundColor ?? Theme.rowColour)
                                         }
                                     }
                                 }
@@ -760,7 +756,7 @@ extension Tabs.Content {
             /// - Returns: Void
             private func actionOnAppear() -> Void {
                 self.items = []
-                if let definitions = self.entity.definitions?.allObjects as? [TaxonomyTermDefinitions] {
+                if let definitions = self.entity?.definitions?.allObjects as? [TaxonomyTermDefinitions] {
                     for definition in definitions {
                         if let term = definition.term {
                             self.items.append(term)

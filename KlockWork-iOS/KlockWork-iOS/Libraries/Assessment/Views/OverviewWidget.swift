@@ -23,7 +23,7 @@ struct OverviewWidget: View {
                 GridRow(alignment: .top) {
                     HStack {
                         Text("Assessment")
-                            .foregroundStyle(.yellow)
+                            .foregroundStyle(self.state.theme.tint)
                         Spacer()
 
                         NavigationLink {
@@ -34,7 +34,7 @@ struct OverviewWidget: View {
                                 Image(systemName: "gear")
                             }
                         }
-                        .foregroundStyle(.yellow)
+                        .foregroundStyle(self.state.theme.tint)
                         .help("Modify assessment factors")
                     }
                     .padding([.leading, .trailing])

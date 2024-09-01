@@ -37,7 +37,7 @@ struct PlanTabs: View {
 
             if title == nil {
                 MiniTitleBarPlan(selected: $selected)
-                    .border(width: 1, edges: [.bottom], color: .yellow)
+                    .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
             } else {
                 title
             }
@@ -97,31 +97,33 @@ extension PlanTabs {
 
 extension PlanTabs {
     struct Buttons: View {
+        @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: PlanType
 
         var body: some View {
-            HStack(alignment: .center, spacing: 1) {
-                ForEach(PlanType.allCases, id: \.self) { page in
-                    VStack {
-                        Button {
-                            withAnimation(.bouncy(duration: Tabs.animationDuration)) {
-                                selected = page
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .center, spacing: 1) {
+                    ForEach(PlanType.allCases, id: \.self) { page in
+                        VStack {
+                            Button {
+                                withAnimation(.bouncy(duration: Tabs.animationDuration)) {
+                                    selected = page
+                                }
+                            } label: {
+                                page.icon
+                                    .frame(maxHeight: 20)
+                                    .padding(14)
+                                    .background(page == selected ? Theme.darkBtnColour : .clear)
+                                    .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
                             }
-                        } label: {
-                            page.icon
-                            .frame(maxHeight: 20)
-                            .padding(14)
-                            .background(page == selected ? .white : .clear)
-                            .foregroundStyle(page == selected ? Theme.cPurple : .gray)
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
+                    Spacer()
                 }
-                Spacer()
             }
-            .background(Theme.textBackground)
             .frame(height: 50)
         }
     }
@@ -260,6 +262,7 @@ extension PlanTabs {
         }
 
         struct SelectedItems: View {
+            @EnvironmentObject private var state: AppState
             @Binding public var jobs: [Job]
             @Binding public var tasks: [LogTask]
             @Binding public var notes: [Note]
@@ -283,6 +286,7 @@ extension PlanTabs {
         }
 
         struct MenuItem: View {
+            @EnvironmentObject private var state: AppState
             var count: Int
             var icon: String
             var description: String
@@ -290,9 +294,9 @@ extension PlanTabs {
             var body: some View {
                 HStack {
                     Text("\(count)")
-                        .foregroundStyle(count > 0 ? .yellow : .gray)
+                        .foregroundStyle(count > 0 ? self.state.theme.tint : .gray)
                     Image(systemName: icon)
-                        .foregroundStyle(count > 0 ? .yellow : .gray)
+                        .foregroundStyle(count > 0 ? self.state.theme.tint : .gray)
                         .help("\(count) \(description)")
                 }
                 .padding([.leading, .trailing], 8)
@@ -567,8 +571,8 @@ extension PlanTabs {
 
     struct Feature: View  {
         var body: some View {
-            VStack {
-                HStack {
+            VStack(alignment: .center, spacing: 0) {
+                HStack(alignment: .center, spacing: 0) {
                     Text("Feature planning is coming soon")
                     Spacer()
                 }
@@ -589,7 +593,8 @@ extension PlanTabs {
 
     struct Upcoming: View {
         typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
-
+        
+        @EnvironmentObject private var state: AppState
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var upcoming: [UpcomingRow] = []
 
@@ -606,7 +611,7 @@ extension PlanTabs {
                                         .font(.caption)
                                 }
                                 .background(.black.opacity(0.2))
-                                .border(width: 1, edges: [.bottom], color: .yellow)
+                                .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
 
                                 ForEach(row.tasks) { task in
                                     Row(task: task, callback: self.actionOnAppear)
@@ -664,6 +669,7 @@ extension PlanTabs {
     struct Overdue: View {
         typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
 
+        @EnvironmentObject private var state: AppState
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var overdue: [UpcomingRow] = []
 
@@ -680,7 +686,7 @@ extension PlanTabs {
                                         .font(.caption)
                                 }
                                 .background(.black.opacity(0.2))
-                                .border(width: 1, edges: [.bottom], color: .yellow)
+                                .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
 
                                 ForEach(row.tasks) { task in
                                     Row(task: task, callback: self.actionOnAppear)

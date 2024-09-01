@@ -35,7 +35,11 @@ struct Main: View {
         TabView {
             Planning(inSheet: false)
             .tabItem {
-                Image(systemName: "hexagon")
+                if self.state.plan != nil {
+                    Image(systemName: "circle.hexagongrid.fill")
+                } else {
+                    Image(systemName: "hexagon")
+                }
                 Text("Planning")
             }
             Today(inSheet: false)

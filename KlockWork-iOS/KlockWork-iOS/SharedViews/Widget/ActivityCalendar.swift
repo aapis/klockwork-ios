@@ -55,7 +55,7 @@ extension Widget {
                                 LazyVGrid(columns: self.columns, alignment: .center) {
                                     ForEach(weekdays) {sym in
                                         Text(sym.symbol)
-                                            .foregroundStyle(sym.current ? .yellow : .white)
+                                            .foregroundStyle(sym.current ? self.state.theme.tint : .white)
                                     }
                                     .font(.caption)
                                 }
@@ -105,6 +105,7 @@ extension Widget {
         }
 
         struct MonthNav: View {
+            @EnvironmentObject private var state: AppState
             @Binding public var date: Date
             @State private var isCurrentMonth: Bool = false // @TODO: implement
 
@@ -119,7 +120,7 @@ extension Widget {
                             selection: $date,
                             displayedComponents: [.date]
                         )
-                        .background(self.isCurrentMonth ? .yellow : Theme.rowColour)
+                        .background(self.isCurrentMonth ? self.state.theme.tint : Theme.rowColour)
                         .labelsHidden()
                         .mask(Capsule(style: .continuous))
                         .foregroundStyle(self.isCurrentMonth ? Theme.cGreen : .gray)

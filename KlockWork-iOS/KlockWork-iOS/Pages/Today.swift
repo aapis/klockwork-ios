@@ -9,22 +9,41 @@
 import SwiftUI
 
 struct CreateEntitiesButton: View {
+    @EnvironmentObject private var state: AppState
+    @State public var date: Date = Date()
     public var isViewModeSelectorVisible: Bool = true
+    public var isDateSelectorVisible: Bool = false
+
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
             Today.AddButton()
             if isViewModeSelectorVisible {
                 Today.ViewModeSelector()
             }
+            if isDateSelectorVisible {
+                DatePicker(
+                    "Today",
+                    selection: $date,
+                    displayedComponents: [.date]
+                )
+                .labelsHidden()
+            }
+            
+            // @TODO: implement settings page
+//            NavigationLink {
+//                AppSettings()
+//            } label: {
+//                Image(systemName: "gearshape")
+//                    .font(.title)
+//            }
         }
-        .padding(10)
-        .background(
-            LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .leading, endPoint: .trailing)
-                .opacity(0.4)
-                .blendMode(.softLight)
-                .frame(height: 50)
-        )
-        .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 16))
+        .padding(8)
+        .background(Theme.base.opacity(0.1).blendMode(.softLight))
+        .clipShape(.rect(topLeadingRadius: 16))
+        .frame(height: 50)
+        .onChange(of: date) {
+            self.state.date = date
+        }
     }
 }
 
@@ -106,26 +125,18 @@ extension Today {
         @Binding public var path: NavigationPath
 
         var body: some View {
-            HStack(alignment: .center) {
-                HStack(alignment: .center, spacing: 8) {
-                    Text(Calendar.autoupdatingCurrent.isDateInToday(date) ? "Today" : date.formatted(date: .abbreviated, time: .omitted))
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding([.leading, .top, .bottom])
-                        .overlay {
-                            DatePicker(
-                                "Date picker",
-                                selection: $date,
-                                displayedComponents: [.date]
-                            )
-//                            .labelStyle(DatePickerDateAwareTitle())
-                            .labelsHidden()
-//                            .contentShape(Rectangle())
-                            .opacity(0.011)
-                        }
-                    Image(systemName: "chevron.right")
-                    Spacer()
-                    CreateEntitiesButton()
+            HStack(alignment: .center, spacing: 0) {
+                ZStack(alignment: .bottom) {
+                    LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .bottom, endPoint: .top)
+                        .opacity(0.2)
+                        .blendMode(.softLight)
+                        .frame(height: 45)
+
+                    HStack(spacing: 8) {
+                        Text("Today").font(.title2).padding([.leading, .trailing], 14).bold()
+                        Spacer()
+                        CreateEntitiesButton()
+                    }
                 }
             }
             .onAppear(perform: {
@@ -215,6 +226,7 @@ extension Today {
     }
 
     struct ViewModeSelector: View {
+        @EnvironmentObject private var state: AppState
         @AppStorage("today.viewMode") private var storedVm: Int = 0
         @State private var viewMode: ViewMode = .tabular
 
@@ -229,8 +241,8 @@ extension Today {
                     }
                     .disabled(self.storedVm == 0)
                     .padding(5)
-                    .background(self.storedVm == 0 ? .yellow : .black.opacity(0.1))
-                    .foregroundStyle(self.storedVm == 0 ? Theme.cPurple : .yellow )
+                    .background(self.storedVm == 0 ? self.state.theme.tint : .black.opacity(0.1))
+                    .foregroundStyle(self.storedVm == 0 ? Theme.cPurple : self.state.theme.tint )
                     .clipShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
 
                     Button {
@@ -241,8 +253,8 @@ extension Today {
                     }
                     .disabled(self.storedVm == 1)
                     .padding(5)
-                    .background(self.storedVm == 1 ? .yellow : .black.opacity(0.1))
-                    .foregroundStyle(self.storedVm == 1 ? Theme.cPurple : .yellow)
+                    .background(self.storedVm == 1 ? self.state.theme.tint : .black.opacity(0.1))
+                    .foregroundStyle(self.storedVm == 1 ? Theme.cPurple : self.state.theme.tint)
                     .clipShape(.rect(bottomTrailingRadius: 6, topTrailingRadius: 6))
                 }
             }

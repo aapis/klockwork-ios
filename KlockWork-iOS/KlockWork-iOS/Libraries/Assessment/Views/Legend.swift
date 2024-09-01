@@ -37,7 +37,7 @@ struct Legend: View {
                                 Image(systemName: "gear")
                             }
                         }
-                        .foregroundStyle(self.state.activities.statuses.isEmpty ? .gray : .yellow)
+                        .foregroundStyle(self.state.activities.statuses.isEmpty ? .gray : self.state.theme.tint)
                         .help("Modify assessment factors")
                         .disabled(self.state.activities.statuses.isEmpty)
                     }
@@ -47,7 +47,7 @@ struct Legend: View {
                     ForEach(self.state.activities.statuses.sorted(by: {$0.defaultValue < $1.defaultValue})) { status in
                         Row(status: status)
                     }
-                    RowBasic(colour: .yellow, label: "Today")
+                    RowBasic(colour: self.state.theme.tint, label: "Today")
                     RowBasic(colour: .blue, label: "Selected")
                 }
             }
