@@ -601,12 +601,27 @@ extension PlanTabs {
         /// - Returns: Void
         private func actionOnAppear() -> Void {
             self.upcoming = []
-            let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.due!.formatted(date: .abbreviated, time: .omitted)})
             let sorted = Array(grouped)
-                .sorted(by: {$0.key < $1.key})
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
 
             for group in sorted {
-                self.upcoming.append(UpcomingRow(date: group.key, tasks: group.value))
+                self.upcoming.append(
+                    UpcomingRow(
+                        date: group.key,
+                        tasks: group.value.sorted(by: {$0.due! < $1.due!})
+                    )
+                )
             }
         }
     }
@@ -662,7 +677,17 @@ extension PlanTabs {
             self.overdue = []
             let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
             let sorted = Array(grouped)
-                .sorted(by: {$0.key < $1.key})
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
 
             for group in sorted {
                 self.overdue.append(UpcomingRow(date: group.key, tasks: group.value))
