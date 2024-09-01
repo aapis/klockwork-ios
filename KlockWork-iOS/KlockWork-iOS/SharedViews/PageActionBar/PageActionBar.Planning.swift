@@ -121,27 +121,9 @@ extension PageActionBar.Planning {
         self.selectedTasks = []
         self.selectedProjects = []
         self.selectedCompanies = []
-
-        if self.plan != nil {
-            // Delete the old plan
-            do {
-                try self.plan!.validateForDelete()
-                self.state.moc.delete(self.plan!)
-            } catch {
-                print("[error] Planning.PlanTabs Unable to delete old session due to error \(error)")
-            }
-
-            // Create a new empty plan
-            self.plan = CoreDataPlan(moc: self.state.moc).createAndReturn(
-                date: Date(),
-                jobs: Set(),
-                tasks: Set(),
-                notes: Set(),
-                projects: Set(),
-                companies: Set()
-            )
-        }
-
         self.plan = nil
+
+        // Delete the old plans
+        CoreDataPlan(moc: self.state.moc).deleteAll(for: self.state.date)
     }
 }
