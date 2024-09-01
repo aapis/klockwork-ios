@@ -571,8 +571,8 @@ extension PlanTabs {
 
     struct Feature: View  {
         var body: some View {
-            VStack {
-                HStack {
+            VStack(alignment: .center, spacing: 0) {
+                HStack(alignment: .center, spacing: 0) {
                     Text("Feature planning is coming soon")
                     Spacer()
                 }

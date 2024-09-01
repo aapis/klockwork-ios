@@ -117,6 +117,7 @@ extension PageConfiguration {
             switch self {
             case .planning: Theme.cOrange
             case .today, .create, .modify: Theme.cPurple
+            case .find: Theme.cRoyal
             case .error, .intersitial, .settings: .white
             default:
                 Theme.cGreen
