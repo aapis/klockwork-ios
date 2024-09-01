@@ -43,6 +43,7 @@ extension SearchBar {
 
 extension SearchBar {
     struct Bar: View {
+        @EnvironmentObject private var state: AppState
         public let placeholder: String
         @Binding public var text: String
         @Binding public var sheetPresented: Bool
@@ -66,7 +67,7 @@ extension SearchBar {
 
                     Spacer()
                     Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.yellow)
+                        .foregroundStyle(self.state.theme.tint)
                 }
             }
             .listRowBackground(Theme.textBackground)

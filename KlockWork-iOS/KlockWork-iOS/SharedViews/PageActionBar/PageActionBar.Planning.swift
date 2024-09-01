@@ -103,7 +103,7 @@ extension PageActionBar.Planning {
     /// Create a new Plan for today
     /// - Returns: Void
     private func store() -> Void {
-        CoreDataPlan(moc: self.state.moc).create(
+        self.state.plan = CoreDataPlan(moc: self.state.moc).createAndReturn(
             date: Date(),
             jobs: Set(self.selectedJobs),
             tasks: Set(self.selectedTasks),
@@ -122,6 +122,7 @@ extension PageActionBar.Planning {
         self.selectedProjects = []
         self.selectedCompanies = []
         self.plan = nil
+        self.state.plan = nil
 
         // Delete the old plans
         CoreDataPlan(moc: self.state.moc).deleteAll(for: self.state.date)

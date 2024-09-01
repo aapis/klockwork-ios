@@ -66,6 +66,7 @@ struct FlashcardActivity: View {
         }
 
         struct Actions: View {
+            @EnvironmentObject private var state: AppState
             @Binding public var isAnswerCardShowing: Bool
             @Binding public var definitions: [TaxonomyTermDefinitions]
             @Binding public var current: TaxonomyTerm?
@@ -144,7 +145,7 @@ struct FlashcardActivity: View {
                     .mask(Circle().frame(width: 50, height: 50))
                 }
                 .frame(height: 90)
-                .border(width: 1, edges: [.top], color: .yellow)
+                .border(width: 1, edges: [.top], color: self.state.theme.tint)
             }
         }
 

@@ -17,10 +17,11 @@ struct Planning: View {
     @State private var text: String = ""
     @State private var job: Job? = nil
     @State private var selected: PlanType = .daily
+    @State private var path = NavigationPath()
     private let page: PageConfiguration.AppPage = .planning
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 0) {
                 Header(page: self.page)
                 Divider().background(.white).frame(height: 1)
@@ -45,26 +46,22 @@ extension Planning {
         @EnvironmentObject private var state: AppState
         @State private var date: Date = Date()
         public let page: PageConfiguration.AppPage
+        
 
         var body: some View {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Planning")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding([.leading, .top, .bottom])
-                    .overlay {
-                        DatePicker(
-                            "Date picker",
-                            selection: $date,
-                            displayedComponents: [.date]
-                        )
-                        .labelsHidden()
-                        .contentShape(Rectangle())
-                        .opacity(0.011)
+            HStack(alignment: .center, spacing: 0) {
+                ZStack(alignment: .bottom) {
+                    LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .bottom, endPoint: .top)
+                        .opacity(0.2)
+                        .blendMode(.softLight)
+                        .frame(height: 45)
+                    
+                    HStack(spacing: 8) {
+                        Text("Planning").font(.title2).padding([.leading, .trailing], 10).bold()
+                        Spacer()
+                        CreateEntitiesButton(isViewModeSelectorVisible: false, isDateSelectorVisible: true)
                     }
-                Image(systemName: "chevron.right")
-                Spacer()
-                CreateEntitiesButton(isViewModeSelectorVisible: false)
+                }
             }
             .onAppear(perform: {
                 date = self.state.date

@@ -13,7 +13,6 @@ struct Explore: View {
     typealias EntityTypePair = PageConfiguration.EntityTypePair
 
     @EnvironmentObject private var state: AppState
-    private let fgColour: Color = .yellow
     private var columns: [GridItem] {
         Array(repeating: .init(.flexible()), count: 2)
     }
@@ -41,15 +40,28 @@ struct Explore: View {
 
     struct Header: View {
         @EnvironmentObject private var state: AppState
+        @State public var date: Date = Date()
 
         var body: some View {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Explore")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding([.leading, .top, .bottom])
-                Spacer()
-                CreateEntitiesButton(isViewModeSelectorVisible: false)
+            HStack(alignment: .center, spacing: 0) {
+                ZStack(alignment: .bottom) {
+                    LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .bottom, endPoint: .top)
+                        .opacity(0.1)
+                        .blendMode(.softLight)
+                        .frame(height: 45)
+
+                    HStack(spacing: 8) {
+                        Text("Explore").font(.title2).padding([.leading, .trailing], 10).bold()
+                        Spacer()
+                        CreateEntitiesButton(isViewModeSelectorVisible: false, isDateSelectorVisible: true)
+                    }
+                }
+            }
+            .onAppear(perform: {
+                date = self.state.date
+            })
+            .onChange(of: date) {
+                self.state.date = date
             }
         }
     }

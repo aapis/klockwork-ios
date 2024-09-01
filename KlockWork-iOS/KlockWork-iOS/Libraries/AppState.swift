@@ -15,6 +15,7 @@ class AppState: ObservableObject {
     @Published var theme: AppTheme = AppTheme()
     @Published var today: TodayPage = TodayPage()
     @Published var job: Job?
+    @Published var plan: Plan?
 
     init() {
         self.activities.state = self

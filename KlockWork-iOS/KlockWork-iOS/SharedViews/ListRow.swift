@@ -14,7 +14,7 @@ struct ListRow: View {
     public var extraColumn: AnyView?
     public var highlight: Bool = false // @TODO: highlight is deprecated and unused
     public var gradientColours: (Color, Color) = (.clear, .clear) // (.clear, .black)
-    public var padding: (CGFloat, CGFloat, CGFloat, CGFloat) = (14, 14, 14, 14)
+    public var padding: (CGFloat, CGFloat, CGFloat, CGFloat) = (8, 8, 8, 8)
 
     var body: some View {
         HStack(alignment: .center, spacing: 5) {
@@ -44,6 +44,7 @@ struct ListRow: View {
 }
 
 struct ToggleableListRow: View {
+    @EnvironmentObject private var state: AppState
     public let name: String
     public var colour: Color? = .clear
     public var iconOff: String = "square"
@@ -68,12 +69,12 @@ struct ToggleableListRow: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 0) {
                 Image(systemName: selected ? iconOn : iconOff)
-                    .foregroundStyle(.yellow)
+                    .foregroundStyle(self.state.theme.tint)
                     .font(.title3)
                     .padding(1)
             }
-            .background(selected ? .yellow : .clear)
-            .listRowBackground(selected ? Color.yellow : Color.clear)
+            .background(selected ? self.state.theme.tint : .clear)
+            .listRowBackground(selected ? self.state.theme.tint : Color.clear)
             .cornerRadius(5)
         }
         .padding([.leading, .trailing, .top, .bottom], self.padding)

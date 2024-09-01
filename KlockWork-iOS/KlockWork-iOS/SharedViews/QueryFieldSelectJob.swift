@@ -17,7 +17,7 @@ struct QueryFieldSelectJob: View {
 
     public let prompt: String
     public var onSubmit: () -> Void
-    @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
     @Binding public var text: String
     @Binding public var job: Job?
     @Binding public var entityType: EntityType
@@ -34,7 +34,7 @@ struct QueryFieldSelectJob: View {
                             Text("Select a job")
                             Spacer()
                             Image(systemName: "chevron.right")
-                                .foregroundStyle(.yellow)
+                                .foregroundStyle(self.state.theme.tint)
                         }
                     }
                     .padding()
@@ -42,7 +42,7 @@ struct QueryFieldSelectJob: View {
                     QueryField(prompt: prompt, onSubmit: self.onSubmit, text: $text)
                 }
             }
-            .border(width: 1, edges: [.top], color: job != nil && text.isEmpty ? .gray : .yellow)
+            .border(width: 1, edges: [.top], color: job != nil && text.isEmpty ? .gray : self.state.theme.tint)
         }
         .onSubmit(self.onSubmit)
     }

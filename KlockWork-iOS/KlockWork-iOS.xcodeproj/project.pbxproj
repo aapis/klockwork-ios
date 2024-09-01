@@ -27,6 +27,7 @@
 		53274B3C2C13C7E6008387BF /* AssessmentFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */; };
 		536B32B22C1A03BB00E01517 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536B32B12C1A038E00E01517 /* AppState.swift */; };
 		536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536E4F682C0D77A600FDC1F4 /* ActionType.swift */; };
+		53733D512C851CF500212DD6 /* Logo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53733D502C851CF200212DD6 /* Logo.swift */; };
 		537582C72BFFB37900CB528C /* Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 537582C52BFFB37900CB528C /* Data.xcdatamodeld */; };
 		537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CB2BFFD70D00CB528C /* RecordDetail.swift */; };
 		537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CD2BFFEB7500CB528C /* EdgeBorder.swift */; };
@@ -144,6 +145,7 @@
 		53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentFactor.swift; sourceTree = "<group>"; };
 		536B32B12C1A038E00E01517 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		536E4F682C0D77A600FDC1F4 /* ActionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionType.swift; sourceTree = "<group>"; };
+		53733D502C851CF200212DD6 /* Logo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logo.swift; sourceTree = "<group>"; };
 		537582C62BFFB37900CB528C /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
 		537582CB2BFFD70D00CB528C /* RecordDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDetail.swift; sourceTree = "<group>"; };
 		537582CD2BFFEB7500CB528C /* EdgeBorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EdgeBorder.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/EdgeBorder.swift; sourceTree = "<group>"; };
@@ -309,6 +311,7 @@
 		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
+				53733D502C851CF200212DD6 /* Logo.swift */,
 				538A10322C31C7CC0028B785 /* RowAddButton.swift */,
 				530C8D1F2C1BE87600ED3AD1 /* Error */,
 				53E33F842C1B8D2D001191ED /* LargeDateIndicator.swift */,
@@ -682,6 +685,7 @@
 				537582D52C0033B800CB528C /* Tabs.swift in Sources */,
 				538A10312C30FB600028B785 /* ViewMode.swift in Sources */,
 				53F926042BFE9B2400948076 /* PersistenceController.swift in Sources */,
+				53733D512C851CF500212DD6 /* Logo.swift in Sources */,
 				539134F02C02C44000B48494 /* Swipe.swift in Sources */,
 				53D4CBCA2BFE955000AFEDEA /* SaveSource.swift in Sources */,
 				53D4CBC52BFE94C900AFEDEA /* DateHelper.swift in Sources */,
@@ -861,7 +865,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 6DT7L2N5X6;
@@ -904,7 +908,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 6DT7L2N5X6;

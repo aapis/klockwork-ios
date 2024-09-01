@@ -95,6 +95,8 @@ struct Find: View {
 
 extension Find {
     struct Header: View {
+        @EnvironmentObject private var state: AppState
+        @State public var date: Date = Date()
         @Binding public var text: String
         @Binding public var recentSearchTerms: [String]
         @State private var isPresented: Bool = false
@@ -102,34 +104,35 @@ extension Find {
 
         var body: some View {
             HStack(alignment: .center, spacing: 0) {
-                if text.isEmpty {
-                    Text("Find")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding([.leading, .top, .bottom])
-                } else {
-                    if text.count < 10 {
-                        Text("Find: \(text.prefix(10))")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .padding([.leading, .top, .bottom])
-                    } else {
-                        Text("Find: \(text.prefix(10))...")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .padding([.leading, .top, .bottom])
+                ZStack(alignment: .bottom) {
+                    LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .bottom, endPoint: .top)
+                        .opacity(0.1)
+                        .blendMode(.softLight)
+                        .frame(height: 45)
+
+                    HStack(spacing: 8) {
+                        HStack {
+                            if text.isEmpty {
+                                Text("Find")
+                            } else {
+                                if text.count < 10 {
+                                    Text("Find: \(text.prefix(10))")
+                                } else {
+                                    Text("Find: \(text.prefix(10))...")
+                                }
+                            }
+                        }
+                        .font(.title2).padding([.leading, .trailing], 10).bold()
+                        Spacer()
+                        CreateEntitiesButton(isViewModeSelectorVisible: false, isDateSelectorVisible: true)
                     }
                 }
-
-                Spacer()
-                CreateEntitiesButton(isViewModeSelectorVisible: false)
-                // @TODO: move to CreateEntitiesButton
-//                NavigationLink {
-//                    AppSettings()
-//                } label: {
-//                    Image(systemName: "gearshape")
-//                        .font(.title)
-//                }
+            }
+            .onAppear(perform: {
+                date = self.state.date
+            })
+            .onChange(of: date) {
+                self.state.date = date
             }
         }
     }

@@ -28,7 +28,7 @@ struct GroupedRecordDateRow: View {
 
 struct RecordFilter: View {
     typealias Button = Tabs.Content.Individual.SingleRecord
-    public let job: Job
+    public var job: Job?
     public var page: PageConfiguration.AppPage = .create
     @FetchRequest private var records: FetchedResults<LogRecord>
     @State private var groupedRecords: [RecordsGroupedByDate] = []
@@ -57,9 +57,9 @@ struct RecordFilter: View {
         .scrollDismissesKeyboard(.immediately)
     }
 
-    init(job: Job) {
+    init(job: Job?) {
         self.job = job
-        _records = CoreDataRecords.fetch(job: self.job)
+        _records = CoreDataRecords.fetch(job: self.job!)
     }
 }
 

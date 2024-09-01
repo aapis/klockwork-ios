@@ -20,7 +20,7 @@ struct QueryField: View {
     public let prompt: String
     public var onSubmit: () -> Void
     public var action: Action = .submit
-    @Environment(\.managedObjectContext) var moc
+    @EnvironmentObject private var state: AppState
     @Binding public var text: String
     @FocusState public var focused: Field?
 
@@ -39,7 +39,7 @@ struct QueryField: View {
                 .submitLabel(action == .search ? .search : .return)
                 .textSelection(.enabled)
                 .padding()
-                .foregroundStyle(.yellow)
+                .foregroundStyle(self.state.theme.tint)
 
                 Spacer()
 
@@ -59,19 +59,19 @@ struct QueryField: View {
                                 Image(systemName: "xmark.circle.fill")
                                     .fontWeight(.bold)
                                     .font(.title)
-                                    .foregroundStyle(.yellow)
+                                    .foregroundStyle(self.state.theme.tint)
                             } else {
                                 Image(systemName: "chevron.up.circle.fill")
                                     .fontWeight(.bold)
                                     .font(.title)
-                                    .foregroundStyle(text.isEmpty ? .gray : .yellow)
+                                    .foregroundStyle(text.isEmpty ? .gray : self.state.theme.tint)
                             }
                         }
                     }
                 }
                 .padding(.trailing)
             }
-            .border(width: 1, edges: [.top], color: text.isEmpty ? .gray : .yellow)
+            .border(width: 1, edges: [.top], color: text.isEmpty ? .gray : self.state.theme.tint)
         }
         .onSubmit(self.onSubmit)
     }
