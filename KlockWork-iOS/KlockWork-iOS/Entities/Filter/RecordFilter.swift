@@ -73,6 +73,7 @@ extension RecordFilter {
                 .sliced(by: [.year, .month, .day], for: \.timestamp!)
                 .sorted(by: {$0.key > $1.key})
             let grouped = Dictionary(grouping: sortedRecords, by: {$0.key})
+            // @TODO: implement similar sorting to Upcoming/Overdue tabs
 
             for group in grouped {
                 self.groupedRecords.append(

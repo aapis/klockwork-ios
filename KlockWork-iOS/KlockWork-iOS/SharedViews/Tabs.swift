@@ -1368,7 +1368,7 @@ extension Tabs.Content {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
-                    HStack(spacing: 0) {
+                    HStack(alignment: .firstTextBaseline, spacing: 0) {
                         // Open company button
                         Button {
                             selected.toggle()

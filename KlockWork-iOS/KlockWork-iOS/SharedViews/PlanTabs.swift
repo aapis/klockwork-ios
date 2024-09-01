@@ -207,6 +207,7 @@ extension PlanTabs {
                                 ForEach(selectedJobs.sorted(by: {$0.project != nil && $1.project != nil ? $0.project!.name! > $1.project!.name! && $0.jid < $1.jid : $0.jid < $1.jid})) { job in // sooo sorry
                                     Row(
                                         job: job,
+                                        selectedJobs: $selectedJobs,
                                         selectedTasks: $selectedTasks,
                                         selectedNotes: $selectedNotes,
                                         selectedProjects: $selectedProjects,
@@ -233,7 +234,7 @@ extension PlanTabs {
         /// - Returns: Void
         private func restore() -> Void {
             let model = CoreDataPlan(moc: self.state.moc)
-            let plan = model.forToday().first
+            let plan = model.forToday(self.state.date).first
 
             if let existingPlan = plan {
                 self.selectedJobs = existingPlan.jobs?.allObjects as! [Job]
@@ -242,6 +243,19 @@ extension PlanTabs {
                 self.selectedProjects = existingPlan.projects?.allObjects as! [Project]
                 self.selectedCompanies = existingPlan.companies?.allObjects as! [Company]
                 self.plan = existingPlan
+            } else {
+                let suggested = CoreDataTasks(moc: self.state.moc).dueToday(self.state.date)
+                var sJobs: Set<Job> = []
+
+                if !suggested.isEmpty {
+                    for task in suggested {
+                        if let job = task.owner {
+                            sJobs.insert(job)
+                        }
+                    }
+
+                    self.selectedJobs = Array(sJobs)
+                }
             }
         }
 
@@ -288,7 +302,9 @@ extension PlanTabs {
         struct PlanRow: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButton
 
+            @EnvironmentObject private var state: AppState
             public var job: Job
+            @Binding public var selectedJobs: [Job]
             @Binding public var selectedTasks: [LogTask]
             @Binding public var selectedNotes: [Note]
             @Binding public var selectedProjects: [Project]
@@ -302,7 +318,24 @@ extension PlanTabs {
             var body: some View {
                 NavigationStack {
                     VStack(alignment: .leading, spacing: 1) {
-                        Row(job: job, callback: self.rowTapCallback)
+                        HStack(alignment: .center, spacing: 0) {
+                            Row(job: job, callback: self.rowTapCallback)
+                            Button {
+                                withAnimation(.bouncy(duration: Tabs.animationDuration)) {
+                                    selectedJobs.removeAll(where: {$0 == self.job})
+
+                                    if selectedJobs.isEmpty {
+                                        CoreDataPlan(moc: self.state.moc).deleteAll(for: self.state.date)
+                                    }
+                                }
+                            } label: {
+                                ZStack(alignment: .center) {
+                                    Theme.base.opacity(0.5)
+                                    Image(systemName: "xmark")
+                                }
+                            }
+                            .frame(width: 50)
+                        }
 
                         if isDetailsPresented {
                             VStack(alignment: .leading) {
@@ -418,14 +451,16 @@ extension PlanTabs {
             /// Default init
             /// - Parameters:
             ///   - job: Job
+            ///   - selectedJobs: Bound variable representing selected jobs
             ///   - selectedTasks: Bound variable representing selected tasks
             ///   - selectedNotes: Bound variable representing selected notes
             ///   - selectedProjects: Bound variable representing selected projects
             ///   - selectedCompanies: Bound variable representing selected companies
-            init(job: Job, selectedTasks: Binding<[LogTask]>, selectedNotes: Binding<[Note]>, selectedProjects: Binding<[Project]>, selectedCompanies: Binding<[Company]>) {
+            init(job: Job, selectedJobs: Binding<[Job]>, selectedTasks: Binding<[LogTask]>, selectedNotes: Binding<[Note]>, selectedProjects: Binding<[Project]>, selectedCompanies: Binding<[Company]>) {
                 self.job = job
                 _incompleteTasks = CoreDataTasks.fetch(by: job)
                 _notes = CoreDataNotes.fetch(by: job)
+                _selectedJobs = selectedJobs
                 _selectedTasks = selectedTasks
                 _selectedNotes = selectedNotes
                 _selectedProjects = selectedProjects
@@ -601,12 +636,27 @@ extension PlanTabs {
         /// - Returns: Void
         private func actionOnAppear() -> Void {
             self.upcoming = []
-            let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.due!.formatted(date: .abbreviated, time: .omitted)})
             let sorted = Array(grouped)
-                .sorted(by: {$0.key < $1.key})
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
 
             for group in sorted {
-                self.upcoming.append(UpcomingRow(date: group.key, tasks: group.value))
+                self.upcoming.append(
+                    UpcomingRow(
+                        date: group.key,
+                        tasks: group.value.sorted(by: {$0.due! < $1.due!})
+                    )
+                )
             }
         }
     }
@@ -662,7 +712,17 @@ extension PlanTabs {
             self.overdue = []
             let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
             let sorted = Array(grouped)
-                .sorted(by: {$0.key < $1.key})
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
 
             for group in sorted {
                 self.overdue.append(UpcomingRow(date: group.key, tasks: group.value))
