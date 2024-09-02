@@ -38,9 +38,8 @@ struct CreateEntitiesButton: View {
 //            }
         }
         .padding(8)
-        .background(Theme.base.opacity(0.1).blendMode(.softLight))
+        .background(Theme.base.opacity(0.2).blendMode(.softLight))
         .clipShape(.rect(topLeadingRadius: 16))
-        .frame(height: 50)
         .onChange(of: date) {
             self.state.date = date
         }
