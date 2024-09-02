@@ -20,7 +20,8 @@ struct MiniTitleBar: View {
                 .font(.caption)
             Spacer()
         }
-        .padding(5)
+        .padding([.top, .bottom], 5)
+        .padding([.leading, .trailing], 8)
         .background(Theme.darkBtnColour)
         .foregroundStyle(.gray)
         .onAppear(perform: self.setTitle)

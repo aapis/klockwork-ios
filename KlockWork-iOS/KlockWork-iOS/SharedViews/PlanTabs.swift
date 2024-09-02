@@ -338,7 +338,7 @@ extension PlanTabs {
                                     Image(systemName: "xmark")
                                 }
                             }
-                            .frame(width: 50)
+                            .frame(width: 40)
                         }
 
                         if isDetailsPresented {
@@ -361,22 +361,26 @@ extension PlanTabs {
                 HStack(alignment: .center, spacing: 8) {
                     if let project = self.job.project {
                         if let company = project.company {
-                            if company.name != nil {
+                            if company.abbreviation != nil {
                                 Button {
                                     self.isCompanyPresented.toggle()
                                 } label: {
-                                    Text(company.name!)
+                                    Text(company.abbreviation!)
+                                        .multilineTextAlignment(.leading)
+                                        .underline(true, pattern: .dot)
                                 }
                             }
                             Image(systemName: "chevron.right")
                                 .font(.caption)
                         }
 
-                        if project.name != nil {
+                        if project.abbreviation != nil {
                             Button {
                                 self.isProjectPresented.toggle()
                             } label: {
-                                Text(project.name!)
+                                Text(project.abbreviation!)
+                                    .multilineTextAlignment(.leading)
+                                    .underline(true, pattern: .dot)
                             }
                         }
                     }
@@ -523,6 +527,7 @@ extension PlanTabs {
                         Image(systemName: self.selected ? "square.fill" : "square")
                         if let content = self.task.content {
                             Text(content)
+                                .multilineTextAlignment(.leading)
                         }
                         Spacer()
                     }
@@ -552,6 +557,7 @@ extension PlanTabs {
                         Image(systemName: selected ? "square.fill" : "square")
                         if let title = note.title {
                             Text(title)
+                                .multilineTextAlignment(.leading)
                         }
                         Spacer()
                     }

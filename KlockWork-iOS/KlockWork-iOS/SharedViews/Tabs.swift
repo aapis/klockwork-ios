@@ -886,8 +886,9 @@ extension Tabs.Content {
                         name: record.message ?? "_RECORD_CONTENT",
                         colour: record.job != nil ? record.job!.backgroundColor : Theme.rowColour,
                         extraColumn: AnyView(
-                            Text(record.timestamp!.formatted(date: .omitted, time: .shortened))
-                                .foregroundStyle(.gray)
+                            VStack(alignment: .leading, spacing: 1) {
+                                Timestamp(text: record.timestamp!.formatted(date: .omitted, time: .shortened))
+                            }
                         )
                     )
                 }
