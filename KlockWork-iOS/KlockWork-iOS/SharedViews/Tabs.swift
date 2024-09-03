@@ -91,15 +91,21 @@ extension Tabs {
                     ForEach(EntityType.allCases, id: \.self) { page in
                         VStack(spacing: 0) {
                             Button {
-                                withAnimation(.bouncy(duration: Tabs.animationDuration)) {
-                                    selected = page
-                                }
+                                selected = page
                             } label: {
-                                (page == selected ? page.selectedIcon : page.icon)
-                                    .frame(maxHeight: 20)
-                                    .padding(14)
-                                    .background(page == selected ? Theme.darkBtnColour : .clear)
-                                    .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
+                                if page == .jobs {
+                                    (page == selected ? page.selectedIcon : page.icon)
+                                        .frame(maxHeight: 20)
+                                        .padding(14)
+                                        .background(page == selected ? Theme.darkBtnColour : .clear)
+                                        .foregroundStyle(self.state.job == nil ? page == selected ? self.state.theme.tint : .gray : self.state.job!.backgroundColor)
+                                } else {
+                                    (page == selected ? page.selectedIcon : page.icon)
+                                        .frame(maxHeight: 20)
+                                        .padding(14)
+                                        .background(page == selected ? Theme.darkBtnColour : .clear)
+                                        .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
+                                }
                             }
                             .buttonStyle(.plain)
                         }
