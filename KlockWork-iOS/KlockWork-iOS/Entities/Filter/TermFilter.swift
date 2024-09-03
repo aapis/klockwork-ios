@@ -32,6 +32,7 @@ struct TermFilter: View {
     public var page: PageConfiguration.AppPage = .create
     @FetchRequest private var definitions: FetchedResults<TaxonomyTermDefinitions>
     @State private var grouped: [TermsGroupedByDate] = []
+    @State private var searchText: String = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -48,6 +49,9 @@ struct TermFilter: View {
                     }
                 }
             }
+
+//            @TODO: implement
+//            QueryField(prompt: "Search for keywords or phrases", onSubmit: self.actionOnSubmit, action: .search, text: $searchText)
         }
         .onAppear(perform: self.actionOnAppear)
         .navigationTitle("Taxonomy Terms")
@@ -71,6 +75,7 @@ struct TermFilterBound: View {
     public var page: PageConfiguration.AppPage = .create
     @FetchRequest private var definitions: FetchedResults<TaxonomyTermDefinitions>
     @State private var grouped: [TermsGroupedByDate] = []
+    @State private var searchText: String = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -87,6 +92,9 @@ struct TermFilterBound: View {
                     }
                 }
             }
+
+//            @TODO: implement
+//            QueryField(prompt: "Search for keywords or phrases", onSubmit: self.actionOnSubmit, action: .search, text: $searchText)
         }
         .onChange(of: job) { self.actionOnAppear() }
         .onAppear(perform: self.actionOnAppear)
@@ -123,6 +131,13 @@ extension TermFilter {
             }
         }
     }
+
+    /// Plaintext search onsubmit handler
+    /// @TODO: implement
+    /// - Returns: Void
+    private func actionOnSubmit() -> Void {
+
+    }
 }
 
 extension TermFilterBound {
@@ -142,5 +157,12 @@ extension TermFilterBound {
                 )
             }
         }
+    }
+
+    /// Plaintext search onsubmit handler
+    /// @TODO: implement
+    /// - Returns: Void
+    private func actionOnSubmit() -> Void {
+
     }
 }
