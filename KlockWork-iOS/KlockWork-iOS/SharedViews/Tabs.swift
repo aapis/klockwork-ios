@@ -391,6 +391,7 @@ extension Tabs.Content {
                 @State private var tasks: [LogTask] = []
                 @State private var notes: [Note] = []
                 @State private var records: [LogRecord] = []
+                @State private var terms: [TaxonomyTermDefinitions] = []
                 @State private var colour: Color = .clear
                 @State private var newTaskContent: String = "" // @TODO: move this to a new struct
                 @State private var newNoteTitle: String = "" // @TODO: move this to a new struct
@@ -534,7 +535,45 @@ extension Tabs.Content {
                                 }
 
                                 /// Terms
-                                Terms(inSheet: false, entity: self.entity)
+                                ZStack(alignment: .leading) {
+                                    self.entity.backgroundColor
+                                    LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                        .opacity(0.6)
+                                        .blendMode(.softLight)
+                                        .frame(height: 50)
+
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+                                            .frame(width: 15)
+                                        if self.terms.isEmpty {
+                                            Rectangle()
+                                                .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                                .frame(width: 15)
+                                        }
+
+                                        HStack(spacing: 0) {
+                                            if self.terms.isEmpty {
+                                                Text("No Terms")
+                                                    .opacity(0.5)
+                                            } else {
+                                                NavigationLink {
+                                                    TermFilter(job: self.entity)
+                                                } label: {
+                                                    ListRow(
+                                                        name: terms.count == 1 ? "1 Term" : "\(terms.count) Terms",
+                                                        colour: self.entity.backgroundColor,
+                                                        icon: "chevron.right"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        .padding(.leading, 8)
+                                    }
+                                }
 
                                 /// Record view link
                                 ZStack(alignment: .leading) {
@@ -544,7 +583,7 @@ extension Tabs.Content {
                                         .blendMode(.softLight)
                                         .frame(height: 50)
 
-                                    HStack(alignment: .center, spacing: 0) {
+                                    HStack(alignment: .top, spacing: 0) {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
@@ -565,7 +604,11 @@ extension Tabs.Content {
                                                 NavigationLink {
                                                     RecordFilter(job: self.entity)
                                                 } label: {
-                                                    ListRow(name: "\(self.records.count) Records", colour: self.entity.backgroundColor)
+                                                    ListRow(
+                                                        name: "\(self.records.count) Records",
+                                                        colour: self.entity.backgroundColor,
+                                                        icon: "chevron.right"
+                                                    )
                                                 }
                                             }
                                         }
@@ -597,6 +640,10 @@ extension Tabs.Content {
 
                     if let records = self.entity.records?.allObjects as? [LogRecord] {
                         self.records = records.filter({$0.alive == true}).sorted(by: {$0.timestamp! > $1.timestamp!})
+                    }
+
+                    if let terms = self.entity.definitions?.allObjects as? [TaxonomyTermDefinitions] {
+                        self.terms = terms.filter({$0.alive == true}).sorted(by: {$0.created! > $1.created!})
                     }
 
                     self.colour = Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble)
