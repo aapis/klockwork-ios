@@ -17,6 +17,7 @@ struct TaskDetail: View {
     @State private var content: String = ""
     @State private var created: Date = Date()
     @State private var due: Date = DateHelper.endOfDay() ?? Date()
+    @State private var dueTomorrow: Date = DateHelper.endOfTomorrow() ?? Date()
     @State private var lastUpdate: Date = Date()
     @State public var job: Job?
     @State private var company: Company?
@@ -53,20 +54,28 @@ struct TaskDetail: View {
 
                                 self.actionOnSave()
                             } label: {
-                                Text("Reopen")
+                                HStack {
+                                    Image(systemName: "plus")
+                                        .foregroundStyle(self.state.theme.tint)
+                                    Text("Reopen")
+                                }
                             }
                             .listRowBackground(Theme.textBackground)
                         }
-                        
+
                         Button {
-                            var dc = DateComponents()
-                            dc.day = +1
-                            self.due = Calendar.autoupdatingCurrent.date(byAdding: dc, to: self.due) ?? DateHelper.endOfDay() ?? Date()
+                            if let newDate = DateHelper.endOfTomorrow(self.due) {
+                                self.due = newDate
+                            }
                         } label: {
-                            Text("+1 Due")
+                            HStack {
+                                Image(systemName: "calendar.badge.clock")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Due tomorrow")
+                            }
                         }
                         .listRowBackground(Theme.textBackground)
-                        
+
                         if self.task != nil {
                             Button {
                                 CoreDataTasks(moc: self.state.moc).create(
@@ -77,7 +86,11 @@ struct TaskDetail: View {
                                 )
                                 dismiss()
                             } label: {
-                                Text("Duplicate")
+                                HStack {
+                                    Image(systemName: "doc.on.doc")
+                                        .foregroundStyle(self.state.theme.tint)
+                                    Text("Duplicate")
+                                }
                             }
                             .listRowBackground(Theme.textBackground)
                         }

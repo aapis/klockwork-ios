@@ -113,30 +113,6 @@ struct Explore: View {
                         }
                         .listRowBackground(Theme.textBackground)
                     }
-
-                    Section("Utilities") {
-                        NavigationLink {
-                            GlasgowComaScaleCalculator()
-                        } label: {
-                            HStack {
-                                Image(systemName: "function")
-                                    .foregroundStyle(self.state.theme.tint)
-                                Text("GCS Calculator")
-                            }
-                        }
-                        .listRowBackground(Theme.textBackground)
-
-                        NavigationLink {
-                            PrimaryAssessmentGuide()
-                        } label: {
-                            HStack {
-                                Image(systemName: "stethoscope")
-                                    .foregroundStyle(self.state.theme.tint)
-                                Text("Primary Assessment Guide")
-                            }
-                        }
-                        .listRowBackground(Theme.textBackground)
-                    }
                 }
                 Spacer()
             }

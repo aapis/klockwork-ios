@@ -49,11 +49,6 @@ struct Tabs: View {
             }
         }
         .background(.clear)
-        .onChange(of: job) {
-            withAnimation(.bouncy(duration: Tabs.animationDuration)) {
-                selected = .records
-            }
-        }
     }
 }
 
@@ -141,6 +136,18 @@ extension Tabs {
             case .terms:
                 if self.job != nil {
                     List.Terms(inSheet: self.inSheet, entity: self.job!)
+                } else {
+                    VStack(alignment: .center, spacing: 0) {
+                        HStack(alignment: .center, spacing: 0) {
+                            Text("No terms found for query")
+                            Spacer()
+                        }
+                        .padding()
+                        .background(Theme.textBackground)
+                        .clipShape(.rect(cornerRadius: 16))
+                        Spacer()
+                    }
+                    .padding()
                 }
             }
         }
@@ -526,7 +533,7 @@ extension Tabs.Content {
                                     }
                                 }
 
-                                // Terms
+                                /// Terms
                                 Terms(inSheet: false, entity: self.entity)
 
                                 /// Record view link
@@ -712,11 +719,11 @@ extension Tabs.Content {
             @State private var items: [TaxonomyTerm] = [] // @TODO: we maaaaay only use this to determine term count
             @State private var newTermName: String = ""
             @State private var newTermDefinition: String = ""
+            @State private var id: UUID = UUID()
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
                     ZStack(alignment: .leading) {
-                        self.entity.backgroundColor
                         LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
                             .opacity(0.6)
                             .blendMode(.softLight)
@@ -729,25 +736,7 @@ extension Tabs.Content {
                                 Rectangle()
                                     .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                     .frame(width: 15)
-                                if self.items.isEmpty {
-                                    Rectangle()
-                                        .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
-                                        .frame(width: 15)
-                                }
-
-                                HStack(spacing: 0) {
-                                    if self.items.isEmpty {
-                                        Text("No Terms")
-                                            .opacity(0.5)
-                                    } else {
-                                        NavigationLink {
-                                            TermFilter(job: self.entity)
-                                        } label: {
-                                            ListRow(name: self.items.count == 1 ? "1 Term" : "\(self.items.count) Terms", colour: self.entity.backgroundColor ?? Theme.rowColour)
-                                        }
-                                    }
-                                }
-                                .padding(.leading, 8)
+                                TermFilterBound(job: $entity)
                             }
                         }
                     }
@@ -1011,7 +1000,7 @@ extension Tabs.Content {
                     ListRow(
                         name: job.title ?? job.jid.string,
                         colour: job.backgroundColor,
-                        icon: selected ? "minus" : "plus"
+                        icon: selected ? "chevron.up" : "chevron.down"
                     )
                 }
                 .buttonStyle(.plain)
@@ -1200,6 +1189,8 @@ extension Tabs.Content {
             public var callback: (() -> Void)? = nil
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
+            @State private var isCompanyPresented: Bool = false
+            @State private var isProjectPresented: Bool = false
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
@@ -1228,7 +1219,7 @@ extension Tabs.Content {
                                 Spacer()
                                 Image(systemName: "chevron.right")
                             }
-                            .padding(12)
+                            .padding(8)
                         }
                         .background(task.owner?.backgroundColor ?? Theme.rowColour)
                     }
@@ -1240,11 +1231,35 @@ extension Tabs.Content {
                                 .opacity(0.1)
 
                             VStack(alignment: .leading, spacing: 4) {
-                                HStack(alignment: .center) {
-                                    Text("\(task.owner?.project?.company?.abbreviation ?? "DEF").\(task.owner?.project?.abbreviation ?? "DEF") > \(task.owner?.title ?? "_TASK_OWNER")")
-                                        .multilineTextAlignment(.leading)
+                                HStack(alignment: .center, spacing: 8) {
+                                    if let project = task.owner?.project {
+                                        if let company = project.company {
+                                            if company.abbreviation != nil {
+                                                Button {
+                                                    self.isCompanyPresented.toggle()
+                                                } label: {
+                                                    Text(company.abbreviation!)
+                                                        .multilineTextAlignment(.leading)
+                                                        .underline(true, pattern: .dot)
+                                                }
+                                            }
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                        }
+
+                                        if project.abbreviation != nil {
+                                            Button {
+                                                self.isProjectPresented.toggle()
+                                            } label: {
+                                                Text(project.abbreviation!)
+                                                    .multilineTextAlignment(.leading)
+                                                    .underline(true, pattern: .dot)
+                                            }
+                                        }
+                                    }
                                     Spacer()
                                 }
+
                                 if task.due != nil {
                                     HStack(alignment: .center) {
                                         Text("Due: \(task.due!.formatted(date: .abbreviated, time: .complete))")
@@ -1254,7 +1269,7 @@ extension Tabs.Content {
                                 }
                             }
                             .padding(8)
-                            .font(.caption)
+                            .font(.system(.caption, design: .monospaced))
                             .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                         }
                     }
@@ -1262,6 +1277,22 @@ extension Tabs.Content {
                 .background(self.task.owner?.backgroundColor ?? Theme.rowColour)
                 .opacity(isCompleted ? 0.5 : 1.0)
                 .onAppear(perform: self.actionOnAppear)
+                .sheet(isPresented: $isCompanyPresented) {
+                    if let project = task.owner?.project {
+                        if let company = project.company {
+                            CompanyDetail(company: company)
+                                .scrollContentBackground(.hidden)
+                                .presentationBackground(Theme.cOrange)
+                        }
+                    }
+                }
+                .sheet(isPresented: $isProjectPresented) {
+                    if let project = task.owner?.project {
+                        ProjectDetail(project: project)
+                            .scrollContentBackground(.hidden)
+                            .presentationBackground(Theme.cOrange)
+                    }
+                }
             }
 
             /// Onload handler. Sets state vars isCompleted and isCancelled to default state

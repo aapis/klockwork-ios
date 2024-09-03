@@ -92,7 +92,7 @@ struct Today: View {
                 Tabs(inSheet: inSheet, job: $job, selected: $selected)
                 if !inSheet {
                     // @TODO: each one of these could include the create entity button, but for now it's only relevant to the Records tab
-                    if selected == .records {
+                    if [.records, .terms].contains(where: {$0 == selected}) {
                         PageActionBar.Today(job: $job, isPresented: $isPresented)
                     }
 

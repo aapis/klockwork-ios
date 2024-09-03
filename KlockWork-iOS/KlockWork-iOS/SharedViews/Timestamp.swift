@@ -9,12 +9,18 @@ import SwiftUI
 
 struct Timestamp: View {
     public let text: String
+    public var fullWidth: Bool = false
 
     var body: some View {
-        Text(self.text)
-            .padding(2)
-            .background(.black.opacity(0.6))
-            .foregroundStyle(.white)
-            .font(.system(.caption, design: .monospaced))
+        HStack(alignment: .center, spacing: 0) {
+            Text(self.text)
+            if fullWidth {
+                Spacer()
+            }
+        }
+        .padding(2)
+        .background(.black.opacity(0.6))
+        .foregroundStyle(.white)
+        .font(.system(.caption, design: .monospaced))
     }
 }
