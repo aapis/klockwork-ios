@@ -10,11 +10,15 @@ import SwiftUI
 struct Timestamp: View {
     public let text: String
     public var fullWidth: Bool = false
+    public var alignment: Edge = .leading
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
+            if self.fullWidth && self.alignment == .trailing {
+                Spacer()
+            }
             Text(self.text)
-            if fullWidth {
+            if self.fullWidth && self.alignment == .leading {
                 Spacer()
             }
         }

@@ -610,14 +610,7 @@ extension PlanTabs {
                     VStack(alignment: .leading, spacing: 1) {
                         if !self.tasks.isEmpty {
                             ForEach(self.upcoming, id: \.id) { row in
-                                HStack {
-                                    Spacer()
-                                    Text(row.date)
-                                        .padding(5)
-                                        .font(.caption)
-                                }
-                                .background(.black.opacity(0.2))
-                                .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
+                                Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
 
                                 ForEach(row.tasks) { task in
                                     Row(task: task, callback: self.actionOnAppear)
@@ -685,14 +678,7 @@ extension PlanTabs {
                     VStack(alignment: .leading, spacing: 1) {
                         if !self.tasks.isEmpty {
                             ForEach(self.overdue, id: \.id) { row in
-                                HStack {
-                                    Spacer()
-                                    Text(row.date)
-                                        .padding(5)
-                                        .font(.caption)
-                                }
-                                .background(.black.opacity(0.2))
-                                .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
+                                Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
 
                                 ForEach(row.tasks) { task in
                                     Row(task: task, callback: self.actionOnAppear)
