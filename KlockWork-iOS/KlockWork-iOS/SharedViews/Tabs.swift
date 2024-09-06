@@ -239,7 +239,7 @@ extension Tabs.Content {
                     VStack(alignment: .leading, spacing: 1) {
                         if items.count > 0 {
                             ForEach(items) { task in
-                                Individual.SingleTaskDetailedChecklistItem(task: task)
+                                Individual.SingleTaskDetailedChecklistItem(task: task, includeDueDate: true)
                             }
                         } else {
                             StatusMessage.Warning(message: "No tasks modified within the last 7 days")
@@ -1240,6 +1240,7 @@ extension Tabs.Content {
             @EnvironmentObject private var state: AppState
             public let task: LogTask
             public var callback: (() -> Void)? = nil
+            public var includeDueDate: Bool = false
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
             @State private var isCompanyPresented: Bool = false
@@ -1315,7 +1316,7 @@ extension Tabs.Content {
 
                                 if task.due != nil {
                                     HStack(alignment: .center) {
-                                        Text("Due: \(task.due!.formatted(date: .abbreviated, time: .complete))")
+                                        Text("Due: \(task.due!.formatted(date: self.includeDueDate ? .abbreviated : .omitted, time: .complete))")
                                             .multilineTextAlignment(.leading)
                                         Spacer()
                                     }
@@ -1390,20 +1391,14 @@ extension Tabs.Content {
                     NoteDetail.Sheet(note: note, page: self.page)
                 } label: {
                     ListRow(
-                        name: note.title ?? "",
+                        name: note.title ?? "_NOTE_TITLE",
                         colour: note.mJob != nil ? note.mJob!.backgroundColor : Theme.rowColour,
-                        extraColumn: AnyView(VersionCountBadge),
+                        extraColumn: AnyView(
+                            Timestamp(text: "v\(note.versions?.count ?? 0)")
+                        ),
                         highlight: false
                     )
                 }
-            }
-
-            @ViewBuilder private var VersionCountBadge: some View {
-                Text(String(note.versions?.count ?? 0))
-                    .padding(8)
-                    .foregroundStyle(.white)
-                    .background(Theme.base.opacity(0.2))
-                    .clipShape(.circle)
             }
         }
 
