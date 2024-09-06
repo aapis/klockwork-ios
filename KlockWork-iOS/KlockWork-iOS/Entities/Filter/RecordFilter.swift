@@ -9,17 +9,17 @@ import SwiftUI
 
 struct RecordsGroupedByDate: Identifiable {
     var id: UUID = UUID()
-    var date: Date
+    var date: String
     var records: [LogRecord]
 }
 
 struct GroupedRecordDateRow: View {
-    public let date: Date
+    public let date: String
 
     var body: some View {
         HStack(alignment: .center, spacing: 5) {
             Image(systemName: "calendar")
-            Text(date.formatted(date: .abbreviated, time: .omitted))
+            Text(date)
             Spacer()
         }
         .padding(8)
@@ -27,25 +27,35 @@ struct GroupedRecordDateRow: View {
 }
 
 struct RecordFilter: View {
-    typealias Button = Tabs.Content.Individual.SingleRecord
+    typealias Record = Tabs.Content.Individual.SingleRecord
+
+    @EnvironmentObject private var state: AppState
     public var job: Job?
     public var page: PageConfiguration.AppPage = .create
     @FetchRequest private var records: FetchedResults<LogRecord>
     @State private var groupedRecords: [RecordsGroupedByDate] = []
+    @State private var searchText: String = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ScrollView(showsIndicators: false) {
-                ForEach(groupedRecords) { group in
-                    VStack(alignment: .leading, spacing: 1) {
-                        GroupedRecordDateRow(date: group.date)
+            ZStack(alignment: .bottomLeading) {
+                ScrollView(showsIndicators: false) {
+                    ForEach(groupedRecords) { group in
+                        VStack(alignment: .leading, spacing: 1) {
+                            GroupedRecordDateRow(date: group.date)
 
-                        ForEach(group.records) { record in
-                            Button(record: record)
+                            ForEach(group.records) { record in
+                                Record(record: record)
+                            }
                         }
                     }
                 }
+                LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
+                    .frame(height: 50)
+                    .opacity(0.1)
             }
+
+            QueryField(prompt: "Search for keywords or phrases", onSubmit: self.actionOnSubmit, action: .search, text: $searchText)
         }
         .onAppear(perform: self.actionOnAppear)
         .navigationTitle("Records")
@@ -69,16 +79,60 @@ extension RecordFilter {
     private func actionOnAppear() -> Void {
         self.groupedRecords = []
         if self.records.count > 0 {
-            let sortedRecords = Array(self.records)
-                .sliced(by: [.year, .month, .day], for: \.timestamp!)
-                .sorted(by: {$0.key > $1.key})
-            let grouped = Dictionary(grouping: sortedRecords, by: {$0.key})
-            // @TODO: implement similar sorting to Upcoming/Overdue tabs
+            let grouped = Dictionary(grouping: self.records, by: {$0.timestamp!.formatted(date: .abbreviated, time: .omitted)})
+            let sorted = Array(grouped)
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
 
-            for group in grouped {
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
+
+            for group in sorted {
                 self.groupedRecords.append(
-                    RecordsGroupedByDate(date: group.key, records: group.value.first?.value ?? [])
+                    RecordsGroupedByDate(date: group.key, records: group.value.sorted(by: {$0.timestamp! < $1.timestamp!}))
                 )
+            }
+        }
+    }
+    
+    /// Plaintext search onsubmit handler
+    /// - Returns: Void
+    private func actionOnSubmit() -> Void {
+        self.groupedRecords = []
+        if self.records.count > 0 {
+            let grouped = Dictionary(grouping: self.records, by: {$0.timestamp!.formatted(date: .abbreviated, time: .omitted)})
+            let sorted = Array(grouped)
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
+
+            for group in sorted {
+                if self.searchText.isEmpty {
+                    self.groupedRecords.append(
+                        RecordsGroupedByDate(date: group.key, records: group.value.sorted(by: {$0.timestamp! < $1.timestamp!}))
+                    )
+                } else {
+                    let matchingRecords = group.value.filter({$0.message?.contains(self.searchText.lowercased()) ?? false})
+                    self.groupedRecords.append(
+                        RecordsGroupedByDate(date: group.key, records: matchingRecords.sorted(by: {$0.timestamp! < $1.timestamp!}))
+                    )
+                }
             }
         }
     }

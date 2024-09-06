@@ -18,10 +18,12 @@ extension PageActionBar {
         @Binding public var isPresented: Bool
         @State private var plan: Plan? = nil
         @State private var id: UUID = UUID()
+        @State private var isResetAlertPresented: Bool = false
         private let page: PageConfiguration.AppPage = .planning
 
         var body: some View {
             PageActionBar(
+                page: self.page,
                 groupView: AnyView(Group),
                 sheetView: AnyView(
                     Widget.JobSelector.Multi(
@@ -34,6 +36,12 @@ extension PageActionBar {
                 ),
                 isPresented: $isPresented
             )
+            .alert("Reset plan. Are you sure?", isPresented: $isResetAlertPresented) {
+                Button("Yes", role: .destructive) {
+                    self.destroyPlan()
+                }
+                Button("No", role: .cancel) {}
+            }
             .id(self.id)
             .onChange(of: self.selectedJobs) { // sheet/group view are essentially static unless we manually refresh them, @TODO: fix this
                 self.id = UUID()
@@ -49,7 +57,12 @@ extension PageActionBar {
                     State
                 }
             }
-            .background(Theme.cOrange.opacity(0.5))
+            .background(
+                ZStack {
+                    Theme.cOrange
+                    Color.white.blendMode(.softLight)
+                }
+            )
         }
 
         @ViewBuilder var AddButton: some View {
@@ -58,42 +71,46 @@ extension PageActionBar {
             } label: {
                 HStack(alignment: .center) {
                     Image(systemName: "hammer.circle.fill")
-                        .fontWeight(.bold)
                         .font(.largeTitle)
 
                     if self.selectedJobs.count == 0 {
                         Text("Choose jobs to get started")
-                            .fontWeight(.bold)
+                            .multilineTextAlignment(.leading)
+                    } else {
+                        Text("Add or remove jobs")
+                            .multilineTextAlignment(.leading)
                     }
                     Spacer()
                 }
             }
+            .fontWeight(.bold)
             .padding(8)
         }
 
         @ViewBuilder var State: some View {
-            HStack(spacing: 0) {
+            HStack(alignment: .center, spacing: 0) {
                 Button {
                     self.store()
                 } label: {
-                    Text("Save")
+                    Image(systemName: "circle.hexagongrid.circle.fill")
                 }
-                .fontWeight(.bold)
-                .padding(8)
-                .background(.green.opacity(0.5))
-                .background(.gray)
+                .help("Save plan")
+                .clipShape(Circle())
 
-                Button {
-                    self.destroyPlan()
-                } label: {
-                    Text("Reset")
+                if self.plan != nil {
+                    Button {
+                        self.isResetAlertPresented.toggle()
+                    } label: {
+                        Image(systemName: "hexagon.fill")
+                            .font(.largeTitle)
+                    }
+                    .help("Clear plan and start over")
+                    .foregroundStyle(Theme.cOrange)
+                    .clipShape(Circle())
                 }
-                .padding(8)
-                .background(.black.opacity(0.1))
-                .background(.gray)
             }
-            .clipShape(.capsule(style: .continuous))
-            .foregroundStyle(.white)
+            .font(.largeTitle)
+            .fontWeight(.bold)
             .padding([.trailing], 8)
         }
     }
@@ -111,6 +128,8 @@ extension PageActionBar.Planning {
             projects: Set(self.selectedProjects),
             companies: Set(self.selectedCompanies)
         )
+        self.plan = self.state.plan
+        self.id = UUID()
     }
 
     /// Destroy and recreate today's plan
@@ -123,6 +142,7 @@ extension PageActionBar.Planning {
         self.selectedCompanies = []
         self.plan = nil
         self.state.plan = nil
+        self.id = UUID()
 
         // Delete the old plans
         CoreDataPlan(moc: self.state.moc).deleteAll(for: self.state.date)

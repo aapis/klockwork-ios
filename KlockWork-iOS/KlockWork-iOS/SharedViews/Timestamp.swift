@@ -9,12 +9,22 @@ import SwiftUI
 
 struct Timestamp: View {
     public let text: String
+    public var fullWidth: Bool = false
+    public var alignment: Edge = .leading
 
     var body: some View {
-        Text(self.text)
-            .padding(2)
-            .background(.black.opacity(0.6))
-            .foregroundStyle(.white)
-            .font(.system(.caption, design: .monospaced))
+        HStack(alignment: .center, spacing: 0) {
+            if self.fullWidth && self.alignment == .trailing {
+                Spacer()
+            }
+            Text(self.text)
+            if self.fullWidth && self.alignment == .leading {
+                Spacer()
+            }
+        }
+        .padding(2)
+        .background(.black.opacity(0.6))
+        .foregroundStyle(.white)
+        .font(.system(.caption, design: .monospaced))
     }
 }
