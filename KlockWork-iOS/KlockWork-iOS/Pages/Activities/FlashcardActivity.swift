@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct FlashcardActivity: View {
+    @EnvironmentObject private var state: AppState
     private var page: PageConfiguration.AppPage = .explore
-    @State private var isJobSelectorPresented: Bool = true
+    @State private var isJobSelectorPresented: Bool = false
     @State private var job: Job?
 
     var body: some View {
@@ -22,11 +23,20 @@ struct FlashcardActivity: View {
                         title: "Flashcard topic",
                         prompt: "Choose a topic",
                         job: $job,
-                        isPresented: $isJobSelectorPresented
+                        isPresented: $isJobSelectorPresented,
+                        page: self.page
                     )
                 }
             }
         }
+        .onAppear(perform: {
+            if self.state.job != nil {
+                self.job = self.state.job
+                self.isJobSelectorPresented = false
+            } else {
+                self.isJobSelectorPresented = true
+            }
+        })
         .background(self.page.primaryColour)
         .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Activity: Flashcard")
         .toolbarBackground(job != nil ? self.job!.backgroundColor : Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -227,11 +237,13 @@ struct FlashcardActivity: View {
                     Spacer()
                 }
                 .onChange(of: current) {
-                    clue = current?.name ?? "Clue"
+                    if self.current != nil {
+                        self.clue = current?.name ?? "Clue"
 
-                    if let defs = self.current!.definitions {
-                        if let ttds = defs.allObjects as? [TaxonomyTermDefinitions] {
-                            definitions = ttds
+                        if let defs = self.current!.definitions {
+                            if let ttds = defs.allObjects as? [TaxonomyTermDefinitions] {
+                                self.definitions = ttds
+                            }
                         }
                     }
                 }
@@ -250,9 +262,14 @@ extension FlashcardActivity.FlashcardDeck {
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.isAnswerCardShowing = false
+        self.terms = []
+        self.definitions = []
+        self.current = nil
+        self.clue = ""
+
         if self.job != nil {
             if let termsForJob = CoreDataTaxonomyTerms(moc: self.state.moc).byJob(self.job!) {
-                terms = termsForJob
+                self.terms = termsForJob
             }
         }
 
@@ -260,7 +277,7 @@ extension FlashcardActivity.FlashcardDeck {
             self.current = self.terms.randomElement()
             self.clue = self.current?.name ?? "_TERM_NAME"
             self.viewed.insert(self.current!)
-            self.definitions = []
+//            self.definitions = []
 
             if let defs = self.current!.definitions {
                 if let ttds = defs.allObjects as? [TaxonomyTermDefinitions] {

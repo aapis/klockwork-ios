@@ -169,9 +169,9 @@ extension Widget {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButton
             
             @EnvironmentObject private var state: AppState
+            @Environment(\.dismiss) private var dismiss
             public var title: String?
             @FetchRequest private var items: FetchedResults<Job>
-            @Binding public var showing: Bool
             @Binding public var job: Job?
 
             private var columns: [GridItem] {
@@ -186,7 +186,7 @@ extension Widget {
                                 .font(.title2)
                             Spacer()
                             Button {
-                                showing.toggle()
+                                dismiss()
                             } label: {
                                 Image(systemName: "xmark")
                             }
@@ -198,7 +198,7 @@ extension Widget {
                                 Row(job: jerb, callback: { job in
                                     self.job = job
                                     self.state.job = job
-                                    self.showing.toggle()
+                                    dismiss()
                                 })
                             }
                         } else {
@@ -209,9 +209,8 @@ extension Widget {
                 .scrollContentBackground(.hidden)
             }
 
-            init(title: String? = "What are you working on now?", showing: Binding<Bool>, job: Binding<Job?>) {
+            init(title: String? = "What are you working on now?", job: Binding<Job?>) {
                 self.title = title
-                _showing = showing
                 _job = job
                 _items = CoreDataJob.fetchAll()
             }

@@ -17,7 +17,7 @@ extension PageActionBar {
         @State private var selectedJobTitle: String = ""
         @State private var id: UUID = UUID()
         @Binding public var isPresented: Bool
-        private let page: PageConfiguration.AppPage = .today
+        public var page: PageConfiguration.AppPage = .today
         private let buttonLineLengthLimit: Int = 25
 
         var body: some View {
@@ -25,7 +25,7 @@ extension PageActionBar {
                 page: self.page,
                 groupView: AnyView(Group),
                 sheetView: AnyView(
-                    Widget.JobSelector.Single(title: self.title, showing: $isPresented, job: $job)
+                    Widget.JobSelector.Single(title: self.title, job: $job)
                         .presentationBackground(Theme.cPurple)
                 ),
                 isPresented: $isPresented
@@ -99,6 +99,9 @@ extension PageActionBar.Today {
             let tmpTitle = (self.job!.title ?? self.job!.jid.string).prefix(self.buttonLineLengthLimit)
 
             self.selectedJobTitle = tmpTitle.count < self.buttonLineLengthLimit ? "\(tmpTitle)" : "\(tmpTitle)..."
+            self.state.job = self.job
+        } else {
+            self.job = self.state.job
         }
     }
 }
