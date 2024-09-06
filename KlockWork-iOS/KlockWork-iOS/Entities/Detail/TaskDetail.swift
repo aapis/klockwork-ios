@@ -67,6 +67,7 @@ struct TaskDetail: View {
                             if let newDate = DateHelper.endOfTomorrow(self.due) {
                                 self.due = newDate
                             }
+                            self.actionOnSave()
                         } label: {
                             HStack {
                                 Image(systemName: "calendar.badge.clock")
