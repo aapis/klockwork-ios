@@ -36,7 +36,6 @@ struct ListRow: View {
                 }
             }
         }
-
         .padding(.trailing, self.padding.1)
         .padding(.leading, self.padding.3)
         .background(colour)

@@ -33,13 +33,13 @@ struct NoteDetail: View {
                     .blendMode(.softLight)
 
                 ZStack {
-                    VStack {
+                    VStack(alignment: .leading, spacing: 0) {
                         Editor(job: $job, title: $title)
-                        HStack {
+                        HStack(alignment: .top, spacing: 0) {
                             TextEditor(text: $content)
                                 .focused($contentFieldFocused)
-                                .padding()
-                                .foregroundStyle(contentFieldFocused ? .white : .gray)
+                                .padding(8)
+                                .foregroundStyle(.white)
                             Spacer()
                         }
                         Spacer()
@@ -78,7 +78,7 @@ struct NoteDetail: View {
                     TextField("Title", text: $title)
                         .focused($titleFieldFocused)
                         .padding(.leading)
-                        .foregroundStyle(titleFieldFocused ? .white : .gray)
+                        .foregroundStyle(.white)
                     Spacer()
                     Menu {
                         // A little bit of info about the current job (title and JID)
@@ -144,11 +144,10 @@ struct NoteDetail: View {
                                 .frame(maxHeight: 20)
                         }
                         .padding(14)
-                        .tint(self.job != nil ? self.job!.backgroundColor.isBright() ? Theme.base : self.state.theme.tint : .white)
+                        .foregroundStyle(self.job != nil ? self.job!.backgroundColor.isBright() ? Theme.cPurple : self.state.theme.tint : .white)
                         .background(self.job != nil ? self.job!.backgroundColor : .red)
                     }
                 }
-                .frame(height: 50)
             }
             .background(Theme.textBackground)
             .border(width: 1, edges: [.bottom], color: Theme.rowColour)
