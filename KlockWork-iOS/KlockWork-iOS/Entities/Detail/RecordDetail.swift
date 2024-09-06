@@ -76,7 +76,6 @@ struct RecordDetail: View {
         }
         .sheet(isPresented: $isJobSelectorPresented) {
             Widget.JobSelector.Single(
-                showing: $isJobSelectorPresented,
                 job: $job
             )
             .presentationBackground(self.page.primaryColour)

@@ -1052,8 +1052,8 @@ extension Tabs.Content {
                 } label: {
                     ListRow(
                         name: job.title ?? job.jid.string,
-                        colour: job.backgroundColor,
-                        icon: selected ? "chevron.up" : "chevron.down"
+                        colour: job.backgroundColor
+//                        icon: selected ? "chevron.up" : "chevron.down"
                     )
                 }
                 .buttonStyle(.plain)
