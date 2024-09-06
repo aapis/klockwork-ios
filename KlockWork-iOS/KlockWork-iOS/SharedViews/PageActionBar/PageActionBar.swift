@@ -10,6 +10,7 @@ import SwiftUI
 /// Page action bar whose primary functionality occurs through interaction with another sheet
 struct PageActionBar: View {
     @EnvironmentObject private var state: AppState
+    public let page: PageConfiguration.AppPage
     @State public var groupView: AnyView? = AnyView(EmptyView())
     @State public var sheetView: AnyView? = AnyView(EmptyView())
     @Binding public var isPresented: Bool
@@ -20,7 +21,7 @@ struct PageActionBar: View {
         }
         .foregroundStyle(self.state.theme.tint)
         .clipShape(.capsule(style: .continuous))
-        .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)
+        .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
         .padding()
         .sheet(isPresented: $isPresented) {
             sheetView
@@ -53,10 +54,11 @@ struct PageActionBarSingleAction: View {
                 }
             }
             .padding(8)
-            .background((job?.backgroundColor ?? self.page.primaryColour).opacity(0.4))
+            .background(job?.backgroundColor ?? self.page.primaryColour)
+            .foregroundStyle((job?.backgroundColor ?? self.page.primaryColour).isBright() ? Theme.cPurple : self.state.theme.tint)
         }
         .clipShape(.capsule(style: .continuous))
-        .shadow(color: .black.opacity(0.4), radius: 6, x: 2, y: 2)
+        .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
         .padding()
     }
 }
