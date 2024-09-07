@@ -1245,6 +1245,7 @@ extension Tabs.Content {
             @State private var isCancelled: Bool = false
             @State private var isCompanyPresented: Bool = false
             @State private var isProjectPresented: Bool = false
+            @State private var isJobPresented: Bool = false
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
@@ -1310,6 +1311,18 @@ extension Tabs.Content {
                                                     .underline(true, pattern: .dot)
                                             }
                                         }
+
+                                        if task.owner != nil {
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                            Button {
+                                                self.isJobPresented.toggle()
+                                            } label: {
+                                                Text((task.owner?.title ?? task.owner?.jid.string)!)
+                                                    .multilineTextAlignment(.leading)
+                                                    .underline(true, pattern: .dot)
+                                            }
+                                        }
                                     }
                                     Spacer()
                                 }
@@ -1336,7 +1349,6 @@ extension Tabs.Content {
                         if let company = project.company {
                             CompanyDetail(company: company)
                                 .scrollContentBackground(.hidden)
-                                .presentationBackground(Theme.cOrange)
                         }
                     }
                 }
@@ -1344,7 +1356,12 @@ extension Tabs.Content {
                     if let project = task.owner?.project {
                         ProjectDetail(project: project)
                             .scrollContentBackground(.hidden)
-                            .presentationBackground(Theme.cOrange)
+                    }
+                }
+                .sheet(isPresented: $isJobPresented) {
+                    if let job = task.owner {
+                        JobDetail(job: job)
+                            .scrollContentBackground(.hidden)
                     }
                 }
             }
