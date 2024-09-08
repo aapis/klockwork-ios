@@ -195,11 +195,53 @@ extension Widget {
 
                         if items.count > 0 {
                             ForEach(items, id: \.objectID) { jerb in
-                                Row(job: jerb, callback: { job in
-                                    self.job = job
-                                    self.state.job = job
-                                    dismiss()
-                                })
+                                VStack(alignment: .leading, spacing: 0) {
+                                    Row(job: jerb, callback: { job in
+                                        self.job = job
+                                        self.state.job = job
+                                        dismiss()
+                                    })
+
+                                    ZStack {
+                                        jerb.backgroundColor
+                                        LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                                            .opacity(0.1)
+
+                                        HStack(alignment: .center, spacing: 8) {
+                                            Spacer()
+                                            HStack {
+                                                Text("\(jerb.tasks?.count ?? 0)")
+                                                Image(systemName: "checklist")
+                                                    .help("\(jerb.tasks?.count ?? 0) task(s) selected")
+                                            }
+                                            .padding(3)
+                                            .background(.white.opacity(0.4).blendMode(.softLight))
+                                            .clipShape(RoundedRectangle(cornerRadius: 3))
+
+                                            HStack {
+                                                Text("\(jerb.tasks?.count ?? 0)")
+                                                Image(systemName: "note.text")
+                                                    .help("\(jerb.tasks?.count ?? 0) note(s) selected")
+                                            }
+                                            .padding(3)
+                                            .background(.white.opacity(0.4).blendMode(.softLight))
+                                            .clipShape(RoundedRectangle(cornerRadius: 3))
+
+                                            HStack {
+                                                Text("\(jerb.records?.count ?? 0)")
+                                                Image(systemName: "tray.fill")
+                                                    .help("\(jerb.tasks?.count ?? 0) records(s) selected")
+                                            }
+                                            .padding(3)
+                                            .background(.white.opacity(0.4).blendMode(.softLight))
+                                            .clipShape(RoundedRectangle(cornerRadius: 3))
+                                        }
+                                        .padding(8)
+                                        .font(.system(.caption, design: .monospaced))
+                                        .foregroundStyle(jerb.backgroundColor.isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                                        .multilineTextAlignment(.leading)
+                                    }
+                                }
                             }
                         } else {
                             StatusMessage.Warning(message: "No jobs found")
