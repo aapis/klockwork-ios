@@ -53,7 +53,7 @@ struct Explore: View {
                     HStack(spacing: 8) {
                         Text("Explore").font(.title2).padding([.leading, .trailing], 10).bold()
                         Spacer()
-                        CreateEntitiesButton(isViewModeSelectorVisible: false, isDateSelectorVisible: true)
+                        CreateEntitiesButton()
                     }
                 }
             }

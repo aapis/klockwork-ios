@@ -59,7 +59,7 @@ extension Planning {
                     HStack(spacing: 8) {
                         Text("Planning").font(.title2).padding([.leading, .trailing], 10).bold()
                         Spacer()
-                        CreateEntitiesButton(isViewModeSelectorVisible: false, isDateSelectorVisible: true)
+                        CreateEntitiesButton()
                     }
                 }
             }

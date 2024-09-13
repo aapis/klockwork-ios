@@ -8,44 +8,6 @@
 
 import SwiftUI
 
-struct CreateEntitiesButton: View {
-    @EnvironmentObject private var state: AppState
-    @State public var date: Date = Date()
-    public var isViewModeSelectorVisible: Bool = true
-    public var isDateSelectorVisible: Bool = false
-
-    var body: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Today.AddButton()
-            if isViewModeSelectorVisible {
-                Today.ViewModeSelector()
-            }
-            if isDateSelectorVisible {
-                DatePicker(
-                    "Today",
-                    selection: $date,
-                    displayedComponents: [.date]
-                )
-                .labelsHidden()
-            }
-            
-            // @TODO: implement settings page
-//            NavigationLink {
-//                AppSettings()
-//            } label: {
-//                Image(systemName: "gearshape")
-//                    .font(.title)
-//            }
-        }
-        .padding(8)
-        .background(Theme.base.opacity(0.2).blendMode(.softLight))
-        .clipShape(.rect(topLeadingRadius: 16))
-        .onChange(of: date) {
-            self.state.date = date
-        }
-    }
-}
-
 struct Today: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias PlanType = PageConfiguration.PlanType
@@ -132,9 +94,9 @@ extension Today {
                         .frame(height: 45)
 
                     HStack(spacing: 8) {
-                        Text("Today").font(.title2).padding([.leading, .trailing], 14).bold()
+                        Text("Today").font(.title2).padding([.leading, .trailing], 10).bold()
                         Spacer()
-                        CreateEntitiesButton()
+                        CreateEntitiesButton(isViewModeSelectorVisible: true)
                     }
                 }
             }

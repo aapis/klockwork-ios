@@ -361,11 +361,7 @@ extension Tabs.Content {
                         if let pJobs = self.entity.jobs {
                             if let jobs = pJobs.allObjects as? [Job] {
                                 ForEach(jobs.filter({$0.alive == true}).sorted(by: {
-                                    if $0.title != nil && $1.title != nil {
-                                        return $0.title! > $1.title!
-                                    } else {
-                                        return $0.jid < $1.jid
-                                    }
+                                    $0.title ?? "_TITLE" > $1.title ?? "_TITLE"
                                 }), id: \Job.objectID) { job in
                                     ThirdLevel(entity: job)
                                 }

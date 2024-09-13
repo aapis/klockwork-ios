@@ -603,33 +603,41 @@ extension PlanTabs {
         @EnvironmentObject private var state: AppState
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var upcoming: [UpcomingRow] = []
+        @State private var id: UUID = UUID()
 
         var body: some View {
             NavigationStack {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if !self.tasks.isEmpty {
-                            ForEach(self.upcoming, id: \.id) { row in
-                                Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
+                VStack(alignment: .leading, spacing: 0) {
+                    TaskForecast(callback: self.actionForecastCallback)
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 1) {
+                            if !self.tasks.isEmpty {
+                                ForEach(self.upcoming, id: \.id) { row in
+                                    Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
 
-                                ForEach(row.tasks) { task in
-                                    Row(task: task, callback: self.actionOnAppear)
+                                    ForEach(row.tasks) { task in
+                                        Row(task: task, callback: self.actionOnAppear)
+                                    }
                                 }
-                            }
-                        } else {
-                            HStack {
-                                Text("No upcoming due dates")
+                            } else {
+                                HStack {
+                                    Text("No upcoming due dates")
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(Theme.textBackground)
+                                .clipShape(.rect(cornerRadius: 16))
                                 Spacer()
                             }
-                            .padding()
-                            .background(Theme.textBackground)
-                            .clipShape(.rect(cornerRadius: 16))
-                            Spacer()
                         }
                     }
                 }
             }
+            .id(self.id)
             .onAppear(perform: self.actionOnAppear)
+            .onChange(of: self.state.date) {
+                self.actionOnSelectDate()
+            }
         }
 
         init() {
@@ -639,6 +647,7 @@ extension PlanTabs {
         /// Onload handler
         /// - Returns: Void
         private func actionOnAppear() -> Void {
+            self.id = UUID()
             self.upcoming = []
             let grouped = Dictionary(grouping: self.tasks, by: {$0.due!.formatted(date: .abbreviated, time: .omitted)})
             let sorted = Array(grouped)
@@ -663,6 +672,47 @@ extension PlanTabs {
                 )
             }
         }
+        
+        /// Select date handler
+        /// @TODO: refactor
+        /// - Returns: Void
+        private func actionOnSelectDate() -> Void {
+            self.id = UUID()
+            self.upcoming = []
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.due!.formatted(date: .abbreviated, time: .omitted)})
+            let sorted = Array(grouped)
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
+
+            for group in sorted {
+                if group.key == self.state.date.formatted(date: .abbreviated, time: .omitted) {
+                    self.upcoming.append(
+                        UpcomingRow(
+                            date: group.key,
+                            tasks: group.value.sorted(by: {$0.due! < $1.due!})
+                        )
+                    )
+                }
+            }
+        }
+        
+        /// Forecast tap callback handler
+        /// - Returns: Void
+        private func actionForecastCallback() -> Void {
+            self.id = UUID()
+            self.upcoming = []
+            print("DERPO fcalllback")
+            // @TODO: this doesn't work and I have no idea why
+        }
     }
 
     struct Overdue: View {
@@ -674,7 +724,7 @@ extension PlanTabs {
 
         var body: some View {
             NavigationStack {
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 1) {
                         if !self.tasks.isEmpty {
                             ForEach(self.overdue, id: \.id) { row in
@@ -725,12 +775,6 @@ extension PlanTabs {
             for group in sorted {
                 self.overdue.append(UpcomingRow(date: group.key, tasks: group.value))
             }
-        }
-
-        struct UpcomingRow: Identifiable, Hashable {
-            var id: UUID = UUID()
-            var date: String
-            var tasks: [LogTask]
         }
     }
 }
