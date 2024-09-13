@@ -334,8 +334,9 @@ extension PlanTabs {
                                 }
                             } label: {
                                 ZStack(alignment: .center) {
-                                    Theme.base.opacity(0.5)
-                                    Image(systemName: "xmark")
+                                    job.backgroundColor.opacity(0.7)
+                                    Image(systemName: "square.fill")
+                                        .foregroundStyle(self.state.theme.tint)
                                 }
                             }
                             .frame(width: 40)

@@ -37,6 +37,11 @@ struct AppTheme {
 struct TodayPage {
     var job: Job? = nil
     var mode: PageMode = .read
+    var tableButtonMode: TableButtonDisplayMode = .items
+
+    enum TableButtonDisplayMode {
+        case actions, items
+    }
 }
 
 struct PlanningPage {

@@ -111,6 +111,7 @@ extension Find {
                         .frame(height: 45)
 
                     HStack(spacing: 8) {
+                        DateStrip(date: self.date)
                         HStack {
                             if text.isEmpty {
                                 Text("Find")
@@ -122,7 +123,7 @@ extension Find {
                                 }
                             }
                         }
-                        .font(.title2).padding([.leading, .trailing], 10).bold()
+                        .font(.title2).padding([.trailing], 10).bold()
                         Spacer()
                         CreateEntitiesButton()
                     }

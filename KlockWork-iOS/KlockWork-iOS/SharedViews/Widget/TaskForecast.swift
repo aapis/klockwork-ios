@@ -55,6 +55,7 @@ struct Forecast: View, Identifiable {
     @State private var dateStripMonth: String = ""
     @State private var dateStripDay: String = ""
     @State private var isSelected: Bool = false
+    @State private var isUpcomingTaskListPresented: Bool = false
     @FetchRequest private var upcomingTasks: FetchedResults<LogTask>
 
     var body: some View {
@@ -102,20 +103,9 @@ struct Forecast: View, Identifiable {
                 }
             } else {
                 HStack(alignment: .center, spacing: 8) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(self.dateStripMonth)
-                            .multilineTextAlignment(.leading)
-                        Divider()
-                            .background(self.state.theme.tint)
-                            .frame(width: 15)
-                        Text(self.dateStripDay)
-                            .multilineTextAlignment(.leading)
-                    }
-                    .font(.system(.callout, design: .monospaced))
-                    .foregroundStyle(self.isSelected ? self.state.theme.tint : .white)
-
                     Button {
                         self.state.date = self.date
+                        self.isUpcomingTaskListPresented.toggle()
 
                         if self.isSelected {
                             if let cb = self.callback { cb() }
@@ -145,7 +135,7 @@ struct Forecast: View, Identifiable {
                         }
                     }
                 }
-                .frame(width: 70, height: 35)
+                .frame(width: 40, height: 35)
 //                .opacity(self.itemsDue == 0 ? 0.4 : 1)
             }
         }
@@ -153,6 +143,12 @@ struct Forecast: View, Identifiable {
         .onAppear(perform: self.actionOnAppear)
         .onChange(of: self.state.date) {
             self.actionOnAppear()
+        }
+        .sheet(isPresented: $isUpcomingTaskListPresented) {
+            NavigationStack {
+                PlanTabs.Upcoming()
+                    .presentationBackground(Theme.cPurple)
+            }
         }
     }
 
@@ -174,18 +170,6 @@ struct Forecast: View, Identifiable {
         df.timeZone = TimeZone.autoupdatingCurrent
         df.locale = NSLocale.current
 
-        let df1 = DateFormatter()
-        df1.dateFormat = "MM"
-        df1.timeZone = TimeZone.autoupdatingCurrent
-        df1.locale = NSLocale.current
-
-        let df2 = DateFormatter()
-        df2.dateFormat = "dd"
-        df2.timeZone = TimeZone.autoupdatingCurrent
-        df2.locale = NSLocale.current
-        
-        self.dateStripMonth = df1.string(from: self.date)
-        self.dateStripDay = df2.string(from: self.date)
         self.dateStrip = df.string(from: self.date)
         let fSelected = df.string(from: self.state.date)
         self.isSelected = self.dateStrip == fSelected

@@ -36,7 +36,8 @@ extension Widget {
         /// Allows selection of multiple jobs from the list
         struct Multi: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState
-
+            
+            @EnvironmentObject private var state: AppState
             public let title: String
             public let filter: ResultsFilter
             @FetchRequest private var items: FetchedResults<Job>
@@ -70,15 +71,17 @@ extension Widget {
 
                         if items.count > 0 {
                             ForEach(items, id: \.objectID) { jerb in
-                                Row(job: jerb, alreadySelected: self.jobIsSelected(jerb), callback: { job, action in
-                                    if action == .add {
-                                        selectedJobs.append(job)
-                                    } else if action == .remove {
-                                        if let index = selectedJobs.firstIndex(where: {$0 == job}) {
-                                            selectedJobs.remove(at: index)
+                                HStack(alignment: .center, spacing: 0) {
+                                    Row(job: jerb, alreadySelected: self.jobIsSelected(jerb), callback: { job, action in
+                                        if action == .add {
+                                            selectedJobs.append(job)
+                                        } else if action == .remove {
+                                            if let index = selectedJobs.firstIndex(where: {$0 == job}) {
+                                                selectedJobs.remove(at: index)
+                                            }
                                         }
-                                    }
-                                })
+                                    })
+                                }
                             }
                         } else {
                             StatusMessage.Warning(message: "No jobs found")

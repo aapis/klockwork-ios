@@ -24,10 +24,22 @@ struct Tabs: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if buttons == nil {
-                Buttons(inSheet: inSheet, job: $job, selected: $selected)
-                    .swipe([.left, .right]) { swipe in
-                        self.actionOnSwipe(swipe)
+                switch self.state.today.tableButtonMode {
+                case .actions:
+                    HStack(alignment: .center, spacing: 8) {
+                        AddButton()
+                            .frame(width: 50, height: 45)
+                            .background(Theme.darkBtnColour)
+
+                        ViewModeSelector()
                     }
+                case .items:
+                    Buttons(inSheet: inSheet, job: $job, selected: $selected)
+                        .swipe([.left, .right]) { swipe in
+                            self.actionOnSwipe(swipe)
+                        }
+                }
+
             } else {
                 buttons
             }
@@ -1077,6 +1089,7 @@ extension Tabs.Content {
             public var alreadySelected: Bool
             public var callback: (Job, ButtonAction) -> Void
             public var padding: CGFloat = 8
+            public var showToggleIcon: Bool = true
             @State private var selected: Bool = false
 
             var body: some View {
@@ -1087,8 +1100,8 @@ extension Tabs.Content {
                     ToggleableListRow(
                         name: job.title ?? job.jid.string,
                         colour: job.backgroundColor,
-                        iconOff: "square",
-                        iconOn: "square.fill",
+                        iconOff: self.showToggleIcon ? "square" : nil,
+                        iconOn: self.showToggleIcon ? "square.fill" : nil,
                         padding: self.padding,
                         selected: $selected
                     )

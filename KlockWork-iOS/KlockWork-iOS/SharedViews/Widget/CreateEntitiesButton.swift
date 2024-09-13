@@ -14,23 +14,29 @@ struct CreateEntitiesButton: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
-            Today.AddButton()
+            AddButton()
             if isViewModeSelectorVisible {
-                Today.ViewModeSelector()
+                ViewModeSelector()
             }
 
+//            Button {
+//                if self.state.today.tableButtonMode == .items {
+//                    self.state.today.tableButtonMode = .actions
+//                } else {
+//                    self.state.today.tableButtonMode = .items
+//                }
+//            } label: {
+//                Image(systemName: "filemenu.and.selection")
+//                    .font(.title)
+//            }
+//            .padding(8)
+//            .background(.white.opacity(0.1))
+//            .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
+
             Forecast(date: self.state.date, isForecastMember: false)
-                .background(Theme.base.opacity(0.2).blendMode(.softLight))
-                .clipShape(.rect(topLeadingRadius: 16, topTrailingRadius: 16))
-                .padding([.leading, .trailing], 8)
-//                    .overlay(
-//                        DatePicker(
-//                            "Today",
-//                            selection: $date,
-//                            displayedComponents: [.date]
-//                        )
-//                        .datePickerStyle(.graphical)
-//                    )
+                .background(.white.opacity(0.1))
+                .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
+                .padding([.trailing], 8)
 
             // @TODO: implement settings page
 //            NavigationLink {

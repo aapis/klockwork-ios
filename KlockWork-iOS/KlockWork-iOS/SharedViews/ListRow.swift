@@ -47,38 +47,40 @@ struct ToggleableListRow: View {
     @EnvironmentObject private var state: AppState
     public let name: String
     public var colour: Color? = .clear
-    public var iconOff: String = "square"
-    public var iconOn: String = "square.fill"
+    public var iconOff: String?
+    public var iconOn: String?
     public var extraColumn: AnyView?
     public var highlight: Bool = false // @TODO: highlight is deprecated and unused
     public var padding: CGFloat = 8
     @Binding public var selected: Bool
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 5) {
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
+        HStack(alignment: .top, spacing: 0) {
+            HStack(alignment: .top, spacing: 0) {
                 Text(name)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(selected && (self.colour ?? Theme.rowColour).isBright() ? Theme.base : .white)
                     .multilineTextAlignment(.leading)
                     .padding(6)
-                    .background(.clear)
-                    .cornerRadius(5)
                 Spacer()
                 extraColumn
             }
+            .padding(self.padding)
+            .background(selected ? colour.opacity(1) : colour.opacity(0.3))
 
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                Image(systemName: selected ? iconOn : iconOff)
-                    .foregroundStyle(self.state.theme.tint)
-                    .font(.title3)
-                    .padding(1)
+            if iconOn != nil && iconOff != nil {
+                VStack(alignment: .center, spacing: 0) {
+                    Spacer()
+                    Image(systemName: selected ? iconOn! : iconOff!)
+                        .foregroundStyle(self.state.theme.tint)
+                        .font(.title3)
+                        .padding(1)
+                    Spacer()
+                }
+                .frame(width: 40)
+                .opacity(selected ? 1 : 0.5)
+                .background(selected ? self.colour!.opacity(0.7) : (self.colour ?? .clear).opacity(0.3))
             }
-            .background(selected ? self.state.theme.tint : .clear)
-            .listRowBackground(selected ? self.state.theme.tint : Color.clear)
-            .cornerRadius(5)
         }
-        .padding([.leading, .trailing, .top, .bottom], self.padding)
-        .background(selected ? colour.opacity(1) : colour.opacity(0.3))
-        .listRowBackground(selected ? colour.opacity(1) : colour.opacity(0.3))
+
     }
 }
