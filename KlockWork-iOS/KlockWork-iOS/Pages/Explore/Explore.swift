@@ -51,8 +51,8 @@ struct Explore: View {
                         .frame(height: 45)
 
                     HStack(spacing: 8) {
+                        PageTitle(text: "Explore")
                         DateStrip(date: self.date)
-                        Text("Explore").font(.title2).padding([.trailing], 10).bold()
                         Spacer()
                         CreateEntitiesButton()
                     }

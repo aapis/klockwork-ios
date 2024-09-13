@@ -56,8 +56,8 @@ extension Planning {
                         .frame(height: 45)
                     
                     HStack(spacing: 8) {
+                        PageTitle(text: "Planning")
                         DateStrip(date: self.date)
-                        Text("Planning").font(.title2).padding([.trailing], 10).bold()
                         Spacer()
                         CreateEntitiesButton()
                     }

@@ -25,7 +25,6 @@ struct DateStrip: View {
         }
         .font(.system(.caption, design: .monospaced))
         .foregroundStyle(self.state.theme.tint)
-        .padding(.leading, 10)
         .onAppear(perform: {
             DefaultObjects.deleteDefaultObjects()
 

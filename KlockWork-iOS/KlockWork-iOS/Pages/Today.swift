@@ -77,6 +77,14 @@ struct Today: View {
     }
 }
 
+struct PageTitle: View {
+    public let text: String
+
+    var body: some View {
+        Text(self.text).font(.title2).padding([.leading], 10).bold()
+    }
+}
+
 extension Today {
     struct Header: View {
         @EnvironmentObject private var state: AppState
@@ -94,8 +102,8 @@ extension Today {
                         .frame(height: 45)
 
                     HStack(spacing: 8) {
+                        PageTitle(text: "Today")
                         DateStrip(date: self.date)
-                        Text("Today").font(.title2).padding([.trailing], 10).bold()
                         Spacer()
                         CreateEntitiesButton(isViewModeSelectorVisible: true)
                     }
