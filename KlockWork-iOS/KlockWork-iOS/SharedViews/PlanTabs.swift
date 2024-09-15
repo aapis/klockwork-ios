@@ -605,11 +605,12 @@ extension PlanTabs {
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var upcoming: [UpcomingRow] = []
         @State private var id: UUID = UUID()
+        public let page: PageConfiguration.AppPage = .planning
 
         var body: some View {
             NavigationStack {
                 VStack(alignment: .leading, spacing: 0) {
-                    TaskForecast(callback: self.actionForecastCallback)
+                    TaskForecast(callback: self.actionForecastCallback, page: self.page)
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: 1) {
                             if !self.tasks.isEmpty {

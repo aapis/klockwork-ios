@@ -13,6 +13,7 @@ struct TaskForecast: View {
 
     public var callback: (() -> Void)? = nil
     public var daysToShow: Double = 14
+    public var page: PageConfiguration.AppPage = .today
     @State private var forecast: [Forecast] = []
 
     var body: some View {
@@ -36,7 +37,7 @@ struct TaskForecast: View {
 
         for date in stride(from: dates.lowerBound, to: dates.upperBound, by: hrs24) {
             self.forecast.append(
-                Forecast(date: date, callback: self.callback)
+                Forecast(date: DateHelper.startOfDay(date), callback: self.callback, page: self.page)
             )
         }
     }
@@ -50,6 +51,7 @@ struct Forecast: View, Identifiable {
     var date: Date
     public var callback: (() -> Void)? = nil
     public var isForecastMember: Bool = true
+    public let page: PageConfiguration.AppPage?
     @State public var itemsDue: Int = 0
     @State private var dateStrip: String = ""
     @State private var dateStripMonth: String = ""
@@ -69,7 +71,7 @@ struct Forecast: View, Identifiable {
                         .opacity(self.itemsDue == 0 ? 0.4 : 1)
 
                     Button {
-                        self.state.date = self.date
+                        self.state.date = DateHelper.startOfDay(self.date)
 
                         if self.isSelected {
                             if let cb = self.callback { cb() }
@@ -78,7 +80,7 @@ struct Forecast: View, Identifiable {
                         ZStack {
                             VStack(alignment: .center, spacing: 0) {
                                 if self.upcomingTasks.count > 0 {
-                                    ForEach(self.upcomingTasks) { task in
+                                    ForEach(self.upcomingTasks, id: \.objectID) { task in
                                         Rectangle()
                                             .foregroundStyle(task.owner?.backgroundColor ?? Theme.rowColour)
                                     }
@@ -104,8 +106,9 @@ struct Forecast: View, Identifiable {
             } else {
                 HStack(alignment: .center, spacing: 8) {
                     Button {
-                        self.state.date = self.date
+                        self.state.date = DateHelper.startOfDay(self.date)
                         self.isUpcomingTaskListPresented.toggle()
+                        print("DERPO date=\(self.state.date) tz=\(TimeZone.autoupdatingCurrent) x=\(Calendar.autoupdatingCurrent.startOfDay(for: self.state.date).description(with: .autoupdatingCurrent))")
 
                         if self.isSelected {
                             if let cb = self.callback { cb() }
@@ -114,7 +117,7 @@ struct Forecast: View, Identifiable {
                         ZStack {
                             VStack(alignment: .center, spacing: 0) {
                                 if self.upcomingTasks.count > 0 {
-                                    ForEach(self.upcomingTasks) { task in
+                                    ForEach(self.upcomingTasks, id: \.objectID) { task in
                                         Rectangle()
                                             .foregroundStyle(task.owner?.backgroundColor ?? Theme.rowColour)
                                     }
@@ -136,7 +139,6 @@ struct Forecast: View, Identifiable {
                     }
                 }
                 .frame(width: 40, height: 35)
-//                .opacity(self.itemsDue == 0 ? 0.4 : 1)
             }
         }
         .padding(8)
@@ -147,15 +149,16 @@ struct Forecast: View, Identifiable {
         .sheet(isPresented: $isUpcomingTaskListPresented) {
             NavigationStack {
                 PlanTabs.Upcoming()
-                    .presentationBackground(Theme.cPurple)
+                    .presentationBackground(self.page?.primaryColour ?? Theme.cOrange)
             }
         }
     }
 
-    init(date: Date, callback: (() -> Void)? = nil, isForecastMember: Bool = true) {
+    init(date: Date, callback: (() -> Void)? = nil, isForecastMember: Bool = true, page: PageConfiguration.AppPage) {
         self.date = date
         self.callback = callback
         self.isForecastMember = isForecastMember
+        self.page = page
 
         _upcomingTasks = CoreDataTasks.fetchDue(on: date)
     }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DateStrip: View {
     @EnvironmentObject private var state: AppState
-    @State public var date: Date = Date()
+    @State public var date: Date = DateHelper.startOfDay()
     @State private var dateStripMonth: String = ""
     @State private var dateStripDay: String = ""
 

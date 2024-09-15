@@ -59,7 +59,7 @@ extension Planning {
                         PageTitle(text: "Planning")
                         DateStrip(date: self.date)
                         Spacer()
-                        CreateEntitiesButton()
+                        CreateEntitiesButton(page: self.page)
                     }
                 }
             }
@@ -68,7 +68,7 @@ extension Planning {
                 DefaultObjects.deleteDefaultObjects()
             })
             .onChange(of: date) {
-                self.state.date = date
+                self.state.date = DateHelper.startOfDay(self.date)
             }
         }
     }

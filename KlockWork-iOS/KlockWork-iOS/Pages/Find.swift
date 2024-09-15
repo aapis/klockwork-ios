@@ -17,7 +17,7 @@ struct Find: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                Header(text: $text, recentSearchTerms: $recentSearchTerms, onSubmit: self.actionOnSubmit)
+                Header(text: $text, recentSearchTerms: $recentSearchTerms, onSubmit: self.actionOnSubmit, page: self.page)
                 Divider().background(.white).frame(height: 1)
 
                 ZStack(alignment: .bottomLeading) {
@@ -96,11 +96,12 @@ struct Find: View {
 extension Find {
     struct Header: View {
         @EnvironmentObject private var state: AppState
-        @State public var date: Date = Date()
+        @State public var date: Date = DateHelper.startOfDay()
         @Binding public var text: String
         @Binding public var recentSearchTerms: [String]
         @State private var isPresented: Bool = false
         public var onSubmit: () -> Void
+        public var page: PageConfiguration.AppPage
 
         var body: some View {
             HStack(alignment: .center, spacing: 0) {
@@ -114,7 +115,7 @@ extension Find {
                         PageTitle(text: text.isEmpty ? "Find" : text.count < 10 ? "Find: \(text.prefix(10))" : "Find: \(text.prefix(10))...")
                         DateStrip(date: self.date)
                         Spacer()
-                        CreateEntitiesButton()
+                        CreateEntitiesButton(page: self.page)
                     }
                 }
             }
@@ -122,7 +123,7 @@ extension Find {
                 date = self.state.date
             })
             .onChange(of: date) {
-                self.state.date = date
+                self.state.date = DateHelper.startOfDay(self.date)
             }
         }
     }

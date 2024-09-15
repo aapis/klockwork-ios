@@ -9,8 +9,9 @@ import SwiftUI
 
 struct CreateEntitiesButton: View {
     @EnvironmentObject private var state: AppState
-    @State public var date: Date = Date()
+    @State public var date: Date = DateHelper.startOfDay()
     public var isViewModeSelectorVisible: Bool = false
+    public var page: PageConfiguration.AppPage = .planning
 
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
@@ -33,7 +34,7 @@ struct CreateEntitiesButton: View {
 //            .background(.white.opacity(0.1))
 //            .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
 
-            Forecast(date: self.state.date, isForecastMember: false)
+            Forecast(date: DateHelper.startOfDay(self.state.date), isForecastMember: false, page: self.page)
                 .background(.white.opacity(0.1))
                 .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
                 .padding([.trailing], 8)

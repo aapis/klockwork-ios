@@ -88,7 +88,7 @@ struct PageTitle: View {
 extension Today {
     struct Header: View {
         @EnvironmentObject private var state: AppState
-        @State public var date: Date = Date()
+        @State public var date: Date = DateHelper.startOfDay()
         @State private var isCreateSheetPresented: Bool = false
         public let page: PageConfiguration.AppPage
         @Binding public var path: NavigationPath
@@ -105,7 +105,7 @@ extension Today {
                         PageTitle(text: "Today")
                         DateStrip(date: self.date)
                         Spacer()
-                        CreateEntitiesButton(isViewModeSelectorVisible: true)
+                        CreateEntitiesButton(isViewModeSelectorVisible: true, page: self.page)
                     }
                 }
             }
@@ -114,7 +114,7 @@ extension Today {
             })
             .onChange(of: self.date) {
                 if self.state.date != self.date {
-                    self.state.date = self.date
+                    self.state.date = DateHelper.startOfDay(self.date)
                 }
             }
         }
