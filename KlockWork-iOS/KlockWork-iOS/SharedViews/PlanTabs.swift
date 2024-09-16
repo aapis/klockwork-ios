@@ -605,34 +605,60 @@ extension PlanTabs {
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var upcoming: [UpcomingRow] = []
         @State private var id: UUID = UUID()
-        public let page: PageConfiguration.AppPage = .planning
+        public var page: PageConfiguration.AppPage = .planning
+        public var inSheet: Bool = false
 
         var body: some View {
             NavigationStack {
                 VStack(alignment: .leading, spacing: 0) {
                     TaskForecast(callback: self.actionForecastCallback, page: self.page)
-                    ScrollView(showsIndicators: false) {
-                        VStack(alignment: .leading, spacing: 1) {
-                            if !self.tasks.isEmpty {
+                        if !self.tasks.isEmpty {
+                            List {
                                 ForEach(self.upcoming, id: \.id) { row in
-                                    Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
-
-                                    ForEach(row.tasks) { task in
-                                        Row(task: task, callback: self.actionOnAppear)
+                                    Section {
+                                        ForEach(row.tasks) { task in
+                                            Row(task: task, callback: self.actionOnAppear, inSheet: self.inSheet)
+                                                .swipeActions(edge: .leading) {
+                                                    Button {
+                                                        CoreDataTasks(moc: self.state.moc).complete(task)
+                                                        self.actionOnAppear()
+                                                    } label: {
+                                                        Image(systemName: "checkmark.seal.fill")
+                                                    }
+                                                    .tint(.green)
+                                                }
+                                                .swipeActions(edge: .trailing) {
+                                                    Button(role: .destructive) {
+                                                        CoreDataTasks(moc: self.state.moc).cancel(task)
+                                                        self.actionOnAppear()
+                                                    } label: {
+                                                        Image(systemName: "xmark.square")
+                                                    }
+                                                    .tint(.red)
+                                                }
+                                        }
+                                    } header: {
+                                        Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing, clear: true)
                                     }
                                 }
-                            } else {
-                                HStack {
-                                    Text("No upcoming due dates")
-                                    Spacer()
-                                }
-                                .padding()
-                                .background(Theme.textBackground)
-                                .clipShape(.rect(cornerRadius: 16))
+                            }
+                            .background(Theme.base.opacity(0.6))
+                            .listStyle(.plain)
+                            .listRowInsets(.none)
+                            .listRowSpacing(.none)
+                            .listRowSeparator(.hidden)
+                            .listSectionSeparatorTint(.red)
+                        } else {
+                            HStack {
+                                Text("No upcoming due dates")
                                 Spacer()
                             }
+                            .padding()
+                            .background(Theme.textBackground)
+                            .clipShape(.rect(cornerRadius: 16))
+                            Spacer()
                         }
-                    }
+//                    }
                 }
             }
             .id(self.id)
@@ -642,7 +668,9 @@ extension PlanTabs {
             }
         }
 
-        init() {
+        init(inSheet: Bool = false) {
+            self.inSheet = inSheet
+
             _tasks = CoreDataTasks.fetchUpcoming()
         }
 
@@ -718,7 +746,7 @@ extension PlanTabs {
     }
 
     struct Overdue: View {
-        typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
+        typealias Row = Tabs.Content.Individual.SingleTaskChecklistItem
 
         @EnvironmentObject private var state: AppState
         @FetchRequest private var tasks: FetchedResults<LogTask>
@@ -733,7 +761,7 @@ extension PlanTabs {
                                 Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
 
                                 ForEach(row.tasks) { task in
-                                    Row(task: task, callback: self.actionOnAppear)
+                                    Row(task: task/*, callback: self.actionOnAppear*/)
                                 }
                             }
                         } else {

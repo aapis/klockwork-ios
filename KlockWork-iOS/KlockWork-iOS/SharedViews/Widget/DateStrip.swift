@@ -9,7 +9,6 @@ import SwiftUI
 
 struct DateStrip: View {
     @EnvironmentObject private var state: AppState
-    @State public var date: Date = DateHelper.startOfDay()
     @State private var dateStripMonth: String = ""
     @State private var dateStripDay: String = ""
 
@@ -50,8 +49,8 @@ extension DateStrip {
         df2.timeZone = TimeZone.autoupdatingCurrent
         df2.locale = NSLocale.current
 
-        self.dateStripMonth = df1.string(from: self.date)
-        self.dateStripDay = df2.string(from: self.date)
+        self.dateStripMonth = df1.string(from: self.state.date)
+        self.dateStripDay = df2.string(from: self.state.date)
     }
 }
 

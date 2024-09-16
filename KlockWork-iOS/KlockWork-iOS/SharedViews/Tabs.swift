@@ -250,8 +250,8 @@ extension Tabs.Content {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 1) {
                         if items.count > 0 {
-                            ForEach(items) { task in
-                                Individual.SingleTaskDetailedChecklistItem(task: task, includeDueDate: true)
+                            ForEach(items, id: \.objectID) { task in
+                                Individual.SingleTaskChecklistItem(task: task/*, includeDueDate: true*/)
                             }
                         } else {
                             StatusMessage.Warning(message: "No tasks modified within the last 7 days")
@@ -1250,6 +1250,7 @@ extension Tabs.Content {
             public let task: LogTask
             public var callback: (() -> Void)? = nil
             public var includeDueDate: Bool = false
+            public var inSheet: Bool = false
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
             @State private var isCompanyPresented: Bool = false
@@ -1258,121 +1259,124 @@ extension Tabs.Content {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
-                    HStack(alignment: .top, spacing: 0) {
-                        Button {
-                            isCompleted.toggle()
-                            self.actionOnSave()
-                            if let cb = callback { cb() }
-                        } label: {
-                            VStack(alignment: .center, spacing: 0) {
-                                Spacer()
-                                Image(systemName: isCompleted ? "square.fill" : "square")
-                                    .font(.title2)
-                                Spacer()
+                    HStack(alignment: .center, spacing: 0) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            NavigationLink {
+                                TaskDetail(task: task)
+                            } label: {
+                                HStack(alignment: .center) {
+                                    Text(task.content ?? "_TASK_CONTENT")
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
+                                .padding(.bottom, 8)
                             }
-                            .frame(width: 50)
-                            .background(.black.opacity(0.1))
-                        }
 
-                        NavigationLink {
-                            TaskDetail(task: task)
-                        } label: {
-                            HStack(alignment: .center) {
-                                Text(task.content ?? "_TASK_CONTENT")
-                                    .multilineTextAlignment(.leading)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                            }
-                            .padding(8)
-                        }
-                        .background(task.owner?.backgroundColor ?? Theme.rowColour)
-                    }
-                    .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
+                            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack(alignment: .center, spacing: 8) {
+                                        Image(systemName: "location.fill")
+                                            .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.35) : .white.opacity(0.35))
 
-                    HStack(alignment: .firstTextBaseline, spacing: 0) {
-                        ZStack(alignment: .topLeading) {
-                            LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                                .opacity(0.1)
+                                        if let project = task.owner?.project {
+                                            if let company = project.company {
+                                                if company.abbreviation != nil {
+                                                    Button {
+                                                        self.isCompanyPresented.toggle()
+                                                    } label: {
+                                                        Text(company.abbreviation!)
+                                                            .multilineTextAlignment(.leading)
+                                                            .underline(true, pattern: .dot)
+                                                    }
+                                                }
+                                                Image(systemName: "chevron.right")
+                                                    .font(.caption)
+                                            }
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack(alignment: .center, spacing: 8) {
-                                    if let project = task.owner?.project {
-                                        if let company = project.company {
-                                            if company.abbreviation != nil {
+                                            if project.abbreviation != nil {
                                                 Button {
-                                                    self.isCompanyPresented.toggle()
+                                                    self.isProjectPresented.toggle()
                                                 } label: {
-                                                    Text(company.abbreviation!)
+                                                    Text(project.abbreviation!)
                                                         .multilineTextAlignment(.leading)
                                                         .underline(true, pattern: .dot)
                                                 }
                                             }
-                                            Image(systemName: "chevron.right")
-                                                .font(.caption)
-                                        }
 
-                                        if project.abbreviation != nil {
-                                            Button {
-                                                self.isProjectPresented.toggle()
-                                            } label: {
-                                                Text(project.abbreviation!)
-                                                    .multilineTextAlignment(.leading)
-                                                    .underline(true, pattern: .dot)
+                                            if task.owner != nil {
+                                                Image(systemName: "chevron.right")
+                                                    .font(.caption)
+                                                Button {
+                                                    self.isJobPresented.toggle()
+                                                } label: {
+                                                    Text((task.owner?.title ?? task.owner?.jid.string)!)
+                                                        .multilineTextAlignment(.leading)
+                                                        .underline(true, pattern: .dot)
+                                                }
                                             }
                                         }
-
-                                        if task.owner != nil {
-                                            Image(systemName: "chevron.right")
-                                                .font(.caption)
-                                            Button {
-                                                self.isJobPresented.toggle()
-                                            } label: {
-                                                Text((task.owner?.title ?? task.owner?.jid.string)!)
-                                                    .multilineTextAlignment(.leading)
-                                                    .underline(true, pattern: .dot)
-                                            }
-                                        }
-                                    }
-                                    Spacer()
-                                }
-
-                                if task.due != nil {
-                                    HStack(alignment: .center) {
-                                        Text("Due: \(task.due!.formatted(date: self.includeDueDate ? .abbreviated : .omitted, time: .complete))")
-                                            .multilineTextAlignment(.leading)
                                         Spacer()
                                     }
+
+                                    if task.due != nil {
+                                        HStack(alignment: .center) {
+                                            Image(systemName: "flag.fill")
+                                                .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.35) : .white.opacity(0.35))
+                                            Text("Due: \(task.due!.formatted(date: self.includeDueDate ? .abbreviated : .omitted, time: .complete))")
+                                                .multilineTextAlignment(.leading)
+                                            Spacer()
+                                        }
+                                    }
                                 }
+                                .font(.system(.caption, design: .monospaced))
+                                .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                             }
-                            .padding(8)
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                         }
                     }
                 }
-                .background(self.task.owner?.backgroundColor ?? Theme.rowColour)
+                .listRowBackground(
+                    ZStack(alignment: .center) {
+                        self.task.owner?.backgroundColor ?? Theme.rowColour
+                        LinearGradient(colors: [Theme.base, .clear], startPoint: .top, endPoint: .bottom)
+                            .opacity(0.1)
+                    }
+                )
+                .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                 .opacity(isCompleted ? 0.5 : 1.0)
                 .onAppear(perform: self.actionOnAppear)
-                .sheet(isPresented: $isCompanyPresented) {
-                    if let project = task.owner?.project {
-                        if let company = project.company {
-                            CompanyDetail(company: company)
-                                .scrollContentBackground(.hidden)
-                        }
-                    }
-                }
-                .sheet(isPresented: $isProjectPresented) {
-                    if let project = task.owner?.project {
-                        ProjectDetail(project: project)
-                            .scrollContentBackground(.hidden)
-                    }
-                }
-                .sheet(isPresented: $isJobPresented) {
-                    if let job = task.owner {
-                        JobDetail(job: job)
-                            .scrollContentBackground(.hidden)
-                    }
-                }
+                // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
+//                .sheet(isPresented: $isCompanyPresented) {
+//                    if let project = task.owner?.project {
+//                        if let company = project.company {
+//                            if !self.inSheet {
+//                                NavigationStack {
+//                                    CompanyDetail(company: company)
+//                                        .scrollContentBackground(.hidden)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isProjectPresented) {
+//                    if let project = task.owner?.project {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                ProjectDetail(project: project)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isJobPresented) {
+//                    if let job = task.owner {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                JobDetail(job: job)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
             }
 
             /// Onload handler. Sets state vars isCompleted and isCancelled to default state
@@ -1404,6 +1408,14 @@ extension Tabs.Content {
                 }
 
                 PersistenceController.shared.save()
+            }
+            
+            /// Fires when the task close/open icon is tapped
+            /// - Returns: Void
+            private func actionOnTap() -> Void {
+                isCompleted.toggle()
+                self.actionOnSave()
+                if let cb = callback { cb() }
             }
         }
 

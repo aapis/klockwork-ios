@@ -23,7 +23,7 @@ struct TaskForecast: View {
                     ForEach(self.forecast, id: \.id) { row in row }
                 }
             }
-            .background(.black.opacity(0.6))
+            .background(Theme.base.opacity(0.6))
         }
         .onAppear(perform: self.actionOnAppear)
     }
@@ -148,8 +148,9 @@ struct Forecast: View, Identifiable {
         }
         .sheet(isPresented: $isUpcomingTaskListPresented) {
             NavigationStack {
-                PlanTabs.Upcoming()
+                PlanTabs.Upcoming(inSheet: true)
                     .presentationBackground(self.page?.primaryColour ?? Theme.cOrange)
+                    .scrollContentBackground(.hidden)
             }
         }
     }
