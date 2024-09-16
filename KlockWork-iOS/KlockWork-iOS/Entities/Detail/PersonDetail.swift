@@ -107,6 +107,8 @@ extension PersonDetail {
             if let nm = person.name {name = nm}
             if let ti = person.title {title = ti}
             if let co = person.company {company = co}
+        } else {
+            self.created = self.state.date
         }
     }
     

@@ -139,6 +139,8 @@ extension ProjectDetail {
             self.alive = project.alive
             self.pid = project.pid
             self.jobs = project.jobs?.allObjects as! [Job]
+        } else {
+            self.createdDate = self.state.date
         }
     }
     

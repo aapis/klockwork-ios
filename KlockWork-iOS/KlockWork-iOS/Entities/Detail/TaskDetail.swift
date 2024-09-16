@@ -207,6 +207,7 @@ extension TaskDetail {
             if let jo = task.owner {job = jo}
         } else {
             self.job = self.state.job
+            self.created = self.state.date
         }
     }
     

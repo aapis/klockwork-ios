@@ -314,6 +314,7 @@ extension NoteDetail {
             }
         } else {
             self.job = self.state.job
+            self.postedDate = self.state.date
         }
     }
     

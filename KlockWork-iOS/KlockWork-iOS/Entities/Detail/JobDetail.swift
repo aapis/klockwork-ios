@@ -189,6 +189,8 @@ extension JobDetail {
             if let link = self.job!.uri {
                 self.url = link.absoluteString
             }
+        } else {
+            self.created = self.state.date
         }
     }
     
