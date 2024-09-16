@@ -57,7 +57,7 @@ extension Planning {
                     
                     HStack(spacing: 8) {
                         PageTitle(text: "Planning")
-                        DateStrip(date: self.date)
+                        DateStrip()
                         Spacer()
                         CreateEntitiesButton(page: self.page)
                     }

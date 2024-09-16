@@ -113,7 +113,7 @@ extension Find {
 
                     HStack(spacing: 8) {
                         PageTitle(text: text.isEmpty ? "Find" : text.count < 10 ? "Find: \(text.prefix(10))" : "Find: \(text.prefix(10))...")
-                        DateStrip(date: self.date)
+                        DateStrip()
                         Spacer()
                         CreateEntitiesButton(page: self.page)
                     }
