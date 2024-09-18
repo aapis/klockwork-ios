@@ -70,7 +70,7 @@ struct TaskDetail: View {
                             self.actionOnSave()
                         } label: {
                             HStack {
-                                Image(systemName: "calendar.badge.clock")
+                                Image(systemName: "clock")
                                     .foregroundStyle(self.state.theme.tint)
                                 Text("Due tomorrow")
                             }

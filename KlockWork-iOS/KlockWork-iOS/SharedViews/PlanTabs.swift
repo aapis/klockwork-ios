@@ -204,9 +204,9 @@ extension PlanTabs {
 
                 ZStack(alignment: .bottomLeading) {
                     ZStack(alignment: .topLeading){
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: 1) {
-                                ForEach(selectedJobs.sorted(by: {$0.project != nil && $1.project != nil ? $0.project!.name! > $1.project!.name! && $0.jid < $1.jid : $0.jid < $1.jid})) { job in // sooo sorry
+                        List {
+                            ForEach(selectedJobs.sorted(by: {$0.project != nil && $1.project != nil ? $0.project!.name! > $1.project!.name! && $0.jid < $1.jid : $0.jid < $1.jid})) { job in // sooo sorry
+                                Section {
                                     Row(
                                         job: job,
                                         selectedJobs: $selectedJobs,
@@ -215,9 +215,39 @@ extension PlanTabs {
                                         selectedProjects: $selectedProjects,
                                         selectedCompanies: $selectedCompanies
                                     )
+//                                    .listRowBackground(
+//                                        Tabs.Content.Common.TypedListRowBackground(colour: job.backgroundColor, type: .jobs)
+//                                    )
+                                    .swipeActions(edge: .leading) {
+                                        Button {
+                                            self.actionOnSwipeComplete(job)
+                                        } label: {
+                                            Image(systemName: "checkmark.seal.fill")
+                                        }
+                                        .tint(.green)
+                                    }
+                                    .swipeActions(edge: .trailing) {
+                                        Button {
+                                            self.actionOnSwipeDelay(job)
+                                        } label: {
+                                            Image(systemName: "clock.fill")
+                                        }
+                                        .tint(.yellow)
+
+                                        Button(role: .destructive) {
+                                            self.actionOnSwipeCancel(job)
+                                        } label: {
+                                            Image(systemName: "calendar.badge.minus")
+                                        }
+                                        .tint(.red)
+                                    }
                                 }
                             }
                         }
+                        .listStyle(.plain)
+                        .listRowInsets(.none)
+                        .listRowSpacing(.none)
+                        .listRowSeparator(.hidden)
                     }
                     PageActionBar.Planning(
                         selectedJobs: $selectedJobs,
@@ -259,6 +289,27 @@ extension PlanTabs {
                     self.selectedJobs = Array(sJobs)
                 }
             }
+        }
+
+        /// Callback which handles the Complete swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeComplete(_ job: Job) -> Void {
+
+        }
+
+        /// Callback which handles the Delay swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeDelay(_ job: Job) -> Void {
+
+        }
+
+        /// Callback which handles the Cancel swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeCancel(_ job: Job) -> Void {
+
         }
 
         struct SelectedItems: View {
@@ -304,7 +355,7 @@ extension PlanTabs {
         }
 
         struct PlanRow: View {
-            typealias Row = Tabs.Content.Individual.SingleJobCustomButton
+            typealias Row = Tabs.Content.Individual.SingleJobDetailedCustomButton
 
             @EnvironmentObject private var state: AppState
             public var job: Job
@@ -318,6 +369,58 @@ extension PlanTabs {
             @State private var isDetailsPresented: Bool = false
             @State private var isCompanyPresented: Bool = false
             @State private var isProjectPresented: Bool = false
+            @State private var id: UUID = UUID()
+
+//            var body: some View {
+//                NavigationStack {
+//                    VStack(alignment: .leading, spacing: 0) {
+//                        List {
+//                            ForEach(self.selectedJobs, id: \.id) { row in
+//                                Section {
+//                                    ForEach(row.tasks) { task in
+//                                        Row(job: job, callback: self.rowTapCallback, inSheet: self.inSheet)
+//                                            .swipeActions(edge: .leading) {
+//                                                Button {
+//                                                    self.actionOnSwipeComplete(task)
+//                                                } label: {
+//                                                    Image(systemName: "checkmark.seal.fill")
+//                                                }
+//                                                .tint(.green)
+//                                            }
+//                                            .swipeActions(edge: .trailing) {
+//                                                Button {
+//                                                    self.actionOnSwipeDelay(task)
+//                                                } label: {
+//                                                    Image(systemName: "clock.fill")
+//                                                }
+//                                                .tint(.yellow)
+//
+//                                                Button(role: .destructive) {
+//                                                    self.actionOnSwipeCancel(task)
+//                                                } label: {
+//                                                    Image(systemName: "calendar.badge.minus")
+//                                                }
+//                                                .tint(.red)
+//                                            }
+//                                    }
+//                                } header: {
+//                                    Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
+//                                }
+//                            }
+//                        }
+//                        .background(Theme.base.opacity(0.6))
+//                        .listStyle(.plain)
+//                        .listRowInsets(.none)
+//                        .listRowSpacing(.none)
+//                        .listRowSeparator(.hidden)
+//                    }
+//                }
+//                .id(self.id)
+//                .onAppear(perform: self.actionOnAppear)
+//                .onChange(of: self.state.date) {
+//                    self.actionOnSelectDate()
+//                }
+//            }
 
             var body: some View {
                 NavigationStack {
@@ -353,6 +456,7 @@ extension PlanTabs {
                         }
                     }
                 }
+//                .listRowBackground(self.job.backgroundColor)
             }
 
             @ViewBuilder private var OwnershipHierarchy: some View {
@@ -612,53 +716,56 @@ extension PlanTabs {
             NavigationStack {
                 VStack(alignment: .leading, spacing: 0) {
                     TaskForecast(callback: self.actionForecastCallback, page: self.page)
-                        if !self.tasks.isEmpty {
-                            List {
-                                ForEach(self.upcoming, id: \.id) { row in
-                                    Section {
-                                        ForEach(row.tasks) { task in
-                                            Row(task: task, callback: self.actionOnAppear, inSheet: self.inSheet)
-                                                .swipeActions(edge: .leading) {
-                                                    Button {
-                                                        CoreDataTasks(moc: self.state.moc).complete(task)
-                                                        self.actionOnAppear()
-                                                    } label: {
-                                                        Image(systemName: "checkmark.seal.fill")
-                                                    }
-                                                    .tint(.green)
+                    if !self.tasks.isEmpty {
+                        List {
+                            ForEach(self.upcoming, id: \.id) { row in
+                                Section {
+                                    ForEach(row.tasks) { task in
+                                        Row(task: task, callback: self.actionOnAppear, inSheet: self.inSheet)
+                                            .swipeActions(edge: .leading) {
+                                                Button {
+                                                    self.actionOnSwipeComplete(task)
+                                                } label: {
+                                                    Image(systemName: "checkmark.seal.fill")
                                                 }
-                                                .swipeActions(edge: .trailing) {
-                                                    Button(role: .destructive) {
-                                                        CoreDataTasks(moc: self.state.moc).cancel(task)
-                                                        self.actionOnAppear()
-                                                    } label: {
-                                                        Image(systemName: "xmark.square")
-                                                    }
-                                                    .tint(.red)
+                                                .tint(.green)
+                                            }
+                                            .swipeActions(edge: .trailing) {
+                                                Button {
+                                                    self.actionOnSwipeDelay(task)
+                                                } label: {
+                                                    Image(systemName: "clock.fill")
                                                 }
-                                        }
-                                    } header: {
-                                        Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing, clear: true)
+                                                .tint(.yellow)
+
+                                                Button(role: .destructive) {
+                                                    self.actionOnSwipeCancel(task)
+                                                } label: {
+                                                    Image(systemName: "calendar.badge.minus")
+                                                }
+                                                .tint(.red)
+                                            }
                                     }
+                                } header: {
+                                    Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
                             }
-                            .background(Theme.base.opacity(0.6))
-                            .listStyle(.plain)
-                            .listRowInsets(.none)
-                            .listRowSpacing(.none)
-                            .listRowSeparator(.hidden)
-                            .listSectionSeparatorTint(.red)
-                        } else {
-                            HStack {
-                                Text("No upcoming due dates")
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Theme.textBackground)
-                            .clipShape(.rect(cornerRadius: 16))
+                        }
+                        .background(Theme.base.opacity(0.6))
+                        .listStyle(.plain)
+                        .listRowInsets(.none)
+                        .listRowSpacing(.none)
+                        .listRowSeparator(.hidden)
+                    } else {
+                        HStack {
+                            Text("No upcoming due dates")
                             Spacer()
                         }
-//                    }
+                        .padding()
+                        .background(Theme.textBackground)
+                        .clipShape(.rect(cornerRadius: 16))
+                        Spacer()
+                    }
                 }
             }
             .id(self.id)
@@ -666,6 +773,7 @@ extension PlanTabs {
             .onChange(of: self.state.date) {
                 self.actionOnSelectDate()
             }
+            .scrollContentBackground(.hidden)
         }
 
         init(inSheet: Bool = false) {
@@ -743,41 +851,108 @@ extension PlanTabs {
             print("DERPO fcalllback")
             // @TODO: this doesn't work and I have no idea why
         }
+
+        /// Callback which handles the Complete swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeComplete(_ task: LogTask) -> Void {
+            CoreDataTasks(moc: self.state.moc).complete(task)
+            self.actionOnAppear()
+        }
+
+        /// Callback which handles the Delay swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeDelay(_ task: LogTask) -> Void {
+            if let due = task.due {
+                if let newDate = DateHelper.endOfTomorrow(due) {
+                    CoreDataTasks(moc: self.state.moc).due(on: newDate, task: task)
+                }
+            }
+
+            self.actionOnAppear()
+        }
+
+        /// Callback which handles the Cancel swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeCancel(_ task: LogTask) -> Void {
+            CoreDataTasks(moc: self.state.moc).cancel(task)
+            self.actionOnAppear()
+        }
     }
 
     struct Overdue: View {
-        typealias Row = Tabs.Content.Individual.SingleTaskChecklistItem
+        typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
 
         @EnvironmentObject private var state: AppState
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var overdue: [UpcomingRow] = []
+        @State private var id: UUID = UUID()
+        public var page: PageConfiguration.AppPage = .planning
+        public var inSheet: Bool = false
 
         var body: some View {
             NavigationStack {
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if !self.tasks.isEmpty {
+                VStack(alignment: .leading, spacing: 1) {
+                    if !self.tasks.isEmpty {
+                        List {
                             ForEach(self.overdue, id: \.id) { row in
-                                Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
+                                Section {
+                                    ForEach(row.tasks) { task in
+                                        Row(task: task, callback: self.actionOnAppear, inSheet: self.inSheet)
+                                            .swipeActions(edge: .leading) {
+                                                Button {
+                                                    self.actionOnSwipeComplete(task)
+                                                } label: {
+                                                    Image(systemName: "checkmark.seal.fill")
+                                                }
+                                                .tint(.green)
+                                            }
+                                            .swipeActions(edge: .trailing) {
+                                                Button {
+                                                    self.actionOnSwipeDelay(task)
+                                                } label: {
+                                                    Image(systemName: "clock.fill")
+                                                }
+                                                .tint(.yellow)
 
-                                ForEach(row.tasks) { task in
-                                    Row(task: task/*, callback: self.actionOnAppear*/)
+                                                Button(role: .destructive) {
+                                                    self.actionOnSwipeCancel(task)
+                                                } label: {
+                                                    Image(systemName: "calendar.badge.minus")
+                                                }
+                                                .tint(.red)
+                                            }
+                                    }
+                                } header: {
+                                    Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
                             }
-                        } else {
-                            HStack {
-                                Text("No overdue tasks!")
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Theme.textBackground)
-                            .clipShape(.rect(cornerRadius: 16))
+                        }
+                        .background(Theme.base.opacity(0.6))
+                        .listStyle(.plain)
+                        .listRowInsets(.none)
+                        .listRowSpacing(.none)
+                        .listRowSeparator(.hidden)
+                    } else {
+                        HStack {
+                            Text("No overdue tasks!")
                             Spacer()
                         }
+                        .padding()
+                        .background(Theme.textBackground)
+                        .clipShape(.rect(cornerRadius: 16))
+                        Spacer()
                     }
                 }
             }
+            .id(self.id)
             .onAppear(perform: self.actionOnAppear)
+            .onChange(of: self.state.date) {
+                self.actionOnSelectDate()
+            }
+            .scrollContentBackground(.hidden)
         }
 
         init() {
@@ -787,6 +962,7 @@ extension PlanTabs {
         /// Onload handler
         /// - Returns: Void
         private func actionOnAppear() -> Void {
+            self.id = UUID()
             self.overdue = []
             let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
             let sorted = Array(grouped)
@@ -805,6 +981,62 @@ extension PlanTabs {
             for group in sorted {
                 self.overdue.append(UpcomingRow(date: group.key, tasks: group.value))
             }
+        }
+
+        /// Select date handler
+        /// @TODO: refactor
+        /// - Returns: Void
+        private func actionOnSelectDate() -> Void {
+            self.id = UUID()
+            self.overdue = []
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
+            let sorted = Array(grouped)
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
+
+            for group in sorted {
+                if group.key == self.state.date.formatted(date: .abbreviated, time: .omitted) {
+                    self.overdue.append(UpcomingRow(date: group.key, tasks: group.value))
+                }
+            }
+        }
+        
+        /// Callback which handles the Complete swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeComplete(_ task: LogTask) -> Void {
+            CoreDataTasks(moc: self.state.moc).complete(task)
+            self.actionOnAppear()
+        }
+        
+        /// Callback which handles the Delay swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeDelay(_ task: LogTask) -> Void {
+            if let due = task.due {
+                if let newDate = DateHelper.endOfTomorrow(due) {
+                    CoreDataTasks(moc: self.state.moc).due(on: newDate, task: task)
+                }
+            }
+
+            self.actionOnAppear()
+        }
+        
+        /// Callback which handles the Cancel swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeCancel(_ task: LogTask) -> Void {
+            CoreDataTasks(moc: self.state.moc).cancel(task)
+            self.actionOnAppear()
         }
     }
 }
