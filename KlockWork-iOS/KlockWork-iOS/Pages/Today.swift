@@ -103,7 +103,6 @@ extension Today {
 
                     HStack(spacing: 8) {
                         PageTitle(text: "Today")
-                        DateStrip()
                         Spacer()
                         CreateEntitiesButton(isViewModeSelectorVisible: true, page: self.page)
                     }

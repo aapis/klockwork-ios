@@ -53,7 +53,6 @@ struct Explore: View {
 
                     HStack(spacing: 8) {
                         PageTitle(text: "Explore")
-                        DateStrip()
                         Spacer()
                         CreateEntitiesButton(page: self.page)
                     }
