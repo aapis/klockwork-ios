@@ -78,6 +78,7 @@ extension Tabs.Content {
                             .padding(.bottom, 8)
                         }
                         Timestamp(text: self.record!.timestamp!.formatted(date: .omitted, time: .shortened), fullWidth: false, alignment: .trailing)
+                            .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                     }
                 }
                 .frame(minHeight: 45)
@@ -523,7 +524,7 @@ extension Tabs.Content {
 
         struct SingleJobDetailedCustomButton: View {
             @EnvironmentObject private var state: AppState
-            public var job: Job?
+            @State public var job: Job?
             public var callback: ((Job?) -> Void)? = nil
             public var inSheet: Bool = false
             @State private var isCompanyPresented: Bool = false
@@ -611,6 +612,29 @@ extension Tabs.Content {
                 )
                 .foregroundStyle((self.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                 .onAppear(perform: self.actionOnAppear)
+                .swipeActions(edge: .leading) {
+                    Button {
+                        self.actionOnSwipeComplete(job)
+                    } label: {
+                        Image(systemName: "checkmark.seal.fill")
+                    }
+                    .tint(.green)
+                }
+                .swipeActions(edge: .trailing) {
+                    Button {
+                        self.actionOnSwipeDelay(job)
+                    } label: {
+                        Image(systemName: "clock.fill")
+                    }
+                    .tint(.yellow)
+
+                    Button(role: .destructive) {
+                        self.actionOnSwipeCancel(job)
+                    } label: {
+                        Image(systemName: "calendar.badge.minus")
+                    }
+                    .tint(.red)
+                }
                 // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
 //                .sheet(isPresented: $isCompanyPresented) {
 //                    if let project = task.owner?.project {
@@ -684,6 +708,27 @@ extension Tabs.Content {
 //                self.actionOnSave()
 //                if let cb = callback { cb() }
             }
+
+            /// Callback which handles the Complete swipe action
+            /// - Parameter task: LogTask
+            /// - Returns: Void
+            private func actionOnSwipeComplete(_ job: Job?) -> Void {
+
+            }
+
+            /// Callback which handles the Delay swipe action
+            /// - Parameter task: LogTask
+            /// - Returns: Void
+            private func actionOnSwipeDelay(_ job: Job?) -> Void {
+
+            }
+
+            /// Callback which handles the Cancel swipe action
+            /// - Parameter task: LogTask
+            /// - Returns: Void
+            private func actionOnSwipeCancel(_ job: Job?) -> Void {
+
+            }
         }
 
         struct SingleTask: View {
@@ -706,7 +751,7 @@ extension Tabs.Content {
 
         struct SingleTaskChecklistItem: View {
             @EnvironmentObject private var state: AppState
-            public let task: LogTask
+            @State public var task: LogTask
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
 
@@ -772,8 +817,11 @@ extension Tabs.Content {
 
         struct SingleTaskDetailedChecklistItem: View {
             @EnvironmentObject private var state: AppState
-            public let task: LogTask
+            @State public var task: LogTask
             public var callback: (() -> Void)? = nil
+            public var onActionComplete: (() -> Void)? = nil
+            public var onActionDelay: (() -> Void)? = nil
+            public var onActionCancel: (() -> Void)? = nil
             public var includeDueDate: Bool = false
             public var inSheet: Bool = false
             @State private var isCompleted: Bool = false
@@ -957,6 +1005,10 @@ extension Tabs.Content {
             private func actionOnSwipeComplete(_ task: LogTask) -> Void {
                 CoreDataTasks(moc: self.state.moc).complete(task)
                 self.actionOnAppear()
+
+                if let completed = self.onActionComplete {
+                    completed()
+                }
             }
 
             /// Callback which handles the Delay swipe action
@@ -970,6 +1022,10 @@ extension Tabs.Content {
                 }
 
                 self.actionOnAppear()
+
+                if let delayed = self.onActionDelay {
+                    delayed()
+                }
             }
 
             /// Callback which handles the Cancel swipe action
@@ -978,6 +1034,10 @@ extension Tabs.Content {
             private func actionOnSwipeCancel(_ task: LogTask) -> Void {
                 CoreDataTasks(moc: self.state.moc).cancel(task)
                 self.actionOnAppear()
+
+                if let cancelled = self.onActionCancel {
+                    cancelled()
+                }
             }
         }
 
@@ -1002,6 +1062,115 @@ extension Tabs.Content {
             }
         }
 
+        struct SingleNoteDetailedLink: View {
+            @EnvironmentObject private var state: AppState
+            public var note: Note?
+            public var callback: ((Note?) -> Void)? = nil
+            public var inSheet: Bool = false
+            @State private var isCompanyPresented: Bool = false
+            @State private var isProjectPresented: Bool = false
+            private let page: PageConfiguration.AppPage = .create
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 1) {
+                    if self.note != nil {
+                        NavigationLink {
+                            NoteDetail(note: self.note)
+                                .background(self.page.primaryColour)
+                                .scrollContentBackground(.hidden)
+                        } label: {
+                            HStack(alignment: .center) {
+                                Text(self.note?.title ?? "_NOTE_TITLE")
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                            }
+                            .padding(.bottom, 8)
+                        }
+                        Timestamp(text: "\(self.note?.versions?.count ?? 0)", fullWidth: false, alignment: .trailing, type: .notes)
+                            .foregroundStyle((self.note?.mJob?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                    }
+                }
+                .frame(minHeight: 45)
+                .listRowBackground(
+                    Common.TypedListRowBackground(colour: (self.note?.mJob?.backgroundColor ?? Theme.rowColour), type: .notes)
+                )
+                .foregroundStyle((self.note?.mJob?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
+                .onAppear(perform: self.actionOnAppear)
+                // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
+//                .sheet(isPresented: $isCompanyPresented) {
+//                    if let project = task.owner?.project {
+//                        if let company = project.company {
+//                            if !self.inSheet {
+//                                NavigationStack {
+//                                    CompanyDetail(company: company)
+//                                        .scrollContentBackground(.hidden)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isProjectPresented) {
+//                    if let project = task.owner?.project {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                ProjectDetail(project: project)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isJobPresented) {
+//                    if let job = task.owner {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                JobDetail(job: job)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+            }
+
+            /// Onload handler. Sets state vars isCompleted and isCancelled to default state
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+//                self.isCompleted = self.task.completedDate != nil
+//                self.isCancelled = self.task.cancelledDate != nil
+            }
+
+            /// Save handler. Saves completed or cancelled status for the given task.
+            /// - Returns: Void
+            private func actionOnSave() -> Void {
+//                if self.isCompleted {
+//                    self.task.completedDate = Date()
+//
+//                    // Create a record indicating when the task was completed
+//                    CoreDataTasks(moc: self.state.moc).complete(self.task)
+//                } else {
+//                    self.task.completedDate = nil
+//                }
+//
+//                if self.isCancelled {
+//                    self.task.cancelledDate = Date()
+//
+//                    // Create a record indicating when the task was cancelled
+//                    CoreDataTasks(moc: self.state.moc).cancel(self.task)
+//                } else {
+//                    self.task.cancelledDate = nil
+//                }
+//
+//                PersistenceController.shared.save()
+            }
+
+            /// Fires when the task close/open icon is tapped
+            /// - Returns: Void
+            private func actionOnTap() -> Void {
+//                isCompleted.toggle()
+//                self.actionOnSave()
+//                if let cb = callback { cb() }
+            }
+        }
+
         struct SingleCompany: View {
             public let company: Company
 
@@ -1017,6 +1186,118 @@ extension Tabs.Content {
                     )
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleCompanyDetailedLink: View {
+            @EnvironmentObject private var state: AppState
+            public var entity: Company?
+            public var callback: ((Company?) -> Void)? = nil
+            public var inSheet: Bool = false
+            @State private var isCompanyPresented: Bool = false
+            @State private var isProjectPresented: Bool = false
+            private let page: PageConfiguration.AppPage = .create
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 1) {
+                    if self.entity != nil {
+                        NavigationLink {
+                            CompanyDetail(company: self.entity)
+                                .background(self.page.primaryColour)
+                                .scrollContentBackground(.hidden)
+                        } label: {
+                            HStack(alignment: .center) {
+                                Text(self.entity?.name ?? "_NAME")
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                            }
+                            .padding(.bottom, 8)
+                        }
+
+                        if self.entity!.isDefault {
+                            Timestamp(text: "Default", fullWidth: false, alignment: .trailing, type: .companies)
+                                .foregroundStyle((self.entity?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                        }
+                    }
+                }
+                .frame(height: 70)
+                .listRowBackground(
+                    Common.TypedListRowBackground(colour: (self.entity?.backgroundColor ?? Theme.rowColour), type: .companies)
+                )
+                .foregroundStyle((self.entity?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
+                .onAppear(perform: self.actionOnAppear)
+                // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
+//                .sheet(isPresented: $isCompanyPresented) {
+//                    if let project = task.owner?.project {
+//                        if let company = project.company {
+//                            if !self.inSheet {
+//                                NavigationStack {
+//                                    CompanyDetail(company: company)
+//                                        .scrollContentBackground(.hidden)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isProjectPresented) {
+//                    if let project = task.owner?.project {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                ProjectDetail(project: project)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isJobPresented) {
+//                    if let job = task.owner {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                JobDetail(job: job)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+            }
+
+            /// Onload handler. Sets state vars isCompleted and isCancelled to default state
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+//                self.isCompleted = self.task.completedDate != nil
+//                self.isCancelled = self.task.cancelledDate != nil
+            }
+
+            /// Save handler. Saves completed or cancelled status for the given task.
+            /// - Returns: Void
+            private func actionOnSave() -> Void {
+//                if self.isCompleted {
+//                    self.task.completedDate = Date()
+//
+//                    // Create a record indicating when the task was completed
+//                    CoreDataTasks(moc: self.state.moc).complete(self.task)
+//                } else {
+//                    self.task.completedDate = nil
+//                }
+//
+//                if self.isCancelled {
+//                    self.task.cancelledDate = Date()
+//
+//                    // Create a record indicating when the task was cancelled
+//                    CoreDataTasks(moc: self.state.moc).cancel(self.task)
+//                } else {
+//                    self.task.cancelledDate = nil
+//                }
+//
+//                PersistenceController.shared.save()
+            }
+
+            /// Fires when the task close/open icon is tapped
+            /// - Returns: Void
+            private func actionOnTap() -> Void {
+//                isCompleted.toggle()
+//                self.actionOnSave()
+//                if let cb = callback { cb() }
             }
         }
 
@@ -1128,6 +1409,117 @@ extension Tabs.Content {
             }
         }
 
+        struct SinglePersonDetailedLink: View {
+            @EnvironmentObject private var state: AppState
+            public var person: Person?
+            public var callback: ((Person?) -> Void)? = nil
+            public var inSheet: Bool = false
+            @State private var isCompanyPresented: Bool = false
+            @State private var isProjectPresented: Bool = false
+            private let page: PageConfiguration.AppPage = .create
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 1) {
+                    if self.person != nil {
+                        NavigationLink {
+                            PersonDetail(person: self.person)
+                                .background(self.page.primaryColour)
+                                .scrollContentBackground(.hidden)
+                        } label: {
+                            HStack(alignment: .center) {
+                                Text(self.person?.name ?? "_NAME")
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                            }
+                            .padding(.bottom, 8)
+                        }
+                        if let cname = self.person?.company?.name {
+                            Timestamp(text: cname, fullWidth: false, alignment: .trailing, type: .people)
+                                .foregroundStyle((self.person?.company?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                        }
+                    }
+                }
+                .frame(height: 70)
+                .listRowBackground(
+                    Common.TypedListRowBackground(colour: (self.person?.company?.backgroundColor ?? Theme.rowColour), type: .people)
+                )
+                .foregroundStyle((self.person?.company?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
+                .onAppear(perform: self.actionOnAppear)
+                // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
+//                .sheet(isPresented: $isCompanyPresented) {
+//                    if let project = task.owner?.project {
+//                        if let company = project.company {
+//                            if !self.inSheet {
+//                                NavigationStack {
+//                                    CompanyDetail(company: company)
+//                                        .scrollContentBackground(.hidden)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isProjectPresented) {
+//                    if let project = task.owner?.project {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                ProjectDetail(project: project)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isJobPresented) {
+//                    if let job = task.owner {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                JobDetail(job: job)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+            }
+
+            /// Onload handler. Sets state vars isCompleted and isCancelled to default state
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+//                self.isCompleted = self.task.completedDate != nil
+//                self.isCancelled = self.task.cancelledDate != nil
+            }
+
+            /// Save handler. Saves completed or cancelled status for the given task.
+            /// - Returns: Void
+            private func actionOnSave() -> Void {
+//                if self.isCompleted {
+//                    self.task.completedDate = Date()
+//
+//                    // Create a record indicating when the task was completed
+//                    CoreDataTasks(moc: self.state.moc).complete(self.task)
+//                } else {
+//                    self.task.completedDate = nil
+//                }
+//
+//                if self.isCancelled {
+//                    self.task.cancelledDate = Date()
+//
+//                    // Create a record indicating when the task was cancelled
+//                    CoreDataTasks(moc: self.state.moc).cancel(self.task)
+//                } else {
+//                    self.task.cancelledDate = nil
+//                }
+//
+//                PersistenceController.shared.save()
+            }
+
+            /// Fires when the task close/open icon is tapped
+            /// - Returns: Void
+            private func actionOnTap() -> Void {
+//                isCompleted.toggle()
+//                self.actionOnSave()
+//                if let cb = callback { cb() }
+            }
+        }
+
         struct SingleProject: View {
             public let project: Project
 
@@ -1143,6 +1535,116 @@ extension Tabs.Content {
                     )
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleProjectDetailedLink: View {
+            @EnvironmentObject private var state: AppState
+            public var entity: Project?
+            public var callback: ((Project?) -> Void)? = nil
+            public var inSheet: Bool = false
+            @State private var isCompanyPresented: Bool = false
+            @State private var isProjectPresented: Bool = false
+            private let page: PageConfiguration.AppPage = .create
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 1) {
+                    if self.entity != nil {
+                        NavigationLink {
+                            ProjectDetail(project: self.entity)
+                                .background(self.page.primaryColour)
+                                .scrollContentBackground(.hidden)
+                        } label: {
+                            HStack(alignment: .center) {
+                                Text(self.entity?.name ?? "_NAME")
+                                    .multilineTextAlignment(.leading)
+                                Spacer()
+                            }
+                            .padding(.bottom, 8)
+                        }
+
+                        Timestamp(text: "\(self.entity?.jobs?.count ?? 0)", fullWidth: false, alignment: .trailing, type: .jobs)
+                            .foregroundStyle((self.entity?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                    }
+                }
+                .frame(height: 70)
+                .listRowBackground(
+                    Common.TypedListRowBackground(colour: (self.entity?.backgroundColor ?? Theme.rowColour), type: .projects)
+                )
+                .foregroundStyle((self.entity?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
+                .onAppear(perform: self.actionOnAppear)
+                // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
+//                .sheet(isPresented: $isCompanyPresented) {
+//                    if let project = task.owner?.project {
+//                        if let company = project.company {
+//                            if !self.inSheet {
+//                                NavigationStack {
+//                                    CompanyDetail(company: company)
+//                                        .scrollContentBackground(.hidden)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isProjectPresented) {
+//                    if let project = task.owner?.project {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                ProjectDetail(project: project)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isJobPresented) {
+//                    if let job = task.owner {
+//                        if !self.inSheet {
+//                            NavigationStack {
+//                                JobDetail(job: job)
+//                                    .scrollContentBackground(.hidden)
+//                            }
+//                        }
+//                    }
+//                }
+            }
+
+            /// Onload handler. Sets state vars isCompleted and isCancelled to default state
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+//                self.isCompleted = self.task.completedDate != nil
+//                self.isCancelled = self.task.cancelledDate != nil
+            }
+
+            /// Save handler. Saves completed or cancelled status for the given task.
+            /// - Returns: Void
+            private func actionOnSave() -> Void {
+//                if self.isCompleted {
+//                    self.task.completedDate = Date()
+//
+//                    // Create a record indicating when the task was completed
+//                    CoreDataTasks(moc: self.state.moc).complete(self.task)
+//                } else {
+//                    self.task.completedDate = nil
+//                }
+//
+//                if self.isCancelled {
+//                    self.task.cancelledDate = Date()
+//
+//                    // Create a record indicating when the task was cancelled
+//                    CoreDataTasks(moc: self.state.moc).cancel(self.task)
+//                } else {
+//                    self.task.cancelledDate = nil
+//                }
+//
+//                PersistenceController.shared.save()
+            }
+
+            /// Fires when the task close/open icon is tapped
+            /// - Returns: Void
+            private func actionOnTap() -> Void {
+//                isCompleted.toggle()
+//                self.actionOnSave()
+//                if let cb = callback { cb() }
             }
         }
 

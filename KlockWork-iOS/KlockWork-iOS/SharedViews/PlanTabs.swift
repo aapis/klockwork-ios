@@ -218,29 +218,6 @@ extension PlanTabs {
                                     .listRowBackground(
                                         Tabs.Content.Common.TypedListRowBackground(colour: job.backgroundColor, type: .jobs)
                                     )
-                                    .swipeActions(edge: .leading) {
-                                        Button {
-                                            self.actionOnSwipeComplete(job)
-                                        } label: {
-                                            Image(systemName: "checkmark.seal.fill")
-                                        }
-                                        .tint(.green)
-                                    }
-                                    .swipeActions(edge: .trailing) {
-                                        Button {
-                                            self.actionOnSwipeDelay(job)
-                                        } label: {
-                                            Image(systemName: "clock.fill")
-                                        }
-                                        .tint(.yellow)
-
-                                        Button(role: .destructive) {
-                                            self.actionOnSwipeCancel(job)
-                                        } label: {
-                                            Image(systemName: "calendar.badge.minus")
-                                        }
-                                        .tint(.red)
-                                    }
                                 }
                             }
                         }
@@ -290,27 +267,6 @@ extension PlanTabs {
                     self.selectedJobs = Array(sJobs)
                 }
             }
-        }
-
-        /// Callback which handles the Complete swipe action
-        /// - Parameter task: LogTask
-        /// - Returns: Void
-        private func actionOnSwipeComplete(_ job: Job) -> Void {
-
-        }
-
-        /// Callback which handles the Delay swipe action
-        /// - Parameter task: LogTask
-        /// - Returns: Void
-        private func actionOnSwipeDelay(_ job: Job) -> Void {
-
-        }
-
-        /// Callback which handles the Cancel swipe action
-        /// - Parameter task: LogTask
-        /// - Returns: Void
-        private func actionOnSwipeCancel(_ job: Job) -> Void {
-
         }
 
         struct SelectedItems: View {
@@ -386,6 +342,7 @@ extension PlanTabs {
                         .background(.gray)
                     }
                 }
+                .id(self.id)
             }
 
             @ViewBuilder private var OwnershipHierarchy: some View {
@@ -530,6 +487,7 @@ extension PlanTabs {
                         selectedTasks.remove(at: index)
                     }
                 }
+                self.id = UUID()
             }
             
             /// Handler for tapping on a note
@@ -651,30 +609,7 @@ extension PlanTabs {
                             ForEach(self.upcoming, id: \.id) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, callback: self.actionOnAppear, inSheet: self.inSheet)
-                                            .swipeActions(edge: .leading) {
-                                                Button {
-                                                    self.actionOnSwipeComplete(task)
-                                                } label: {
-                                                    Image(systemName: "checkmark.seal.fill")
-                                                }
-                                                .tint(.green)
-                                            }
-                                            .swipeActions(edge: .trailing) {
-                                                Button {
-                                                    self.actionOnSwipeDelay(task)
-                                                } label: {
-                                                    Image(systemName: "clock.fill")
-                                                }
-                                                .tint(.yellow)
-
-                                                Button(role: .destructive) {
-                                                    self.actionOnSwipeCancel(task)
-                                                } label: {
-                                                    Image(systemName: "calendar.badge.minus")
-                                                }
-                                                .tint(.red)
-                                            }
+                                        Row(task: task, callback: self.actionOnAppear, onActionComplete: self.actionOnAppear, inSheet: self.inSheet)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
@@ -830,30 +765,7 @@ extension PlanTabs {
                             ForEach(self.overdue, id: \.id) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, callback: self.actionOnAppear, inSheet: self.inSheet)
-                                            .swipeActions(edge: .leading) {
-                                                Button {
-                                                    self.actionOnSwipeComplete(task)
-                                                } label: {
-                                                    Image(systemName: "checkmark.seal.fill")
-                                                }
-                                                .tint(.green)
-                                            }
-                                            .swipeActions(edge: .trailing) {
-                                                Button {
-                                                    self.actionOnSwipeDelay(task)
-                                                } label: {
-                                                    Image(systemName: "clock.fill")
-                                                }
-                                                .tint(.yellow)
-
-                                                Button(role: .destructive) {
-                                                    self.actionOnSwipeCancel(task)
-                                                } label: {
-                                                    Image(systemName: "calendar.badge.minus")
-                                                }
-                                                .tint(.red)
-                                            }
+                                        Row(task: task, callback: self.actionOnAppear, onActionComplete: self.actionOnAppear, inSheet: self.inSheet)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)

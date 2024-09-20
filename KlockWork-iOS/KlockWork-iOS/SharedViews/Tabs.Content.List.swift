@@ -47,10 +47,6 @@ extension Tabs.Content {
             @Binding public var job: Job?
             public var date: Date
 
-            private var columns: [GridItem] {
-                return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
-            }
-
             var body: some View {
                 SwiftUI.List {
                     if items.count > 0 {
@@ -58,7 +54,7 @@ extension Tabs.Content {
                             Individual.SingleJobDetailedLink(job: jerb)
                         }
                     } else {
-                        StatusMessage.Warning(message: "No jobs modified within the last 7 days")
+                        StatusMessage.Warning(message: "No jobs found")
                     }
                 }
                 .listStyle(.plain)
@@ -72,7 +68,7 @@ extension Tabs.Content {
                 _job = job
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataJob.fetchRecent(from: date)
+                _items = CoreDataJob.recentJobsWidgetData()
             }
         }
 
@@ -88,7 +84,7 @@ extension Tabs.Content {
                             Individual.SingleTaskDetailedChecklistItem(task: task)
                         }
                     } else {
-                        StatusMessage.Warning(message: "No tasks modified within the last 7 days")
+                        StatusMessage.Warning(message: "No tasks found")
                     }
                 }
                 .listStyle(.plain)
@@ -101,7 +97,7 @@ extension Tabs.Content {
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataTasks.fetch(for: self.date)
+                _items = CoreDataTasks.recentTasksWidgetData()
             }
         }
 
@@ -111,26 +107,26 @@ extension Tabs.Content {
             public var date: Date
 
             var body: some View {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if items.count > 0 {
-                            ForEach(items) { note in
-                                Individual.SingleNote(note: note)
-                            }
-                        } else {
-                            StatusMessage.Warning(message: "No notes updated within the last 7 days")
+                SwiftUI.List {
+                    if items.count > 0 {
+                        ForEach(items) { note in
+                            Individual.SingleNoteDetailedLink(note: note)
                         }
+                    } else {
+                        StatusMessage.Warning(message: "No notes found")
                     }
                 }
-                .scrollContentBackground(.hidden)
-                .scrollIndicators(.hidden)
+                .listStyle(.plain)
+                .listRowInsets(.none)
+                .listRowSpacing(.none)
+                .listRowSeparator(.hidden)
                 .navigationTitle("Notes")
             }
 
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataNotes.fetch(for: self.date, daysPrior: 7)
+                _items = CoreDataNotes.fetchNotes()
             }
         }
 
@@ -150,7 +146,7 @@ extension Tabs.Content {
                                     TopLevel(entity: item)
                                 }
                             } else {
-                                StatusMessage.Warning(message: "No companies updated within the last 7 days")
+                                StatusMessage.Warning(message: "No companies found")
                             }
                             Spacer()
                         }
@@ -672,26 +668,26 @@ extension Tabs.Content {
             public var date: Date
 
             var body: some View {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if items.count > 0 {
-                            ForEach(items, id: \Company.objectID) { item in
-                                Individual.SingleCompany(company: item)
-                            }
-                        } else {
-                            StatusMessage.Warning(message: "No companies updated within the last 7 days")
+                SwiftUI.List {
+                    if items.count > 0 {
+                        ForEach(items, id: \Company.objectID) { item in
+                            Individual.SingleCompanyDetailedLink(entity: item)
                         }
+                    } else {
+                        StatusMessage.Warning(message: "No companies found")
                     }
                 }
-                .scrollContentBackground(.hidden)
-                .scrollIndicators(.hidden)
+                .listStyle(.plain)
+                .listRowInsets(.none)
+                .listRowSpacing(.none)
+                .listRowSeparator(.hidden)
                 .navigationTitle("Companies")
             }
 
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataCompanies.fetch(for: self.date)
+                _items = CoreDataCompanies.all()
             }
         }
 
@@ -701,26 +697,26 @@ extension Tabs.Content {
             public var date: Date
 
             var body: some View {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if items.count > 0 {
-                            ForEach(items, id: \Person.objectID) { item in
-                                Individual.SinglePerson(person: item)
-                            }
-                        } else {
-                            StatusMessage.Warning(message: "No people updated within the last 7 days")
+                SwiftUI.List {
+                    if items.count > 0 {
+                        ForEach(items, id: \Person.objectID) { item in
+                            Individual.SinglePersonDetailedLink(person: item)
                         }
+                    } else {
+                        StatusMessage.Warning(message: "No people found")
                     }
                 }
-                .scrollContentBackground(.hidden)
-                .scrollIndicators(.hidden)
+                .listStyle(.plain)
+                .listRowInsets(.none)
+                .listRowSpacing(.none)
+                .listRowSeparator(.hidden)
                 .navigationTitle("People")
             }
 
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataPerson.fetch(for: self.date)
+                _items = CoreDataPerson.fetchAll()
             }
         }
 
@@ -730,26 +726,26 @@ extension Tabs.Content {
             public var date: Date
 
             var body: some View {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if items.count > 0 {
-                            ForEach(items, id: \Project.objectID) { item in
-                                Individual.SingleProject(project: item)
-                            }
-                        } else {
-                            StatusMessage.Warning(message: "No projects updated within the last 7 days")
+                SwiftUI.List {
+                    if items.count > 0 {
+                        ForEach(items, id: \Project.objectID) { item in
+                            Individual.SingleProjectDetailedLink(entity: item)
                         }
+                    } else {
+                        StatusMessage.Warning(message: "No projects found")
                     }
                 }
-                .scrollContentBackground(.hidden)
-                .scrollIndicators(.hidden)
+                .listStyle(.plain)
+                .listRowInsets(.none)
+                .listRowSpacing(.none)
+                .listRowSeparator(.hidden)
                 .navigationTitle("Projects")
             }
 
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataProjects.fetch(for: self.date)
+                _items = CoreDataProjects.fetchAll()
             }
         }
     }

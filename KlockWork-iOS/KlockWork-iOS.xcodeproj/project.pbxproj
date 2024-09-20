@@ -70,6 +70,7 @@
 		53C518402C9CF56B00E2BB2E /* Tabs.Content.List.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C5183F2C9CF55900E2BB2E /* Tabs.Content.List.swift */; };
 		53C518422C9CF5AB00E2BB2E /* Tabs.Content.Individual.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C518412C9CF5A600E2BB2E /* Tabs.Content.Individual.swift */; };
 		53C518442C9CF5CB00E2BB2E /* Tabs.Content.Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C518432C9CF5C700E2BB2E /* Tabs.Content.Common.swift */; };
+		53C518462C9E274B00E2BB2E /* Company.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C518452C9E274900E2BB2E /* Company.swift */; };
 		53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */; };
 		53D4CB642BFE930300AFEDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53D4CB632BFE930300AFEDEA /* Preview Assets.xcassets */; };
 		53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D4CB6A2BFE93B000AFEDEA /* Main.swift */; };
@@ -197,6 +198,7 @@
 		53C5183F2C9CF55900E2BB2E /* Tabs.Content.List.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.Content.List.swift; sourceTree = "<group>"; };
 		53C518412C9CF5A600E2BB2E /* Tabs.Content.Individual.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.Content.Individual.swift; sourceTree = "<group>"; };
 		53C518432C9CF5C700E2BB2E /* Tabs.Content.Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tabs.Content.Common.swift; sourceTree = "<group>"; };
+		53C518452C9E274900E2BB2E /* Company.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Company.swift; sourceTree = "<group>"; };
 		53D4CB532BFE930100AFEDEA /* KlockWork-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KlockWork-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53D4CB562BFE930100AFEDEA /* KlockWork_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KlockWork_iOSApp.swift; sourceTree = "<group>"; };
 		53D4CB612BFE930300AFEDEA /* KlockWork_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KlockWork_iOS.entitlements; sourceTree = "<group>"; };
@@ -322,6 +324,7 @@
 		53274B3A2C13C7DB008387BF /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				53C518452C9E274900E2BB2E /* Company.swift */,
 				53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */,
 			);
 			path = Extensions;
@@ -684,6 +687,7 @@
 				538A53522C6FF1C400711639 /* TermDetail.swift in Sources */,
 				539134EC2C02883000B48494 /* PersonDetail.swift in Sources */,
 				53F926082BFE9BF300948076 /* CoreDataJob.swift in Sources */,
+				53C518462C9E274B00E2BB2E /* Company.swift in Sources */,
 				532441662C04428700659F14 /* Titlebar.swift in Sources */,
 				53B2C36B2C22708D003507CE /* PageMode.swift in Sources */,
 				53F926092BFE9BF300948076 /* CoreDataNotes.swift in Sources */,

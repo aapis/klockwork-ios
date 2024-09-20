@@ -12,21 +12,35 @@ struct Timestamp: View {
     public var fullWidth: Bool = false
     public var alignment: Edge = .leading
     public var clear: Bool = false
+    public var type: PageConfiguration.EntityType?
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
             if self.alignment == .trailing {
                 Spacer()
             }
-            Text(self.text)
-                .padding(2)
-                .background(self.clear ? .clear : .black.opacity(0.6))
-                .clipShape(.rect(cornerRadius: 2))
+            HStack(spacing: 8) {
+                if self.alignment == .leading {
+                    if let type = self.type {
+                        type.selectedIcon
+                    }
+                }
+                Text(self.text)
+
+                if self.alignment == .trailing {
+                    if let type = self.type {
+                        type.selectedIcon
+                    }
+                }
+            }
+            .padding(3)
+            .background((self.clear ? Color.clear : Color.white.opacity(0.4)).blendMode(.softLight))
+            .clipShape(.rect(cornerRadius: 3))
+
             if self.alignment == .leading {
                 Spacer()
             }
         }
-        .foregroundStyle(.white)
         .font(.system(.caption, design: .monospaced))
     }
 }
