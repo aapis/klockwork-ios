@@ -215,9 +215,9 @@ extension PlanTabs {
                                         selectedProjects: $selectedProjects,
                                         selectedCompanies: $selectedCompanies
                                     )
-//                                    .listRowBackground(
-//                                        Tabs.Content.Common.TypedListRowBackground(colour: job.backgroundColor, type: .jobs)
-//                                    )
+                                    .listRowBackground(
+                                        Tabs.Content.Common.TypedListRowBackground(colour: job.backgroundColor, type: .jobs)
+                                    )
                                     .swipeActions(edge: .leading) {
                                         Button {
                                             self.actionOnSwipeComplete(job)
@@ -244,6 +244,7 @@ extension PlanTabs {
                                 }
                             }
                         }
+                        // @TODO: if you comment these out, this looks pretty dope as a regular list row too. build that as well!
                         .listStyle(.plain)
                         .listRowInsets(.none)
                         .listRowSpacing(.none)
@@ -371,92 +372,20 @@ extension PlanTabs {
             @State private var isProjectPresented: Bool = false
             @State private var id: UUID = UUID()
 
-//            var body: some View {
-//                NavigationStack {
-//                    VStack(alignment: .leading, spacing: 0) {
-//                        List {
-//                            ForEach(self.selectedJobs, id: \.id) { row in
-//                                Section {
-//                                    ForEach(row.tasks) { task in
-//                                        Row(job: job, callback: self.rowTapCallback, inSheet: self.inSheet)
-//                                            .swipeActions(edge: .leading) {
-//                                                Button {
-//                                                    self.actionOnSwipeComplete(task)
-//                                                } label: {
-//                                                    Image(systemName: "checkmark.seal.fill")
-//                                                }
-//                                                .tint(.green)
-//                                            }
-//                                            .swipeActions(edge: .trailing) {
-//                                                Button {
-//                                                    self.actionOnSwipeDelay(task)
-//                                                } label: {
-//                                                    Image(systemName: "clock.fill")
-//                                                }
-//                                                .tint(.yellow)
-//
-//                                                Button(role: .destructive) {
-//                                                    self.actionOnSwipeCancel(task)
-//                                                } label: {
-//                                                    Image(systemName: "calendar.badge.minus")
-//                                                }
-//                                                .tint(.red)
-//                                            }
-//                                    }
-//                                } header: {
-//                                    Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
-//                                }
-//                            }
-//                        }
-//                        .background(Theme.base.opacity(0.6))
-//                        .listStyle(.plain)
-//                        .listRowInsets(.none)
-//                        .listRowSpacing(.none)
-//                        .listRowSeparator(.hidden)
-//                    }
-//                }
-//                .id(self.id)
-//                .onAppear(perform: self.actionOnAppear)
-//                .onChange(of: self.state.date) {
-//                    self.actionOnSelectDate()
-//                }
-//            }
-
             var body: some View {
-                NavigationStack {
-                    VStack(alignment: .leading, spacing: 1) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Row(job: job, callback: self.rowTapCallback)
-                            Button {
-                                withAnimation(.bouncy(duration: Tabs.animationDuration)) {
-                                    selectedJobs.removeAll(where: {$0 == self.job})
+                VStack(alignment: .leading, spacing: 1) {
+                    Row(job: job, callback: self.rowTapCallback)
 
-                                    if selectedJobs.isEmpty {
-                                        CoreDataPlan(moc: self.state.moc).deleteAll(for: self.state.date)
-                                    }
-                                }
-                            } label: {
-                                ZStack(alignment: .center) {
-                                    job.backgroundColor.opacity(0.7)
-                                    Image(systemName: "square.fill")
-                                        .foregroundStyle(self.state.theme.tint)
-                                }
-                            }
-                            .frame(width: 40)
+                    if isDetailsPresented {
+                        VStack(alignment: .leading) {
+                            OwnershipHierarchy
+                            IncompleteTasks
+                            Notes
                         }
-
-                        if isDetailsPresented {
-                            VStack(alignment: .leading) {
-                                OwnershipHierarchy
-                                IncompleteTasks
-                                Notes
-                            }
-                            .background(job.backgroundColor.opacity(0.5))
-                            .background(.gray)
-                        }
+                        .background(job.backgroundColor.opacity(0.5))
+                        .background(.gray)
                     }
                 }
-//                .listRowBackground(self.job.backgroundColor)
             }
 
             @ViewBuilder private var OwnershipHierarchy: some View {
@@ -493,22 +422,23 @@ extension PlanTabs {
                 }
                 .padding(8)
                 .background(Theme.textBackground)
-                .sheet(isPresented: $isCompanyPresented) {
-                    if let project = self.job.project {
-                        if let company = project.company {
-                            CompanyDetail(company: company)
-                                .scrollContentBackground(.hidden)
-                                .presentationBackground(Theme.cOrange)
-                        }
-                    }
-                }
-                .sheet(isPresented: $isProjectPresented) {
-                    if let project = self.job.project {
-                        ProjectDetail(project: project)
-                            .scrollContentBackground(.hidden)
-                            .presentationBackground(Theme.cOrange)
-                    }
-                }
+                // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
+//                .sheet(isPresented: $isCompanyPresented) {
+//                    if let project = self.job.project {
+//                        if let company = project.company {
+//                            CompanyDetail(company: company)
+//                                .scrollContentBackground(.hidden)
+//                                .presentationBackground(Theme.cOrange)
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isProjectPresented) {
+//                    if let project = self.job.project {
+//                        ProjectDetail(project: project)
+//                            .scrollContentBackground(.hidden)
+//                            .presentationBackground(Theme.cOrange)
+//                    }
+//                }
             }
 
             @ViewBuilder private var IncompleteTasks: some View {
@@ -583,7 +513,7 @@ extension PlanTabs {
             /// Handler for when you tap on a single row
             /// - Parameter job: Job
             /// - Returns: Void
-            private func rowTapCallback(_ job: Job) -> Void {
+            private func rowTapCallback(_ job: Job?) -> Void {
                 isDetailsPresented.toggle()
             }
             

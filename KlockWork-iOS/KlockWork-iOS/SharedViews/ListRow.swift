@@ -81,6 +81,57 @@ struct ToggleableListRow: View {
                 .background(selected ? self.colour!.opacity(0.7) : (self.colour ?? .clear).opacity(0.3))
             }
         }
+    }
+}
 
+struct ToggleableListRowTyped: View {
+    typealias Row = Tabs.Content.Individual.SingleJobDetailedCustomButton
+
+    @EnvironmentObject private var state: AppState
+    public var job: Job
+    public var iconOff: String?
+    public var iconOn: String?
+    public var extraColumn: AnyView?
+    public var highlight: Bool = false // @TODO: highlight is deprecated and unused
+    public var padding: CGFloat = 8
+    @Binding public var selected: Bool
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 0) {
+            HStack(alignment: .top, spacing: 0) {
+                Row(job: self.job)
+                Spacer()
+                extraColumn
+            }
+            .padding(self.padding)
+
+            if iconOn != nil && iconOff != nil {
+                VStack(alignment: .center, spacing: 0) {
+                    Spacer()
+                    Image(systemName: selected ? iconOn! : iconOff!)
+                        .foregroundStyle(self.state.theme.tint)
+                        .font(.title3)
+                        .padding(1)
+                    Spacer()
+                }
+                .frame(width: 40)
+                .opacity(selected ? 1 : 0.5)
+                .background(selected ? self.job.backgroundColor.isBright() ? .black.opacity(0.5) : .clear : .clear)
+            }
+        }
+        .background(
+            Tabs.Content.Common.TypedListRowBackground(colour: self.job.backgroundColor, type: .jobs)
+        )
+        .listRowBackground(
+            Tabs.Content.Common.TypedListRowBackground(colour: self.job.backgroundColor, type: .jobs)
+        )
+    }
+}
+
+extension ToggleableListRowTyped {
+    /// Tap handler. Marks current row as selected.
+    /// - Returns: Void
+    private func actionOnTap(_ job: Job?) -> Void {
+        self.selected.toggle()
     }
 }

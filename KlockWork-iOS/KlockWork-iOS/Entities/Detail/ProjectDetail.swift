@@ -54,7 +54,6 @@ struct ProjectDetail: View {
                             isJobSelectorPresented: $isJobSelectorPresented
                         )
                     }
-                    .listRowBackground(Theme.textBackground)
 
                     Section("Settings") {
                         Toggle("Published", isOn: $alive)

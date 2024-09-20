@@ -15,16 +15,17 @@ struct Timestamp: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
-            if self.fullWidth && self.alignment == .trailing {
+            if self.alignment == .trailing {
                 Spacer()
             }
             Text(self.text)
-            if self.fullWidth && self.alignment == .leading {
+                .padding(2)
+                .background(self.clear ? .clear : .black.opacity(0.6))
+                .clipShape(.rect(cornerRadius: 2))
+            if self.alignment == .leading {
                 Spacer()
             }
         }
-        .padding(2)
-        .background(self.clear ? .clear : .black.opacity(0.6))
         .foregroundStyle(.white)
         .font(.system(.caption, design: .monospaced))
     }

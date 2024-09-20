@@ -11,23 +11,26 @@ extension Widget {
     struct JobSelector {
         /// Selector view
         struct FormField: View {
+            typealias C = Tabs.Content
+            typealias SelectedJob = C.Individual.SingleJobDetailedCustomButton
+
             @Binding public var job: Job?
             @Binding public var isJobSelectorPresented: Bool
 
             var body: some View {
-                Section("Job") {
-                    Button {
-                        isJobSelectorPresented.toggle()
-                    } label: {
-                        if self.job == nil {
-                            Text("Select...")
-                        } else {
-                            Text(self.job!.title ?? self.job!.jid.string)
-                                .foregroundStyle(self.job!.backgroundColor.isBright() ? Theme.base : .white)
-                        }
+                Button {
+                    job = nil
+                    isJobSelectorPresented.toggle()
+                } label: {
+                    if self.job == nil {
+                        Text("Select Job...")
+                    } else {
+                        SelectedJob(job: job)
                     }
                 }
-                .listRowBackground(self.job == nil ? Theme.textBackground : Color.fromStored(self.job!.colour ?? Theme.rowColourAsDouble))
+                .listRowBackground(
+                    C.Common.TypedListRowBackground(colour: (self.job?.backgroundColor ?? Theme.rowColour), type: .jobs)
+                )
             }
         }
 
@@ -36,7 +39,7 @@ extension Widget {
         /// Allows selection of multiple jobs from the list
         struct Multi: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState
-            
+
             @EnvironmentObject private var state: AppState
             public let title: String
             public let filter: ResultsFilter
@@ -132,7 +135,9 @@ extension Widget {
                                 Spacer()
                             }
                         }
-                        .listRowBackground(Theme.textBackground)
+                        .listRowBackground(
+                            Tabs.Content.Common.TypedListRowBackground(colour: Theme.rowColour, type: .jobs)
+                        )
                     } else {
                         ForEach(jobs.filter({$0.alive == true}), id: \.objectID) { entity in
                             Row(job: entity, alreadySelected: self.isSelected(entity), callback: { job, action in
@@ -154,7 +159,9 @@ extension Widget {
                                 Text("Add")
                             }
                         }
-                        .listRowBackground(Theme.textBackground)
+                        .listRowBackground(
+                            Tabs.Content.Common.TypedListRowBackground(colour: Theme.rowColour, type: .jobs)
+                        )
                     }
                 }
 
@@ -169,8 +176,8 @@ extension Widget {
 
         /// Allows selection of a single job from the list
         struct Single: View {
-            typealias Row = Tabs.Content.Individual.SingleJobCustomButton
-            
+            typealias Row = Tabs.Content.Individual.SingleJobDetailedCustomButton
+
             @EnvironmentObject private var state: AppState
             @Environment(\.dismiss) private var dismiss
             public var title: String?
@@ -182,76 +189,40 @@ extension Widget {
             }
 
             var body: some View {
-                ScrollView(showsIndicators: false) {
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Text(self.title!)
-                                .font(.title2)
-                            Spacer()
-                            Button {
-                                dismiss()
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
-                        }
-                        .padding()
-
-                        if items.count > 0 {
-                            ForEach(items, id: \.objectID) { jerb in
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Row(job: jerb, callback: { job in
-                                        self.job = job
-                                        self.state.job = job
-                                        dismiss()
-                                    })
-
-                                    ZStack {
-                                        jerb.backgroundColor
-                                        LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                                            .opacity(0.1)
-
-                                        HStack(alignment: .center, spacing: 8) {
-                                            Spacer()
-                                            HStack {
-                                                Text("\(jerb.tasks?.count ?? 0)")
-                                                Image(systemName: "checklist")
-                                                    .help("\(jerb.tasks?.count ?? 0) task(s) selected")
-                                            }
-                                            .padding(3)
-                                            .background(.white.opacity(0.4).blendMode(.softLight))
-                                            .clipShape(RoundedRectangle(cornerRadius: 3))
-
-                                            HStack {
-                                                Text("\(jerb.tasks?.count ?? 0)")
-                                                Image(systemName: "note.text")
-                                                    .help("\(jerb.tasks?.count ?? 0) note(s) selected")
-                                            }
-                                            .padding(3)
-                                            .background(.white.opacity(0.4).blendMode(.softLight))
-                                            .clipShape(RoundedRectangle(cornerRadius: 3))
-
-                                            HStack {
-                                                Text("\(jerb.records?.count ?? 0)")
-                                                Image(systemName: "tray.fill")
-                                                    .help("\(jerb.tasks?.count ?? 0) records(s) selected")
-                                            }
-                                            .padding(3)
-                                            .background(.white.opacity(0.4).blendMode(.softLight))
-                                            .clipShape(RoundedRectangle(cornerRadius: 3))
-                                        }
-                                        .padding(8)
-                                        .font(.system(.caption, design: .monospaced))
-                                        .foregroundStyle(jerb.backgroundColor.isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
-                                        .multilineTextAlignment(.leading)
-                                    }
-                                }
-                            }
-                        } else {
-                            StatusMessage.Warning(message: "No jobs found")
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .center, spacing: 0) {
+                        Text(self.title!)
+                            .font(.title2)
+                        Spacer()
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark")
                         }
                     }
+                    .padding()
+
+                    if items.count > 0 {
+                        List {
+                            ForEach(items, id: \.objectID) { jerb in
+                                Row(job: jerb, callback: { job in
+                                    self.job = job
+                                    self.state.job = job
+                                    dismiss()
+                                })
+                                .background(
+                                    Tabs.Content.Common.TypedListRowBackground(colour: jerb.backgroundColor, type: .jobs)
+                                )
+                            }
+                        }
+                        .listStyle(.plain)
+                        .listRowInsets(.none)
+                        .listRowSpacing(.none)
+                        .listRowSeparator(.hidden)
+                    } else {
+                        StatusMessage.Warning(message: "No jobs found")
+                    }
                 }
-                .scrollContentBackground(.hidden)
             }
 
             init(title: String? = "What are you working on now?", job: Binding<Job?>) {
