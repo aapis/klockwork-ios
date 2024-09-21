@@ -226,6 +226,7 @@ extension PlanTabs {
                         .listRowInsets(.none)
                         .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
+                        .listSectionSpacing(0)
                     }
                     PageActionBar.Planning(
                         selectedJobs: $selectedJobs,
@@ -609,7 +610,7 @@ extension PlanTabs {
                             ForEach(self.upcoming, id: \.id) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, callback: self.actionOnAppear, onActionComplete: self.actionOnAppear, inSheet: self.inSheet)
+                                        Row(task: task, callback: self.actionOnAppear, onAction: self.actionOnAppear, inSheet: self.inSheet)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
@@ -621,13 +622,13 @@ extension PlanTabs {
                         .listRowInsets(.none)
                         .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
+                        .listSectionSpacing(0)
                     } else {
                         HStack {
                             Text("No upcoming due dates")
                             Spacer()
                         }
                         .padding()
-                        .background(Theme.textBackground)
                         .clipShape(.rect(cornerRadius: 16))
                         Spacer()
                     }
@@ -765,30 +766,30 @@ extension PlanTabs {
                             ForEach(self.overdue, id: \.id) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, callback: self.actionOnAppear, onActionComplete: self.actionOnAppear, inSheet: self.inSheet)
+                                        Row(task: task, callback: self.actionOnAppear, onAction: self.actionOnAppear, inSheet: self.inSheet)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
                             }
                         }
-                        .background(Theme.base.opacity(0.6))
                         .listStyle(.plain)
                         .listRowInsets(.none)
                         .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
+                        .listSectionSpacing(0)
                     } else {
                         HStack {
                             Text("No overdue tasks!")
                             Spacer()
                         }
                         .padding()
-                        .background(Theme.textBackground)
                         .clipShape(.rect(cornerRadius: 16))
                         Spacer()
                     }
                 }
             }
+            .background(self.page.primaryColour)
             .id(self.id)
             .onAppear(perform: self.actionOnAppear)
             .onChange(of: self.state.date) {

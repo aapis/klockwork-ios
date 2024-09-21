@@ -30,6 +30,7 @@ extension Tabs.Content {
                 .listRowInsets(.none)
                 .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+                .listSectionSpacing(0)
                 .navigationTitle("Records")
             }
 
@@ -61,6 +62,7 @@ extension Tabs.Content {
                 .listRowInsets(.none)
                 .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+                .listSectionSpacing(0)
                 .navigationTitle("Jobs")
             }
 
@@ -91,6 +93,7 @@ extension Tabs.Content {
                 .listRowInsets(.none)
                 .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+                .listSectionSpacing(0)
                 .navigationTitle("Tasks")
             }
 
@@ -681,6 +684,7 @@ extension Tabs.Content {
                 .listRowInsets(.none)
                 .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+                .listSectionSpacing(0)
                 .navigationTitle("Companies")
             }
 
@@ -710,6 +714,7 @@ extension Tabs.Content {
                 .listRowInsets(.none)
                 .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+                .listSectionSpacing(0)
                 .navigationTitle("People")
             }
 
@@ -739,6 +744,7 @@ extension Tabs.Content {
                 .listRowInsets(.none)
                 .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+                .listSectionSpacing(0)
                 .navigationTitle("Projects")
             }
 

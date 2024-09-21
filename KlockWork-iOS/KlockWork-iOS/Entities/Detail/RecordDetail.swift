@@ -114,7 +114,7 @@ extension RecordDetail {
         dismiss()
     }
 
-    /// Soft delete a Task
+    /// Hard delete a Task
     /// - Returns: Void
     private func actionOnDelete() -> Void {
         if self.record != nil {

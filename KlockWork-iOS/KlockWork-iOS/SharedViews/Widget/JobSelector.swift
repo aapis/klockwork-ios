@@ -219,6 +219,7 @@ extension Widget {
                         .listRowInsets(.none)
                         .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
+                        .listSectionSpacing(0)
                     } else {
                         StatusMessage.Warning(message: "No jobs found")
                     }

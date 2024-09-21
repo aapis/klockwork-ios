@@ -55,11 +55,15 @@ extension Tabs.Content {
 
         struct SingleRecordDetailedLink: View {
             @EnvironmentObject private var state: AppState
+            @Environment(\.dismiss) private var dismiss
             public var record: LogRecord?
             public var callback: ((LogRecord?) -> Void)? = nil
+            public var onActionDelete: (() -> Void)? = nil
+            public var onAction: (() -> Void)? = nil
             public var inSheet: Bool = false
             @State private var isCompanyPresented: Bool = false
             @State private var isProjectPresented: Bool = false
+            @State private var isDeleteAlertPresented: Bool = false
             private let page: PageConfiguration.AppPage = .create
 
             var body: some View {
@@ -77,8 +81,11 @@ extension Tabs.Content {
                             }
                             .padding(.bottom, 8)
                         }
-                        Timestamp(text: self.record!.timestamp!.formatted(date: .omitted, time: .shortened), fullWidth: false, alignment: .trailing)
-                            .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+
+                        if self.record?.timestamp != nil {
+                            Timestamp(text: self.record!.timestamp!.formatted(date: .omitted, time: .shortened), fullWidth: false, alignment: .trailing)
+                                .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                        }
                     }
                 }
                 .frame(minHeight: 45)
@@ -87,6 +94,22 @@ extension Tabs.Content {
                 )
                 .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                 .onAppear(perform: self.actionOnAppear)
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        self.actionOnSoftDelete()
+
+                        if let onDelete = self.onActionDelete {
+                            onDelete()
+                        }
+
+                        if let onAction = self.onAction {
+                            onAction()
+                        }
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                    .tint(.red)
+                }
                 // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
 //                .sheet(isPresented: $isCompanyPresented) {
 //                    if let project = task.owner?.project {
@@ -159,6 +182,28 @@ extension Tabs.Content {
 //                isCompleted.toggle()
 //                self.actionOnSave()
 //                if let cb = callback { cb() }
+            }
+
+            /// Soft delete a Task
+            /// - Returns: Void
+            private func actionOnSoftDelete() -> Void {
+                if self.record != nil {
+                    self.record!.alive = false
+                }
+
+                PersistenceController.shared.save()
+                dismiss()
+            }
+
+            /// Hard delete a Task
+            /// - Returns: Void
+            private func actionOnHardDelete() -> Void {
+                if self.record != nil {
+                    self.state.moc.delete(self.record!)
+                }
+
+                PersistenceController.shared.save()
+                dismiss()
             }
         }
 
@@ -822,6 +867,7 @@ extension Tabs.Content {
             public var onActionComplete: (() -> Void)? = nil
             public var onActionDelay: (() -> Void)? = nil
             public var onActionCancel: (() -> Void)? = nil
+            public var onAction: (() -> Void)? = nil
             public var includeDueDate: Bool = false
             public var inSheet: Bool = false
             @State private var isCompleted: Bool = false
@@ -1009,6 +1055,10 @@ extension Tabs.Content {
                 if let completed = self.onActionComplete {
                     completed()
                 }
+
+                if let onAction = self.onAction {
+                    onAction()
+                }
             }
 
             /// Callback which handles the Delay swipe action
@@ -1026,6 +1076,10 @@ extension Tabs.Content {
                 if let delayed = self.onActionDelay {
                     delayed()
                 }
+
+                if let onAction = self.onAction {
+                    onAction()
+                }
             }
 
             /// Callback which handles the Cancel swipe action
@@ -1037,6 +1091,10 @@ extension Tabs.Content {
 
                 if let cancelled = self.onActionCancel {
                     cancelled()
+                }
+
+                if let onAction = self.onAction {
+                    onAction()
                 }
             }
         }
