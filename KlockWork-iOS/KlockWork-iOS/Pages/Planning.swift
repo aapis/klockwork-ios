@@ -46,7 +46,6 @@ extension Planning {
         @EnvironmentObject private var state: AppState
         @State private var date: Date = Date()
         public let page: PageConfiguration.AppPage
-        
 
         var body: some View {
             HStack(alignment: .center, spacing: 0) {
@@ -57,9 +56,9 @@ extension Planning {
                         .frame(height: 45)
                     
                     HStack(spacing: 8) {
-                        Text("Planning").font(.title2).padding([.leading, .trailing], 10).bold()
+                        PageTitle(text: "Planning")
                         Spacer()
-                        CreateEntitiesButton(isViewModeSelectorVisible: false, isDateSelectorVisible: true)
+                        CreateEntitiesButton(page: self.page)
                     }
                 }
             }
@@ -68,7 +67,7 @@ extension Planning {
                 DefaultObjects.deleteDefaultObjects()
             })
             .onChange(of: date) {
-                self.state.date = date
+                self.state.date = DateHelper.startOfDay(self.date)
             }
         }
     }

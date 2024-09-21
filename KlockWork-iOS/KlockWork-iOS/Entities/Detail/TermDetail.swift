@@ -101,6 +101,8 @@ extension TermDetail {
             }
 
             self.alive = self.term!.alive
+        } else {
+            self.created = self.state.date
         }
     }
 

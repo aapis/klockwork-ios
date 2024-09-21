@@ -14,6 +14,7 @@ class AppState: ObservableObject {
     @Published var activities: Activities = Activities()
     @Published var theme: AppTheme = AppTheme()
     @Published var today: TodayPage = TodayPage()
+    @Published var planning: PlanningPage = PlanningPage()
     @Published var job: Job?
     @Published var plan: Plan?
 
@@ -28,14 +29,23 @@ class AppState: ObservableObject {
     }
 }
 
-class AppTheme {
+struct AppTheme {
     var tint: Color = .yellow
     var page: PageConfiguration.AppPage = .planning
 }
 
-class TodayPage {
+struct TodayPage {
     var job: Job? = nil
     var mode: PageMode = .read
+    var tableButtonMode: TableButtonDisplayMode = .items
+
+    enum TableButtonDisplayMode {
+        case actions, items
+    }
+}
+
+struct PlanningPage {
+    var selectedDate: Date? = nil
 }
 
 class Activities {

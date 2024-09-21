@@ -39,10 +39,9 @@ struct TaskDetail: View {
                         isJobSelectorPresented: $isJobSelectorPresented
                     )
 
-                    Section("What needs to be done?") {
-                        TextField("Task content", text: $content, axis: .vertical)
-                    }
-                    .listRowBackground(Theme.textBackground)
+                    TextField("What needs to be done?", text: $content, axis: .vertical)
+                        .lineLimit(5...10)
+                        .listRowBackground(Theme.textBackground)
 
                     Section {
                         if self.isCompleted || self.isCancelled {
@@ -62,22 +61,22 @@ struct TaskDetail: View {
                             }
                             .listRowBackground(Theme.textBackground)
                         }
-
-                        Button {
-                            if let newDate = DateHelper.endOfTomorrow(self.due) {
-                                self.due = newDate
-                            }
-                            self.actionOnSave()
-                        } label: {
-                            HStack {
-                                Image(systemName: "calendar.badge.clock")
-                                    .foregroundStyle(self.state.theme.tint)
-                                Text("Due tomorrow")
-                            }
-                        }
-                        .listRowBackground(Theme.textBackground)
-
+                        
                         if self.task != nil {
+                            Button {
+                                if let newDate = DateHelper.endOfTomorrow(self.due) {
+                                    self.due = newDate
+                                }
+                                self.actionOnSave()
+                            } label: {
+                                HStack {
+                                    Image(systemName: "clock")
+                                        .foregroundStyle(self.state.theme.tint)
+                                    Text("Due tomorrow")
+                                }
+                            }
+                            .listRowBackground(Theme.textBackground)
+
                             Button {
                                 CoreDataTasks(moc: self.state.moc).create(
                                     content: self.content,
@@ -99,19 +98,13 @@ struct TaskDetail: View {
 
                     Section("Settings") {
                         DatePicker(
-                            "Created",
-                            selection: $created,
-                            displayedComponents: [.date, .hourAndMinute]
-                        )
-
-                        DatePicker(
                             "Due",
                             selection: $due,
                             displayedComponents: [.date, .hourAndMinute]
                         )
                         
                         // Show last updated when editing
-                        if self.job != nil {
+                        if self.task != nil {
                             DatePicker(
                                 "Last updated",
                                 selection: $lastUpdate,
@@ -130,15 +123,17 @@ struct TaskDetail: View {
                         } else {
                             Toggle("Completed", isOn: $isCompleted)
                         }
-
-                        if isCancelled {
-                            DatePicker(
-                                "Cancelled on",
-                                selection: $cancelledDate,
-                                displayedComponents: [.date, .hourAndMinute]
-                            )
-                        } else {
-                            Toggle("Cancelled", isOn: $isCancelled)
+                        
+                        if self.task != nil {
+                            if isCancelled {
+                                DatePicker(
+                                    "Cancelled on",
+                                    selection: $cancelledDate,
+                                    displayedComponents: [.date, .hourAndMinute]
+                                )
+                            } else {
+                                Toggle("Cancelled", isOn: $isCancelled)
+                            }
                         }
                     }
                     .listRowBackground(Theme.textBackground)
@@ -207,6 +202,7 @@ extension TaskDetail {
             if let jo = task.owner {job = jo}
         } else {
             self.job = self.state.job
+            self.created = self.state.date
         }
     }
     

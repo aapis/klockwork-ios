@@ -112,7 +112,7 @@ extension PlanTabs {
                                     selected = page
                                 }
                             } label: {
-                                page.icon
+                                (page == selected ? page.selectedIcon : page.icon)
                                     .frame(maxHeight: 20)
                                     .padding(14)
                                     .background(page == selected ? Theme.darkBtnColour : .clear)
@@ -204,9 +204,9 @@ extension PlanTabs {
 
                 ZStack(alignment: .bottomLeading) {
                     ZStack(alignment: .topLeading){
-                        ScrollView(showsIndicators: false) {
-                            VStack(spacing: 1) {
-                                ForEach(selectedJobs.sorted(by: {$0.project != nil && $1.project != nil ? $0.project!.name! > $1.project!.name! && $0.jid < $1.jid : $0.jid < $1.jid})) { job in // sooo sorry
+                        List {
+                            ForEach(selectedJobs.sorted(by: {$0.project != nil && $1.project != nil ? $0.project!.name! > $1.project!.name! && $0.jid < $1.jid : $0.jid < $1.jid})) { job in // sooo sorry
+                                Section {
                                     Row(
                                         job: job,
                                         selectedJobs: $selectedJobs,
@@ -215,9 +215,18 @@ extension PlanTabs {
                                         selectedProjects: $selectedProjects,
                                         selectedCompanies: $selectedCompanies
                                     )
+                                    .listRowBackground(
+                                        Tabs.Content.Common.TypedListRowBackground(colour: job.backgroundColor, type: .jobs)
+                                    )
                                 }
                             }
                         }
+                        // @TODO: if you comment these out, this looks pretty dope as a regular list row too. build that as well!
+                        .listStyle(.plain)
+                        .listRowInsets(.none)
+                        .listRowSpacing(.none)
+                        .listRowSeparator(.hidden)
+                        .listSectionSpacing(0)
                     }
                     PageActionBar.Planning(
                         selectedJobs: $selectedJobs,
@@ -304,7 +313,7 @@ extension PlanTabs {
         }
 
         struct PlanRow: View {
-            typealias Row = Tabs.Content.Individual.SingleJobCustomButton
+            typealias Row = Tabs.Content.Individual.SingleJobDetailedCustomButton
 
             @EnvironmentObject private var state: AppState
             public var job: Job
@@ -318,40 +327,23 @@ extension PlanTabs {
             @State private var isDetailsPresented: Bool = false
             @State private var isCompanyPresented: Bool = false
             @State private var isProjectPresented: Bool = false
+            @State private var id: UUID = UUID()
 
             var body: some View {
-                NavigationStack {
-                    VStack(alignment: .leading, spacing: 1) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Row(job: job, callback: self.rowTapCallback)
-                            Button {
-                                withAnimation(.bouncy(duration: Tabs.animationDuration)) {
-                                    selectedJobs.removeAll(where: {$0 == self.job})
+                VStack(alignment: .leading, spacing: 1) {
+                    Row(job: job, callback: self.rowTapCallback)
 
-                                    if selectedJobs.isEmpty {
-                                        CoreDataPlan(moc: self.state.moc).deleteAll(for: self.state.date)
-                                    }
-                                }
-                            } label: {
-                                ZStack(alignment: .center) {
-                                    Theme.base.opacity(0.5)
-                                    Image(systemName: "xmark")
-                                }
-                            }
-                            .frame(width: 40)
+                    if isDetailsPresented {
+                        VStack(alignment: .leading) {
+                            OwnershipHierarchy
+                            IncompleteTasks
+                            Notes
                         }
-
-                        if isDetailsPresented {
-                            VStack(alignment: .leading) {
-                                OwnershipHierarchy
-                                IncompleteTasks
-                                Notes
-                            }
-                            .background(job.backgroundColor.opacity(0.5))
-                            .background(.gray)
-                        }
+                        .background(job.backgroundColor.opacity(0.5))
+                        .background(.gray)
                     }
                 }
+                .id(self.id)
             }
 
             @ViewBuilder private var OwnershipHierarchy: some View {
@@ -388,22 +380,23 @@ extension PlanTabs {
                 }
                 .padding(8)
                 .background(Theme.textBackground)
-                .sheet(isPresented: $isCompanyPresented) {
-                    if let project = self.job.project {
-                        if let company = project.company {
-                            CompanyDetail(company: company)
-                                .scrollContentBackground(.hidden)
-                                .presentationBackground(Theme.cOrange)
-                        }
-                    }
-                }
-                .sheet(isPresented: $isProjectPresented) {
-                    if let project = self.job.project {
-                        ProjectDetail(project: project)
-                            .scrollContentBackground(.hidden)
-                            .presentationBackground(Theme.cOrange)
-                    }
-                }
+                // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
+//                .sheet(isPresented: $isCompanyPresented) {
+//                    if let project = self.job.project {
+//                        if let company = project.company {
+//                            CompanyDetail(company: company)
+//                                .scrollContentBackground(.hidden)
+//                                .presentationBackground(Theme.cOrange)
+//                        }
+//                    }
+//                }
+//                .sheet(isPresented: $isProjectPresented) {
+//                    if let project = self.job.project {
+//                        ProjectDetail(project: project)
+//                            .scrollContentBackground(.hidden)
+//                            .presentationBackground(Theme.cOrange)
+//                    }
+//                }
             }
 
             @ViewBuilder private var IncompleteTasks: some View {
@@ -478,7 +471,7 @@ extension PlanTabs {
             /// Handler for when you tap on a single row
             /// - Parameter job: Job
             /// - Returns: Void
-            private func rowTapCallback(_ job: Job) -> Void {
+            private func rowTapCallback(_ job: Job?) -> Void {
                 isDetailsPresented.toggle()
             }
             
@@ -495,6 +488,7 @@ extension PlanTabs {
                         selectedTasks.remove(at: index)
                     }
                 }
+                self.id = UUID()
             }
             
             /// Handler for tapping on a note
@@ -603,42 +597,61 @@ extension PlanTabs {
         @EnvironmentObject private var state: AppState
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var upcoming: [UpcomingRow] = []
+        @State private var id: UUID = UUID()
+        public var page: PageConfiguration.AppPage = .planning
+        public var inSheet: Bool = false
 
         var body: some View {
             NavigationStack {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if !self.tasks.isEmpty {
+                VStack(alignment: .leading, spacing: 0) {
+                    TaskForecast(callback: self.actionForecastCallback, page: self.page)
+                    if !self.tasks.isEmpty {
+                        List {
                             ForEach(self.upcoming, id: \.id) { row in
-                                Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
-
-                                ForEach(row.tasks) { task in
-                                    Row(task: task, callback: self.actionOnAppear)
+                                Section {
+                                    ForEach(row.tasks) { task in
+                                        Row(task: task, callback: self.actionOnAppear, onAction: self.actionOnAppear, inSheet: self.inSheet)
+                                    }
+                                } header: {
+                                    Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
                             }
-                        } else {
-                            HStack {
-                                Text("No upcoming due dates")
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Theme.textBackground)
-                            .clipShape(.rect(cornerRadius: 16))
+                        }
+                        .background(Theme.base.opacity(0.6))
+                        .listStyle(.plain)
+                        .listRowInsets(.none)
+                        .listRowSpacing(.none)
+                        .listRowSeparator(.hidden)
+                        .listSectionSpacing(0)
+                    } else {
+                        HStack {
+                            Text("No upcoming due dates")
                             Spacer()
                         }
+                        .padding()
+                        .clipShape(.rect(cornerRadius: 16))
+                        Spacer()
                     }
                 }
             }
+            .id(self.id)
             .onAppear(perform: self.actionOnAppear)
+            .onChange(of: self.state.date) {
+                self.actionOnSelectDate()
+            }
+            .scrollContentBackground(.hidden)
         }
 
-        init() {
+        init(inSheet: Bool = false) {
+            self.inSheet = inSheet
+
             _tasks = CoreDataTasks.fetchUpcoming()
         }
 
         /// Onload handler
         /// - Returns: Void
         private func actionOnAppear() -> Void {
+            self.id = UUID()
             self.upcoming = []
             let grouped = Dictionary(grouping: self.tasks, by: {$0.due!.formatted(date: .abbreviated, time: .omitted)})
             let sorted = Array(grouped)
@@ -663,6 +676,76 @@ extension PlanTabs {
                 )
             }
         }
+        
+        /// Select date handler
+        /// @TODO: refactor
+        /// - Returns: Void
+        private func actionOnSelectDate() -> Void {
+            self.id = UUID()
+            self.upcoming = []
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.due!.formatted(date: .abbreviated, time: .omitted)})
+            let sorted = Array(grouped)
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
+
+            for group in sorted {
+                if group.key == self.state.date.formatted(date: .abbreviated, time: .omitted) {
+                    self.upcoming.append(
+                        UpcomingRow(
+                            date: group.key,
+                            tasks: group.value.sorted(by: {$0.due! < $1.due!})
+                        )
+                    )
+                }
+            }
+        }
+        
+        /// Forecast tap callback handler
+        /// - Returns: Void
+        private func actionForecastCallback() -> Void {
+            self.id = UUID()
+            self.upcoming = []
+            print("DERPO fcalllback")
+            // @TODO: this doesn't work and I have no idea why
+        }
+
+        /// Callback which handles the Complete swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeComplete(_ task: LogTask) -> Void {
+            CoreDataTasks(moc: self.state.moc).complete(task)
+            self.actionOnAppear()
+        }
+
+        /// Callback which handles the Delay swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeDelay(_ task: LogTask) -> Void {
+            if let due = task.due {
+                if let newDate = DateHelper.endOfTomorrow(due) {
+                    CoreDataTasks(moc: self.state.moc).due(on: newDate, task: task)
+                }
+            }
+
+            self.actionOnAppear()
+        }
+
+        /// Callback which handles the Cancel swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeCancel(_ task: LogTask) -> Void {
+            CoreDataTasks(moc: self.state.moc).cancel(task)
+            self.actionOnAppear()
+        }
     }
 
     struct Overdue: View {
@@ -671,33 +754,48 @@ extension PlanTabs {
         @EnvironmentObject private var state: AppState
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var overdue: [UpcomingRow] = []
+        @State private var id: UUID = UUID()
+        public var page: PageConfiguration.AppPage = .planning
+        public var inSheet: Bool = false
 
         var body: some View {
             NavigationStack {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 1) {
-                        if !self.tasks.isEmpty {
+                VStack(alignment: .leading, spacing: 1) {
+                    if !self.tasks.isEmpty {
+                        List {
                             ForEach(self.overdue, id: \.id) { row in
-                                Timestamp(text: "\(row.tasks.count) due on \(row.date)", fullWidth: true, alignment: .trailing)
-
-                                ForEach(row.tasks) { task in
-                                    Row(task: task, callback: self.actionOnAppear)
+                                Section {
+                                    ForEach(row.tasks) { task in
+                                        Row(task: task, callback: self.actionOnAppear, onAction: self.actionOnAppear, inSheet: self.inSheet)
+                                    }
+                                } header: {
+                                    Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
                             }
-                        } else {
-                            HStack {
-                                Text("No overdue tasks!")
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Theme.textBackground)
-                            .clipShape(.rect(cornerRadius: 16))
+                        }
+                        .listStyle(.plain)
+                        .listRowInsets(.none)
+                        .listRowSpacing(.none)
+                        .listRowSeparator(.hidden)
+                        .listSectionSpacing(0)
+                    } else {
+                        HStack {
+                            Text("No overdue tasks!")
                             Spacer()
                         }
+                        .padding()
+                        .clipShape(.rect(cornerRadius: 16))
+                        Spacer()
                     }
                 }
             }
+            .background(self.page.primaryColour)
+            .id(self.id)
             .onAppear(perform: self.actionOnAppear)
+            .onChange(of: self.state.date) {
+                self.actionOnSelectDate()
+            }
+            .scrollContentBackground(.hidden)
         }
 
         init() {
@@ -707,6 +805,7 @@ extension PlanTabs {
         /// Onload handler
         /// - Returns: Void
         private func actionOnAppear() -> Void {
+            self.id = UUID()
             self.overdue = []
             let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
             let sorted = Array(grouped)
@@ -727,10 +826,60 @@ extension PlanTabs {
             }
         }
 
-        struct UpcomingRow: Identifiable, Hashable {
-            var id: UUID = UUID()
-            var date: String
-            var tasks: [LogTask]
+        /// Select date handler
+        /// @TODO: refactor
+        /// - Returns: Void
+        private func actionOnSelectDate() -> Void {
+            self.id = UUID()
+            self.overdue = []
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
+            let sorted = Array(grouped)
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 < d2
+                        }
+                    }
+                    return false
+                })
+
+            for group in sorted {
+                if group.key == self.state.date.formatted(date: .abbreviated, time: .omitted) {
+                    self.overdue.append(UpcomingRow(date: group.key, tasks: group.value))
+                }
+            }
+        }
+        
+        /// Callback which handles the Complete swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeComplete(_ task: LogTask) -> Void {
+            CoreDataTasks(moc: self.state.moc).complete(task)
+            self.actionOnAppear()
+        }
+        
+        /// Callback which handles the Delay swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeDelay(_ task: LogTask) -> Void {
+            if let due = task.due {
+                if let newDate = DateHelper.endOfTomorrow(due) {
+                    CoreDataTasks(moc: self.state.moc).due(on: newDate, task: task)
+                }
+            }
+
+            self.actionOnAppear()
+        }
+        
+        /// Callback which handles the Cancel swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeCancel(_ task: LogTask) -> Void {
+            CoreDataTasks(moc: self.state.moc).cancel(task)
+            self.actionOnAppear()
         }
     }
 }

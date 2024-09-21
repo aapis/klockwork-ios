@@ -24,7 +24,7 @@ struct Explore: View {
     var body: some View {
         NavigationStack(path: $path) {
             VStack(spacing: 0) {
-                Header()
+                Header(page: self.page)
                 Divider().background(.white).frame(height: 1)
                 Widgets(text: $searchText)
             }
@@ -40,7 +40,8 @@ struct Explore: View {
 
     struct Header: View {
         @EnvironmentObject private var state: AppState
-        @State public var date: Date = Date()
+        @State public var date: Date = DateHelper.startOfDay()
+        public var page: PageConfiguration.AppPage
 
         var body: some View {
             HStack(alignment: .center, spacing: 0) {
@@ -51,9 +52,9 @@ struct Explore: View {
                         .frame(height: 45)
 
                     HStack(spacing: 8) {
-                        Text("Explore").font(.title2).padding([.leading, .trailing], 10).bold()
+                        PageTitle(text: "Explore")
                         Spacer()
-                        CreateEntitiesButton(isViewModeSelectorVisible: false, isDateSelectorVisible: true)
+                        CreateEntitiesButton(page: self.page)
                     }
                 }
             }
@@ -61,7 +62,7 @@ struct Explore: View {
                 date = self.state.date
             })
             .onChange(of: date) {
-                self.state.date = date
+                self.state.date = DateHelper.startOfDay(self.date)
             }
         }
     }

@@ -91,7 +91,7 @@ extension Widget {
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
-                            self.state.date = Date()
+                            self.state.date = DateHelper.startOfDay()
                             self.date = self.state.date
                         } label: {
                             Image(systemName: "clock.arrow.circlepath")
@@ -189,7 +189,7 @@ extension Widget.ActivityCalendar {
         let df = DateFormatter()
         df.dateFormat = "MMM"
         self.month = df.string(from: self.date)
-        self.state.date = self.date // sets AppState.date whenever we change $date
+        self.state.date = DateHelper.startOfDay(self.date)
     }
     
     /// Onload handler. Used by DatePicker, should be AppState.date by default

@@ -128,6 +128,8 @@ extension CompanyDetail {
             if let nm = company.name {name = nm}
             if let ab = company.abbreviation {abbreviation = ab}
             if let co = company.colour {colour = Color.fromStored(co)}
+        } else {
+            self.createdDate = self.state.date
         }
     }
 

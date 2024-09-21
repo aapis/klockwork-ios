@@ -8,44 +8,6 @@
 
 import SwiftUI
 
-struct CreateEntitiesButton: View {
-    @EnvironmentObject private var state: AppState
-    @State public var date: Date = Date()
-    public var isViewModeSelectorVisible: Bool = true
-    public var isDateSelectorVisible: Bool = false
-
-    var body: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Today.AddButton()
-            if isViewModeSelectorVisible {
-                Today.ViewModeSelector()
-            }
-            if isDateSelectorVisible {
-                DatePicker(
-                    "Today",
-                    selection: $date,
-                    displayedComponents: [.date]
-                )
-                .labelsHidden()
-            }
-            
-            // @TODO: implement settings page
-//            NavigationLink {
-//                AppSettings()
-//            } label: {
-//                Image(systemName: "gearshape")
-//                    .font(.title)
-//            }
-        }
-        .padding(8)
-        .background(Theme.base.opacity(0.2).blendMode(.softLight))
-        .clipShape(.rect(topLeadingRadius: 16))
-        .onChange(of: date) {
-            self.state.date = date
-        }
-    }
-}
-
 struct Today: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias PlanType = PageConfiguration.PlanType
@@ -115,10 +77,18 @@ struct Today: View {
     }
 }
 
+struct PageTitle: View {
+    public let text: String
+
+    var body: some View {
+        Text(self.text).font(.title2).padding([.leading], 10).bold()
+    }
+}
+
 extension Today {
     struct Header: View {
         @EnvironmentObject private var state: AppState
-        @State public var date: Date = Date()
+        @State public var date: Date = DateHelper.startOfDay()
         @State private var isCreateSheetPresented: Bool = false
         public let page: PageConfiguration.AppPage
         @Binding public var path: NavigationPath
@@ -132,9 +102,9 @@ extension Today {
                         .frame(height: 45)
 
                     HStack(spacing: 8) {
-                        Text("Today").font(.title2).padding([.leading, .trailing], 14).bold()
+                        PageTitle(text: "Today")
                         Spacer()
-                        CreateEntitiesButton()
+                        CreateEntitiesButton(isViewModeSelectorVisible: true, page: self.page)
                     }
                 }
             }
@@ -143,7 +113,7 @@ extension Today {
             })
             .onChange(of: self.date) {
                 if self.state.date != self.date {
-                    self.state.date = self.date
+                    self.state.date = DateHelper.startOfDay(self.date)
                 }
             }
         }
@@ -164,107 +134,6 @@ extension Today {
                     text: $text
                 )
                 .focused($focused)
-            }
-        }
-    }
-
-    struct AddButton: View {
-        typealias Entity = PageConfiguration.EntityType
-        @EnvironmentObject private var state: AppState
-        @State private var isPresented: Bool = false
-
-        var body: some View {
-            NavigationStack {
-                Menu("", systemImage: "plus") {
-                    NavigationLink {
-                        TaskDetail()
-                    } label: {
-                        Text(Entity.tasks.enSingular)
-                        Entity.tasks.icon
-                    }
-
-                    NavigationLink {
-                        NoteDetail.Sheet()
-                    } label: {
-                        Text(Entity.notes.enSingular)
-                        Entity.notes.icon
-                    }
-
-                    NavigationLink {
-                        PersonDetail()
-                    } label: {
-                        Text(Entity.people.enSingular)
-                        Entity.people.icon
-                    }
-
-                    NavigationLink {
-                        CompanyDetail()
-                    } label: {
-                        Text(Entity.companies.enSingular)
-                        Entity.companies.icon
-                    }
-
-                    NavigationLink {
-                        ProjectDetail()
-                    } label: {
-                        Text(Entity.projects.enSingular)
-                        Entity.projects.icon
-                    }
-
-                    NavigationLink {
-                        JobDetail()
-                    } label: {
-                        Text(Entity.jobs.enSingular)
-                        Entity.jobs.icon
-                    }
-                }
-            }
-            .font(.title2)
-            .foregroundStyle(self.state.theme.tint)
-        }
-    }
-
-    struct ViewModeSelector: View {
-        @EnvironmentObject private var state: AppState
-        @AppStorage("today.viewMode") private var storedVm: Int = 0
-        @State private var viewMode: ViewMode = .tabular
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .center, spacing: 0) {
-                    Button {
-                        self.viewMode = .tabular
-                        self.storedVm = self.viewMode.id
-                    } label: {
-                        Image(systemName: "tablecells")
-                    }
-                    .disabled(self.storedVm == 0)
-                    .padding(5)
-                    .background(self.storedVm == 0 ? self.state.theme.tint : .black.opacity(0.1))
-                    .foregroundStyle(self.storedVm == 0 ? Theme.cPurple : self.state.theme.tint )
-                    .clipShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
-
-                    Button {
-                        self.viewMode = .hierarchical
-                        self.storedVm = self.viewMode.id
-                    } label: {
-                        Image(systemName: "list.bullet")
-                    }
-                    .disabled(self.storedVm == 1)
-                    .padding(5)
-                    .background(self.storedVm == 1 ? self.state.theme.tint : .black.opacity(0.1))
-                    .foregroundStyle(self.storedVm == 1 ? Theme.cPurple : self.state.theme.tint)
-                    .clipShape(.rect(bottomTrailingRadius: 6, topTrailingRadius: 6))
-                }
-            }
-            .onAppear(perform: self.actionOnAppear)
-        }
-
-        /// Onload handler. Sets the viewMode to the stored value.
-        /// - Returns: Void
-        private func actionOnAppear() -> Void {
-            if let fromStored = ViewMode.by(id: storedVm) {
-                self.viewMode = fromStored
             }
         }
     }

@@ -49,6 +49,16 @@ extension PageConfiguration {
             case .overdue: Image(systemName: "alarm")
             }
         }
+
+        /// Alternative icon to use when selected
+        var selectedIcon: Image {
+            switch self {
+            case .daily: Image(systemName: "calendar")
+            case .feature: Image(systemName: "list.bullet.below.rectangle")
+            case .upcoming: Image(systemName: "hourglass.bottomhalf.filled")
+            case .overdue: Image(systemName: "alarm.fill")
+            }
+        }
     }
 
     enum EntityType: CaseIterable, Equatable {
@@ -96,6 +106,7 @@ extension PageConfiguration {
             }
         }
 
+        /// Alternative icon to use when selected
         var selectedIcon: Image {
             switch self {
             case .records: Image(systemName: "tray.fill")

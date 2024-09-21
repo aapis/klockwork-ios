@@ -54,7 +54,6 @@ struct ProjectDetail: View {
                             isJobSelectorPresented: $isJobSelectorPresented
                         )
                     }
-                    .listRowBackground(Theme.textBackground)
 
                     Section("Settings") {
                         Toggle("Published", isOn: $alive)
@@ -139,6 +138,8 @@ extension ProjectDetail {
             self.alive = project.alive
             self.pid = project.pid
             self.jobs = project.jobs?.allObjects as! [Job]
+        } else {
+            self.createdDate = self.state.date
         }
     }
     

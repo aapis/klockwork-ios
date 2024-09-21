@@ -14,7 +14,7 @@ struct RecordDetail: View {
     @State private var timestamp = Date()
     @State private var message: String = ""
     @State public var job: Job?
-    @State private var alive: Bool = false
+    @State private var alive: Bool = true
     @State private var isJobSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
     @State private var isDeleteAlertPresented: Bool = false
@@ -28,19 +28,12 @@ struct RecordDetail: View {
                     isJobSelectorPresented: $isJobSelectorPresented
                 )
 
-                Section("Message") {
-                    TextField("Record content", text: $message, axis: .vertical)
-                }
-                .listRowBackground(Theme.textBackground)
-
+                TextField("Record content", text: $message, axis: .vertical)
+                    .lineLimit(5...10)
+                    .listRowBackground(Theme.textBackground)
+                
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
-                    DatePicker(
-                        "Created",
-                        selection: $timestamp,
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                    // @TODO: implement JobPicker as a sheet
                 }
                 .listRowBackground(Theme.textBackground)
 
@@ -121,7 +114,7 @@ extension RecordDetail {
         dismiss()
     }
 
-    /// Soft delete a Task
+    /// Hard delete a Task
     /// - Returns: Void
     private func actionOnDelete() -> Void {
         if self.record != nil {

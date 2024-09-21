@@ -119,43 +119,43 @@ struct JobDetail: View {
                         .foregroundStyle(.white)
                 }
             }
-        }
-        .onAppear(perform: self.actionOnAppear)
-        .navigationTitle("Job")
-        .background(page.primaryColour)
-        .scrollContentBackground(.hidden)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .scrollDismissesKeyboard(.immediately)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                // Creates new entity on tap, then sends user back to Today
-                Button {
-                    self.actionOnSave()
-                } label: {
-                    Text("Save")
+            .onAppear(perform: self.actionOnAppear)
+            .navigationTitle("Job")
+            .background(page.primaryColour)
+            .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .scrollDismissesKeyboard(.immediately)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    // Creates new entity on tap, then sends user back to Today
+                    Button {
+                        self.actionOnSave()
+                    } label: {
+                        Text("Save")
+                    }
+                    .foregroundStyle(self.state.theme.tint)
                 }
-                .foregroundStyle(self.state.theme.tint)
             }
-        }
-        .sheet(isPresented: $isCompanySelectorPresented) {
-            Widget.CompanySelector.Single(
-                showing: $isCompanySelectorPresented,
-                entity: $company
-            )
-            .presentationBackground(self.page.primaryColour)
-        }
-        .sheet(isPresented: $isProjectSelectorPresented) {
-            if let corpo = self.company {
-                Widget.ProjectSelector.Single(
-                    showing: $isProjectSelectorPresented,
-                    entity: $project,
-                    company: corpo
+            .sheet(isPresented: $isCompanySelectorPresented) {
+                Widget.CompanySelector.Single(
+                    showing: $isCompanySelectorPresented,
+                    entity: $company
                 )
                 .presentationBackground(self.page.primaryColour)
-            } else {
-                ErrorView.MissingCompany(isPresented: $isProjectSelectorPresented)
+            }
+            .sheet(isPresented: $isProjectSelectorPresented) {
+                if let corpo = self.company {
+                    Widget.ProjectSelector.Single(
+                        showing: $isProjectSelectorPresented,
+                        entity: $project,
+                        company: corpo
+                    )
+                    .presentationBackground(self.page.primaryColour)
+                } else {
+                    ErrorView.MissingCompany(isPresented: $isProjectSelectorPresented)
+                }
             }
         }
     }
@@ -189,6 +189,8 @@ extension JobDetail {
             if let link = self.job!.uri {
                 self.url = link.absoluteString
             }
+        } else {
+            self.created = self.state.date
         }
     }
     
