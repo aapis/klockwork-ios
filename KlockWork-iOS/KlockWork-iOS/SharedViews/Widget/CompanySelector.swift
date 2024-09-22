@@ -59,34 +59,30 @@ extension Widget {
         }
 
         struct Single: View {
-            typealias Row = Tabs.Content.Individual.SingleCompanyCustomButton
+            typealias Row = Tabs.Content.Individual.SingleCompanyDetailedCustomButton
 
             @FetchRequest private var items: FetchedResults<Company>
             @Binding public var showing: Bool
             @Binding public var entity: Company?
 
-            private var columns: [GridItem] {
-                return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
-            }
-
             var body: some View {
-                ScrollView(showsIndicators: false) {
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Text("Choose a company")
-                                .font(.title2)
-                            Spacer()
-                            Button {
-                                showing.toggle()
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .center, spacing: 0) {
+                        Text("Choose a company")
+                            .font(.title2)
+                        Spacer()
+                        Button {
+                            showing.toggle()
+                        } label: {
+                            Image(systemName: "xmark")
                         }
-                        .padding()
+                    }
+                    .padding()
 
+                    List {
                         if items.filter({$0.alive == true}).count > 0 {
                             ForEach(items.filter({$0.alive == true}), id: \.objectID) { corpo in
-                                Row(company: corpo, callback: { company in
+                                Row(entity: corpo, callback: { company in
                                     self.entity = company
                                     self.showing.toggle()
                                 })
@@ -95,8 +91,13 @@ extension Widget {
                             StatusMessage.Warning(message: "No companies found")
                         }
                     }
+                    .listStyle(.plain)
+                    .listRowInsets(.none)
+                    .listRowSpacing(.none)
+                    .listRowSeparator(.hidden)
+                    .listSectionSpacing(0)
+                    .scrollContentBackground(.hidden)
                 }
-                .scrollContentBackground(.hidden)
             }
 
             init(showing: Binding<Bool>, entity: Binding<Company?>) {

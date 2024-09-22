@@ -18,9 +18,8 @@ struct StatusMessage {
                     .fontWeight(.bold)
                 Spacer()
             }
-            .padding(8)
-            .background(self.state.theme.tint)
-            .foregroundStyle(.black.opacity(0.6))
+            .foregroundStyle(.gray)
+            .listRowBackground(Theme.textBackground)
         }
     }
 }
