@@ -59,32 +59,28 @@ extension Widget {
 
         // Select a single Project from the list
         struct Single: View {
-            typealias Row = Tabs.Content.Individual.SingleProjectCustomButton
+            typealias Row = Tabs.Content.Individual.SingleProjectDetailedCustomButton
 
             @FetchRequest private var items: FetchedResults<Project>
             @Binding public var showing: Bool
             @Binding public var entity: Project?
             public let company: Company
 
-            private var columns: [GridItem] {
-                return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
-            }
-
             var body: some View {
-                ScrollView(showsIndicators: false) {
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Text("Choose a project")
-                                .font(.title2)
-                            Spacer()
-                            Button {
-                                showing.toggle()
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .center, spacing: 0) {
+                        Text("Choose a project")
+                            .font(.title2)
+                        Spacer()
+                        Button {
+                            showing.toggle()
+                        } label: {
+                            Image(systemName: "xmark")
                         }
-                        .padding()
+                    }
+                    .padding()
 
+                    List {
                         if items.count > 0 {
                             ForEach(items, id: \.objectID) { item in
                                 Row(entity: item, callback: { project  in
@@ -96,8 +92,13 @@ extension Widget {
                             StatusMessage.Warning(message: "No projects found")
                         }
                     }
+                    .listStyle(.plain)
+                    .listRowInsets(.none)
+                    .listRowSpacing(.none)
+                    .listRowSeparator(.hidden)
+                    .listSectionSpacing(0)
+                    .scrollContentBackground(.hidden)
                 }
-                .scrollContentBackground(.hidden)
             }
 
             init(showing: Binding<Bool>, entity: Binding<Project?>, company: Company) {
@@ -116,31 +117,27 @@ extension Widget {
             @Binding public var showing: Bool
             @Binding private var selected: [Project]
 
-            private var columns: [GridItem] {
-                return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
-            }
-
             var body: some View {
-                ScrollView(showsIndicators: false) {
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Text("Projects")
-                                .font(.title2)
-                            Spacer()
-                            Button {
-                                showing.toggle()
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .center, spacing: 0) {
+                        Text("Projects")
+                            .font(.title2)
+                        Spacer()
+                        Button {
+                            showing.toggle()
+                        } label: {
+                            Image(systemName: "xmark")
                         }
-                        .padding()
+                    }
+                    .padding()
 
-                        HStack(alignment: .center, spacing: 5) {
-                            Spacer()
-                            Text("Selected: \(selected.count)")
-                        }
-                        .padding()
+                    HStack(alignment: .center, spacing: 5) {
+                        Spacer()
+                        Text("Selected: \(selected.count)")
+                    }
+                    .padding()
 
+                    List {
                         if items.filter({$0.alive == true}).count > 0 {
                             ForEach(items.filter({$0.alive == true}), id: \.objectID) { entity in
                                 Row(entity: entity, alreadySelected: self.isSelected(entity), callback: { project, action in
@@ -157,8 +154,13 @@ extension Widget {
                             StatusMessage.Warning(message: "No projects found")
                         }
                     }
+                    .listStyle(.plain)
+                    .listRowInsets(.none)
+                    .listRowSpacing(.none)
+                    .listRowSeparator(.hidden)
+                    .listSectionSpacing(0)
+                    .scrollContentBackground(.hidden)
                 }
-                .scrollContentBackground(.hidden)
             }
 
             init(showing: Binding<Bool>, selected: Binding<[Project]>) {
