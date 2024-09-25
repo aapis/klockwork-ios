@@ -231,6 +231,8 @@ extension TaskDetail {
         }
 
         PersistenceController.shared.save()
+        // We use 2 on purpose to close the sheet
+        dismiss()
         dismiss()
     }
 
@@ -242,6 +244,8 @@ extension TaskDetail {
         }
 
         PersistenceController.shared.save()
+        // We use 2 on purpose to close the sheet
+        dismiss()
         dismiss()
     }
 
