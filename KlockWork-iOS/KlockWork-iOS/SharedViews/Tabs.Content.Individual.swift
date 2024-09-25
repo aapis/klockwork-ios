@@ -95,7 +95,7 @@ extension Tabs.Content {
                 .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                 .onAppear(perform: self.actionOnAppear)
                 .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
+                    Button {
                         self.actionOnSoftDelete()
 
                         if let onDelete = self.onActionDelete {
@@ -106,7 +106,21 @@ extension Tabs.Content {
                             onAction()
                         }
                     } label: {
-                        Image(systemName: "xmark")
+                        Image(systemName: "eye.slash")
+                    }
+                    .tint(.purple)
+                    Button(role: .destructive) {
+                        self.actionOnHardDelete()
+
+                        if let onDelete = self.onActionDelete {
+                            onDelete()
+                        }
+
+                        if let onAction = self.onAction {
+                            onAction()
+                        }
+                    } label: {
+                        Image(systemName: "trash")
                     }
                     .tint(.red)
                 }
