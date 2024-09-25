@@ -145,7 +145,7 @@ extension Tabs.Content {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             if self.items.count > 0 {
-                                ForEach(self.items, id: \Company.objectID) { item in
+                                ForEach(self.items, id: \.objectID) { item in
                                     TopLevel(entity: item)
                                 }
                             } else {
@@ -172,7 +172,7 @@ extension Tabs.Content {
             struct TopLevel: View {
                 typealias Button = Tabs.Content.Individual.SingleCompanyHierarchical
 
-                @State public var entity: Company
+                public var entity: Company
                 @State private var isPresented: Bool = false
 
                 var body: some View {
@@ -182,6 +182,12 @@ extension Tabs.Content {
                         if let projects = self.entity.projects?.allObjects as? [Project] {
                             ForEach(projects.filter({$0.alive == true}).sorted(by: {$0.name! < $1.name!}), id: \Project.objectID) { project in
                                 SecondLevel(entity: project)
+                            }
+                        }
+
+                        if let people = self.entity.people?.allObjects as? [Person] {
+                            if people.count > 0 {
+                                TopLevelPeople(people: people, colour: self.entity.backgroundColor)
                             }
                         }
                     }
@@ -194,10 +200,42 @@ extension Tabs.Content {
                 }
             }
 
+            struct TopLevelPeople: View {
+                typealias Button = Tabs.Content.Individual.SingleTextCustomButton
+                typealias PersonButton = Tabs.Content.Individual.SinglePerson
+
+                public var people: [Person]?
+                public var colour: Color
+                @State private var isPresented: Bool = false
+
+                var body: some View {
+                    Button(text: "People", colour: self.colour, callback: self.actionOnTap)
+
+                    if self.isPresented && self.people != nil {
+                        ForEach(self.people!.sorted(by: {
+                            $0.name ?? "" < $1.name ?? ""
+                        }), id: \.objectID) { person in
+                            HStack(alignment: .center, spacing: 0) {
+                                Rectangle()
+                                    .foregroundStyle(self.colour)
+                                    .frame(width: 15)
+                                PersonButton(person: person, colour: .clear)
+                            }
+                        }
+                    }
+                }
+
+                /// Tap/click handler. Opens to show list of projects.
+                /// - Returns: Void
+                private func actionOnTap() -> Void {
+                    self.isPresented.toggle()
+                }
+            }
+
             struct SecondLevel: View {
                 typealias Button = Tabs.Content.Individual.SingleProjectHierarchical
 
-                @State public var entity: Project
+                public var entity: Project
                 @State private var isPresented: Bool = false
 
                 var body: some View {
@@ -207,8 +245,8 @@ extension Tabs.Content {
                         if let pJobs = self.entity.jobs {
                             if let jobs = pJobs.allObjects as? [Job] {
                                 ForEach(jobs.filter({$0.alive == true}).sorted(by: {
-                                    $0.title ?? "_TITLE" > $1.title ?? "_TITLE"
-                                }), id: \Job.objectID) { job in
+                                    $0.title ?? "" > $1.title ?? ""
+                                }), id: \.objectID) { job in
                                     ThirdLevel(entity: job)
                                 }
                             } else {

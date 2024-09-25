@@ -863,7 +863,6 @@ extension Tabs.Content {
         struct SingleTaskDetailedChecklistItem: View {
             @EnvironmentObject private var state: AppState
             @State public var task: LogTask
-            public var callback: (() -> Void)? = nil
             public var onActionComplete: (() -> Void)? = nil
             public var onActionDelay: (() -> Void)? = nil
             public var onActionCancel: (() -> Void)? = nil
@@ -1011,38 +1010,6 @@ extension Tabs.Content {
             private func actionOnAppear() -> Void {
                 self.isCompleted = self.task.completedDate != nil
                 self.isCancelled = self.task.cancelledDate != nil
-            }
-
-            /// Save handler. Saves completed or cancelled status for the given task.
-            /// - Returns: Void
-            private func actionOnSave() -> Void {
-                if self.isCompleted {
-                    self.task.completedDate = Date()
-
-                    // Create a record indicating when the task was completed
-                    CoreDataTasks(moc: self.state.moc).complete(self.task)
-                } else {
-                    self.task.completedDate = nil
-                }
-
-                if self.isCancelled {
-                    self.task.cancelledDate = Date()
-
-                    // Create a record indicating when the task was cancelled
-                    CoreDataTasks(moc: self.state.moc).cancel(self.task)
-                } else {
-                    self.task.cancelledDate = nil
-                }
-
-                PersistenceController.shared.save()
-            }
-
-            /// Fires when the task close/open icon is tapped
-            /// - Returns: Void
-            private func actionOnTap() -> Void {
-                isCompleted.toggle()
-                self.actionOnSave()
-                if let cb = callback { cb() }
             }
 
             /// Callback which handles the Complete swipe action
@@ -1557,12 +1524,13 @@ extension Tabs.Content {
                         }
                     }
                 }
-                .background(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble))
+                .background(self.entity.backgroundColor)
             }
         }
 
         struct SinglePerson: View {
             public let person: Person
+            public var colour: Color?
 
             var body: some View {
                 NavigationLink {
@@ -1570,9 +1538,9 @@ extension Tabs.Content {
                         .background(Theme.cPurple)
                         .scrollContentBackground(.hidden)
                 } label: {
-                    ListRow(
-                        name: person.name ?? "_PERSON_NAME",
-                        colour: Color.fromStored(person.company?.colour ?? Theme.rowColourAsDouble)
+                    ContactListRow(
+                        person: person,
+                        colour: self.colour ?? person.company?.backgroundColor
                     )
                 }
                 .buttonStyle(.plain)
@@ -2086,6 +2054,50 @@ extension Tabs.Content {
                     )
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleTextCustomButton: View {
+            public let text: String
+            public let colour: Color
+            public var callback: (() -> Void)?
+            @State private var selected: Bool = false
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .center, spacing: 0) {
+                        Rectangle()
+                            .foregroundStyle(self.colour)
+                            .frame(width: 15)
+
+                        // Open people list button
+                        Button {
+                            self.selected.toggle()
+                            self.callback?()
+                        } label: {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(.black)
+                                    .opacity(0.4)
+                                Image(systemName: self.selected ? "minus" : "plus")
+                            }
+                        }
+                        .frame(width: 25, height: 25)
+                        .padding([.leading, .trailing])
+                        .padding([.top, .bottom], 8)
+
+                        Button {
+                            if let cb = self.callback { cb() }
+                        } label: {
+                            ListRow(
+                                name: self.text,
+                                padding: (8,8,8,0)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .background(Theme.base.opacity(0.8).blendMode(.softLight))
             }
         }
     }

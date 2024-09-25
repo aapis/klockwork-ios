@@ -610,7 +610,7 @@ extension PlanTabs {
                             ForEach(self.upcoming, id: \.id) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, callback: self.actionOnAppear, onAction: self.actionOnAppear, inSheet: self.inSheet)
+                                        Row(task: task, onAction: self.actionOnAppear, inSheet: self.inSheet)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
@@ -766,7 +766,7 @@ extension PlanTabs {
                             ForEach(self.overdue, id: \.id) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, callback: self.actionOnAppear, onAction: self.actionOnAppear, inSheet: self.inSheet)
+                                        Row(task: task, onAction: self.actionOnAppear, inSheet: self.inSheet)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)

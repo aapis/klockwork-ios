@@ -135,3 +135,75 @@ extension ToggleableListRowTyped {
         self.selected.toggle()
     }
 }
+
+struct ContactListRow: View {
+    public let person: Person
+    public var colour: Color? = .clear
+    public var icon: String?
+    public var extraColumn: AnyView?
+    public var highlight: Bool = false // @TODO: highlight is deprecated and unused
+    public var gradientColours: (Color, Color) = (.clear, .clear) // (.clear, .black)
+    public var padding: (CGFloat, CGFloat, CGFloat, CGFloat) = (8, 8, 8, 8)
+    @State private var initials: String = ""
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 8) {
+            ZStack {
+                Circle()
+                    .foregroundStyle(.white.opacity(0.6))
+                    .frame(width: 33, height: 33)
+                Text(self.initials)
+                    .font(.subheadline)
+                    .bold()
+                    .foregroundStyle(Theme.cPurple)
+            }
+
+            Text(self.person.name ?? "_NAME")
+                .foregroundStyle(self.colour!.isBright() ? Theme.base : .white)
+                .multilineTextAlignment(.leading)
+            Spacer()
+            Text(self.person.title ?? "_TITLE")
+                .foregroundStyle(self.colour!.isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                .font(.caption)
+                .multilineTextAlignment(.trailing)
+
+            if extraColumn != nil {
+                Spacer()
+                extraColumn
+            }
+            if self.icon != nil {
+                Spacer()
+                ZStack {
+                    Image(systemName: icon!)
+                        .foregroundStyle(self.highlight ? .white : self.colour!.isBright() ? Theme.base.opacity(0.6) : .white)
+                    LinearGradient(gradient: Gradient(colors: [self.gradientColours.0, self.gradientColours.1]), startPoint: .trailing, endPoint: .leading)
+                        .opacity(0.3)
+                        .blendMode(.softLight)
+                        .frame(width: 20)
+                }
+            }
+        }
+        .padding(.top, self.padding.0)
+        .padding(.bottom, self.padding.2)
+        .padding(.trailing, self.padding.1)
+        .padding(.leading, self.padding.3)
+        .background(colour)
+        .listRowBackground(colour)
+        .onAppear(perform: self.actionOnAppear)
+    }
+}
+
+extension ContactListRow {
+    /// Onload handler. Populates abbreviation
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        if let name = self.person.name {
+            self.initials = ""
+            for word in name.components(separatedBy: " ") {
+                if let letter = word.uppercased().first {
+                    self.initials += "\(letter)"
+                }
+            }
+        }
+    }
+}
