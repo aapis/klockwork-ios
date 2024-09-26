@@ -333,7 +333,6 @@
 		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
-				53C518432C9CF5C700E2BB2E /* Tabs.Content.Common.swift */,
 				53B1A9742C863B3800096071 /* Timestamp.swift */,
 				53733D502C851CF200212DD6 /* Logo.swift */,
 				538A10322C31C7CC0028B785 /* RowAddButton.swift */,
@@ -344,6 +343,7 @@
 				537582D42C0033B800CB528C /* Tabs.swift */,
 				53C5183F2C9CF55900E2BB2E /* Tabs.Content.List.swift */,
 				53C518412C9CF5A600E2BB2E /* Tabs.Content.Individual.swift */,
+				53C518432C9CF5C700E2BB2E /* Tabs.Content.Common.swift */,
 				537582D62C004A9600CB528C /* StatusMessage.swift */,
 				5387AE882C0143D100EEC581 /* SearchBar.swift */,
 				539134EF2C02C44000B48494 /* Swipe.swift */,
@@ -357,14 +357,6 @@
 				53274B342C1214E0008387BF /* LegendLabel.swift */,
 			);
 			path = SharedViews;
-			sourceTree = "<group>";
-		};
-		538A535F2C72765F00711639 /* Explore */ = {
-			isa = PBXGroup;
-			children = (
-				53D4CB6C2BFE93B000AFEDEA /* Explore.swift */,
-			);
-			path = Explore;
 			sourceTree = "<group>";
 		};
 		539134E82C0269A200B48494 /* SharedEnums */ = {
@@ -483,9 +475,9 @@
 			isa = PBXGroup;
 			children = (
 				53147EBC2C72A52F008850A9 /* Activities */,
-				538A535F2C72765F00711639 /* Explore */,
 				53D4CB6B2BFE93B000AFEDEA /* AppSettings.swift */,
 				53D4CB6D2BFE93B000AFEDEA /* Planning.swift */,
+				53D4CB6C2BFE93B000AFEDEA /* Explore.swift */,
 				53D4CB6E2BFE93B000AFEDEA /* Today.swift */,
 				539134F12C03879E00B48494 /* Find.swift */,
 			);

@@ -230,6 +230,8 @@ extension TaskDetail {
             )
         }
 
+        self.state.job = self.job
+
         PersistenceController.shared.save()
         // We use 2 on purpose to close the sheet
         dismiss()

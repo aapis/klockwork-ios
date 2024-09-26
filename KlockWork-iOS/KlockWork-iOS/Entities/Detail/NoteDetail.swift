@@ -344,6 +344,8 @@ extension NoteDetail {
             )
         }
 
+        self.state.job = self.job
+
         dismiss()
     }
 }

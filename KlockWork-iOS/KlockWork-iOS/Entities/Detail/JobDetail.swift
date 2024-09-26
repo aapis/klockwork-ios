@@ -223,6 +223,8 @@ extension JobDetail {
             )
         }
 
+        self.state.job = self.job
+
         PersistenceController.shared.save()
         dismiss()
     }
