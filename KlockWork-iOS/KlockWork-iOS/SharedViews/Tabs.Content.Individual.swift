@@ -583,7 +583,7 @@ extension Tabs.Content {
 
         struct SingleJobDetailedCustomButton: View {
             @EnvironmentObject private var state: AppState
-            @State public var job: Job?
+            public var job: Job?
             public var callback: ((Job?) -> Void)? = nil
             public var inSheet: Bool = false
             @State private var isCompanyPresented: Bool = false
@@ -810,7 +810,7 @@ extension Tabs.Content {
 
         struct SingleTaskChecklistItem: View {
             @EnvironmentObject private var state: AppState
-            @State public var task: LogTask
+            public var task: LogTask
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
 
@@ -876,7 +876,7 @@ extension Tabs.Content {
 
         struct SingleTaskDetailedChecklistItem: View {
             @EnvironmentObject private var state: AppState
-            @State public var task: LogTask
+            public var task: LogTask
             public var onActionComplete: (() -> Void)? = nil
             public var onActionDelay: (() -> Void)? = nil
             public var onActionCancel: (() -> Void)? = nil
@@ -2116,4 +2116,3 @@ extension Tabs.Content {
         }
     }
 }
-

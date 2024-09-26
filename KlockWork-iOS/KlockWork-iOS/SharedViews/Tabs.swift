@@ -18,6 +18,7 @@ struct Tabs: View {
     @Binding public var selected: EntityType
     public var content: AnyView? = nil
     public var buttons: AnyView? = nil
+    public var filters: AnyView? = nil
     public var title: AnyView? = nil
     static public let animationDuration: Double = 0.2
 
@@ -30,7 +31,6 @@ struct Tabs: View {
                         AddButton()
                             .frame(width: 50, height: 45)
                             .background(Theme.darkBtnColour)
-
                         ViewModeSelector()
                     }
                 case .items:
@@ -49,6 +49,12 @@ struct Tabs: View {
                     .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
             } else {
                 title
+            }
+
+            if filters == nil {
+                Filters(selected: $selected)
+            } else {
+                filters
             }
 
             if content == nil {
@@ -169,5 +175,113 @@ extension Tabs {
                 }
             }
         }
+    }
+
+    struct Filters: View {
+        @EnvironmentObject private var state: AppState
+        @Binding public var selected: EntityType
+        @State private var isPresented: Bool = false
+        @State private var selectedFilters: [FilterField] = []
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(alignment: .center, spacing: 0) {
+                    ScrollView(.horizontal) {
+                        ForEach(self.selectedFilters, id: \.id) { filter in
+                            FilterFieldView(filter: filter, callback: self.actionDeSelectFilter)
+                                .opacity(self.isPresented ? 0.5 : 1)
+                        }
+                    }
+                    Spacer()
+                    Button {
+                        self.isPresented.toggle()
+                    } label: {
+                        ZStack(alignment: .center) {
+                            Image(systemName: self.isPresented ? "minus" : "plus")
+                            Color.white.opacity(0.7).blendMode(.softLight)
+                        }
+                    }
+                    .foregroundStyle(.yellow)
+                    .frame(width: 35, height: 35)
+                }
+                .padding(.leading, 8)
+
+                if self.isPresented {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(self.selected.filters, id: \.id) { filter in
+                            FilterFieldView(filter: filter, callback: self.actionSelectFilter)
+                        }
+                    }
+                    .padding(8)
+                }
+            }
+            .background(Theme.textBackground)
+        }
+
+        struct FilterField: Identifiable, Equatable {
+            var id: UUID = UUID()
+            var name: String
+            var options: [FilterOptionPair] = []
+            
+            /// Equatable implementation
+            /// - Parameters:
+            ///   - lhs: FilterField
+            ///   - rhs: FilterField
+            /// - Returns: Bool
+            static func == (lhs: Tabs.Filters.FilterField, rhs: Tabs.Filters.FilterField) -> Bool {
+                return lhs.id == rhs.id
+            }
+        }
+
+        struct FilterOptionPair: Identifiable {
+            var id: UUID = UUID()
+            var key: String
+            var value: Any
+        }
+
+        struct FilterFieldView: View {
+            var filter: FilterField
+            var callback: ((FilterField) -> Void)?
+
+            var body: some View {
+                Button {
+                    self.callback?(self.filter)
+                } label: {
+                    HStack(alignment: .center, spacing: 8) {
+                        Text(filter.name)
+                        Image(systemName: "xmark.square.fill")
+                    }
+                    .foregroundStyle(.yellow)
+                    .padding(3)
+                    .background(.white.opacity(0.7).blendMode(.softLight))
+                    .clipShape(RoundedRectangle(cornerRadius: 3))
+                    .font(Theme.fontCaption)
+                }
+            }
+        }
+    }
+}
+
+extension Tabs.Filters {
+    /// Onload handler. Determines which filter fields to display
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        self.selectedFilters = []
+    }
+    
+    /// Select a filter from the list
+    /// - Parameter filter: FilterField
+    /// - Returns: Void
+    private func actionSelectFilter(_ filter: FilterField) -> Void {
+        if !self.selectedFilters.contains(where: {$0 == filter}) {
+            self.selectedFilters.append(filter)
+        }
+    }
+    
+    /// Deselect a filter from the list
+    /// - Parameter filter: FilterField
+    /// - Returns: Void
+    private func actionDeSelectFilter(_ filter: FilterField) -> Void {
+        self.selectedFilters.removeAll(where: {$0 == filter})
     }
 }

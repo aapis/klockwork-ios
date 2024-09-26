@@ -62,6 +62,7 @@ extension PageConfiguration {
     }
 
     enum EntityType: CaseIterable, Equatable {
+        typealias FilterField = Tabs.Filters.FilterField
         case records, tasks, notes, people, companies, projects, jobs, terms
 
         /// Interface-friendly representation
@@ -117,6 +118,19 @@ extension PageConfiguration {
             case .people: Image(systemName: "person.2.fill")
             case .projects: Image(systemName: "folder.fill")
             case .terms: Image(systemName: "list.bullet.rectangle.fill")
+            }
+        }
+
+        var filters: [FilterField] {
+            switch self {
+            case .records: return [FilterField(name: "Published")]
+            case .jobs: return [FilterField(name: "Published")]
+            case .tasks: return [FilterField(name: "Published")]
+            case .notes: return [FilterField(name: "Published")]
+            case .companies: return [FilterField(name: "Published")]
+            case .people: return [FilterField(name: "Published")]
+            case .projects: return [FilterField(name: "Published")]
+            case .terms: return [FilterField(name: "Published")]
             }
         }
     }
