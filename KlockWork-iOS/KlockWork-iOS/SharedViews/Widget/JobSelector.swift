@@ -184,10 +184,6 @@ extension Widget {
             @FetchRequest private var items: FetchedResults<Job>
             @Binding public var job: Job?
 
-            private var columns: [GridItem] {
-                return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
-            }
-
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .center, spacing: 0) {
