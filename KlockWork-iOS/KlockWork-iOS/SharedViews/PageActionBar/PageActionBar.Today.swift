@@ -99,7 +99,12 @@ extension PageActionBar.Today {
             let tmpTitle = (self.job!.title ?? self.job!.jid.string).prefix(self.buttonLineLengthLimit)
 
             self.selectedJobTitle = tmpTitle.count < self.buttonLineLengthLimit ? "\(tmpTitle)" : "\(tmpTitle)..."
-            self.state.job = self.job
+
+            if self.state.job == nil {
+                self.state.job = self.job
+            } else {
+                self.job = self.state.job
+            }
         } else {
             self.job = self.state.job
         }
