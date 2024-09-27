@@ -418,8 +418,11 @@ extension Tabs.Content {
 
         struct SingleJobDetailedLink: View {
             @EnvironmentObject private var state: AppState
+            @Environment(\.dismiss) private var dismiss
             public var job: Job?
             public var callback: ((Job?) -> Void)? = nil
+            public var onActionDelete: (() -> Void)? = nil
+            public var onAction: (() -> Void)? = nil
             public var inSheet: Bool = false
             @State private var isCompanyPresented: Bool = false
             @State private var isProjectPresented: Bool = false
@@ -506,6 +509,30 @@ extension Tabs.Content {
                 )
                 .foregroundStyle((self.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                 .onAppear(perform: self.actionOnAppear)
+                .swipeActions(edge: .leading) {
+                    Button {
+                        self.actionOnSwipeSetJob(job)
+                    } label: {
+                        Image(systemName: "hammer")
+                    }
+                    .tint(.green)
+                }
+                .swipeActions(edge: .trailing) {
+                    Button {
+                        self.actionOnSoftDelete()
+
+                        if let onDelete = self.onActionDelete {
+                            onDelete()
+                        }
+
+                        if let onAction = self.onAction {
+                            onAction()
+                        }
+                    } label: {
+                        Image(systemName: "eye.slash")
+                    }
+                    .tint(.purple)
+                }
                 // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
 //                .sheet(isPresented: $isCompanyPresented) {
 //                    if let project = task.owner?.project {
@@ -578,6 +605,23 @@ extension Tabs.Content {
 //                isCompleted.toggle()
 //                self.actionOnSave()
 //                if let cb = callback { cb() }
+            }
+            
+            /// Callback that fires when this object is swiped
+            /// - Parameter job: Job
+            /// - Returns: Void
+            private func actionOnSwipeSetJob(_ job: Job?) -> Void {
+                self.state.job = job
+            }
+            
+            /// Soft delete a job
+            /// - Returns: Void
+            private func actionOnSoftDelete() -> Void {
+                if self.job != nil {
+                    self.job!.alive = false
+                }
+
+                PersistenceController.shared.save()
             }
         }
 
