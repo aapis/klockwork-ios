@@ -28,10 +28,8 @@ struct DefinitionDetail: View {
                     isJobSelectorPresented: $isJobSelectorPresented
                 )
 
-                Section("Definition") {
-                    TextField("Definition", text: $title, axis: .vertical)
-                }
-                .listRowBackground(Theme.textBackground)
+                TextField("Definition", text: $title, axis: .vertical)
+                    .listRowBackground(Theme.textBackground)
 
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
@@ -61,6 +59,7 @@ struct DefinitionDetail: View {
         }
         .background(self.page.primaryColour)
         .onAppear(perform: self.actionOnAppear)
+#if os(iOS)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .scrollContentBackground(.hidden)
@@ -75,6 +74,7 @@ struct DefinitionDetail: View {
                 .foregroundStyle(self.state.theme.tint)
             }
         }
+#endif
         .sheet(isPresented: $isJobSelectorPresented) {
             Widget.JobSelector.Single(
                 job: $job

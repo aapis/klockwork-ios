@@ -213,9 +213,11 @@ extension Widget {
                         }
                         .listStyle(.plain)
                         .listRowInsets(.none)
-                        .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
+#if os(iOS)
+                        .listRowSpacing(.none)
                         .listSectionSpacing(0)
+#endif
                     } else {
                         StatusMessage.Warning(message: "No jobs found")
                     }

@@ -71,6 +71,7 @@ struct PersonDetail: View {
             .navigationTitle(self.person != nil ? "Person" : "New Person")
             .background(self.page.primaryColour)
             .scrollContentBackground(.hidden)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -86,6 +87,7 @@ struct PersonDetail: View {
                     .foregroundStyle(self.state.theme.tint)
                 }
             }
+#endif
             .sheet(isPresented: $isCompanySelectorPresented) {
                 Widget.CompanySelector.Single(
                     showing: $isCompanySelectorPresented,

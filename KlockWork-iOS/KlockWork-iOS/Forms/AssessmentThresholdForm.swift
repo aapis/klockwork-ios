@@ -47,6 +47,7 @@ struct AssessmentThresholdForm: View {
         .background(Theme.cGreen)
         .scrollContentBackground(.hidden)
         .navigationTitle("Modify Status")
+#if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
@@ -65,6 +66,7 @@ struct AssessmentThresholdForm: View {
                 }
             }
         }
+#endif
     }
 }
 

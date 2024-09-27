@@ -89,6 +89,7 @@ struct ProjectDetail: View {
             .navigationTitle(self.project != nil ? "Project" : "New Project")
             .background(self.page.primaryColour)
             .scrollContentBackground(.hidden)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -104,6 +105,7 @@ struct ProjectDetail: View {
                     .foregroundStyle(self.state.theme.tint)
                 }
             }
+#endif
             .sheet(isPresented: $isCompanySelectorPresent) {
                 Widget.CompanySelector.Single(
                     showing: $isCompanySelectorPresent,

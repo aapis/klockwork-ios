@@ -93,9 +93,11 @@ extension Widget {
                     }
                     .listStyle(.plain)
                     .listRowInsets(.none)
-                    .listRowSpacing(.none)
                     .listRowSeparator(.hidden)
+#if os(iOS)
+                    .listRowSpacing(.none)
                     .listSectionSpacing(0)
+#endif
                     .scrollContentBackground(.hidden)
                 }
             }

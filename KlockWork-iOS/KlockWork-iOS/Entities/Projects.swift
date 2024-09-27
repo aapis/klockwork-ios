@@ -52,6 +52,7 @@ struct Projects: View {
             })
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -63,6 +64,7 @@ struct Projects: View {
                     }
                 }
             }
+#endif
         }
     }
 }

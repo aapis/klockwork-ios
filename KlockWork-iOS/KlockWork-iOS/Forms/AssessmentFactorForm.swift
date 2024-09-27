@@ -36,8 +36,10 @@ struct AssessmentFactorForm: View {
         .background(Theme.cGreen)
         .scrollContentBackground(.hidden)
         .navigationTitle("Modify Assessment Factors")
+#if os(iOS)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarTitleDisplayMode(.inline)
+#endif
     }
 }

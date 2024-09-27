@@ -61,9 +61,11 @@ struct RecordFilter: View {
         .navigationTitle("Records")
         .background(self.page.primaryColour)
         .scrollContentBackground(.hidden)
+#if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+#endif
         .scrollDismissesKeyboard(.immediately)
     }
 

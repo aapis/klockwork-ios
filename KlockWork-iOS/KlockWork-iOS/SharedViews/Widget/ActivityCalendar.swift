@@ -81,13 +81,14 @@ extension Widget {
                     }
                     Spacer()
                 }
-                .navigationBarTitleDisplayMode(.inline)
                 .background(Theme.cGreen)
-                .toolbarBackground(.visible, for: .navigationBar)
                 .scrollDismissesKeyboard(.immediately)
                 .onAppear(perform: self.actionOnAppear)
                 .onChange(of: self.date) { self.actionChangeDate()}
                 .navigationTitle("Activity Calendar")
+#if os(iOS)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -98,6 +99,7 @@ extension Widget {
                         }
                     }
                 }
+#endif
                 .swipe([.left, .right]) { swipe in
                     self.actionOnSwipe(swipe)
                 }

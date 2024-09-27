@@ -49,6 +49,7 @@ struct Tasks: View {
             })
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -63,6 +64,7 @@ struct Tasks: View {
                     }
                 }
             }
+#endif
         }
     }
 }
@@ -77,9 +79,9 @@ extension Tasks {
 
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
-            for index in offsets {
+//            for index in offsets {
 //                modelContext.delete(items[index])
-            }
+//            }
         }
     }
 }

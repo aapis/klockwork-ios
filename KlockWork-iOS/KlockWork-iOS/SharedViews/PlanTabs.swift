@@ -224,9 +224,11 @@ extension PlanTabs {
                         // @TODO: if you comment these out, this looks pretty dope as a regular list row too. build that as well!
                         .listStyle(.plain)
                         .listRowInsets(.none)
-                        .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
+#if os(iOS)
+                        .listRowSpacing(.none)
                         .listSectionSpacing(0)
+#endif
                     }
                     PageActionBar.Planning(
                         selectedJobs: $selectedJobs,
@@ -620,9 +622,11 @@ extension PlanTabs {
                         .background(Theme.base.opacity(0.6))
                         .listStyle(.plain)
                         .listRowInsets(.none)
-                        .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
+#if os(iOS)
+                        .listRowSpacing(.none)
                         .listSectionSpacing(0)
+#endif
                     } else {
                         HStack {
                             Text("No upcoming due dates")
@@ -775,9 +779,11 @@ extension PlanTabs {
                         }
                         .listStyle(.plain)
                         .listRowInsets(.none)
-                        .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
+#if os(iOS)
+                        .listRowSpacing(.none)
                         .listSectionSpacing(0)
+#endif
                     } else {
                         HStack {
                             Text("No overdue tasks!")

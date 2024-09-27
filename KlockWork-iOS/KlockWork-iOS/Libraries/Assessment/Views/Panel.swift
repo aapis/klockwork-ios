@@ -19,6 +19,7 @@ struct Panel: View {
                     ZStack(alignment: .topLeading) {
                         OverviewWidget(assessment: assessment)
                             .navigationTitle(assessment.date.formatted(date: .abbreviated, time: .omitted))
+#if os(iOS)
                             .toolbarTitleDisplayMode(.inline)
                             .toolbar {
                                 ToolbarItem(placement: .topBarTrailing) {
@@ -34,6 +35,7 @@ struct Panel: View {
                             }
                             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
                             .toolbarBackground(.visible, for: .navigationBar)
+#endif
 
                         LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
                             .frame(height: 50)

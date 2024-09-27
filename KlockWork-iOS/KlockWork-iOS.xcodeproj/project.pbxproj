@@ -60,6 +60,8 @@
 		539135002C03AD9A00B48494 /* ListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539134FF2C03AD9A00B48494 /* ListRow.swift */; };
 		539135032C03EF6E00B48494 /* SearchLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539135022C03EF6E00B48494 /* SearchLibrary.swift */; };
 		539135052C040D7500B48494 /* MiniTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539135042C040D7500B48494 /* MiniTitleBar.swift */; };
+		53A34EFB2CA630720038CCBC /* FancyStaticTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A34EFA2CA630720038CCBC /* FancyStaticTextField.swift */; };
+		53A34EFD2CA630E50038CCBC /* ClipboardHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A34EFC2CA630E50038CCBC /* ClipboardHelper.swift */; };
 		53B1A9752C863B3A00096071 /* Timestamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B1A9742C863B3800096071 /* Timestamp.swift */; };
 		53B2C3692C1F7D65003507CE /* DefaultObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B2C3682C1F7D59003507CE /* DefaultObjects.swift */; };
 		53B2C36B2C22708D003507CE /* PageMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B2C36A2C22708A003507CE /* PageMode.swift */; };
@@ -188,6 +190,8 @@
 		539134FF2C03AD9A00B48494 /* ListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListRow.swift; sourceTree = "<group>"; };
 		539135022C03EF6E00B48494 /* SearchLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLibrary.swift; sourceTree = "<group>"; };
 		539135042C040D7500B48494 /* MiniTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniTitleBar.swift; sourceTree = "<group>"; };
+		53A34EFA2CA630720038CCBC /* FancyStaticTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FancyStaticTextField.swift; path = ../../DLPrototype/DLPrototype/Views/Shared/Fancy/FancyStaticTextField.swift; sourceTree = "<group>"; };
+		53A34EFC2CA630E50038CCBC /* ClipboardHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ClipboardHelper.swift; path = ../../DLPrototype/DLPrototype/Helpers/ClipboardHelper.swift; sourceTree = "<group>"; };
 		53B1A9742C863B3800096071 /* Timestamp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timestamp.swift; sourceTree = "<group>"; };
 		53B2C3682C1F7D59003507CE /* DefaultObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultObjects.swift; sourceTree = "<group>"; };
 		53B2C36A2C22708A003507CE /* PageMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageMode.swift; sourceTree = "<group>"; };
@@ -395,6 +399,8 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				53A34EFC2CA630E50038CCBC /* ClipboardHelper.swift */,
+				53A34EFA2CA630720038CCBC /* FancyStaticTextField.swift */,
 				538A53552C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift */,
 				538A534F2C6FEA6600711639 /* CoreDataTaxonomyTerms.swift */,
 				53911FC42C19E87300B77DAB /* ActivityWeight.swift */,
@@ -639,6 +645,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53A34EFD2CA630E50038CCBC /* ClipboardHelper.swift in Sources */,
+				53A34EFB2CA630720038CCBC /* FancyStaticTextField.swift in Sources */,
 				538A53562C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift in Sources */,
 				538A53502C6FEA6600711639 /* CoreDataTaxonomyTerms.swift in Sources */,
 				53911FC52C19E87300B77DAB /* ActivityWeight.swift in Sources */,
@@ -928,7 +936,7 @@
 		53D4CB692BFE930300AFEDEA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = iOS.Beta.Icon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = iOS.Icon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
@@ -940,7 +948,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "KlockWork-iOS/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = KlockWork.Beta;
+				INFOPLIST_KEY_CFBundleDisplayName = KlockWork;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Associate information with specific meetings";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;

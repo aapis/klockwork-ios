@@ -57,9 +57,11 @@ struct TermFilter: View {
         .navigationTitle("Taxonomy Terms")
         .background(self.page.primaryColour)
         .scrollContentBackground(.hidden)
+#if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+#endif
         .scrollDismissesKeyboard(.immediately)
     }
 
@@ -101,9 +103,11 @@ struct TermFilterBound: View {
         .navigationTitle("Taxonomy Terms")
         .background(self.page.primaryColour)
         .scrollContentBackground(.hidden)
+#if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+#endif
         .scrollDismissesKeyboard(.immediately)
     }
 

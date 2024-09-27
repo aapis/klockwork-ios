@@ -26,9 +26,11 @@ struct AssessmentTypeMenu: View {
                         }
                         .listRowBackground(Theme.textBackground)
                         .navigationTitle("Assessment Configuration")
+#if os(iOS)
                         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
                         .toolbarBackground(.visible, for: .navigationBar)
                         .toolbarTitleDisplayMode(.inline)
+#endif
 
                         if let ass = self.assessment {
                             NavigationLink {
@@ -37,10 +39,12 @@ struct AssessmentTypeMenu: View {
                                 Text("Factors")
                             }
                             .listRowBackground(Theme.textBackground)
+#if os(iOS)
                             .navigationTitle("Assessment Configuration")
                             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
                             .toolbarBackground(.visible, for: .navigationBar)
                             .toolbarTitleDisplayMode(.inline)
+#endif
                         }
                     }
 
@@ -57,8 +61,10 @@ struct AssessmentTypeMenu: View {
         .toolbarTitleDisplayMode(.inline)
         .presentationBackground(Theme.cGreen)
         .navigationTitle("Assessment Configuration")
+#if os(iOS)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+#endif
         .toolbarTitleDisplayMode(.inline)
         .onAppear(perform: self.actionOnAppear)
     }

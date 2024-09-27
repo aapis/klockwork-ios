@@ -39,8 +39,10 @@ struct FlashcardActivity: View {
         })
         .background(self.page.primaryColour)
         .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Activity: Flashcard")
+#if os(iOS)
         .toolbarBackground(job != nil ? self.job!.backgroundColor : Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+#endif
     }
 
     struct FlashcardDeck: View {

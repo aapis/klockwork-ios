@@ -66,6 +66,7 @@ struct TermDetail: View {
         }
         .background(self.page.primaryColour)
         .onAppear(perform: actionOnAppear)
+#if os(iOS)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .scrollContentBackground(.hidden)
@@ -80,6 +81,7 @@ struct TermDetail: View {
                 .foregroundStyle(self.state.theme.tint)
             }
         }
+#endif
     }
 }
 

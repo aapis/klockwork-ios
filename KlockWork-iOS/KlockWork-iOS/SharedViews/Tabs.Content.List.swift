@@ -19,7 +19,7 @@ extension Tabs.Content {
             var body: some View {
                 SwiftUI.List {
                     if items.count > 0 {
-                        ForEach(items) { record in
+                        ForEach(items, id: \.objectID) { record in
                             Individual.SingleRecordDetailedLink(record: record)
                         }
                     } else {
@@ -28,9 +28,11 @@ extension Tabs.Content {
                 }
                 .listStyle(.plain)
                 .listRowInsets(.none)
-                .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+#if os(iOS)
+                .listRowSpacing(.none)
                 .listSectionSpacing(0)
+#endif
                 .navigationTitle("Records")
             }
 
@@ -51,7 +53,7 @@ extension Tabs.Content {
             var body: some View {
                 SwiftUI.List {
                     if items.count > 0 {
-                        ForEach(items) { jerb in
+                        ForEach(items, id: \.objectID) { jerb in
                             Individual.SingleJobDetailedLink(job: jerb)
                         }
                     } else {
@@ -60,9 +62,11 @@ extension Tabs.Content {
                 }
                 .listStyle(.plain)
                 .listRowInsets(.none)
-                .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+#if os(iOS)
+                .listRowSpacing(.none)
                 .listSectionSpacing(0)
+#endif
                 .navigationTitle("Jobs")
             }
 
@@ -70,7 +74,7 @@ extension Tabs.Content {
                 _job = job
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataJob.recentJobsWidgetData()
+                _items = CoreDataJob.fetchAll()
             }
         }
 
@@ -91,9 +95,11 @@ extension Tabs.Content {
                 }
                 .listStyle(.plain)
                 .listRowInsets(.none)
-                .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+#if os(iOS)
+                .listRowSpacing(.none)
                 .listSectionSpacing(0)
+#endif
                 .navigationTitle("Tasks")
             }
 
@@ -112,7 +118,7 @@ extension Tabs.Content {
             var body: some View {
                 SwiftUI.List {
                     if items.count > 0 {
-                        ForEach(items) { note in
+                        ForEach(items, id: \.objectID) { note in
                             Individual.SingleNoteDetailedLink(note: note)
                         }
                     } else {
@@ -121,8 +127,11 @@ extension Tabs.Content {
                 }
                 .listStyle(.plain)
                 .listRowInsets(.none)
-                .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+#if os(iOS)
+                .listRowSpacing(.none)
+                .listSectionSpacing(0)
+#endif
                 .navigationTitle("Notes")
             }
 
@@ -159,9 +168,11 @@ extension Tabs.Content {
                 .background(self.page.primaryColour)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
+#if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
+#endif
             }
 
             init(inSheet: Bool) {
@@ -720,9 +731,11 @@ extension Tabs.Content {
                 }
                 .listStyle(.plain)
                 .listRowInsets(.none)
-                .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+#if os(iOS)
+                .listRowSpacing(.none)
                 .listSectionSpacing(0)
+#endif
                 .navigationTitle("Companies")
             }
 
@@ -750,9 +763,11 @@ extension Tabs.Content {
                 }
                 .listStyle(.plain)
                 .listRowInsets(.none)
-                .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+#if os(iOS)
+                .listRowSpacing(.none)
                 .listSectionSpacing(0)
+#endif
                 .navigationTitle("People")
             }
 
@@ -780,9 +795,11 @@ extension Tabs.Content {
                 }
                 .listStyle(.plain)
                 .listRowInsets(.none)
-                .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
+#if os(iOS)
+                .listRowSpacing(.none)
                 .listSectionSpacing(0)
+#endif
                 .navigationTitle("Projects")
             }
 

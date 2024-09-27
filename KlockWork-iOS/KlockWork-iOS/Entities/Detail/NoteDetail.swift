@@ -57,9 +57,11 @@ struct NoteDetail: View {
         .scrollContentBackground(.hidden)
         .onAppear(perform: self.actionOnAppear)
         .navigationTitle(title.prefix(25))
+#if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+#endif
     }
 
     struct Editor: View {
@@ -178,6 +180,7 @@ struct NoteDetail: View {
 
         var body: some View {
             NoteDetail(note: note, page: self.page)
+#if os(iOS)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink {
@@ -199,6 +202,7 @@ struct NoteDetail: View {
                         }
                     }
                 }
+#endif
         }
 
         init(note: Note? = nil, page: PageConfiguration.AppPage = .create) {
@@ -276,9 +280,11 @@ struct NoteDetail: View {
             }
             .navigationTitle("Metadata")
             .background(self.page.primaryColour)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+#endif
             .scrollContentBackground(.hidden)
         }
     }

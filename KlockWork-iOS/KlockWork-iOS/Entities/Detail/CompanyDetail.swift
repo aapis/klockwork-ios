@@ -90,6 +90,7 @@ struct CompanyDetail: View {
             .onAppear(perform: self.actionOnAppear)
             .navigationTitle(self.company != nil ? "Company" : "New Company")
             .scrollContentBackground(.hidden)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -105,6 +106,7 @@ struct CompanyDetail: View {
                     .foregroundStyle(self.state.theme.tint)
                 }
             }
+#endif
             .sheet(isPresented: $isProjectSelectorPresented) {
                 Widget.ProjectSelector.Multi(
                     showing: $isProjectSelectorPresented,

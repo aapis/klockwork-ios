@@ -54,6 +54,7 @@ struct RecordDetail: View {
         }
         .onAppear(perform: actionOnAppear)
         .navigationTitle(self.record != nil ? "Record" : "New Record")
+#if os(iOS)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
@@ -67,6 +68,7 @@ struct RecordDetail: View {
                 .foregroundStyle(self.state.theme.tint)
             }
         }
+#endif
         .sheet(isPresented: $isJobSelectorPresented) {
             Widget.JobSelector.Single(
                 job: $job

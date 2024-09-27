@@ -49,6 +49,7 @@ struct Jobs: View {
             })
             .scrollContentBackground(.hidden)
             .background(Theme.cGreen)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -63,6 +64,7 @@ struct Jobs: View {
                     }
                 }
             }
+#endif
             .sheet(isPresented: $isCreateEditorPresented) {
                 if let defaultCompany = CoreDataCompanies(moc: self.state.moc).findDefault() {
                     let projects = defaultCompany.projects!.allObjects as! [Project]

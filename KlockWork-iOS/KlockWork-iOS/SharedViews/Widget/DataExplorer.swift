@@ -33,10 +33,12 @@ extension Widget {
                     Spacer()
                 }
                 .scrollContentBackground(.hidden)
+#if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
                 .background(Theme.cGreen)
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
+#endif
                 .scrollDismissesKeyboard(.immediately)
                 .navigationTitle(self.title)
             }

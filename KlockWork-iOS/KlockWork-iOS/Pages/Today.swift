@@ -39,10 +39,12 @@ struct Today: View {
                 }
             }
             .background(page.primaryColour)
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(inSheet ? .visible : .hidden)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+#endif
             .scrollDismissesKeyboard(.immediately)
             .onChange(of: self.job) {self.actionOnJobChange()}
         }
