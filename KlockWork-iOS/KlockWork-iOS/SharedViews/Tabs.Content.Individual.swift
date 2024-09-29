@@ -106,7 +106,10 @@ extension Tabs.Content {
                             onAction()
                         }
                     } label: {
-                        Image(systemName: "eye.slash")
+                        VStack(alignment: .center) {
+                            Image(systemName: "eye.slash")
+                            Text("Unpublish")
+                        }
                     }
                     .tint(.purple)
                     Button(role: .destructive) {
@@ -120,7 +123,10 @@ extension Tabs.Content {
                             onAction()
                         }
                     } label: {
-                        Image(systemName: "trash")
+                        VStack(alignment: .center) {
+                            Image(systemName: "trash")
+                            Text("Delete")
+                        }
                     }
                     .tint(.red)
                 }
@@ -513,7 +519,10 @@ extension Tabs.Content {
                     Button {
                         self.actionOnSwipeSetJob(job)
                     } label: {
-                        Image(systemName: "hammer")
+                        VStack(alignment: .center) {
+                            Image(systemName: "hammer")
+                            Text("Use")
+                        }
                     }
                     .tint(.green)
                 }
@@ -529,7 +538,10 @@ extension Tabs.Content {
                             onAction()
                         }
                     } label: {
-                        Image(systemName: "eye.slash")
+                        VStack(alignment: .center) {
+                            Image(systemName: "eye.slash")
+                            Text("Unpublish")
+                        }
                     }
                     .tint(.purple)
                 }
@@ -719,7 +731,10 @@ extension Tabs.Content {
                     Button {
                         self.actionOnSwipeComplete(job)
                     } label: {
-                        Image(systemName: "checkmark.seal.fill")
+                        VStack(alignment: .center) {
+                            Image(systemName: "checkmark.seal")
+                            Text("Done")
+                        }
                     }
                     .tint(.green)
                 }
@@ -727,14 +742,20 @@ extension Tabs.Content {
                     Button {
                         self.actionOnSwipeDelay(job)
                     } label: {
-                        Image(systemName: "clock.fill")
+                        VStack(alignment: .center) {
+                            Image(systemName: "clock")
+                            Text("Delay")
+                        }
                     }
                     .tint(.yellow)
 
                     Button(role: .destructive) {
                         self.actionOnSwipeCancel(job)
                     } label: {
-                        Image(systemName: "calendar.badge.minus")
+                        VStack(alignment: .center) {
+                            Image(systemName: "calendar.badge.minus")
+                            Text("Cancel")
+                        }
                     }
                     .tint(.red)
                 }
@@ -1009,7 +1030,10 @@ extension Tabs.Content {
                     Button {
                         self.actionOnSwipeComplete(task)
                     } label: {
-                        Image(systemName: "checkmark.seal.fill")
+                        VStack(alignment: .center) {
+                            Image(systemName: "checkmark.seal")
+                            Text("Done")
+                        }
                     }
                     .tint(.green)
                 }
@@ -1017,14 +1041,20 @@ extension Tabs.Content {
                     Button {
                         self.actionOnSwipeDelay(task)
                     } label: {
-                        Image(systemName: "clock.fill")
+                        VStack(alignment: .center) {
+                            Image(systemName: "clock")
+                            Text("Delay")
+                        }
                     }
                     .tint(.yellow)
 
                     Button(role: .destructive) {
                         self.actionOnSwipeCancel(task)
                     } label: {
-                        Image(systemName: "calendar.badge.minus")
+                        VStack(alignment: .center) {
+                            Image(systemName: "calendar.badge.minus")
+                            Text("Cancel")
+                        }
                     }
                     .tint(.red)
                 }
