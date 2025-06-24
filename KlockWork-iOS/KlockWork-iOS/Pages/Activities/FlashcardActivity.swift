@@ -15,8 +15,7 @@ struct FlashcardActivity: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            FlashcardDeck(job: $job)
-
+            FlashcardDeck()
             VStack(alignment: .center, spacing: 0) {
                 HStack(alignment: .center) {
                     PageActionBar.Today(
@@ -31,47 +30,157 @@ struct FlashcardActivity: View {
         }
         .onAppear(perform: {
             if self.state.job != nil {
-                self.job = self.state.job
                 self.isJobSelectorPresented = false
             } else {
                 self.isJobSelectorPresented = true
             }
         })
         .background(self.page.primaryColour)
-        .navigationTitle(job != nil ? self.job!.title ?? self.job!.jid.string: "Activity: Flashcard")
-        .toolbarBackground(job != nil ? self.job!.backgroundColor : Theme.textBackground.opacity(0.7), for: .navigationBar)
+        .navigationTitle(self.state.job != nil ? self.state.job!.title ?? self.state.job!.jid.string: "Activity: Flashcard")
+#if os(iOS)
+        .toolbarBackground(self.state.job != nil ? self.state.job!.backgroundColor : Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+#endif
     }
 
     struct FlashcardDeck: View {
         @EnvironmentObject private var state: AppState
-        @Binding public var job: Job?
         @State private var terms: Array<TaxonomyTerm> = []
         @State private var current: TaxonomyTerm? = nil
         @State private var isAnswerCardShowing: Bool = false
         @State private var clue: String = ""
         @State private var viewed: Set<TaxonomyTerm> = []
         @State private var definitions: [TaxonomyTermDefinitions] = []
+        @State private var isMenuShowing: Bool = false
 
         var body: some View {
             VStack(alignment: .center, spacing: 0) {
-                Card(
-                    isAnswerCardShowing: $isAnswerCardShowing,
-                    definitions: $definitions,
-                    current: $current,
-                    job: $job
-                )
-                Actions(
-                    isAnswerCardShowing: $isAnswerCardShowing,
-                    definitions: $definitions,
-                    current: $current,
-                    terms: $terms,
-                    viewed: $viewed
-                )
+                HStack {
+                    Button {
+                        self.isMenuShowing.toggle()
+                    } label: {
+                        Image(systemName: "line.3.horizontal")
+                            .font(.title)
+                            .padding()
+                    }
+//                    .useDefaultHover({ _ in})
+                    .buttonStyle(.plain)
+
+                    if self.state.job != nil {
+                        if let project = self.state.job?.project {
+                            if let company = project.company {
+                                Text("\(company.name ?? "Company")")
+                                Image(systemName: "chevron.right")
+                            }
+                            Text("\(project.name ?? "Project")")
+                            Image(systemName: "chevron.right")
+                        }
+                        Text("\(self.state.job!.title ?? "Job")")
+
+                        // @TODO: maybe add this back? when final styling is in place?
+//                                    if self.current != nil {
+//                                        Image(systemName: "chevron.right")
+//                                        Text("\(self.current!.name ?? "Current")")
+//                                    }
+                    } else {
+                        Text("None selected")
+                    }
+
+                    Spacer()
+                }
+                .background(self.state.job?.backgroundColor ?? .clear)
+                .foregroundStyle(self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white)
+
+                if self.isMenuShowing {
+                    Menu(
+                        isMenuShowing: $isMenuShowing,
+                        isAnswerCardShowing: $isAnswerCardShowing,
+                        terms: $terms,
+                        current: $current
+                    )
+                } else {
+                    Card(
+                        isAnswerCardShowing: $isAnswerCardShowing,
+                        definitions: $definitions,
+                        current: $current,
+                        clue: $clue
+                    )
+                    Actions(
+                        isAnswerCardShowing: $isAnswerCardShowing,
+                        definitions: $definitions,
+                        current: $current,
+                        terms: $terms,
+                        viewed: $viewed
+                    )
+                }
             }
             .onAppear(perform: self.actionOnAppear)
-            .onChange(of: job) {
+            .onChange(of: self.state.job) {
                 self.actionOnAppear()
+            }
+            .onChange(of: self.current) {
+                if let curr = self.current {
+                    self.clue = curr.name ?? "_TERM_NAME"
+                    self.viewed.insert(curr)
+
+                    if let defs = self.current!.definitions {
+                        if let ttds = defs.allObjects as? [TaxonomyTermDefinitions] {
+                            self.definitions = ttds
+                        }
+                    }
+                }
+            }
+        }
+
+        struct Menu: View {
+            @EnvironmentObject private var state: AppState
+            @Binding public var isMenuShowing: Bool
+            @Binding public var isAnswerCardShowing: Bool
+            @Binding public var terms: [TaxonomyTerm]
+            @Binding public var current: TaxonomyTerm?
+
+            var body: some View {
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        HStack(alignment: .center, spacing: 0) {
+                            Text("\(self.terms.count) terms")
+                                .textCase(.uppercase)
+                                .font(.caption)
+                                .padding(5)
+                            Spacer()
+                        }
+                        .background(self.state.job?.backgroundColor ?? Theme.rowColour)
+
+                        ForEach(self.terms) { term in
+                            Button {
+                                self.current = term
+                                self.isMenuShowing = false
+                                self.isAnswerCardShowing = true
+                            } label: {
+                                ZStack(alignment: .topLeading) {
+                                    LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                                        .frame(height: 50)
+                                        .opacity(0.1)
+
+                                    HStack {
+                                        if self.current == term {
+                                            Image(systemName: "star.fill")
+                                                .foregroundStyle(.yellow)
+                                        }
+                                        Text(term.name ?? "Term")
+                                        Spacer()
+                                    }
+                                    .padding()
+                                }
+                                .background(self.state.job?.backgroundColor)
+                                .foregroundStyle(self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white)
+//                                .useDefaultHover({ _ in})
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        Spacer()
+                    }
+                }
             }
         }
 
@@ -103,6 +212,7 @@ struct FlashcardActivity: View {
                             Image(systemName: "rectangle.landscape.rotate")
                         }
                     }
+                    .buttonStyle(.plain)
                     .padding()
                     .mask(Circle().frame(width: 50, height: 50))
 
@@ -114,6 +224,7 @@ struct FlashcardActivity: View {
                             Image(systemName: "hand.thumbsup.fill")
                         }
                     }
+                    .buttonStyle(.plain)
                     .padding()
                     .mask(Circle().frame(width: 50, height: 50))
 
@@ -125,6 +236,7 @@ struct FlashcardActivity: View {
                             Image(systemName: "hand.thumbsdown.fill")
                         }
                     }
+                    .buttonStyle(.plain)
                     .padding()
                     .mask(Circle().frame(width: 50, height: 50))
 
@@ -151,6 +263,7 @@ struct FlashcardActivity: View {
                             Image(systemName: "chevron.right")
                         }
                     }
+                    .buttonStyle(.plain)
                     .padding()
                     .mask(Circle().frame(width: 50, height: 50))
                 }
@@ -160,63 +273,43 @@ struct FlashcardActivity: View {
         }
 
         struct Card: View {
+            @EnvironmentObject private var state: AppState
             @Binding public var isAnswerCardShowing: Bool
             @Binding public var definitions: [TaxonomyTermDefinitions] // @TODO: convert this to dict grouped by job
             @Binding public var current: TaxonomyTerm?
-            @Binding public var job: Job?
-            @State private var clue: String = ""
+            @Binding public var clue: String
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
                     if self.isAnswerCardShowing {
-                        // Definitions
-                        HStack(alignment: .center, spacing: 0) {
-                            Text("\(self.definitions.count) Jobs define \"\(self.clue)\"")
-                                .textCase(.uppercase)
-                                .font(.caption)
-                                .padding(5)
-                            Spacer()
-                        }
-                        .background(self.job?.backgroundColor ?? Theme.rowColour)
-
                         VStack(alignment: .leading, spacing: 0) {
+                            HStack {
+                                Text(self.clue)
+                                    .font(.title2)
+                                    .bold()
+                                    .padding()
+                                    .foregroundStyle((self.state.job?.backgroundColor ?? Theme.rowColour).isBright() ? Theme.base : .white)
+                                    .help("\(self.definitions.count) definitions for \(self.clue)")
+                                Spacer()
+                            }
+                            .background(self.state.job?.backgroundColor)
+
                             ScrollView {
-                                VStack(alignment: .leading, spacing: 1) {
-                                    ForEach(Array(definitions.enumerated()), id: \.element) { idx, term in
-                                        VStack(alignment: .leading, spacing: 0) {
-                                            HStack(alignment: .top) {
-                                                Text((term.job?.title ?? term.job?.jid.string) ?? "_JOB_NAME")
-                                                    .multilineTextAlignment(.leading)
-                                                    .padding(14)
-                                                    .foregroundStyle((term.job?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
-                                                Spacer()
-                                            }
-
-
-                                            ZStack(alignment: .topLeading) {
-                                                LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
-                                                    .frame(height: 50)
-                                                    .opacity(0.1)
-
-                                                NavigationLink {
-                                                    DefinitionDetail(definition: term)
-                                                } label: {
-                                                    HStack(alignment: .center) {
-                                                        Text(term.definition ?? "Definition not found")
-                                                            .multilineTextAlignment(.leading)
-                                                        Spacer()
-                                                        Image(systemName: "chevron.right")
-                                                    }
-                                                    .padding(14)
-                                                }
-                                            }
+                                ZStack(alignment: .topLeading) {
+                                    VStack(alignment: .leading) {
+                                        ForEach(Array(definitions.enumerated()), id: \.element) { idx, term in
+                                            CardDefinition(term: term)
                                         }
-                                        .background(term.job?.backgroundColor)
-                                        .foregroundStyle((term.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                                     }
+                                    .padding()
+
+                                    LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                                        .frame(height: 50)
+                                        .opacity(0.1)
                                 }
                             }
                         }
+                        .background(Theme.lightWhite)
                     } else {
                         // Answer
                         if self.current != nil {
@@ -224,7 +317,7 @@ struct FlashcardActivity: View {
                                 Spacer()
                                 VStack(alignment: .center) {
                                     Text("Clue")
-                                        .foregroundStyle((self.job?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
+                                        .foregroundStyle((self.state.job?.backgroundColor ?? Theme.rowColour).isBright() ? .white.opacity(0.75) : .gray)
                                     Text(clue)
                                         .font(.title2)
                                         .bold()
@@ -248,12 +341,40 @@ struct FlashcardActivity: View {
                     }
                 }
             }
-
         }
     }
 
+    // MARK: FlashcardActivity.Flashcard
     struct Flashcard {
         var term: TaxonomyTerm
+    }
+
+    // MARK: FlashcardActivity.CardDefinition
+    struct CardDefinition: View {
+        public let term: TaxonomyTermDefinitions
+        @State private var isHighlighted: Bool = false
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 2) {
+                NavigationLink {
+                    DefinitionDetail(definition: self.term)
+                } label: {
+                    HStack(alignment: .top) {
+                        Image(systemName: self.isHighlighted ? "pencil.circle.fill" : "circle")
+                        Text(self.term.definition ?? "Definition not found")
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
+                    .padding(3)
+//                    .useDefaultHover({ hover in self.isHighlighted = hover })
+                    .help("Edit definition")
+                }
+                .buttonStyle(.plain)
+            }
+            .background(self.term.job?.backgroundColor.opacity(self.isHighlighted ? 1 : 0.6))
+            .foregroundStyle((self.term.job?.backgroundColor ?? Theme.rowColour).isBright() ? Theme.base : .white)
+            .clipShape(RoundedRectangle(cornerRadius: 5))
+        }
     }
 }
 
@@ -267,9 +388,9 @@ extension FlashcardActivity.FlashcardDeck {
         self.current = nil
         self.clue = ""
 
-        if self.job != nil {
-            if let termsForJob = CoreDataTaxonomyTerms(moc: self.state.moc).byJob(self.job!) {
-                self.terms = termsForJob
+        if let job = self.state.job {
+            if let termsForJob = CoreDataTaxonomyTerms(moc: self.state.moc).byJob(job) {
+                self.terms = termsForJob.sorted(by: {$0.name ?? "" < $1.name ?? ""})
             }
         }
 
@@ -277,11 +398,10 @@ extension FlashcardActivity.FlashcardDeck {
             self.current = self.terms.randomElement()
             self.clue = self.current?.name ?? "_TERM_NAME"
             self.viewed.insert(self.current!)
-//            self.definitions = []
 
             if let defs = self.current!.definitions {
                 if let ttds = defs.allObjects as? [TaxonomyTermDefinitions] {
-                    self.definitions = ttds
+                    self.definitions = ttds.sorted(by: {$0.definition ?? "" < $1.definition ?? ""})
                 }
             }
         }

@@ -11,7 +11,7 @@ extension PageActionBar {
     struct Today: View {
         @EnvironmentObject private var state: AppState
         public var title: String = "What are you working on now?"
-        public var prompt: String = "Choose a job to get started"
+        public var prompt: String = "Choose a job"
         @Binding public var job: Job?
         @State private var selectedJobs: [Job] = []
         @State private var selectedJobTitle: String = ""
@@ -44,8 +44,15 @@ extension PageActionBar {
 
         @ViewBuilder var Group: some View {
             HStack(alignment: .center, spacing: 10) {
-                AddButton
+                ChooseJobButton
                 Spacer()
+                AddButton()
+                    .bold()
+                    .padding(10)
+                    .padding(.leading, 8)
+                    .background(Theme.base.opacity(0.2))
+                    .clipShape(Circle())
+                    .foregroundStyle((self.job?.backgroundColor ?? self.page.primaryColour).isBright() ? self.page.primaryColour : self.state.theme.tint)
             }
             .background(
                 ZStack {
@@ -59,7 +66,7 @@ extension PageActionBar {
             )
         }
 
-        @ViewBuilder var AddButton: some View {
+        @ViewBuilder var ChooseJobButton: some View {
             Button {
                 self.isPresented.toggle()
                 // clear job before setting, may add a dedicated clear button at some point

@@ -19,6 +19,7 @@ struct Today: View {
     @State private var jobs: [Job] = []
     @State private var isPresented: Bool = false
     @State private var path = NavigationPath()
+    @State private var text: String = "" // @TODO: remove code that requires this
     @AppStorage("today.viewMode") private var viewMode: Int = 0
     @FocusState private var textFieldActive: Bool
     private let page: PageConfiguration.AppPage = .today
@@ -34,6 +35,10 @@ struct Today: View {
                 switch(self.viewMode) {
                 case 1:
                     Tabs.Content.List.HierarchyExplorer(inSheet: false)
+                case 2:
+                    Widget.ActivityCalendar(searchTerm: $text, showActivity: false)
+                case 0:
+                    main
                 default:
                     main
                 }
@@ -90,6 +95,8 @@ extension Today {
         @EnvironmentObject private var state: AppState
         @State public var date: Date = DateHelper.startOfDay()
         @State private var isCreateSheetPresented: Bool = false
+        @State private var isCalendarPresented: Bool = false
+        @AppStorage("today.viewMode") private var viewMode: Int = 0
         public let page: PageConfiguration.AppPage
         @Binding public var path: NavigationPath
 
@@ -102,7 +109,14 @@ extension Today {
                         .frame(height: 45)
 
                     HStack(spacing: 8) {
-                        PageTitle(text: "Today")
+                        Button {
+                            self.isCalendarPresented.toggle()
+                        } label: {
+                            PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMM dd"))
+                        }
+                        .buttonStyle(.plain)
+                        .opacity(self.viewMode == 0 || self.viewMode == 1 ? 1 : 0.5)
+
                         Spacer()
                         CreateEntitiesButton(isViewModeSelectorVisible: true, page: self.page)
                     }
@@ -114,6 +128,13 @@ extension Today {
             .onChange(of: self.date) {
                 if self.state.date != self.date {
                     self.state.date = DateHelper.startOfDay(self.date)
+                }
+            }
+            .onChange(of: self.isCalendarPresented) {
+                if self.isCalendarPresented {
+                    self.viewMode = 2
+                } else {
+                    self.viewMode = 0
                 }
             }
         }

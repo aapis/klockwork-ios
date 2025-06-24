@@ -15,9 +15,14 @@ struct CreateEntitiesButton: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
-            AddButton()
+            if self.page == .planning {
+                AddButton()
+            }
             if isViewModeSelectorVisible {
                 ViewModeSelector()
+                    .padding(12)
+                    .background(.white.opacity(0.1))
+                    .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
             }
 
 //            Button {

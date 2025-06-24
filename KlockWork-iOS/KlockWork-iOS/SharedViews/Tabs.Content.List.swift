@@ -133,6 +133,7 @@ extension Tabs.Content {
             }
         }
 
+        // MARK: HierarchyExplorer
         struct HierarchyExplorer: View {
             @EnvironmentObject private var state: AppState
             public var inSheet: Bool
