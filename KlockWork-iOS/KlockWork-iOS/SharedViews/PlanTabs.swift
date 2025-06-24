@@ -634,6 +634,7 @@ extension PlanTabs {
                     }
                 }
             }
+            .background(self.page.primaryColour)
             .id(self.id)
             .onAppear(perform: self.actionOnAppear)
             .onChange(of: self.state.date) {
@@ -815,7 +816,7 @@ extension PlanTabs {
                     df.timeStyle = .none
                     if let d1 = df.date(from: $0.key) {
                         if let d2 = df.date(from: $1.key) {
-                            return d1 < d2
+                            return d1 > d2
                         }
                     }
                     return false
@@ -840,7 +841,7 @@ extension PlanTabs {
                     df.timeStyle = .none
                     if let d1 = df.date(from: $0.key) {
                         if let d2 = df.date(from: $1.key) {
-                            return d1 < d2
+                            return d1 > d2
                         }
                     }
                     return false

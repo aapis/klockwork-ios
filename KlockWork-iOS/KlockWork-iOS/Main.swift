@@ -33,15 +33,11 @@ struct Main: View {
 
     var body: some View {
         TabView {
-            Planning(inSheet: false)
-            .tabItem {
-                if self.state.plan != nil {
-                    Image(systemName: "circle.hexagongrid.fill")
-                } else {
-                    Image(systemName: "hexagon")
+            Home(inSheet: false)
+                .tabItem {
+                    Image(systemName: "house")
+                    Text("Home")
                 }
-                Text("Planning")
-            }
             Today(inSheet: false)
             .tabItem {
                 Image(systemName: "tray")
@@ -58,9 +54,8 @@ struct Main: View {
                 Text("Find")
             }
         }
-        .foregroundStyle(.white)
         .preferredColorScheme(.dark) // intentionally forcing dark mode on this view for aesthetics
-        .tint(.yellow)
+        .tint(self.state.theme.tint)
         .onAppear(perform: self.onApplicationBoot)
         .environmentObject(self.state)
     }
@@ -92,8 +87,8 @@ extension Main {
     /// - Returns: Void
     private func recreateTermsAndDefinitionsFromRecords() -> Void {
         let records = CoreDataRecords(moc: self.moc).matching(/(.*) == (.*)/)
-        var terms = CoreDataTaxonomyTerms(moc: self.moc).all()
-        var definitions = CoreDataTaxonomyTermDefinitions(moc: self.moc).all()
+        let terms = CoreDataTaxonomyTerms(moc: self.moc).all()
+        let definitions = CoreDataTaxonomyTermDefinitions(moc: self.moc).all()
 
         // reset taxonomy terms
         for term in terms {

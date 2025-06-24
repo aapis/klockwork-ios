@@ -23,6 +23,7 @@ extension Widget {
     struct ActivityCalendar: View {
         @EnvironmentObject private var state: AppState
         @Binding public var searchTerm: String
+        public var showActivity: Bool = true
         @State public var month: String = "_DEFAULT_MONTH"
         @State private var date: Date = Date()
         @State private var legendId: UUID = UUID() // @TODO: remove this gross hack once views refresh properly
@@ -67,17 +68,19 @@ extension Widget {
                         
                         VStack {
                             // List of days representing 1 month
-                            Month(month: $month, id: $calendarId, searchTerm: searchTerm)
+                            Month(month: $month, id: $calendarId, searchTerm: searchTerm, showActivity: self.showActivity)
                                 .id(self.calendarId)
 
                             Spacer() // @TODO: put a new set of stats or something here?
                         }
                         .background(Theme.rowColour)
 
-                        // Legend
-                        Legend(id: $legendId, calendarId: $calendarId)
-                            .border(width: 1, edges: [.top], color: .gray.opacity(0.7))
-                            .id(self.legendId)
+                        if self.showActivity {
+                            // Legend
+                            Legend(id: $legendId, calendarId: $calendarId)
+                                .border(width: 1, edges: [.top], color: .gray.opacity(0.7))
+                                .id(self.legendId)
+                        }
                     }
                     Spacer()
                 }

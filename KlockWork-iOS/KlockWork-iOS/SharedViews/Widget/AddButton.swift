@@ -10,7 +10,6 @@ import SwiftUI
 struct AddButton: View {
     typealias Entity = PageConfiguration.EntityType
     @EnvironmentObject private var state: AppState
-    @State private var isPresented: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -59,6 +58,5 @@ struct AddButton: View {
             }
         }
         .font(.title2)
-        .foregroundStyle(self.state.theme.tint)
     }
 }

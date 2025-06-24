@@ -203,8 +203,11 @@ extension Widget {
                     .padding()
 
                     if items.count > 0 {
+                        // @TODO: this should be a NEW inline search widget
+//                        SearchBar(placeholder: "Find", items: self.items, type: .jobs)
+//                            .padding()
                         List {
-                            ForEach(items, id: \.objectID) { jerb in
+                            ForEach(self.items, id: \.objectID) { jerb in
                                 Row(job: jerb, callback: { job in
                                     self.job = job
                                     self.state.job = job
