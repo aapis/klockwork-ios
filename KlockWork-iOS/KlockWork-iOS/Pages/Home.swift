@@ -12,7 +12,7 @@ struct Home: View {
     public var inSheet: Bool
     @State private var path = NavigationPath()
     private let page: PageConfiguration.AppPage = .today
-    private var columns: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
+    private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -22,11 +22,8 @@ struct Home: View {
                     Divider().background(.gray).frame(height: 1)
                 }
                 VStack(alignment: .leading) {
-                    Text("TASKS")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
-                        .padding(.leading)
-                    LazyVGrid(columns: self.columns, alignment: .center) {
+                    SectionTitle(label: "Tasks")
+                    LazyVGrid(columns: self.col2, alignment: .center) {
                         Block(
                             colour: .red,
                             label: "Overdue",
@@ -48,18 +45,43 @@ struct Home: View {
                             target: AnyView(PlanTabs.Upcoming())
                         )
                     }
+                    .padding(.bottom)
+
+                    SectionTitle(label: "Quick Create")
+                    HStack(spacing: 1) {
+                        QuickAccessButton(colour: .white, entity: PageConfiguration.EntityType.notes)
+                        QuickAccessButton(colour: .white, entity: PageConfiguration.EntityType.tasks)
+                        QuickAccessButton(colour: .white, entity: PageConfiguration.EntityType.jobs)
+                        QuickAccessButton(colour: .white, entity: PageConfiguration.EntityType.companies)
+                        QuickAccessButton(colour: .white, entity: PageConfiguration.EntityType.projects)
+                        QuickAccessButton(colour: .white, entity: PageConfiguration.EntityType.terms)
+                    }
                 }
                 .padding()
 
                 List {
-                    Section("Pages") {
+                    Section("Organization") {
                         NavigationLink {
                             Planning(inSheet: true)
                         } label: {
-                            Text("Planning")
+                            HStack {
+                                Image(systemName: self.state.plan != nil ? "circle.hexagongrid.fill" : "hexagon")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Planning")
+                            }
                         }
                         .listRowBackground(Theme.textBackground)
-                        .foregroundStyle(self.state.theme.tint)
+
+                        NavigationLink {
+                            Widget.DataExplorer()
+                        } label: {
+                            HStack {
+                                Image(systemName: "globe")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Data Explorer")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
                 .scrollContentBackground(.hidden)
@@ -169,6 +191,57 @@ extension Home {
             }
         }
     }
+
+    struct QuickAccessButton: View {
+        @EnvironmentObject private var state: AppState
+        public var colour: Color = .clear
+        public var label: String = "Button"
+        public var entity: PageConfiguration.EntityType
+
+        var body: some View {
+            NavigationLink {
+                switch self.entity {
+                case .tasks:
+                    TaskDetail()
+                case .notes:
+                    NoteDetail()
+                case .people:
+                    PersonDetail()
+                case .companies:
+                    CompanyDetail()
+                case .projects:
+                    ProjectDetail()
+                case .jobs:
+                    JobDetail()
+                case .terms:
+                    TermDetail()
+                default:
+                    Text("Nope")
+                    // do nothing
+                }
+            } label: {
+                ZStack(alignment: .bottomTrailing) {
+                    HStack {
+                        self.entity.icon
+                            .font(.headline)
+                            .foregroundStyle(self.colour)
+                            .bold()
+                    }
+                    .frame(height: 25)
+                    .padding()
+                    .background(Theme.textBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                    Image(systemName: "plus")
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.cPurple)
+                        .background(self.state.theme.tint)
+                        .clipShape(UnevenRoundedRectangle(bottomTrailingRadius: 4))
+                }
+            }
+            .buttonStyle(.plain)
+        }
+    }
 }
 
 extension Home.Block {
@@ -179,5 +252,16 @@ extension Home.Block {
         self.target = target
         self.predicate = predicate
         _tasks = CoreDataTasks.fetch(with: predicate)
+    }
+}
+
+struct SectionTitle: View {
+    public let label: String
+
+    var body: some View {
+        Text(self.label.uppercased())
+            .font(.caption)
+            .foregroundStyle(.white.opacity(0.6))
+            .padding(.leading)
     }
 }
