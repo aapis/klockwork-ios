@@ -100,6 +100,17 @@ struct Explore: View {
                             }
                         }
                         .listRowBackground(Theme.textBackground)
+
+                        NavigationLink {
+                            Planning(inSheet: true)
+                        } label: {
+                            HStack {
+                                Image(systemName: self.state.plan != nil ? "circle.hexagongrid.fill" : "hexagon")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Planning")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
                     }
 
                     Section("Activities") {
