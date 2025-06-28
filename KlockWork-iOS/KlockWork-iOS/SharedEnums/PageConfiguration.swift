@@ -129,7 +129,8 @@ extension PageConfiguration {
             case .planning: Theme.cOrange
             case .today, .create, .modify: Theme.cPurple
             case .find: Theme.cRoyal
-            case .error, .intersitial, .settings: .white
+            case .settings: Color.lightGray()
+            case .error, .intersitial: .white
             default:
                 Theme.cGreen
             }
