@@ -182,6 +182,7 @@ extension Widget {
             @Environment(\.dismiss) private var dismiss
             public var title: String?
             @FetchRequest private var items: FetchedResults<Job>
+            @FetchRequest private var recentItems: FetchedResults<Job>
             @Binding public var job: Job?
 
             private var columns: [GridItem] {
@@ -207,6 +208,24 @@ extension Widget {
 //                        SearchBar(placeholder: "Find", items: self.items, type: .jobs)
 //                            .padding()
                         List {
+                            HStack {
+                                Spacer()
+                                SectionTitle(label: "Recent (\(self.recentItems.count))")
+                            }
+                            ForEach(self.recentItems, id: \.objectID) { jerb in
+                                Row(job: jerb, callback: { job in
+                                    self.job = job
+                                    self.state.job = job
+                                    dismiss()
+                                })
+                                .background(
+                                    Tabs.Content.Common.TypedListRowBackground(colour: jerb.backgroundColor, type: .jobs)
+                                )
+                            }
+                            HStack {
+                                Spacer()
+                                SectionTitle(label: "All (\(self.items.count))")
+                            }
                             ForEach(self.items, id: \.objectID) { jerb in
                                 Row(job: jerb, callback: { job in
                                     self.job = job
@@ -223,6 +242,7 @@ extension Widget {
                         .listRowSpacing(.none)
                         .listRowSeparator(.hidden)
                         .listSectionSpacing(0)
+                        .scrollContentBackground(.hidden)
                     } else {
                         StatusMessage.Warning(message: "No jobs found")
                     }
@@ -233,6 +253,7 @@ extension Widget {
                 self.title = title
                 _job = job
                 _items = CoreDataJob.fetchAll()
+                _recentItems = CoreDataJob.fetchRecent()
             }
         }
     }
