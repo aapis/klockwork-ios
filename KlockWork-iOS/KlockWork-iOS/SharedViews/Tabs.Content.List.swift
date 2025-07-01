@@ -142,7 +142,6 @@ extension Tabs.Content {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
-                    Divider().background(.white).frame(height: 1)
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             if self.items.count > 0 {
