@@ -26,6 +26,7 @@
 		53274B352C1214E0008387BF /* LegendLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B342C1214E0008387BF /* LegendLabel.swift */; };
 		53274B372C12179D008387BF /* ButtonType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B362C12179D008387BF /* ButtonType.swift */; };
 		53274B3C2C13C7E6008387BF /* AssessmentFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */; };
+		536129A12E136B2B0006B0FC /* CDSavedSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536129A02E136B2B0006B0FC /* CDSavedSearch.swift */; };
 		536B32B22C1A03BB00E01517 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536B32B12C1A038E00E01517 /* AppState.swift */; };
 		536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536E4F682C0D77A600FDC1F4 /* ActionType.swift */; };
 		53713E362C94CFA9006C244D /* DateStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53713E352C94CFA6006C244D /* DateStrip.swift */; };
@@ -154,6 +155,7 @@
 		53274B342C1214E0008387BF /* LegendLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegendLabel.swift; sourceTree = "<group>"; };
 		53274B362C12179D008387BF /* ButtonType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonType.swift; sourceTree = "<group>"; };
 		53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentFactor.swift; sourceTree = "<group>"; };
+		536129A02E136B2B0006B0FC /* CDSavedSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CDSavedSearch.swift; path = ../../KlockWork/KWCore/Sources/Query/CDSavedSearch.swift; sourceTree = "<group>"; };
 		536B32B12C1A038E00E01517 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		536E4F682C0D77A600FDC1F4 /* ActionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionType.swift; sourceTree = "<group>"; };
 		53713E352C94CFA6006C244D /* DateStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateStrip.swift; sourceTree = "<group>"; };
@@ -408,6 +410,7 @@
 		53D4CB4A2BFE930100AFEDEA = {
 			isa = PBXGroup;
 			children = (
+				536129A02E136B2B0006B0FC /* CDSavedSearch.swift */,
 				53A471F52DF0F11B00E2A816 /* NotificationHelper.swift */,
 				53A1EDCC2DF0EB2C008C049C /* Data.xcdatamodeld */,
 				538A53552C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift */,
@@ -655,6 +658,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				536129A12E136B2B0006B0FC /* CDSavedSearch.swift in Sources */,
 				53A471F62DF0F11B00E2A816 /* NotificationHelper.swift in Sources */,
 				538A53562C7026B500711639 /* CoreDataTaxonomyTermDefinitions.swift in Sources */,
 				538A53502C6FEA6600711639 /* CoreDataTaxonomyTerms.swift in Sources */,
