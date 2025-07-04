@@ -27,6 +27,7 @@ struct Explore: View {
                 Header(page: self.page)
                 Divider().background(.white).frame(height: 1)
                 Widgets(text: $searchText)
+                Home.QuickCreateWidget()
             }
             .background(page.primaryColour)
             .navigationBarTitleDisplayMode(.inline)

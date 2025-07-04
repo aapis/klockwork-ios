@@ -112,7 +112,7 @@ extension Today {
                         Button {
                             self.isCalendarPresented.toggle()
                         } label: {
-                            PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMM dd"))
+                            PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMMM dd"))
                         }
                         .buttonStyle(.plain)
                         .opacity(self.viewMode == 0 || self.viewMode == 1 ? 1 : 0.5)

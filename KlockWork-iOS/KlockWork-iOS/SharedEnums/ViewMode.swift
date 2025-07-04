@@ -8,12 +8,13 @@
 import SwiftUI
 
 enum ViewMode: CaseIterable {
-    case tabular, hierarchical
+    case tabular, hierarchical, calendar
 
     var id: Int {
         switch(self) {
         case .hierarchical: 1
         case .tabular: 0
+        case .calendar: 2
         }
     }
 
@@ -21,6 +22,7 @@ enum ViewMode: CaseIterable {
         switch self {
         case .hierarchical: "list.bullet.indent"
         case .tabular: "tablecells"
+        case .calendar: "calendar"
         }
     }
 
@@ -28,6 +30,7 @@ enum ViewMode: CaseIterable {
         switch(self) {
         case .hierarchical: "Hierarchical"
         case .tabular: "Tabular"
+        case .calendar: "Calendar"
         }
     }
 

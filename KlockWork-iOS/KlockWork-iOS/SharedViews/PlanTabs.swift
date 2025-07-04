@@ -762,6 +762,7 @@ extension PlanTabs {
         var body: some View {
             NavigationStack {
                 VStack(alignment: .leading, spacing: 1) {
+                    TaskForecast(callback: self.actionForecastCallback, daysToShow: -14, page: self.page)
                     if !self.tasks.isEmpty {
                         List {
                             ForEach(self.overdue, id: \.id) { row in
@@ -881,6 +882,12 @@ extension PlanTabs {
         private func actionOnSwipeCancel(_ task: LogTask) -> Void {
             CoreDataTasks(moc: self.state.moc).cancel(task)
             self.actionOnAppear()
+        }
+
+        /// Forecast tap callback handler
+        /// - Returns: Void
+        private func actionForecastCallback() -> Void {
+            self.id = UUID()
         }
     }
 }

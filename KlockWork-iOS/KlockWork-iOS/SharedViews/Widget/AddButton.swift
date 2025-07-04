@@ -10,6 +10,7 @@ import SwiftUI
 struct AddButton: View {
     typealias Entity = PageConfiguration.EntityType
     @EnvironmentObject private var state: AppState
+    public var plain: Bool = true
 
     var body: some View {
         NavigationStack {
@@ -57,6 +58,24 @@ struct AddButton: View {
                 }
             }
         }
+        .tint(self.state.job?.backgroundColor ?? self.state.theme.tint)
         .font(.title2)
+        .bold()
+        .padding(10)
+        .padding(.leading, 8)
+        .background(
+            ZStack {
+                if self.plain {
+                    self.state.job?.backgroundColor ?? Theme.cPurple
+                } else {
+                    self.state.job?.backgroundColor ?? Theme.cPurple
+                    LinearGradient(colors: [.white, .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        .blendMode(.softLight)
+                }
+            }
+        )
+        .clipShape(
+            Circle()
+        )
     }
 }

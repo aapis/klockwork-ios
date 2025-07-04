@@ -24,6 +24,7 @@ struct JobDetail: View {
     @State private var title: String = ""
     @State private var url: String = "https://"
     @State public var project: Project? = nil
+    @State public var starred: Bool = false
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isProjectSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
@@ -92,6 +93,7 @@ struct JobDetail: View {
 
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
+                    Toggle("Favourite", isOn: $starred)
                     DatePicker(
                         "Created",
                         selection: $created,
@@ -168,6 +170,7 @@ extension JobDetail {
         if self.job != nil {
             self.alive = self.job!.alive
             self.colour = self.job!.colour_from_stored()
+            self.starred = self.job!.starred
             if let cDate = self.job!.created {
                 self.created = cDate
             }
@@ -209,6 +212,7 @@ extension JobDetail {
                 self.job!.project = project
             }
             self.job!.uri = URL(string: self.url)
+            self.job!.starred = self.starred
         } else {
             CoreDataJob(moc: self.state.moc).create(
                 alive: self.alive,
@@ -219,6 +223,7 @@ extension JobDetail {
                 title: self.title,
                 uri: URL(string: self.url)!.absoluteString,
                 project: self.project == nil ? DefaultObjects.project : self.project,
+                starred: self.starred,
                 saveByDefault: false
             )
         }

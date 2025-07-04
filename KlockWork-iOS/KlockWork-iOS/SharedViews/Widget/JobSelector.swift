@@ -56,6 +56,7 @@ extension Widget {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 1) {
                         HStack(alignment: .center, spacing: 0) {
                             Text(self.title)
+                                .lineLimit(1)
                                 .font(.title2)
                             Spacer()
                             Button {
@@ -193,6 +194,7 @@ extension Widget {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .center, spacing: 0) {
                         Text(self.title!)
+                            .lineLimit(1)
                             .font(.title2)
                         Spacer()
                         Button {
@@ -212,6 +214,21 @@ extension Widget {
                                 Spacer()
                                 SectionTitle(label: "Recent (\(self.recentItems.count))")
                             }
+                            .listRowBackground(
+                                VStack(spacing: 0) {
+                                    Divider()
+                                        .foregroundStyle(.gray)
+                                    ZStack(alignment: .bottom) {
+                                        Theme.cPurple
+                                        LinearGradient(colors: [.clear, Theme.base], startPoint: .top, endPoint: .bottom)
+                                            .frame(height: 10)
+                                            .blendMode(.softLight)
+                                            .opacity(0.7)
+                                    }
+                                    Divider()
+                                        .foregroundStyle(.gray)
+                                }
+                            )
                             ForEach(self.recentItems, id: \.objectID) { jerb in
                                 Row(job: jerb, callback: { job in
                                     self.job = job
@@ -226,6 +243,21 @@ extension Widget {
                                 Spacer()
                                 SectionTitle(label: "All (\(self.items.count))")
                             }
+                            .listRowBackground(
+                                VStack(spacing: 0) {
+                                    Divider()
+                                        .foregroundStyle(.gray)
+                                    ZStack(alignment: .bottom) {
+                                        Theme.cPurple
+                                        LinearGradient(colors: [.clear, Theme.base], startPoint: .top, endPoint: .bottom)
+                                            .frame(height: 10)
+                                            .blendMode(.softLight)
+                                            .opacity(0.7)
+                                    }
+                                    Divider()
+                                        .foregroundStyle(Color.lightGray())
+                                }
+                            )
                             ForEach(self.items, id: \.objectID) { jerb in
                                 Row(job: jerb, callback: { job in
                                     self.job = job
@@ -253,7 +285,7 @@ extension Widget {
                 self.title = title
                 _job = job
                 _items = CoreDataJob.fetchAll()
-                _recentItems = CoreDataJob.fetchRecent()
+                _recentItems = CoreDataJob.fetchRecent(limit: 8)
             }
         }
     }

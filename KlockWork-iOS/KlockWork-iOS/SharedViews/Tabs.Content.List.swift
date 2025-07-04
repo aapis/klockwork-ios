@@ -9,9 +9,40 @@ import SwiftUI
 
 extension Tabs.Content {
     struct List {
+        struct Separator: View {
+            public var label: String
+            public var description: String? = nil
+
+            var body: some View {
+                HStack {
+                    SectionTitle(label: self.label, uppercase: true)
+                    Spacer()
+                    if self.description != nil {
+                        SectionTitle(label: self.description!, uppercase: true)
+                    }
+                }
+                .listRowBackground(
+                    VStack(spacing: 0) {
+                        Divider()
+                            .foregroundStyle(.gray)
+                        ZStack(alignment: .bottom) {
+                            Theme.cPurple
+                            LinearGradient(colors: [.clear, Theme.base], startPoint: .top, endPoint: .bottom)
+                                .frame(height: 10)
+                                .blendMode(.softLight)
+                                .opacity(0.7)
+                        }
+                        Divider()
+                            .foregroundStyle(.gray)
+                    }
+                )
+            }
+        }
+
         struct Records: View {
             @EnvironmentObject private var state: AppState
             public var inSheet: Bool
+            public var pageTitle: String = "Records"
             @FetchRequest private var items: FetchedResults<LogRecord>
             @Binding public var job: Job?
             private var date: Date
@@ -31,26 +62,42 @@ extension Tabs.Content {
                 .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
-                .navigationTitle("Records")
+                .navigationTitle(self.pageTitle)
             }
 
-            init(job: Binding<Job?>, date: Date, inSheet: Bool) {
+            init(job: Binding<Job?>, date: Date, inSheet: Bool, pageTitle: String = "Records") {
                 _job = job
                 self.date = date
                 self.inSheet = inSheet
+                self.pageTitle = pageTitle
                 _items = CoreDataRecords.fetch(for: self.date)
             }
         }
 
         struct Jobs: View {
+            @EnvironmentObject public var state: AppState
             public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Job>
+            @FetchRequest private var favouriteItems: FetchedResults<Job>
             @Binding public var job: Job?
             public var date: Date
 
             var body: some View {
                 SwiftUI.List {
+                    if let job = self.state.job {
+                        Separator(label: "Current")
+                        Individual.SingleJobDetailedLink(job: job)
+                    }
+
+                    if self.favouriteItems.count > 0 {
+                        Separator(label: "Starred (\(self.favouriteItems.count))", description: "All time")
+                        ForEach(self.favouriteItems, id: \.self) { jerb in
+                            Individual.SingleJobDetailedLink(job: jerb)
+                        }
+                    }
+
                     if items.count > 0 {
+                        Separator(label: "Recent (\(self.items.count))", description: "< 30 days")
                         ForEach(items) { jerb in
                             Individual.SingleJobDetailedLink(job: jerb)
                         }
@@ -70,7 +117,8 @@ extension Tabs.Content {
                 _job = job
                 self.date = date
                 self.inSheet = inSheet
-                _items = CoreDataJob.recentJobsWidgetData()
+                _items = CoreDataJob.fetchRecent(numDaysPrior: 30)
+                _favouriteItems = CoreDataJob.fetchAll(favsOnly: true)
             }
         }
 
@@ -107,11 +155,19 @@ extension Tabs.Content {
         struct Notes: View {
             public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<Note>
+            @FetchRequest private var favouriteItems: FetchedResults<Note>
             public var date: Date
 
             var body: some View {
                 SwiftUI.List {
+                    if self.favouriteItems.count > 0 {
+                        Separator(label: "Starred (\(self.favouriteItems.count))", description: "All time")
+                        ForEach(self.favouriteItems, id: \.self) { note in
+                            Individual.SingleNoteDetailedLink(note: note)
+                        }
+                    }
                     if items.count > 0 {
+                        Separator(label: "All (\(self.items.count))")
                         ForEach(items) { note in
                             Individual.SingleNoteDetailedLink(note: note)
                         }
@@ -130,6 +186,7 @@ extension Tabs.Content {
                 self.date = date
                 self.inSheet = inSheet
                 _items = CoreDataNotes.fetchNotes()
+                _favouriteItems = CoreDataNotes.fetchNotes(favouritesOnly: true)
             }
         }
 
@@ -142,7 +199,6 @@ extension Tabs.Content {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
-                    Divider().background(.white).frame(height: 1)
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             if self.items.count > 0 {
@@ -172,12 +228,15 @@ extension Tabs.Content {
 
             struct TopLevel: View {
                 typealias Button = Tabs.Content.Individual.SingleCompanyHierarchical
-
+                @EnvironmentObject private var state: AppState
                 public var entity: Company
                 @State private var isPresented: Bool = false
 
                 var body: some View {
                     Button(entity: self.entity, callback: self.actionOnTap)
+                        .onAppear(perform: {
+                            self.actionOnAppear(self.entity)
+                        })
 
                     if self.isPresented {
                         if let projects = self.entity.projects?.allObjects as? [Project] {
@@ -198,6 +257,22 @@ extension Tabs.Content {
                 /// - Returns: Void
                 private func actionOnTap(_ company: Company) -> Void {
                     self.isPresented.toggle()
+                }
+                
+                /// Fires on appear
+                /// - Returns: Void
+                private func actionOnAppear(_ company: Company) -> Void {
+                    if self.state.job != nil {
+                        if let project = self.state.job!.project {
+                            if let comp = project.company {
+                                if comp == company {
+                                    self.isPresented = true
+                                } else {
+                                    self.isPresented = false
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -235,12 +310,15 @@ extension Tabs.Content {
 
             struct SecondLevel: View {
                 typealias Button = Tabs.Content.Individual.SingleProjectHierarchical
-
+                @EnvironmentObject private var state: AppState
                 public var entity: Project
                 @State private var isPresented: Bool = false
 
                 var body: some View {
                     Button(entity: self.entity, callback: self.actionOnTap)
+                        .onAppear(perform: {
+                            self.actionOnAppear(self.entity)
+                        })
 
                     if self.isPresented {
                         if let pJobs = self.entity.jobs {
@@ -261,6 +339,20 @@ extension Tabs.Content {
                 /// - Returns: Void
                 private func actionOnTap(_ project: Project) -> Void {
                     self.isPresented.toggle()
+                }
+
+                /// Fires on appear
+                /// - Returns: Void
+                private func actionOnAppear(_ project: Project) -> Void {
+                    if self.state.job != nil {
+                        if let proj = self.state.job!.project {
+                            if proj == project {
+                                self.isPresented = true
+                            } else {
+                                self.isPresented = false
+                            }
+                        }
+                    }
                 }
             }
 
@@ -508,6 +600,7 @@ extension Tabs.Content {
                         }
                     }
                     .id(self.id)
+                    .onAppear(perform: self.actionOpenIfSelected)
                 }
 
                 init(entity: Job) {
@@ -526,7 +619,7 @@ extension Tabs.Content {
                     }
 
                     if let records = self.entity.records?.allObjects as? [LogRecord] {
-                        self.records = records.filter({$0.alive == true}).sorted(by: {$0.timestamp! > $1.timestamp!})
+                        self.records = records.filter({$0.alive == true}).sorted(by: {$0.timestamp ?? Date() > $1.timestamp ?? Date()})
                     }
 
                     if let terms = self.entity.definitions?.allObjects as? [TaxonomyTermDefinitions] {
@@ -534,6 +627,18 @@ extension Tabs.Content {
                     }
 
                     self.colour = Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble)
+                }
+                
+                /// Fired when view loads
+                /// - Returns: Void
+                private func actionOpenIfSelected() -> Void {
+                    if self.state.job != nil {
+                        if self.state.job == self.entity {
+                            self.isPresented = true
+                        } else {
+                            self.isPresented = false
+                        }
+                    }
                 }
 
                 /// Tap/click handler. Opens to show list of jobs.

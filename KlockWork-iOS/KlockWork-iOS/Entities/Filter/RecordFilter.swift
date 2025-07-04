@@ -79,7 +79,7 @@ extension RecordFilter {
     private func actionOnAppear() -> Void {
         self.groupedRecords = []
         if self.records.count > 0 {
-            let grouped = Dictionary(grouping: self.records, by: {$0.timestamp!.formatted(date: .abbreviated, time: .omitted)})
+            let grouped = Dictionary(grouping: self.records, by: {($0.timestamp ?? Date()).formatted(date: .abbreviated, time: .omitted)})
             let sorted = Array(grouped)
                 .sorted(by: {
                     let df = DateFormatter()
@@ -96,7 +96,7 @@ extension RecordFilter {
 
             for group in sorted {
                 self.groupedRecords.append(
-                    RecordsGroupedByDate(date: group.key, records: group.value.sorted(by: {$0.timestamp! < $1.timestamp!}))
+                    RecordsGroupedByDate(date: group.key, records: group.value.sorted(by: {$0.timestamp ?? Date() < $1.timestamp ?? Date()}))
                 )
             }
         }
@@ -107,7 +107,7 @@ extension RecordFilter {
     private func actionOnSubmit() -> Void {
         self.groupedRecords = []
         if self.records.count > 0 {
-            let grouped = Dictionary(grouping: self.records, by: {$0.timestamp!.formatted(date: .abbreviated, time: .omitted)})
+            let grouped = Dictionary(grouping: self.records, by: {($0.timestamp ?? Date()).formatted(date: .abbreviated, time: .omitted)})
             let sorted = Array(grouped)
                 .sorted(by: {
                     let df = DateFormatter()
@@ -125,12 +125,12 @@ extension RecordFilter {
             for group in sorted {
                 if self.searchText.isEmpty {
                     self.groupedRecords.append(
-                        RecordsGroupedByDate(date: group.key, records: group.value.sorted(by: {$0.timestamp! < $1.timestamp!}))
+                        RecordsGroupedByDate(date: group.key, records: group.value.sorted(by: {$0.timestamp ?? Date() < $1.timestamp ?? Date()}))
                     )
                 } else {
                     let matchingRecords = group.value.filter({$0.message?.contains(self.searchText.lowercased()) ?? false})
                     self.groupedRecords.append(
-                        RecordsGroupedByDate(date: group.key, records: matchingRecords.sorted(by: {$0.timestamp! < $1.timestamp!}))
+                        RecordsGroupedByDate(date: group.key, records: matchingRecords.sorted(by: {$0.timestamp ?? Date() < $1.timestamp ?? Date()}))
                     )
                 }
             }

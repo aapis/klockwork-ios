@@ -24,7 +24,8 @@ extension Tabs.Content {
                         colour: record.job != nil ? record.job!.backgroundColor : Theme.rowColour,
                         extraColumn: AnyView(
                             VStack(alignment: .leading, spacing: 1) {
-                                Timestamp(text: record.timestamp!.formatted(date: .omitted, time: .shortened))
+                                Timestamp(text: (record.timestamp ?? Date()).formatted(date: .omitted, time: .shortened), alignment: .trailing)
+                                    .frame(maxWidth: 55)
                             }
                         )
                     )
@@ -76,7 +77,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.record?.message ?? "_RECORD_CONTENT")
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
@@ -236,7 +237,7 @@ extension Tabs.Content {
                             Text(term.name ?? "_TERM_NAME")
                                 .font(.title3)
                                 .fontWeight(.heavy)
-                                .multilineTextAlignment(.leading)
+                                .lineLimit(1)
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundStyle(.gray)
@@ -248,7 +249,7 @@ extension Tabs.Content {
                                 HStack(alignment: .top) {
                                     Text("1. ")
                                     Text(term.definition ?? "_TERM_DEFINITION")
-                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(1)
                                     Spacer()
                                 }
                                 .padding(8)
@@ -431,7 +432,8 @@ extension Tabs.Content {
                     } label: {
                         HStack(alignment: .center) {
                             Text(job?.title ?? job?.jid.string ?? "Job title")
-                                .multilineTextAlignment(.leading)
+                                .lineLimit(1)
+
                             Spacer()
                         }
                         .padding(.bottom, 8)
@@ -446,7 +448,7 @@ extension Tabs.Content {
                                             self.isCompanyPresented.toggle()
                                         } label: {
                                             Text(company.abbreviation!)
-                                                .multilineTextAlignment(.leading)
+                                                .lineLimit(1)
                                                 .underline(true, pattern: .dot)
                                         }
                                     }
@@ -459,7 +461,7 @@ extension Tabs.Content {
                                         self.isProjectPresented.toggle()
                                     } label: {
                                         Text(project.abbreviation!)
-                                            .multilineTextAlignment(.leading)
+                                            .lineLimit(1)
                                             .underline(true, pattern: .dot)
                                     }
                                 }
@@ -596,7 +598,7 @@ extension Tabs.Content {
                     } label: {
                         HStack(alignment: .center) {
                             Text(job?.title ?? job?.jid.string ?? "Job title")
-                                .multilineTextAlignment(.leading)
+                                .lineLimit(1)
                             Spacer()
                         }
                         .padding(.bottom, 8)
@@ -611,7 +613,7 @@ extension Tabs.Content {
                                             self.isCompanyPresented.toggle()
                                         } label: {
                                             Text(company.abbreviation!)
-                                                .multilineTextAlignment(.leading)
+                                                .lineLimit(1)
                                                 .underline(true, pattern: .dot)
                                         }
                                     }
@@ -624,7 +626,7 @@ extension Tabs.Content {
                                         self.isProjectPresented.toggle()
                                     } label: {
                                         Text(project.abbreviation!)
-                                            .multilineTextAlignment(.leading)
+                                            .lineLimit(1)
                                             .underline(true, pattern: .dot)
                                     }
                                 }
@@ -896,7 +898,7 @@ extension Tabs.Content {
                     } label: {
                         HStack(alignment: .center) {
                             Text(task.content ?? "_TASK_CONTENT")
-                                .multilineTextAlignment(.leading)
+                                .lineLimit(1)
                             Spacer()
                         }
                         .padding(.bottom, 8)
@@ -911,7 +913,7 @@ extension Tabs.Content {
                                             self.isCompanyPresented.toggle()
                                         } label: {
                                             Text(company.abbreviation!)
-                                                .multilineTextAlignment(.leading)
+                                                .lineLimit(1)
                                                 .underline(true, pattern: .dot)
                                         }
                                     }
@@ -924,7 +926,7 @@ extension Tabs.Content {
                                         self.isProjectPresented.toggle()
                                     } label: {
                                         Text(project.abbreviation!)
-                                            .multilineTextAlignment(.leading)
+                                            .lineLimit(1)
                                             .underline(true, pattern: .dot)
                                     }
                                 }
@@ -936,7 +938,7 @@ extension Tabs.Content {
                                         self.isJobPresented.toggle()
                                     } label: {
                                         Text((task.owner?.title ?? task.owner?.jid.string)!)
-                                            .multilineTextAlignment(.leading)
+                                            .lineLimit(1)
                                             .underline(true, pattern: .dot)
                                     }
                                 }
@@ -947,7 +949,7 @@ extension Tabs.Content {
                         if task.due != nil {
                             HStack(alignment: .center) {
                                 Text("Due: \(task.due!.formatted(date: self.includeDueDate ? .abbreviated : .omitted, time: .complete))")
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                             }
                         }
@@ -1120,7 +1122,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.note?.title ?? "_NOTE_TITLE")
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
@@ -1247,7 +1249,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.entity?.name ?? "_NAME")
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
@@ -1359,7 +1361,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.entity?.name ?? "_NAME")
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
@@ -1518,7 +1520,7 @@ extension Tabs.Content {
                                     .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
                                     .opacity(0.7)
                                     .padding(.leading, 8)
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                                 RowAddNavLink(
                                     title: "+ Person",
@@ -1580,7 +1582,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.person?.name ?? "_NAME")
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
@@ -1709,7 +1711,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.entity?.name ?? "_NAME")
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
@@ -1819,7 +1821,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.entity?.name ?? "_NAME")
-                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(1)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
