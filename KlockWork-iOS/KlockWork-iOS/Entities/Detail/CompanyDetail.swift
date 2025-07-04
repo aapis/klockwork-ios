@@ -112,6 +112,14 @@ struct CompanyDetail: View {
                 )
                 .presentationBackground(self.page.primaryColour)
             }
+            .onChange(of: self.isDefault) {
+                let model = CoreDataCompanies(moc: self.state.moc)
+                if let company = model.findDefault() {
+                    if self.isDefault == true && company != self.company {
+                        model.unsetDefault()
+                    }
+                }
+            }
         }
     }
 }
@@ -128,6 +136,7 @@ extension CompanyDetail {
             if let nm = company.name {name = nm}
             if let ab = company.abbreviation {abbreviation = ab}
             if let co = company.colour {colour = Color.fromStored(co)}
+            self.isDefault = company.isDefault
         } else {
             self.createdDate = self.state.date
         }
@@ -145,6 +154,7 @@ extension CompanyDetail {
             self.company!.projects = NSSet(array: self.projects)
             self.company!.alive = self.alive
             self.company!.hidden = self.hidden
+            self.company!.isDefault = self.isDefault
         } else {
             CoreDataCompanies(moc: self.state.moc).create(
                 name: self.name,
