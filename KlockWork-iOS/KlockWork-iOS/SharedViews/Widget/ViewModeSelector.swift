@@ -16,28 +16,41 @@ struct ViewModeSelector: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 0) {
                 Button {
+                    self.viewMode = .calendar
+                    self.storedVm = self.viewMode.id
+                } label: {
+                    Image(systemName: "calendar")
+                }
+                .disabled(self.storedVm == 2)
+                .padding(8)
+                .background(self.storedVm == 2 ? self.state.theme.tint : .black.opacity(0.1))
+                .foregroundStyle(self.storedVm == 2 ? Theme.cPurple : self.state.theme.tint)
+                .clipShape(.rect(topLeadingRadius: 4))
+
+                Button {
                     self.viewMode = .tabular
                     self.storedVm = self.viewMode.id
                 } label: {
                     Image(systemName: "tablecells")
                 }
                 .disabled(self.storedVm == 0)
-                .padding(5)
+                .padding(8)
                 .background(self.storedVm == 0 ? self.state.theme.tint : .black.opacity(0.1))
-                .foregroundStyle(self.storedVm == 0 ? Theme.cPurple : self.state.theme.tint )
-                .clipShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
+                .foregroundStyle(self.storedVm == 0 ? Theme.cPurple : self.state.theme.tint)
 
                 Button {
                     self.viewMode = .hierarchical
                     self.storedVm = self.viewMode.id
                 } label: {
-                    Image(systemName: "list.bullet")
+                    Image(systemName: "list.bullet.indent")
                 }
                 .disabled(self.storedVm == 1)
-                .padding(5)
+                .padding(8)
+                .padding(.top, 2)
+                .padding(.bottom, 1)
                 .background(self.storedVm == 1 ? self.state.theme.tint : .black.opacity(0.1))
                 .foregroundStyle(self.storedVm == 1 ? Theme.cPurple : self.state.theme.tint)
-                .clipShape(.rect(bottomTrailingRadius: 6, topTrailingRadius: 6))
+                .clipShape(.rect(topTrailingRadius: 4))
             }
         }
         .onAppear(perform: self.actionOnAppear)
