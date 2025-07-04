@@ -105,19 +105,11 @@ extension Tabs {
                             Button {
                                 selected = page
                             } label: {
-                                if page == .jobs {
-                                    (page == selected ? page.selectedIcon : page.icon)
-                                        .frame(maxHeight: 20)
-                                        .padding(14)
-                                        .background(page == selected ? Theme.darkBtnColour : .clear)
-                                        .foregroundStyle(self.state.job == nil ? page == selected ? self.state.theme.tint : .gray : self.state.job!.backgroundColor)
-                                } else {
-                                    (page == selected ? page.selectedIcon : page.icon)
-                                        .frame(maxHeight: 20)
-                                        .padding(14)
-                                        .background(page == selected ? Theme.darkBtnColour : .clear)
-                                        .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
-                                }
+                                (page == selected ? page.selectedIcon : page.icon)
+                                    .frame(maxHeight: 20)
+                                    .padding(14)
+                                    .background(page == selected ? Theme.darkBtnColour : .clear)
+                                    .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
                             }
                             .buttonStyle(.plain)
                         }
