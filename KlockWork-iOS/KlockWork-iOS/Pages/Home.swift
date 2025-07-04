@@ -1022,8 +1022,11 @@ extension Home.QuickHistory {
                             )
                             SectionTitle(
                                 label: "Interactions",
-                                fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : .white
+                                fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : Theme.lightWhite,
+                                alignment: .trailing
                             )
+                            .padding(4)
+                            .background(Theme.textBackground)
                             VStack(alignment: .leading, spacing: 1) {
                                 ForEach(self.recentInteractions, id: \.self) { timestamp in
                                     GenericTappableRowWithIcon(
@@ -1032,22 +1035,12 @@ extension Home.QuickHistory {
                                         callback: AnyView(
                                             Tabs.Content.List.Records(
                                                 job: self.$job,
-                                                date: self.state.date, // @TODO: convert `timestamp` and use
+                                                date: DateHelper.date(from: timestamp, format: "MMM, dd, yyyy") ?? Date(),
                                                 inSheet: false
                                             )
                                             .background(Theme.cPurple)
+                                            .navigationTitle(timestamp)
                                         )
-                                        //{
-                                        // @TODO: this kinda works but something about the format is wrong so this sends
-                                        // you to the wrong date
-                                        //                                        let df = DateFormatter()
-                                        //                                        df.dateFormat = DateFormatter.Style.medium //"MMM dd, yyyy"
-                                        //
-                                        //                                        if let date = df.date(from: timestamp) {
-                                        //                                            self.state.date = DateHelper.startOfDay(date)
-                                        //                                        }
-                                        //                                        self.state.job = nil
-                                        //}
                                     )
                                 }
                             }
@@ -1122,7 +1115,7 @@ extension Home.QuickHistory {
         public var title: String
         public var icon: String = "hammer.circle.fill"
         public var colour: Color = Theme.textBackground
-        public var iconColour: Color = Theme.base
+        public var iconColour: Color? = nil
         public var callback: AnyView? = nil
 
         var body: some View {
@@ -1132,8 +1125,12 @@ extension Home.QuickHistory {
                 }
             } label: {
                 HStack {
-                    Image(systemName: self.icon)
-                        .foregroundStyle(self.iconColour)
+                    if self.iconColour != nil {
+                        Image(systemName: self.icon)
+                            .foregroundStyle(self.iconColour!)
+                    } else {
+                        Image(systemName: self.icon)
+                    }
                     Text(self.title)
                         .lineLimit(1)
                     Spacer()
