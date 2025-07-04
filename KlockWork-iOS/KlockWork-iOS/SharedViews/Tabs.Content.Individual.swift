@@ -77,7 +77,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.record?.message ?? "_RECORD_CONTENT")
-                                    .lineLimit(1)
+                                    .multilineTextAlignment(.leading)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
@@ -249,7 +249,7 @@ extension Tabs.Content {
                                 HStack(alignment: .top) {
                                     Text("1. ")
                                     Text(term.definition ?? "_TERM_DEFINITION")
-                                        .lineLimit(1)
+                                        .multilineTextAlignment(.leading)
                                     Spacer()
                                 }
                                 .padding(8)
@@ -898,7 +898,7 @@ extension Tabs.Content {
                     } label: {
                         HStack(alignment: .center) {
                             Text(task.content ?? "_TASK_CONTENT")
-                                .lineLimit(1)
+                                .multilineTextAlignment(.leading)
                             Spacer()
                         }
                         .padding(.bottom, 8)
