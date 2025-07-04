@@ -32,7 +32,13 @@ struct TaskForecast: View {
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.forecast = []
-        let dates = Date()..<DateHelper.daysAhead(self.daysToShow)
+
+        var dates = Date()..<Date()
+        if self.daysToShow < 0 {
+            dates = DateHelper.daysAhead(self.daysToShow)..<Date()
+        } else {
+            dates = Date()..<DateHelper.daysAhead(self.daysToShow)
+        }
         let hrs24: TimeInterval = 60*60*24
 
         for date in stride(from: dates.lowerBound, to: dates.upperBound, by: hrs24) {
