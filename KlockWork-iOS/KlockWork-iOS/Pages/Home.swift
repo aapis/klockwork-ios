@@ -1036,10 +1036,10 @@ extension Home.QuickHistory {
                                             Tabs.Content.List.Records(
                                                 job: self.$job,
                                                 date: DateHelper.date(from: timestamp, format: "MMM, dd, yyyy") ?? Date(),
-                                                inSheet: false
+                                                inSheet: false,
+                                                pageTitle: timestamp
                                             )
                                             .background(Theme.cPurple)
-                                            .navigationTitle(timestamp)
                                         )
                                     )
                                 }

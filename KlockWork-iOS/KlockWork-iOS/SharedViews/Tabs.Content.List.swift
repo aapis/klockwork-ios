@@ -42,6 +42,7 @@ extension Tabs.Content {
         struct Records: View {
             @EnvironmentObject private var state: AppState
             public var inSheet: Bool
+            public var pageTitle: String = "Records"
             @FetchRequest private var items: FetchedResults<LogRecord>
             @Binding public var job: Job?
             private var date: Date
@@ -61,13 +62,14 @@ extension Tabs.Content {
                 .listRowSpacing(.none)
                 .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
-                .navigationTitle("Records")
+                .navigationTitle(self.pageTitle)
             }
 
-            init(job: Binding<Job?>, date: Date, inSheet: Bool) {
+            init(job: Binding<Job?>, date: Date, inSheet: Bool, pageTitle: String = "Records") {
                 _job = job
                 self.date = date
                 self.inSheet = inSheet
+                self.pageTitle = pageTitle
                 _items = CoreDataRecords.fetch(for: self.date)
             }
         }
