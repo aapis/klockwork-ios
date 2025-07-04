@@ -68,12 +68,12 @@ extension SearchLibrary.SearchEngine {
         var results = SearchLibrary.SearchResults()
         results.add(await CompanyEntityView(entityType: .companies, term: self.term!))
         results.add(await JobsEntityView(entityType: .jobs, term: self.term!))
-        results.add(await NotesEntityView(entityType: .notes, term: self.term!))
-        results.add(await PeopleEntityView(entityType: .people, term: self.term!))
         results.add(await ProjectsEntityView(entityType: .projects, term: self.term!))
-        results.add(await RecordsEntityView(entityType: .records, term: self.term!))
-        results.add(await TasksEntityView(entityType: .tasks, term: self.term!))
         results.add(await TermEntityView(entityType: .terms, term: self.term!))
+        results.add(await TasksEntityView(entityType: .tasks, term: self.term!))
+        results.add(await PeopleEntityView(entityType: .people, term: self.term!))
+        results.add(await NotesEntityView(entityType: .notes, term: self.term!))
+        results.add(await RecordsEntityView(entityType: .records, term: self.term!))
         return results
     }
 
@@ -87,16 +87,16 @@ extension SearchLibrary.SearchEngine {
         @FetchRequest public var results: FetchedResults<Company>
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                TitleBar(selected: $entityType, open: $open, count: results.count)
+            if self.results.count > 0 {
+                VStack(alignment: .leading, spacing: 1) {
+                    TitleBar(selected: $entityType, open: $open, count: results.count)
 
-                if open {
-                    if !results.isEmpty {
-                        ForEach(results) { entity in
-                            Row(company: entity)
+                    if open {
+                        if !results.isEmpty {
+                            ForEach(results) { entity in
+                                Row(company: entity)
+                            }
                         }
-                    } else {
-                        StatusMessage.Warning(message: "No companies matched")
                     }
                 }
             }
@@ -104,7 +104,6 @@ extension SearchLibrary.SearchEngine {
 
         init(entityType: EntityType, term: String) {
             self.entityType = entityType
-
             _results = CoreDataCompanies.fetchMatching(term: term)
         }
     }
@@ -118,16 +117,16 @@ extension SearchLibrary.SearchEngine {
         @FetchRequest public var results: FetchedResults<Job>
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                TitleBar(selected: $entityType, open: $open, count: results.count)
+            if self.results.count > 0 {
+                VStack(alignment: .leading, spacing: 1) {
+                    TitleBar(selected: $entityType, open: $open, count: results.count)
 
-                if open {
-                    if !results.isEmpty {
-                        ForEach(results) { entity in
-                            Row(job: entity)
+                    if open {
+                        if !results.isEmpty {
+                            ForEach(results) { entity in
+                                Row(job: entity)
+                            }
                         }
-                    } else {
-                        StatusMessage.Warning(message: "No jobs matched")
                     }
                 }
             }
@@ -135,7 +134,6 @@ extension SearchLibrary.SearchEngine {
 
         init(entityType: EntityType, term: String) {
             self.entityType = entityType
-
             _results = CoreDataJob.fetchMatching(term: term)
         }
     }
@@ -149,16 +147,16 @@ extension SearchLibrary.SearchEngine {
         @FetchRequest public var results: FetchedResults<Note>
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                TitleBar(selected: $entityType, open: $open, count: results.count)
+            if self.results.count > 0 {
+                VStack(alignment: .leading, spacing: 1) {
+                    TitleBar(selected: $entityType, open: $open, count: results.count)
 
-                if open {
-                    if !results.isEmpty {
-                        ForEach(results) { entity in
-                            Row(note: entity)
+                    if open {
+                        if !results.isEmpty {
+                            ForEach(results) { entity in
+                                Row(note: entity)
+                            }
                         }
-                    } else {
-                        StatusMessage.Warning(message: "No notes matched")
                     }
                 }
             }
@@ -166,7 +164,6 @@ extension SearchLibrary.SearchEngine {
 
         init(entityType: EntityType, term: String) {
             self.entityType = entityType
-
             _results = CoreDataNotes.fetchMatching(term: term)
         }
     }
@@ -180,16 +177,16 @@ extension SearchLibrary.SearchEngine {
         @FetchRequest public var results: FetchedResults<Person>
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                TitleBar(selected: $entityType, open: $open, count: results.count)
+            if self.results.count > 0 {
+                VStack(alignment: .leading, spacing: 1) {
+                    TitleBar(selected: $entityType, open: $open, count: results.count)
 
-                if open {
-                    if !results.isEmpty {
-                        ForEach(results) { entity in
-                            Row(person: entity)
+                    if open {
+                        if !results.isEmpty {
+                            ForEach(results) { entity in
+                                Row(person: entity)
+                            }
                         }
-                    } else {
-                        StatusMessage.Warning(message: "No people matched")
                     }
                 }
             }
@@ -197,7 +194,6 @@ extension SearchLibrary.SearchEngine {
 
         init(entityType: EntityType, term: String) {
             self.entityType = entityType
-
             _results = CoreDataPerson.fetchMatching(term: term)
         }
     }
@@ -211,16 +207,16 @@ extension SearchLibrary.SearchEngine {
         @FetchRequest public var results: FetchedResults<Project>
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                TitleBar(selected: $entityType, open: $open, count: results.count)
+            if self.results.count > 0 {
+                VStack(alignment: .leading, spacing: 1) {
+                    TitleBar(selected: $entityType, open: $open, count: results.count)
 
-                if open {
-                    if !results.isEmpty {
-                        ForEach(results) { entity in
-                            Row(project: entity)
+                    if open {
+                        if !results.isEmpty {
+                            ForEach(results) { entity in
+                                Row(project: entity)
+                            }
                         }
-                    } else {
-                        StatusMessage.Warning(message: "No projects matched")
                     }
                 }
             }
@@ -228,7 +224,6 @@ extension SearchLibrary.SearchEngine {
 
         init(entityType: EntityType, term: String) {
             self.entityType = entityType
-
             _results = CoreDataProjects.fetchMatching(term: term)
         }
     }
@@ -242,16 +237,16 @@ extension SearchLibrary.SearchEngine {
         @FetchRequest public var results: FetchedResults<LogRecord>
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                TitleBar(selected: $entityType, open: $open, count: results.count)
+            if self.results.count > 0 {
+                VStack(alignment: .leading, spacing: 1) {
+                    TitleBar(selected: $entityType, open: $open, count: results.count)
 
-                if open {
-                    if !results.isEmpty {
-                        ForEach(results) { entity in
-                            Row(record: entity)
+                    if open {
+                        if !results.isEmpty {
+                            ForEach(results) { entity in
+                                Row(record: entity)
+                            }
                         }
-                    } else {
-                        StatusMessage.Warning(message: "No records matched")
                     }
                 }
             }
@@ -259,7 +254,6 @@ extension SearchLibrary.SearchEngine {
 
         init(entityType: EntityType, term: String) {
             self.entityType = entityType
-
             _results = CoreDataRecords.fetchMatching(term: term)
         }
     }
@@ -273,16 +267,16 @@ extension SearchLibrary.SearchEngine {
         @FetchRequest public var results: FetchedResults<LogTask>
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                TitleBar(selected: $entityType, open: $open, count: results.count)
+            if self.results.count > 0 {
+                VStack(alignment: .leading, spacing: 1) {
+                    TitleBar(selected: $entityType, open: $open, count: results.count)
 
-                if open {
-                    if !results.isEmpty {
-                        ForEach(results) { entity in
-                            Row(task: entity)
+                    if open {
+                        if !results.isEmpty {
+                            ForEach(results) { entity in
+                                Row(task: entity)
+                            }
                         }
-                    } else {
-                        StatusMessage.Warning(message: "No tasks matched")
                     }
                 }
             }
@@ -303,16 +297,16 @@ extension SearchLibrary.SearchEngine {
         @FetchRequest public var results: FetchedResults<TaxonomyTerm>
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                TitleBar(selected: $entityType, open: $open, count: results.count)
+            if self.results.count > 0 {
+                VStack(alignment: .leading, spacing: 1) {
+                    TitleBar(selected: $entityType, open: $open, count: results.count)
 
-                if open {
-                    if !results.isEmpty {
-                        ForEach(results) { entity in
-                            Row(term: entity)
+                    if open {
+                        if !results.isEmpty {
+                            ForEach(results) { entity in
+                                Row(term: entity)
+                            }
                         }
-                    } else {
-                        StatusMessage.Warning(message: "No tasks matched")
                     }
                 }
             }
