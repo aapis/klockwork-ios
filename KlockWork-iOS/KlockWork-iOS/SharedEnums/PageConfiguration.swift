@@ -119,6 +119,34 @@ extension PageConfiguration {
             case .terms: Image(systemName: "list.bullet.rectangle.fill")
             }
         }
+        
+        /// Icon as string
+        var iconString: String {
+            switch self {
+            case .records: "tray"
+            case .tasks: "checklist"
+            case .notes: "note.text"
+            case .people: "person.2"
+            case .companies: "building.2"
+            case .projects: "folder"
+            case .jobs: "hammer"
+            case .terms: "list.bullet.rectangle"
+            }
+        }
+
+        /// Selected icon as string
+        var iconSelectedString: String {
+            switch self {
+            case .records: "tray.fill"
+            case .tasks: "checklist"
+            case .notes: "note.text"
+            case .people: "person.2.fill"
+            case .companies: "building.2.fill"
+            case .projects: "folder.fill"
+            case .jobs: "hammer.fill"
+            case .terms: "list.bullet.rectangle.fill"
+            }
+        }
     }
     
     enum AppPage: CaseIterable, Equatable {
