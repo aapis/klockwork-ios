@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import CoreData
 
 public enum TabbedWidget {
-    case record, search
+    case record, search, notes, jobs
 }
 
 struct Home: View {
@@ -28,17 +29,17 @@ struct Home: View {
                     Header(page: self.page, path: $path)
                     Divider().background(.gray).frame(height: 1)
                 }
-                ZStack(alignment: .bottomTrailing) {
+                ZStack(alignment: .bottom) {
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(alignment: .leading) {
                             QuickAccessTabs()
-                            TasksGroup()
                             QuickHistory()
+                            TasksGroup()
                         }
                     }
                     QuickCreateWidget()
                 }
-                .padding()
+                .padding(8)
             }
             .background(self.backgroundColour)
         }
@@ -76,9 +77,19 @@ extension Home {
                         Button {
                             self.isCalendarPresented.toggle()
                         } label: {
-                            HStack(spacing: 0) {
-                                PageTitle(text: "KlockWork @ \(DateHelper.todayShort(self.state.date, format: "MMM dd"))")
+                            HStack {
+                                PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMMM dd"))
                                 Spacer()
+                                Button {
+                                    self.state.job = nil
+                                } label: {
+                                    Image(systemName: "arrow.clockwise")
+                                        .padding([.leading, .trailing], 8)
+                                        .padding([.top, .bottom], 6)
+                                }
+                                .buttonStyle(.plain)
+                                .foregroundStyle(self.state.theme.tint)
+
                                 NavigationLink {
                                     AppSettings()
                                 } label: {
@@ -114,12 +125,13 @@ extension Home {
 
     struct Block: View {
         @EnvironmentObject private var state: AppState
+        @FetchRequest private var tasks: FetchedResults<LogTask>
         public var colour: Color = .clear
         public var label: String = "Block"
         public var icon: String = "circle.circle.fill"
         public var predicate: NSPredicate
         public var target: AnyView? = nil
-        @FetchRequest public var tasks: FetchedResults<LogTask>
+        public var des: Int = 0
 
         var body: some View {
             NavigationLink {
@@ -128,34 +140,72 @@ extension Home {
                         .navigationTitle(self.label)
                 }
             } label: {
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack(alignment: .top) {
-                        Image(systemName: self.icon)
-                            .font(.title)
-                            .foregroundStyle(self.colour)
-                        Spacer()
-                        Text(String(self.tasks.count))
-                            .font(.title2)
-                            .bold()
-                    }
-                    .padding(.bottom, 25)
-                    HStack(alignment: .center) {
-                        Text(self.label)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.subheadline)
-                            .opacity(0.3)
-                    }
+                if self.des == 0 {
+                    self.desOne
+                } else if self.des == 1 {
+                    self.desTwo
                 }
-                .padding()
-                .background(
-                    ZStack {
-                        Theme.textBackground
-                        LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    }
-                )
-                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
             }
+        }
+
+        var desOne: some View {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .top) {
+                    Image(systemName: self.icon)
+                        .font(.title)
+                        .foregroundStyle(self.colour)
+                    Spacer()
+                    Text(String(self.tasks.count))
+                        .font(.title2)
+                        .bold()
+                }
+                .padding(.bottom, 25)
+                HStack(alignment: .center) {
+                    Text(self.label)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.subheadline)
+                        .opacity(0.3)
+                }
+            }
+            .padding()
+            .background(
+                ZStack {
+                    Theme.textBackground
+                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                }
+            )
+            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
+        }
+
+        var desTwo: some View {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack {
+                    SectionTitle(
+                        label: self.label,
+                        uppercase: false,
+                        fgColour: Theme.base,
+                        icon: self.icon,
+                        font: .body
+                    )
+                    Spacer()
+                    SectionTitle(
+                        label: String(self.tasks.count),
+                        uppercase: false,
+                        fgColour: Theme.base,
+                        font: .body
+                    )
+                    Image(systemName: "chevron.right")
+                        .opacity(0.3)
+                }
+                .bold()
+                .padding(4)
+//                .font(.caption)
+                .foregroundStyle(Theme.base)
+                .background(self.colour == .clear ? self.tasks.count < 10 ? .yellow : self.tasks.count < 20 ? .orange : .red : self.colour)
+            }
+            .background(Theme.textBackground)
+            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
         }
     }
 
@@ -222,6 +272,326 @@ extension Home {
         }
     }
 
+    struct QuickHistory: View {
+        @EnvironmentObject private var state: AppState
+        private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
+
+        var body: some View {
+            VStack(alignment: .leading) {
+                SectionTitle(
+                    label: "Quick History",
+                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                )
+                .padding([.leading, .top], 4)
+                LazyVGrid(columns: self.col2, alignment: .leading) {
+                    RecentJobsWidget()
+                    JobOverviewWidget()
+                }
+            }
+            .padding(4)
+            .background(
+                ZStack {
+                    self.state.job?.backgroundColor ?? Theme.textBackground
+                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+    }
+
+    struct QuickCreateWidget: View {
+        @EnvironmentObject private var state: AppState
+        @State private var backgroundColour: Color = Theme.cOrange
+        @AppStorage("home.backgroundColour") public var homeBackgroundColourChoice: Int = 0
+
+        var body: some View {
+            HStack(alignment: .center) {
+                Spacer()
+                AddButton(plain: false)
+                    .foregroundStyle(
+                        self.state.job?.backgroundColor.isBright() ?? false ?
+                            self.backgroundColour
+                        :
+                            self.state.theme.tint
+                    )
+                    .foregroundStyle(self.state.theme.tint)
+                    .clipShape(.capsule(style: .continuous))
+                    .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
+                    .padding()
+                Spacer()
+            }
+            .onAppear(perform: {
+                switch self.homeBackgroundColourChoice {
+                case 1: self.backgroundColour = Theme.cPurple
+                case 2: self.backgroundColour = Theme.cGreen
+                case 3: self.backgroundColour = Theme.cRoyal
+                case 4: self.backgroundColour = Theme.cRed
+                default: self.backgroundColour = Theme.cOrange
+                }
+            })
+        }
+    }
+
+    struct TasksGroup: View {
+        @EnvironmentObject private var state: AppState
+        private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
+
+        var body: some View {
+            VStack(alignment: .leading) {
+                SectionTitle(
+                    label: "Task Overview",
+                    uppercase: true,
+                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                )
+                .padding([.leading, .top], 4)
+                VStack(alignment: .leading, spacing: 1) {
+                    LazyVGrid(columns: self.col2, alignment: .leading) {
+                        VStack(spacing: 1) {
+                            Block(
+                                colour: .green,
+                                label: "Today",
+                                icon: "exclamationmark.circle.fill",
+                                predicate: NSPredicate(
+                                    format: "due > %@ && due < %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                    DateHelper.startOfDay(self.state.date - 86400) as CVarArg,
+                                    DateHelper.endOfDay(self.state.date)! as CVarArg,
+                                ),
+                                target: AnyView(PlanTabs.Overdue()),
+                                des: 1
+                            )
+                            VStack {
+                                StatisticRow(
+                                    label: "Completed"
+                                )
+                                StatisticRow(
+                                    label: "Created"
+                                )
+                                StatisticRow(
+                                    label: "Updated"
+                                )
+                            }
+                            .padding(4)
+                            .background(
+                                ZStack {
+                                    Theme.textBackground
+                                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                                }
+                            )
+                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                        }
+                        VStack(alignment: .leading, spacing: 1) {
+                            Block(
+                                colour: .blue,
+                                label: "Upcoming",
+                                icon: "tray.circle.fill",
+                                predicate: NSPredicate(
+                                    format: "due > %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                    self.state.date as CVarArg
+                                ),
+                                target: AnyView(PlanTabs.Upcoming()),
+                                des: 1
+                            )
+                            VStack {
+                                StatisticRow(
+                                    label: "Today"
+                                )
+                                StatisticRow(
+                                    label: "Next Week"
+                                )
+                                StatisticRow(
+                                    label: "This Month"
+                                )
+                            }
+                            .padding(4)
+                            .background(
+                                ZStack {
+                                    Theme.textBackground
+                                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                                }
+                            )
+                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                        }
+                        VStack(alignment: .leading, spacing: 1) {
+                            Block(
+                                colour: .red,
+                                label: "Overdue",
+                                icon: "exclamationmark.circle.fill",
+                                predicate: NSPredicate(
+                                    format: "due < %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                    self.state.date as CVarArg
+                                ),
+                                target: AnyView(PlanTabs.Overdue()),
+                                des: 1
+                            )
+                            VStack {
+                                StatisticRow(
+                                    label: "Yesterday"
+                                )
+                                StatisticRow(
+                                    label: "Last Week"
+                                )
+                                StatisticRow(
+                                    label: "This Month"
+                                )
+                            }
+                            .padding(4)
+                            .background(
+                                ZStack {
+                                    Theme.textBackground
+                                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                                }
+                            )
+                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                        }
+                        VStack(alignment: .leading, spacing: 1) {
+                            Block(
+                                label: "Delayed",
+                                icon: "tray.circle.fill",
+                                predicate: NSPredicate(
+                                    format: "(created != due && due > %@) && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                    self.state.date as CVarArg
+                                ),
+                                target: AnyView(PlanTabs.Upcoming()),
+                                des: 1
+                            )
+                            VStack {
+                                StatisticRow(
+                                    label: "Today"
+                                )
+                                StatisticRow(
+                                    label: "Next Week"
+                                )
+                                StatisticRow(
+                                    label: "This Month"
+                                )
+                            }
+                            .padding(4)
+                            .background(
+                                ZStack {
+                                    Theme.textBackground
+                                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                                }
+                            )
+                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                        }
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(Theme.lightWhite)
+            }
+            .padding(4)
+            .background(
+                ZStack {
+                    (self.state.job?.backgroundColor ?? Theme.textBackground)
+                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+    }
+
+    struct QuickAccessTabs: View {
+        @EnvironmentObject private var state: AppState
+        @State private var selectedWidgetTab: TabbedWidget = .record
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 0) {
+                // Tabs
+                HStack(spacing: 1) {
+                    Button {
+                        self.selectedWidgetTab = .record
+                    } label: {
+                        Image(systemName: PageConfiguration.EntityType.records.iconString)
+                            .padding(8)
+                            .padding([.top, .bottom], 1)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .background(
+                        ZStack(alignment: .bottom) {
+                            (self.selectedWidgetTab == .record ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
+                            LinearGradient(colors: [.clear, (self.selectedWidgetTab == .record && self.state.job != nil ? Color.black : Color.clear).opacity(0.7)], startPoint: .top, endPoint: .bottom)
+                                .blendMode(.softLight)
+                                .frame(height: 15)
+                        }
+                    )
+                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
+
+                    Button {
+                        self.selectedWidgetTab = .search
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .padding(8)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .background(
+                        ZStack(alignment: .bottom) {
+                            (self.selectedWidgetTab == .search ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
+                            LinearGradient(colors: [.clear, (self.selectedWidgetTab == .search && self.state.job != nil ? Color.black : Color.clear).opacity(0.7)], startPoint: .top, endPoint: .bottom)
+                                .blendMode(.softLight)
+                                .frame(height: 15)
+                        }
+                    )
+                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
+
+                    Button {
+                        self.selectedWidgetTab = .notes
+                    } label: {
+                        Image(systemName: PageConfiguration.EntityType.notes.iconString)
+                            .padding(8)
+                            .padding([.top, .bottom], 1)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .background(
+                        ZStack(alignment: .bottom) {
+                            (self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
+                            LinearGradient(colors: [.clear, (self.selectedWidgetTab == .notes && self.state.job != nil ? Color.black : Color.clear).opacity(0.7)], startPoint: .top, endPoint: .bottom)
+                                .blendMode(.softLight)
+                                .frame(height: 15)
+                        }
+                    )
+                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
+
+                    Button {
+                        self.selectedWidgetTab = .jobs
+                    } label: {
+                        Image(systemName: PageConfiguration.EntityType.jobs.iconString)
+                            .padding([.leading, .trailing], 8)
+                            .padding([.top, .bottom], 6)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .background(
+                        ZStack(alignment: .bottom) {
+                            (self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
+                            LinearGradient(colors: [.clear, (self.selectedWidgetTab == .jobs && self.state.job != nil ? Color.black : Color.clear).opacity(0.7)], startPoint: .top, endPoint: .bottom)
+                                .blendMode(.softLight)
+                                .frame(height: 15)
+                        }
+                    )
+                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
+                }
+                .font(.system(.body, design: .monospaced))
+                .padding(.leading, 8)
+
+                // View bodies
+                if self.selectedWidgetTab == .record {
+                    QuickRecordPanel()
+                } else if self.selectedWidgetTab == .search {
+                    QuickSearchPanel()
+                } else if self.selectedWidgetTab == .notes {
+                    FavouriteNotes()
+                } else if self.selectedWidgetTab == .jobs {
+                    FavouriteJobs()
+                }
+            }
+        }
+    }
+}
+
+extension Home.QuickAccessTabs {
     struct QuickRecordPanel: View {
         @EnvironmentObject private var state: AppState
         @State private var content: String = ""
@@ -287,7 +657,7 @@ extension Home {
                 }
                 .background(
                     ZStack {
-                        Theme.textBackground.opacity(self.hasFocus ? 1 : 0.4)
+                        Theme.textBackground.opacity(self.hasFocus ? 1 : 0.5)
                         LinearGradient(colors: [.clear, Theme.textBackground.opacity(self.hasFocus ? 1 : 0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -301,133 +671,8 @@ extension Home {
                     LinearGradient(colors: [.clear, Theme.textBackground.opacity(self.hasFocus ? 1 : 0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)
                 }
             )
-            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4, topTrailingRadius: 4))
-            .onAppear(perform: self.actionOnAppear)
-        }
-    }
-
-    struct QuickHistory: View {
-        @EnvironmentObject private var state: AppState
-        private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
-
-        var body: some View {
-            VStack(alignment: .leading) {
-                HStack {
-                    SectionTitle(
-                        label: "Quick History",
-                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
-                    )
-                    .padding([.leading, .top], 4)
-                    SectionTitle(
-                        label: "Interactions on date",
-                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite,
-                        alignment: .trailing
-                    )
-                }
-
-                LazyVGrid(columns: self.col2, alignment: .leading) {
-                    RecentJobsWidget()
-                    JobOverviewWidget()
-                }
-            }
-            .padding(4)
-            .background(
-                ZStack {
-                    self.state.job?.backgroundColor ?? Theme.textBackground
-                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
-                }
-            )
             .clipShape(RoundedRectangle(cornerRadius: 4))
-        }
-    }
-
-    struct QuickCreateWidget: View {
-        @EnvironmentObject private var state: AppState
-
-        var body: some View {
-            HStack(alignment: .center) {
-                Spacer()
-                AddButton()
-                    .bold()
-                    .padding(10)
-                    .padding(.leading, 8)
-                    .background(self.state.job?.backgroundColor ?? Theme.cPurple)
-                    .foregroundStyle(self.state.theme.tint)
-                    .clipShape(Circle())
-            }
-        }
-    }
-
-    struct TasksGroup: View {
-        @EnvironmentObject private var state: AppState
-        private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                LazyVGrid(columns: self.col2, alignment: .leading) {
-                    Block(
-                        colour: .red,
-                        label: "Overdue",
-                        icon: "exclamationmark.circle.fill",
-                        predicate: NSPredicate(
-                            format: "due < %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                            self.state.date as CVarArg
-                        ),
-                        target: AnyView(PlanTabs.Overdue())
-                    )
-                    Block(
-                        colour: .blue,
-                        label: "Upcoming",
-                        icon: "tray.circle.fill",
-                        predicate: NSPredicate(
-                            format: "due > %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                            self.state.date as CVarArg
-                        ),
-                        target: AnyView(PlanTabs.Upcoming())
-                    )
-                }
-                LazyVGrid(columns: self.col2, alignment: .leading) {
-                    VStack {
-                        StatisticRow(
-                            label: "Yesterday"
-                        )
-                        StatisticRow(
-                            label: "Last Week"
-                        )
-                        StatisticRow(
-                            label: "This Month"
-                        )
-                    }
-                    .padding(4)
-                    .background(
-                        ZStack {
-                            Theme.textBackground
-                            LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
-                        }
-                    )
-                    VStack {
-                        StatisticRow(
-                            label: "Today"
-                        )
-                        StatisticRow(
-                            label: "Next Week"
-                        )
-                        StatisticRow(
-                            label: "This Month"
-                        )
-                    }
-                    .padding(4)
-                    .background(
-                        ZStack {
-                            Theme.textBackground
-                            LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
-                        }
-                    )
-                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
-                }
-                .font(.caption)
-                .foregroundStyle(Theme.lightWhite)
-            }
+            .onAppear(perform: self.actionOnAppear)
         }
     }
 
@@ -438,10 +683,14 @@ extension Home {
         var body: some View {
             VStack(alignment: .leading, spacing: 1) {
                 HStack {
-                    SectionTitle(label: "Quick Search", uppercase: true)
+                    SectionTitle(
+                        label: "Quick Search",
+                        uppercase: true,
+                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                    )
                     Spacer()
 //                    Button {
-//                        
+//
 //                    } label: {
 //                        Image(systemName: "slider.horizontal.2.square")
 //                    }
@@ -456,90 +705,194 @@ extension Home {
                         }
                     }
                 }
-                .frame(maxHeight: 130)
+                .frame(height: 130)
             }
             .tint(self.state.theme.tint)
             .foregroundStyle(self.state.theme.tint)
             .padding(4)
             .background(
                 ZStack {
-                    Theme.textBackground
+                    (self.state.job?.backgroundColor ?? Theme.textBackground)
                     LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                 }
             )
-            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4, topTrailingRadius: 4))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
         }
-    }
 
-    struct QuickAccessTabs: View {
-        @EnvironmentObject private var state: AppState
-        @State private var selectedWidgetTab: TabbedWidget = .record
+        struct SavedTerm: View {
+            @EnvironmentObject private var state: AppState
+            public var savedSearch: SavedSearch
 
-        var body: some View {
-            VStack(alignment: .leading, spacing: 1) {
-                // Tabs
-                HStack(spacing: 1) {
-                    Button {
-                        self.selectedWidgetTab = .record
-                    } label: {
-                        Image(systemName: "tray")
-                            .padding(8)
-                            .padding([.top, .bottom], 1)
+            var body: some View {
+                NavigationLink {
+                    Find(text: self.savedSearch.term ?? "")
+                } label: {
+                    HStack {
+                        Image(systemName: "magnifyingglass.circle.fill")
+                        if let term = self.savedSearch.term {
+                            Text(term)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle((self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint).opacity(0.3))
                     }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite : Theme.lightWhite)
-                    .background(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
-                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
-
-                    Button {
-                        self.selectedWidgetTab = .search
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                            .padding(8)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite : Theme.lightWhite)
-                    .background(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
-                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
-                }
-
-                // View bodies
-                if self.selectedWidgetTab == .record {
-                    QuickRecordPanel()
-                } else if selectedWidgetTab == .search {
-                    QuickSearchPanel()
+                    .foregroundStyle(self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint)
+                    .padding(4)
+                    .background(Theme.textBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
             }
         }
     }
-}
 
-extension Home.QuickSearchPanel {
-    struct SavedTerm: View {
+    struct FavouriteNotes: View {
         @EnvironmentObject private var state: AppState
-        public var savedSearch: SavedSearch
+        @FetchRequest private var items: FetchedResults<Note>
 
         var body: some View {
-            NavigationLink {
-                Find(text: self.savedSearch.term ?? "")
-            } label: {
-                HStack(spacing: 0) {
-                    if let term = self.savedSearch.term {
-                        Text(term)
-                    }
+            VStack(alignment: .leading) {
+                HStack {
+                    SectionTitle(
+                        label: "Favourite Notes",
+                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                    )
+                    .padding([.leading, .top], 4)
                     Spacer()
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(self.state.theme.tint.opacity(0.7))
                 }
-                .padding(4)
-                .background(Theme.textBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 1) {
+                        ForEach(self.items, id: \.self) { entity in
+                            FavouriteItem(item: entity, link: AnyView(NoteDetail(note: entity)))
+                        }
+                    }
+                }
+                .frame(height: 130)
             }
+            .tint(self.state.theme.tint)
+            .padding(4)
+            .background(
+                ZStack {
+                    (self.state.job?.backgroundColor ?? Theme.textBackground)
+                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+//            .onAppear(perform: self.actionOnAppear)
+        }
+    }
+
+    struct FavouriteJobs: View {
+        @EnvironmentObject private var state: AppState
+        @FetchRequest private var items: FetchedResults<Job>
+
+        var body: some View {
+            VStack(alignment: .leading) {
+                HStack {
+                    SectionTitle(
+                        label: "Favourite Jobs",
+                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                    )
+                    .padding([.leading, .top], 4)
+                    Spacer()
+                }
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 1) {
+                        ForEach(self.items, id: \.self) { entity in
+                            HStack(spacing: 0) {
+                                FavouriteItem(item: entity, link: nil)
+//                                Text(self.state.job == entity ? "Active" : "Inactive")
+                            }
+                        }
+                    }
+                }
+                .frame(height: 130)
+            }
+            .tint(self.state.theme.tint)
+            .padding(4)
+            .background(
+                ZStack {
+                    (self.state.job?.backgroundColor ?? Theme.textBackground)
+                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+//            .onAppear(perform: self.actionOnAppear)
+        }
+    }
+
+    struct FavouriteItem: View {
+        @EnvironmentObject private var state: AppState
+        public var item: NSManagedObject
+        public var link: AnyView?
+
+        var body: some View {
+            if self.link == nil {
+                Button {
+                    switch self.item {
+                    case is Job: self.state.job = (self.item as! Job)
+                    default: {}()
+                    }
+                } label: {
+                    self.label
+                }
+            } else {
+                NavigationLink {
+                    self.link
+                } label: {
+                    self.label
+                }
+            }
+        }
+
+        var label: some View {
+            HStack {
+                Image(systemName: "hammer.circle.fill")
+                switch self.item {
+                case is Note:
+                    Text((self.item as! Note).title ?? "Invalid note title")
+                        .lineLimit(1)
+                case is Job:
+                    Text((self.item as! Job).title ?? (self.item as! Job).jid.string)
+                        .lineLimit(1)
+                default:
+                    Text("Invalid type")
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .opacity(0.3)
+            }
+            .padding(4)
+            .foregroundStyle(
+                ((self.item as? Job)?.backgroundColor ?? (self.item as? Note)?.mJob?.backgroundColor ?? Theme.textBackground).isBright() ?
+                    Theme.base
+                :
+                    self.state.theme.tint
+            )
+            .background(
+                (self.item as? Job)?.backgroundColor ?? (self.item as? Note)?.mJob?.backgroundColor ?? Theme.textBackground
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
         }
     }
 }
 
-extension Home.QuickSearchPanel {
+extension Home.QuickAccessTabs.QuickSearchPanel {
+
+}
+
+extension Home.QuickAccessTabs.FavouriteNotes {
+    init() {
+        _items = CoreDataNotes.fetchNotes(favouritesOnly: true)
+    }
+}
+
+extension Home.QuickAccessTabs.FavouriteJobs {
+    init() {
+        _items = CoreDataJob.fetchAll(favsOnly: true)
+    }
+}
+
+extension Home.QuickAccessTabs.QuickSearchPanel {
     init() {
         // 1 year in the past
         let interval: TimeInterval = (86400*365) * -1
@@ -554,12 +907,13 @@ extension Home.QuickSearchPanel {
 extension Home.TasksGroup {
     struct StatisticRow: View {
         public var label: String
+        public var value: Int = 0
 
         var body: some View {
             HStack {
                 Text(self.label)
                 Spacer()
-                Text("0")
+                Text(String(self.value))
             }
         }
     }
@@ -577,6 +931,17 @@ extension Home.QuickHistory {
                 ScrollView(.vertical) {
                     HStack(spacing: 0) {
                         VStack(alignment: .leading, spacing: 1) {
+                            if let job = self.state.job {
+                                SectionTitle(
+                                    label: "",
+                                    uppercase: false,
+                                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite,
+                                    icon: "hammer",
+                                    alignment: .trailing
+                                )
+                                    .padding(4)
+                                TappableRowWithIcon(job: job, icon: "hammer.circle.fill")
+                            }
                             if self.suggestedJobs.count > 0 {
                                 SectionTitle(
                                     label: "",
@@ -590,7 +955,6 @@ extension Home.QuickHistory {
                                     TappableRowWithIcon(job: job, icon: "hammer.circle.fill")
                                 }
                             }
-
                             if self.recentJobs.count > 0 {
                                 SectionTitle(
                                     label: "",
@@ -612,14 +976,14 @@ extension Home.QuickHistory {
                                     Spacer()
                                 }
                                 .padding(4)
-                                .background(Color.lightGray().opacity(0.4))
+                                .background(.gray.opacity(0.4))
                                 .foregroundStyle(Theme.base)
                             }
                         }
                         .clipShape(RoundedRectangle(cornerRadius: 4))
-                        ScrollIndicator()
                     }
                 }
+                .padding(1)
                 .background(Theme.textBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .frame(height: 130)
@@ -631,38 +995,85 @@ extension Home.QuickHistory {
     struct JobOverviewWidget: View {
         @EnvironmentObject private var state: AppState
         @State private var recentInteractions: [String] = []
+        @State private var job: Job? = nil
 
         var body: some View {
             VStack(alignment: .leading) {
                 ScrollView(.vertical) {
                     if self.state.job != nil {
-                        HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 1) {
+                            GenericTappableRowWithIcon(
+                                title: self.state.job!.project?.company?.name ?? "404",
+                                icon: PageConfiguration.EntityType.companies.iconSelectedString,
+                                iconColour: self.state.job!.project?.company?.backgroundColor ?? Theme.base,
+                                callback: AnyView(CompanyDetail(company: self.state.job!.project!.company!))
+                            )
+                            GenericTappableRowWithIcon(
+                                title: self.state.job!.project?.name ?? "404",
+                                icon: PageConfiguration.EntityType.projects.iconSelectedString,
+                                iconColour: self.state.job!.project?.backgroundColor ?? Theme.base,
+                                callback: AnyView(ProjectDetail(project: self.state.job!.project!))
+                            )
+                            GenericTappableRowWithIcon(
+                                title: self.state.job!.title ?? self.state.job!.jid.string,
+                                icon: PageConfiguration.EntityType.jobs.iconSelectedString,
+                                iconColour: self.state.job!.backgroundColor,
+                                callback: AnyView(JobDetail(job: self.state.job!))
+                            )
+                            SectionTitle(
+                                label: "Interactions",
+                                fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : .white
+                            )
                             VStack(alignment: .leading, spacing: 1) {
                                 ForEach(self.recentInteractions, id: \.self) { timestamp in
                                     GenericTappableRowWithIcon(
                                         title: timestamp,
                                         icon: "calendar",
-                                        callback: {
-                                            // @TODO: this kinda works but something about the format is wrong so this sends
-                                            // you to the wrong date
-                                            //                                        let df = DateFormatter()
-                                            //                                        df.dateFormat = DateFormatter.Style.medium //"MMM dd, yyyy"
-                                            //
-                                            //                                        if let date = df.date(from: timestamp) {
-                                            //                                            self.state.date = DateHelper.startOfDay(date)
-                                            //                                        }
-                                            //                                        self.state.job = nil
-                                        }
+                                        callback: AnyView(
+                                            Tabs.Content.List.Records(
+                                                job: self.$job,
+                                                date: self.state.date, // @TODO: convert `timestamp` and use
+                                                inSheet: false
+                                            )
+                                            .background(Theme.cPurple)
+                                        )
+                                        //{
+                                        // @TODO: this kinda works but something about the format is wrong so this sends
+                                        // you to the wrong date
+                                        //                                        let df = DateFormatter()
+                                        //                                        df.dateFormat = DateFormatter.Style.medium //"MMM dd, yyyy"
+                                        //
+                                        //                                        if let date = df.date(from: timestamp) {
+                                        //                                            self.state.date = DateHelper.startOfDay(date)
+                                        //                                        }
+                                        //                                        self.state.job = nil
+                                        //}
                                     )
                                 }
-                                Spacer()
                             }
-                            .font(.caption)
-                            .foregroundStyle(self.state.job!.backgroundColor.isBright() ? Theme.base : .white)
-                            ScrollIndicator()
-                                .background(Theme.textBackground)
+                            Spacer()
                         }
+                        .font(.caption)
+                        .foregroundStyle(self.state.job!.backgroundColor.isBright() ? Theme.base : self.state.theme.tint)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
+                    } else {
+                        VStack(alignment: .leading, spacing: 1) {
+                            GenericTappableRowWithIcon(
+                                title: "N/A",
+                                icon: PageConfiguration.EntityType.companies.iconSelectedString,
+                                iconColour: Theme.lightWhite
+                            )
+                            GenericTappableRowWithIcon(
+                                title: "N/A",
+                                icon: PageConfiguration.EntityType.projects.iconSelectedString,
+                                iconColour: Theme.lightWhite
+                            )
+                            GenericTappableRowWithIcon(
+                                title: "N/A",
+                                icon: PageConfiguration.EntityType.jobs.iconSelectedString,
+                                iconColour: Theme.lightWhite
+                            )
+                        }
                     }
                 }
 
@@ -692,13 +1103,12 @@ extension Home.QuickHistory {
                     Image(systemName: self.icon)
                     Text(self.job.title ?? "No title")
                         .lineLimit(1)
-                        .font(.caption)
                     Spacer()
                     if self.state.job == self.job {
                         Image(systemName: "chevron.right")
-                            .font(.caption)
                     }
                 }
+                .font(.caption)
                 .padding(4)
                 .background(self.job.backgroundColor)
                 .foregroundStyle(self.job.backgroundColor.isBright() ? Theme.base : .white)
@@ -712,22 +1122,26 @@ extension Home.QuickHistory {
         public var title: String
         public var icon: String = "hammer.circle.fill"
         public var colour: Color = Theme.textBackground
-        public var callback: (() -> Void) = {}
+        public var iconColour: Color = Theme.base
+        public var callback: AnyView? = nil
 
         var body: some View {
-            Button {
-                self.callback()
+            NavigationLink {
+                if self.callback != nil {
+                    self.callback!
+                }
             } label: {
                 HStack {
                     Image(systemName: self.icon)
+                        .foregroundStyle(self.iconColour)
                     Text(self.title)
                         .lineLimit(1)
-                        .font(.caption)
                     Spacer()
-                    // @TODO: may come back if we get these row links fixed
-//                    Image(systemName: "chevron.right")
-//                        .font(.caption)
+                    if self.callback != nil {
+                        Image(systemName: "chevron.right")
+                    }
                 }
+                .font(.caption)
                 .padding(4)
                 .background(self.colour)
 //                .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -743,6 +1157,7 @@ extension Home.QuickHistory.JobOverviewWidget {
     private func actionOnAppear() -> Void {
         self.recentInteractions = []
         if let job = self.state.job {
+            self.job = job
             let interactions = CoreDataRecords(moc: self.state.moc).find(for: job)
             let grouped = Dictionary(grouping: interactions, by: {($0.timestamp ?? Date()).formatted(date: .abbreviated, time: .omitted)})
             let sorted = Array(grouped)
@@ -804,17 +1219,18 @@ extension Home {
 }
 
 extension Home.Block {
-    init(colour: Color, label: String, icon: String, predicate: NSPredicate, target: AnyView? = nil) {
+    init(colour: Color = .clear, label: String, icon: String, predicate: NSPredicate, target: AnyView? = nil, des: Int = 0) {
         self.colour = colour
         self.label = label
         self.icon = icon
         self.target = target
         self.predicate = predicate
+        self.des = des
         _tasks = CoreDataTasks.fetch(with: predicate)
     }
 }
 
-extension Home.QuickRecordPanel {
+extension Home.QuickAccessTabs.QuickRecordPanel {
     /// Fires when view appears
     /// - Returns: Void
     private func actionOnAppear() -> Void {
@@ -852,6 +1268,7 @@ struct SectionTitle: View {
     public var fgColour: Color = .white.opacity(0.6)
     public var icon: String? = nil
     public var alignment: Alignment = .leading
+    public var font: Font = .caption
 
     var body: some View {
         HStack(spacing: self.label == "" ? 0 : 8) {
@@ -864,7 +1281,7 @@ struct SectionTitle: View {
             Text(self.uppercase ? self.label.uppercased() : self.label)
                 .lineLimit(1)
         }
-        .font(.caption)
+        .font(self.font)
         .foregroundStyle(self.fgColour)
     }
 }
