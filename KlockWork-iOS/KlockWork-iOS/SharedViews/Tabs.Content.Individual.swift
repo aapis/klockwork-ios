@@ -24,7 +24,8 @@ extension Tabs.Content {
                         colour: record.job != nil ? record.job!.backgroundColor : Theme.rowColour,
                         extraColumn: AnyView(
                             VStack(alignment: .leading, spacing: 1) {
-                                Timestamp(text: record.timestamp!.formatted(date: .omitted, time: .shortened))
+                                Timestamp(text: (record.timestamp ?? Date()).formatted(date: .omitted, time: .shortened), alignment: .trailing)
+                                    .frame(maxWidth: 55)
                             }
                         )
                     )

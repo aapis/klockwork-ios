@@ -42,7 +42,7 @@ extension TitleBar {
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         if count == 0 {
-            open = false
+            self.open = false
         }
     }
 }
