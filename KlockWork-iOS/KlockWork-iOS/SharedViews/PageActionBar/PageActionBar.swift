@@ -94,14 +94,11 @@ struct PageActionBar: View {
                         .font(.largeTitle)
                     if job == nil {
                         Text(self.prompt)
-                            .multilineTextAlignment(.leading)
+                            .lineLimit(1)
                             .fontWeight(.bold)
                     } else {
-                        // @TODO: this is not ideal, but changing view modes doesn't fire actionOnAppear and this was
-                        // @TODO: quicker than finding out why
-                        let tmpTitle = (self.job!.title ?? self.job!.jid.string).prefix(self.buttonLineLengthLimit)
-                        Text(tmpTitle.count < self.buttonLineLengthLimit ? "\(tmpTitle)" : "\(tmpTitle)...")
-                            .multilineTextAlignment(.leading)
+                        Text(self.job!.title ?? self.job!.jid.string)
+                            .lineLimit(1)
                             .fontWeight(.bold)
                     }
                     Spacer()
