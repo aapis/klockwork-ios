@@ -1050,6 +1050,7 @@ extension Tabs.Content {
             private func actionOnSwipeDelay(_ task: LogTask) -> Void {
                 if let due = task.due {
                     if let newDate = DateHelper.endOfTomorrow(due) {
+                        task.delayCount += 1
                         CoreDataTasks(moc: self.state.moc).due(on: newDate, task: task)
                     }
                 }
