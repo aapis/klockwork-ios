@@ -8,38 +8,38 @@
 import SwiftUI
 import CoreData
 
+// MARK: TabbedWidget
 public enum TabbedWidget {
     case record, search, notes, jobs
 }
 
+// MARK: Home
 struct Home: View {
     @EnvironmentObject private var state: AppState
-    public var inSheet: Bool
     @State private var path = NavigationPath()
     @State private var backgroundColour: Color = Theme.cOrange
     @State private var date: Date = Date()
+    @State private var text: String = "" // @TODO: remove code that requires this
     @AppStorage("home.backgroundColour") public var homeBackgroundColourChoice: Int = 0
     @AppStorage("home.isQuickRecordFocused") private var isQuickRecordFocused: Bool = false
+    @AppStorage("today.viewMode") private var viewMode: Int = 0
+    public var inSheet: Bool
     private let page: PageConfiguration.AppPage = .today
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 0){
                 if !self.inSheet {
                     Header(page: self.page, path: $path)
                     Divider().background(.gray).frame(height: 1)
                 }
-                ZStack(alignment: .bottom) {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        VStack(alignment: .leading) {
-                            QuickAccessTabs()
-                            QuickHistory()
-                            TasksGroup()
-                        }
-                    }
-                    QuickCreateWidget()
+
+                switch(self.viewMode) {
+                case 2:
+                    Widget.ActivityCalendar(searchTerm: $text, showActivity: false)
+                default:
+                    self.main
                 }
-                .padding(8)
             }
             .background(self.backgroundColour)
         }
@@ -52,6 +52,23 @@ struct Home: View {
         .onChange(of: self.homeBackgroundColourChoice) {
             self.actionOnAppear()
         }
+    }
+
+    var main: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .bottom) {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading) {
+                        QuickAccessTabs()
+                        QuickHistory()
+                        TasksGroup()
+                    }
+                }
+                QuickCreateWidget()
+            }
+            .padding(8)
+        }
+        .background(self.backgroundColour)
     }
 }
 
@@ -82,6 +99,7 @@ extension Home {
                                 Spacer()
                                 Button {
                                     self.state.job = nil
+                                    self.state.date = Date.now
                                 } label: {
                                     Image(systemName: "arrow.clockwise")
                                         .padding([.leading, .trailing], 8)
@@ -135,9 +153,14 @@ extension Home {
 
         var body: some View {
             NavigationLink {
-                if let trgt = self.target {
-                    trgt
+                if self.des == 1 {
+                    PlanTabs.FromPredicate(predicate: self.predicate)
                         .navigationTitle(self.label)
+                } else {
+                    if let trgt = self.target {
+                        trgt
+                            .navigationTitle(self.label)
+                    }
                 }
             } label: {
                 if self.des == 0 {
@@ -350,24 +373,38 @@ extension Home {
                             Block(
                                 colour: .green,
                                 label: "Today",
-                                icon: "exclamationmark.circle.fill",
+                                icon: "circle.circle.fill",
                                 predicate: NSPredicate(
-                                    format: "due > %@ && due < %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                                    DateHelper.startOfDay(self.state.date - 86400) as CVarArg,
+                                    format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                    DateHelper.startOfDay(self.state.date) as CVarArg,
                                     DateHelper.endOfDay(self.state.date)! as CVarArg,
                                 ),
-                                target: AnyView(PlanTabs.Overdue()),
                                 des: 1
                             )
                             VStack {
-                                StatisticRow(
-                                    label: "Completed"
+                                SmartStatisticRow(
+                                    label: "Completed",
+                                    predicate: NSPredicate(
+                                        format: "completedDate > %@ && completedDate <= %@ && (cancelledDate == nil && owner.project.company.hidden == false)",
+                                        DateHelper.startOfDay(self.state.date) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date)! as CVarArg
+                                    )
                                 )
-                                StatisticRow(
-                                    label: "Created"
+                                SmartStatisticRow(
+                                    label: "Created",
+                                    predicate: NSPredicate(
+                                        format: "created > %@ && created <= %@ && (owner.project.company.hidden == false)",
+                                        DateHelper.startOfDay(self.state.date) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date)! as CVarArg
+                                    )
                                 )
-                                StatisticRow(
-                                    label: "Updated"
+                                SmartStatisticRow(
+                                    label: "Updated",
+                                    predicate: NSPredicate(
+                                        format: "lastUpdate > %@ && lastUpdate <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        DateHelper.startOfDay(self.state.date) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date)! as CVarArg
+                                    )
                                 )
                             }
                             .padding(4)
@@ -385,21 +422,36 @@ extension Home {
                                 label: "Upcoming",
                                 icon: "tray.circle.fill",
                                 predicate: NSPredicate(
-                                    format: "due > %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                                    self.state.date as CVarArg
+                                    format: "due >= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                    (DateHelper.startOfDay(self.state.date + 86400))  as CVarArg, // +1 day to exclude today's items
                                 ),
-                                target: AnyView(PlanTabs.Upcoming()),
                                 des: 1
                             )
                             VStack {
-                                StatisticRow(
-                                    label: "Today"
+                                SmartStatisticRow(
+                                    label: "Tomorrow",
+                                    predicate: NSPredicate(
+                                        format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        DateHelper.startOfDay(self.state.date + 86400) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date + 86400)! as CVarArg
+                                    )
                                 )
-                                StatisticRow(
-                                    label: "Next Week"
+                                // @TODO: this one doesn't work, needs to use start/endOfWeek (new DateHelper methods)
+                                SmartStatisticRow(
+                                    label: "Next Week",
+                                    predicate: NSPredicate(
+                                        format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        DateHelper.startOfDay(self.state.date + (86400*7)) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date + (86400*7))! as CVarArg
+                                    )
                                 )
-                                StatisticRow(
-                                    label: "This Month"
+                                SmartStatisticRow(
+                                    label: "This Month",
+                                    predicate: NSPredicate(
+                                        format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        DateHelper.startOfMonth(for: self.state.date)! as CVarArg,
+                                        DateHelper.endOfMonth(for: self.state.date)! as CVarArg
+                                    )
                                 )
                             }
                             .padding(4)
@@ -417,15 +469,19 @@ extension Home {
                                 label: "Overdue",
                                 icon: "exclamationmark.circle.fill",
                                 predicate: NSPredicate(
-                                    format: "due < %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                                    self.state.date as CVarArg
+                                    format: "due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                    (DateHelper.startOfDay(self.state.date))  as CVarArg,
                                 ),
-                                target: AnyView(PlanTabs.Overdue()),
                                 des: 1
                             )
                             VStack {
-                                StatisticRow(
-                                    label: "Yesterday"
+                                SmartStatisticRow(
+                                    label: "Yesterday",
+                                    predicate: NSPredicate(
+                                        format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        DateHelper.startOfDay(self.state.date - 86400) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date - 86400)! as CVarArg
+                                    )
                                 )
                                 StatisticRow(
                                     label: "Last Week"
@@ -446,10 +502,9 @@ extension Home {
                         VStack(alignment: .leading, spacing: 1) {
                             Block(
                                 label: "Delayed",
-                                icon: "tray.circle.fill",
+                                icon: "archivebox.circle.fill",
                                 predicate: NSPredicate(
-                                    format: "(created != due && due > %@) && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                                    self.state.date as CVarArg
+                                    format: "delayCount > 0 && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)"
                                 ),
                                 target: AnyView(PlanTabs.Upcoming()),
                                 des: 1
@@ -487,6 +542,33 @@ extension Home {
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+
+        struct StatisticRow: View {
+            public var label: String
+            public var value: Int = 0
+
+            var body: some View {
+                HStack {
+                    Text(self.label)
+                    Spacer()
+                    Text(String(self.value))
+                }
+            }
+        }
+
+        struct SmartStatisticRow: View {
+            public var label: String
+            public var predicate: NSPredicate
+            @FetchRequest private var items: FetchedResults<LogTask>
+
+            var body: some View {
+                HStack {
+                    Text(self.label)
+                    Spacer()
+                    Text(String(self.items.count))
+                }
+            }
         }
     }
 
@@ -627,10 +709,10 @@ extension Home.QuickAccessTabs {
                 }
                 HStack {
                     ZStack(alignment: .trailing) {
-                        TextField("Start typing...", text: $content)
+                        TextField("Start typing...", text: $content, axis: .vertical)
                             .onSubmit(self.actionOnSubmit)
                             .padding()
-                            .lineLimit(3...)
+                            .lineLimit(1...3)
                             .multilineTextAlignment(.leading)
                             .textFieldStyle(.plain)
                             .focused(self.$hasFocus)
@@ -876,49 +958,6 @@ extension Home.QuickAccessTabs {
     }
 }
 
-extension Home.QuickAccessTabs.QuickSearchPanel {
-
-}
-
-extension Home.QuickAccessTabs.FavouriteNotes {
-    init() {
-        _items = CoreDataNotes.fetchNotes(favouritesOnly: true)
-    }
-}
-
-extension Home.QuickAccessTabs.FavouriteJobs {
-    init() {
-        _items = CoreDataJob.fetchAll(favsOnly: true)
-    }
-}
-
-extension Home.QuickAccessTabs.QuickSearchPanel {
-    init() {
-        // 1 year in the past
-        let interval: TimeInterval = (86400*365) * -1
-
-        _savedSearchTerms = CDSavedSearch.createdBetween(
-            DateHelper.startOfMonth(for: Date().addingTimeInterval(interval)),
-            DateHelper.endOfMonth(for: Date())
-        )
-    }
-}
-
-extension Home.TasksGroup {
-    struct StatisticRow: View {
-        public var label: String
-        public var value: Int = 0
-
-        var body: some View {
-            HStack {
-                Text(self.label)
-                Spacer()
-                Text(String(self.value))
-            }
-        }
-    }
-}
-
 extension Home.QuickHistory {
     struct RecentJobsWidget: View {
         @EnvironmentObject private var state: AppState
@@ -1052,24 +1091,27 @@ extension Home.QuickHistory {
                     } else {
                         VStack(alignment: .leading, spacing: 1) {
                             GenericTappableRowWithIcon(
-                                title: "N/A",
+                                title: "...",
                                 icon: PageConfiguration.EntityType.companies.iconSelectedString,
                                 iconColour: Theme.lightWhite
                             )
+                            .foregroundStyle(Theme.lightWhite)
                             GenericTappableRowWithIcon(
-                                title: "N/A",
+                                title: "...",
                                 icon: PageConfiguration.EntityType.projects.iconSelectedString,
                                 iconColour: Theme.lightWhite
                             )
+                            .foregroundStyle(Theme.lightWhite)
                             GenericTappableRowWithIcon(
-                                title: "N/A",
+                                title: "...",
                                 icon: PageConfiguration.EntityType.jobs.iconSelectedString,
                                 iconColour: Theme.lightWhite
                             )
+                            .foregroundStyle(Theme.lightWhite)
                         }
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
                     }
                 }
-
             }
             .onAppear(perform: self.actionOnAppear)
             .onChange(of: self.state.job) {
@@ -1145,6 +1187,38 @@ extension Home.QuickHistory {
             }
             .buttonStyle(.plain)
         }
+    }
+}
+
+extension Home.QuickAccessTabs.FavouriteNotes {
+    init() {
+        _items = CoreDataNotes.fetchNotes(favouritesOnly: true)
+    }
+}
+
+extension Home.QuickAccessTabs.FavouriteJobs {
+    init() {
+        _items = CoreDataJob.fetchAll(favsOnly: true)
+    }
+}
+
+extension Home.QuickAccessTabs.QuickSearchPanel {
+    init() {
+        // 1 year in the past
+        let interval: TimeInterval = (86400*365) * -1
+
+        _savedSearchTerms = CDSavedSearch.createdBetween(
+            DateHelper.startOfMonth(for: Date().addingTimeInterval(interval)),
+            DateHelper.endOfMonth(for: Date())
+        )
+    }
+}
+
+extension Home.TasksGroup.SmartStatisticRow {
+    init(label: String, predicate: NSPredicate) {
+        self.label = label
+        self.predicate = predicate
+        _items = CoreDataTasks.fetch(with: predicate)
     }
 }
 
