@@ -371,6 +371,7 @@ extension Tabs.Content {
         }
 
         struct SingleJobHierarchical: View {
+            @EnvironmentObject private var state: AppState
             public let entity: Job
             public var callback: (Job) -> Void
             public var page: PageConfiguration.AppPage = .create
@@ -388,6 +389,11 @@ extension Tabs.Content {
 
                         // Open Job button
                         Button {
+                            if self.state.job == self.entity {
+                                self.state.job = nil
+                            } else {
+                                self.state.job = self.entity
+                            }
                             callback(self.entity)
                         } label: {
                             ZStack {
@@ -410,6 +416,13 @@ extension Tabs.Content {
                                 padding: (14, 14, 14, 0)
                             )
                         }
+                        .lineLimit(1)
+
+                        // Chevron
+                        Image(systemName: "chevron.right")
+                            .padding(.trailing, 8)
+                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
+                            .opacity(0.3)
                     }
                 }
                 .background(self.entity.colour_from_stored())
@@ -1475,6 +1488,7 @@ extension Tabs.Content {
         }
 
         struct SingleCompanyHierarchical: View {
+            @EnvironmentObject private var state: AppState
             public let entity: Company
             public var callback: (Company) -> Void
             @Binding public var selected: Bool
@@ -1506,6 +1520,13 @@ extension Tabs.Content {
                                 padding: (14, 14, 14, 0)
                             )
                         }
+                        .lineLimit(1)
+
+                        // Chevron
+                        Image(systemName: "chevron.right")
+                            .padding(.trailing, 8)
+                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
+                            .opacity(0.3)
                     }
 
                     if self.selected {
@@ -1977,6 +1998,7 @@ extension Tabs.Content {
         }
 
         struct SingleProjectHierarchical: View {
+            @EnvironmentObject private var state: AppState
             public let entity: Project
             public var callback: (Project) -> Void
             public var page: PageConfiguration.AppPage = .create
@@ -2013,6 +2035,13 @@ extension Tabs.Content {
                                 padding: (14, 14, 14, 0)
                             )
                         }
+                        .lineLimit(1)
+
+                        // Chevron
+                        Image(systemName: "chevron.right")
+                            .padding(.trailing, 8)
+                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
+                            .opacity(0.3)
                     }
 
                     if self.selected {
