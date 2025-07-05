@@ -223,9 +223,8 @@ extension Home {
                 }
                 .bold()
                 .padding(4)
-//                .font(.caption)
                 .foregroundStyle(Theme.base)
-                .background(self.colour == .clear ? self.tasks.count < 10 ? .yellow : self.tasks.count < 20 ? .orange : .red : self.colour)
+                .background(self.colour == .clear ? self.tasks.count == 0 ? .gray : self.tasks.count < 10 ? .yellow : self.tasks.count < 20 ? .orange : .red : self.colour)
             }
             .background(Theme.textBackground)
             .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
@@ -375,7 +374,7 @@ extension Home {
                                 label: "Today",
                                 icon: "circle.circle.fill",
                                 predicate: NSPredicate(
-                                    format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                    format:  DateHelper.isToday(self.state.date) ? "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)" : "due > %@ && due <= %@ && (owner.project.company.hidden == false)",
                                     DateHelper.startOfDay(self.state.date) as CVarArg,
                                     DateHelper.endOfDay(self.state.date)! as CVarArg,
                                 ),
@@ -401,7 +400,7 @@ extension Home {
                                 SmartStatisticRow(
                                     label: "Updated",
                                     predicate: NSPredicate(
-                                        format: "lastUpdate > %@ && lastUpdate <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        format:  DateHelper.isToday(self.state.date) ? "lastUpdate > %@ && lastUpdate <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)" : "lastUpdate > %@ && lastUpdate <= %@ && (owner.project.company.hidden == false)",
                                         DateHelper.startOfDay(self.state.date) as CVarArg,
                                         DateHelper.endOfDay(self.state.date)! as CVarArg
                                     )
@@ -441,16 +440,16 @@ extension Home {
                                     label: "Next Week",
                                     predicate: NSPredicate(
                                         format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                                        DateHelper.startOfDay(self.state.date + (86400*7)) as CVarArg,
-                                        DateHelper.endOfDay(self.state.date + (86400*7))! as CVarArg
+                                        self.state.date.startOfWeek! + (86400*7) as CVarArg,
+                                        self.state.date.endOfWeek! + (86400*7) as CVarArg
                                     )
                                 )
                                 SmartStatisticRow(
                                     label: "This Month",
                                     predicate: NSPredicate(
                                         format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                                        DateHelper.startOfMonth(for: self.state.date)! as CVarArg,
-                                        DateHelper.endOfMonth(for: self.state.date)! as CVarArg
+                                        self.state.date.startOfMonth! as CVarArg,
+                                        self.state.date.endOfMonth! as CVarArg
                                     )
                                 )
                             }
@@ -470,7 +469,7 @@ extension Home {
                                 icon: "exclamationmark.circle.fill",
                                 predicate: NSPredicate(
                                     format: "due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                                    (DateHelper.startOfDay(self.state.date))  as CVarArg,
+                                    self.state.date.startOfDay! as CVarArg
                                 ),
                                 des: 1
                             )
@@ -478,16 +477,23 @@ extension Home {
                                 SmartStatisticRow(
                                     label: "Yesterday",
                                     predicate: NSPredicate(
-                                        format: "due > %@ && due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
-                                        DateHelper.startOfDay(self.state.date - 86400) as CVarArg,
-                                        DateHelper.endOfDay(self.state.date - 86400)! as CVarArg
+                                        format: "due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        self.state.date.endOfDay! - 86400 as CVarArg
                                     )
                                 )
-                                StatisticRow(
-                                    label: "Last Week"
+                                SmartStatisticRow(
+                                    label: "This Week",
+                                    predicate: NSPredicate(
+                                        format: "due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        self.state.date.endOfWeek! as CVarArg
+                                    )
                                 )
-                                StatisticRow(
-                                    label: "This Month"
+                                SmartStatisticRow(
+                                    label: "This Month",
+                                    predicate: NSPredicate(
+                                        format: "due <= %@ && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)",
+                                        self.state.date.endOfMonth! as CVarArg
+                                    )
                                 )
                             }
                             .padding(4)
@@ -504,7 +510,7 @@ extension Home {
                                 label: "Delayed",
                                 icon: "archivebox.circle.fill",
                                 predicate: NSPredicate(
-                                    format: "delayCount > 0 && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)"
+                                    format: DateHelper.isToday(self.state.date) ? "delayCount > 0 && (completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false)" : "delayCount > 0 && (owner.project.company.hidden == false)"
                                 ),
                                 target: AnyView(PlanTabs.Upcoming()),
                                 des: 1
