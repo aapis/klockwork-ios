@@ -545,6 +545,7 @@ extension Home {
         }
 
         struct StatisticRow: View {
+            @EnvironmentObject private var state: AppState
             public var label: String
             public var value: Int = 0
 
@@ -554,10 +555,12 @@ extension Home {
                     Spacer()
                     Text(String(self.value))
                 }
+                .foregroundStyle((self.state.job?.backgroundColor ?? Theme.base).isBright() ? Theme.base : Theme.lightWhite)
             }
         }
 
         struct SmartStatisticRow: View {
+            @EnvironmentObject private var state: AppState
             public var label: String
             public var predicate: NSPredicate
             @FetchRequest private var items: FetchedResults<LogTask>
@@ -568,6 +571,7 @@ extension Home {
                     Spacer()
                     Text(String(self.items.count))
                 }
+                .foregroundStyle((self.state.job?.backgroundColor ?? Theme.base).isBright() ? Theme.base : Theme.lightWhite)
             }
         }
     }
