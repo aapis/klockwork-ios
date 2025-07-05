@@ -374,7 +374,7 @@ extension Tabs.Content {
             public let entity: Job
             public var callback: (Job) -> Void
             public var page: PageConfiguration.AppPage = .create
-            @State private var selected: Bool = false
+            @Binding public var selected: Bool
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
@@ -388,7 +388,6 @@ extension Tabs.Content {
 
                         // Open Job button
                         Button {
-                            selected.toggle()
                             callback(self.entity)
                         } label: {
                             ZStack {
@@ -1478,14 +1477,13 @@ extension Tabs.Content {
         struct SingleCompanyHierarchical: View {
             public let entity: Company
             public var callback: (Company) -> Void
-            @State private var selected: Bool = false
+            @Binding public var selected: Bool
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         // Open company button
                         Button {
-                            selected.toggle()
                             callback(self.entity)
                         } label: {
                             ZStack {
@@ -1982,7 +1980,7 @@ extension Tabs.Content {
             public let entity: Project
             public var callback: (Project) -> Void
             public var page: PageConfiguration.AppPage = .create
-            @State private var selected: Bool = false
+            @Binding public var selected: Bool
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
@@ -1993,7 +1991,6 @@ extension Tabs.Content {
 
                         // Open folder button
                         Button {
-                            selected.toggle()
                             callback(self.entity)
                         } label: {
                             ZStack {
