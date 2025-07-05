@@ -643,6 +643,7 @@ extension PlanTabs {
                 self.actionOnSelectDate()
             }
             .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
         }
 
         init(inSheet: Bool = false) {
@@ -802,6 +803,7 @@ extension PlanTabs {
                 self.actionOnSelectDate()
             }
             .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
         }
 
         init() {
@@ -948,6 +950,7 @@ extension PlanTabs {
                 self.actionOnSelectDate()
             }
             .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
         }
 
         init(predicate: NSPredicate) {
