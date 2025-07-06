@@ -213,8 +213,9 @@ extension JobDetail {
             }
             self.job!.uri = URL(string: self.url)
             self.job!.starred = self.starred
+            self.state.job = self.job
         } else {
-            CoreDataJob(moc: self.state.moc).create(
+            let job = CoreDataJob(moc: self.state.moc).createAndReturn(
                 alive: self.alive,
                 colour: self.colour == .clear ? Color.randomStorable() : self.colour.toStored(),
                 jid: Double(self.jid) ?? 0.0,
@@ -226,6 +227,7 @@ extension JobDetail {
                 starred: self.starred,
                 saveByDefault: false
             )
+            self.state.job = job
         }
 
         PersistenceController.shared.save()

@@ -233,7 +233,7 @@ extension Tabs.Content {
                 @State private var isPresented: Bool = false
 
                 var body: some View {
-                    Button(entity: self.entity, callback: self.actionOnTap)
+                    Button(entity: self.entity, callback: self.actionOnTap, selected: self.$isPresented)
                         .onAppear(perform: {
                             self.actionOnAppear(self.entity)
                         })
@@ -315,7 +315,7 @@ extension Tabs.Content {
                 @State private var isPresented: Bool = false
 
                 var body: some View {
-                    Button(entity: self.entity, callback: self.actionOnTap)
+                    Button(entity: self.entity, callback: self.actionOnTap, selected: self.$isPresented)
                         .onAppear(perform: {
                             self.actionOnAppear(self.entity)
                         })
@@ -378,7 +378,7 @@ extension Tabs.Content {
 
                 var body: some View {
                     VStack(alignment: .leading, spacing: 0) {
-                        JobButton(entity: self.entity, callback: self.actionOnTap)
+                        JobButton(entity: self.entity, callback: self.actionOnTap, selected: self.$isPresented)
 
                         // @TODO: refactor to follow the pattern set in previous levels
                         if self.isPresented {

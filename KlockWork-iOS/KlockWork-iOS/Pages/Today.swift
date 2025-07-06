@@ -49,6 +49,7 @@ struct Today: View {
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
+            .onChange(of: self.state.job) {self.job = self.state.job}
             .onChange(of: self.job) {self.actionOnJobChange()}
         }
     }

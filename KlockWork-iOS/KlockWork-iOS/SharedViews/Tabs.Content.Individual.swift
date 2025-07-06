@@ -77,7 +77,7 @@ extension Tabs.Content {
                         } label: {
                             HStack(alignment: .center) {
                                 Text(self.record?.message ?? "_RECORD_CONTENT")
-                                    .lineLimit(1)
+                                    .multilineTextAlignment(.leading)
                                 Spacer()
                             }
                             .padding(.bottom, 8)
@@ -249,7 +249,7 @@ extension Tabs.Content {
                                 HStack(alignment: .top) {
                                     Text("1. ")
                                     Text(term.definition ?? "_TERM_DEFINITION")
-                                        .lineLimit(1)
+                                        .multilineTextAlignment(.leading)
                                     Spacer()
                                 }
                                 .padding(8)
@@ -371,10 +371,11 @@ extension Tabs.Content {
         }
 
         struct SingleJobHierarchical: View {
+            @EnvironmentObject private var state: AppState
             public let entity: Job
             public var callback: (Job) -> Void
             public var page: PageConfiguration.AppPage = .create
-            @State private var selected: Bool = false
+            @Binding public var selected: Bool
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
@@ -388,7 +389,11 @@ extension Tabs.Content {
 
                         // Open Job button
                         Button {
-                            selected.toggle()
+                            if self.state.job == self.entity {
+                                self.state.job = nil
+                            } else {
+                                self.state.job = self.entity
+                            }
                             callback(self.entity)
                         } label: {
                             ZStack {
@@ -411,6 +416,13 @@ extension Tabs.Content {
                                 padding: (14, 14, 14, 0)
                             )
                         }
+                        .lineLimit(1)
+
+                        // Chevron
+                        Image(systemName: "chevron.right")
+                            .padding(.trailing, 8)
+                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
+                            .opacity(0.3)
                     }
                 }
                 .background(self.entity.colour_from_stored())
@@ -898,7 +910,7 @@ extension Tabs.Content {
                     } label: {
                         HStack(alignment: .center) {
                             Text(task.content ?? "_TASK_CONTENT")
-                                .lineLimit(1)
+                                .multilineTextAlignment(.leading)
                             Spacer()
                         }
                         .padding(.bottom, 8)
@@ -1050,6 +1062,7 @@ extension Tabs.Content {
             private func actionOnSwipeDelay(_ task: LogTask) -> Void {
                 if let due = task.due {
                     if let newDate = DateHelper.endOfTomorrow(due) {
+                        task.delayCount += 1
                         CoreDataTasks(moc: self.state.moc).due(on: newDate, task: task)
                     }
                 }
@@ -1475,16 +1488,16 @@ extension Tabs.Content {
         }
 
         struct SingleCompanyHierarchical: View {
+            @EnvironmentObject private var state: AppState
             public let entity: Company
             public var callback: (Company) -> Void
-            @State private var selected: Bool = false
+            @Binding public var selected: Bool
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         // Open company button
                         Button {
-                            selected.toggle()
                             callback(self.entity)
                         } label: {
                             ZStack {
@@ -1507,6 +1520,13 @@ extension Tabs.Content {
                                 padding: (14, 14, 14, 0)
                             )
                         }
+                        .lineLimit(1)
+
+                        // Chevron
+                        Image(systemName: "chevron.right")
+                            .padding(.trailing, 8)
+                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
+                            .opacity(0.3)
                     }
 
                     if self.selected {
@@ -1978,10 +1998,11 @@ extension Tabs.Content {
         }
 
         struct SingleProjectHierarchical: View {
+            @EnvironmentObject private var state: AppState
             public let entity: Project
             public var callback: (Project) -> Void
             public var page: PageConfiguration.AppPage = .create
-            @State private var selected: Bool = false
+            @Binding public var selected: Bool
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
@@ -1992,7 +2013,6 @@ extension Tabs.Content {
 
                         // Open folder button
                         Button {
-                            selected.toggle()
                             callback(self.entity)
                         } label: {
                             ZStack {
@@ -2015,6 +2035,13 @@ extension Tabs.Content {
                                 padding: (14, 14, 14, 0)
                             )
                         }
+                        .lineLimit(1)
+
+                        // Chevron
+                        Image(systemName: "chevron.right")
+                            .padding(.trailing, 8)
+                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
+                            .opacity(0.3)
                     }
 
                     if self.selected {
