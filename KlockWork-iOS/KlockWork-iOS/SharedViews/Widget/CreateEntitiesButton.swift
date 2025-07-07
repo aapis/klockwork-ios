@@ -14,10 +14,7 @@ struct CreateEntitiesButton: View {
     public var page: PageConfiguration.AppPage = .planning
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 8) {
-            if self.page == .planning {
-                AddButton()
-            }
+        HStack(alignment: .center, spacing: 8) {
             if isViewModeSelectorVisible {
                 ViewModeSelector()
             }
@@ -37,8 +34,6 @@ struct CreateEntitiesButton: View {
 //            .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
 
             Forecast(date: DateHelper.startOfDay(self.state.date), isForecastMember: false, page: self.page)
-                .background(.white.opacity(0.1))
-                .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
                 .padding([.trailing], 8)
 
             // @TODO: implement settings page

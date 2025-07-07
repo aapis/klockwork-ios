@@ -25,6 +25,7 @@ extension Tabs.Content {
                         .opacity(0.3)
                         .shadow(color: self.colour.isBright() ? .black.opacity(0.1) : .white.opacity(0.2), radius: 4, x: 1, y: 1)
                 }
+                .border(width: 1, edges: [.bottom], color: (self.colour.isBright() ? Theme.base : Color.white).opacity(0.3))
             }
         }
     }

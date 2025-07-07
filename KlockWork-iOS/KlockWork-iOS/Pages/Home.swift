@@ -598,7 +598,7 @@ extension Home {
                             .padding([.top, .bottom], 1)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .record ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -616,7 +616,7 @@ extension Home {
                             .padding(8)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .search ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -635,7 +635,7 @@ extension Home {
                             .padding([.top, .bottom], 1)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -654,7 +654,7 @@ extension Home {
                             .padding([.top, .bottom], 6)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)

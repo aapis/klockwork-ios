@@ -25,7 +25,6 @@ struct ViewModeSelector: View {
                 .padding(8)
                 .background(self.storedVm == 2 ? self.state.theme.tint : .black.opacity(0.1))
                 .foregroundStyle(self.storedVm == 2 ? Theme.cPurple : self.state.theme.tint)
-                .clipShape(.rect(topLeadingRadius: 4))
 
                 Button {
                     self.viewMode = .tabular
@@ -50,8 +49,8 @@ struct ViewModeSelector: View {
                 .padding(.bottom, 1)
                 .background(self.storedVm == 1 ? self.state.theme.tint : .black.opacity(0.1))
                 .foregroundStyle(self.storedVm == 1 ? Theme.cPurple : self.state.theme.tint)
-                .clipShape(.rect(topTrailingRadius: 4))
             }
+            .clipShape(RoundedRectangle(cornerRadius: 4))
         }
         .onAppear(perform: self.actionOnAppear)
     }
