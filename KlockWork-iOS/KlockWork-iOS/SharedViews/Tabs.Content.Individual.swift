@@ -418,10 +418,13 @@ extension Tabs.Content {
                         }
                         .lineLimit(1)
 
+                        PageConfiguration.EntityType.jobs.icon
+                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
+
                         // Chevron
                         Image(systemName: "chevron.right")
                             .padding(.trailing, 8)
-                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
+                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : Theme.lightWhite)
                             .opacity(0.3)
                     }
                 }
@@ -1495,7 +1498,7 @@ extension Tabs.Content {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
-                    HStack(alignment: .firstTextBaseline, spacing: 0) {
+                    HStack(alignment: .firstTextBaseline) {
                         // Open company button
                         Button {
                             callback(self.entity)
@@ -1521,6 +1524,9 @@ extension Tabs.Content {
                             )
                         }
                         .lineLimit(1)
+
+                        PageConfiguration.EntityType.companies.icon
+                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
 
                         // Chevron
                         Image(systemName: "chevron.right")
@@ -1561,6 +1567,7 @@ extension Tabs.Content {
                     }
                 }
                 .background(self.entity.backgroundColor)
+                .border(width: 1, edges: [.top], color: (self.entity.backgroundColor.isBright() ? Theme.base : Color.white).opacity(0.3))
             }
         }
 
@@ -2037,10 +2044,13 @@ extension Tabs.Content {
                         }
                         .lineLimit(1)
 
+                        PageConfiguration.EntityType.projects.icon
+                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
+
                         // Chevron
                         Image(systemName: "chevron.right")
                             .padding(.trailing, 8)
-                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
+                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : Theme.lightWhite)
                             .opacity(0.3)
                     }
 
@@ -2064,7 +2074,7 @@ extension Tabs.Content {
                                             Text("\(self.entity.abbreviation ?? "DE")")
                                         }
                                     }
-                                    .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : .white)
+                                    .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : .white)
                                     .opacity(0.7)
                                     .padding(.leading)
                                 }

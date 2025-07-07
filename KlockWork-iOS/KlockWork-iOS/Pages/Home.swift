@@ -90,12 +90,22 @@ extension Home {
                         .blendMode(.softLight)
                         .frame(height: 45)
 
-                    HStack(spacing: 8) {
+                    HStack(spacing: 0) {
                         Button {
                             self.isCalendarPresented.toggle()
                         } label: {
                             HStack {
-                                PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMMM dd"))
+                                HStack(spacing: 0) {
+                                    VStack(alignment: .trailing) {
+                                        Text(DateHelper.todayShort(self.state.date, format: "YYYY"))
+                                        Text(self.state.date.formatted(Date.FormatStyle().weekday(.wide)))
+                                    }
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundStyle(Theme.lightWhite)
+                                    PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMM dd"))
+                                }
+                                .padding([.leading, .trailing], 8)
+
                                 Spacer()
                                 Button {
                                     self.state.job = nil
@@ -114,8 +124,10 @@ extension Home {
                                     Image(systemName: "gear")
                                         .font(.title3)
                                 }
+                                
+                                Forecast(date: DateHelper.startOfDay(self.state.date), isForecastMember: false, page: self.page)
+                                    .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
                             }
-                            .padding(.bottom, 8)
                         }
                         .buttonStyle(.plain)
                         .opacity(self.viewMode == 0 || self.viewMode == 1 ? 1 : 0.5)
@@ -598,7 +610,7 @@ extension Home {
                             .padding([.top, .bottom], 1)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .record ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -616,7 +628,7 @@ extension Home {
                             .padding(8)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .search ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -635,7 +647,7 @@ extension Home {
                             .padding([.top, .bottom], 1)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -654,7 +666,7 @@ extension Home {
                             .padding([.top, .bottom], 6)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -1044,6 +1056,7 @@ extension Home.QuickHistory {
     struct JobOverviewWidget: View {
         @EnvironmentObject private var state: AppState
         @State private var recentInteractions: [String] = []
+        @State private var tasksCreatedToday: [String] = []
         @State private var job: Job? = nil
 
         var body: some View {
@@ -1051,48 +1064,17 @@ extension Home.QuickHistory {
                 ScrollView(.vertical) {
                     if self.state.job != nil {
                         VStack(alignment: .leading, spacing: 1) {
-                            GenericTappableRowWithIcon(
-                                title: self.state.job!.project?.company?.name ?? "404",
-                                icon: PageConfiguration.EntityType.companies.iconSelectedString,
-                                iconColour: self.state.job!.project?.company?.backgroundColor ?? Theme.base,
-                                callback: AnyView(CompanyDetail(company: self.state.job!.project!.company!))
-                            )
-                            GenericTappableRowWithIcon(
-                                title: self.state.job!.project?.name ?? "404",
-                                icon: PageConfiguration.EntityType.projects.iconSelectedString,
-                                iconColour: self.state.job!.project?.backgroundColor ?? Theme.base,
-                                callback: AnyView(ProjectDetail(project: self.state.job!.project!))
-                            )
-                            GenericTappableRowWithIcon(
-                                title: self.state.job!.title ?? self.state.job!.jid.string,
-                                icon: PageConfiguration.EntityType.jobs.iconSelectedString,
-                                iconColour: self.state.job!.backgroundColor,
-                                callback: AnyView(JobDetail(job: self.state.job!))
-                            )
+                            JobInformation()
                             SectionTitle(
-                                label: "Interactions",
+                                label: "Tasks",
                                 fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : Theme.lightWhite,
                                 alignment: .trailing
                             )
                             .padding(4)
                             .background(Theme.textBackground)
-                            VStack(alignment: .leading, spacing: 1) {
-                                ForEach(self.recentInteractions, id: \.self) { timestamp in
-                                    GenericTappableRowWithIcon(
-                                        title: timestamp,
-                                        icon: "calendar",
-                                        callback: AnyView(
-                                            Tabs.Content.List.Records(
-                                                job: self.$job,
-                                                date: DateHelper.date(from: timestamp, format: "MMM, dd, yyyy") ?? Date(),
-                                                inSheet: false,
-                                                pageTitle: timestamp
-                                            )
-                                            .background(Theme.cPurple)
-                                        )
-                                    )
-                                }
-                            }
+                            TasksCreatedToday()
+                            TasksCompletedToday()
+                            Interactions(recentInteractions: self.$recentInteractions, job: self.$job)
                             Spacer()
                         }
                         .font(.caption)
@@ -1128,6 +1110,135 @@ extension Home.QuickHistory {
                 self.actionOnAppear()
             }
             .frame(height: 130)
+        }
+    }
+
+    struct JobInformation: View {
+        @EnvironmentObject private var state: AppState
+
+        var body: some View {
+            if self.state.job != nil {
+                GenericTappableRowWithIcon(
+                    title: self.state.job!.project?.company?.name ?? "404",
+                    icon: PageConfiguration.EntityType.companies.iconSelectedString,
+                    iconColour: self.state.job!.project?.company?.backgroundColor ?? Theme.base,
+                    callback: AnyView(CompanyDetail(company: self.state.job!.project!.company!))
+                )
+                GenericTappableRowWithIcon(
+                    title: self.state.job!.project?.name ?? "404",
+                    icon: PageConfiguration.EntityType.projects.iconSelectedString,
+                    iconColour: self.state.job!.project?.backgroundColor ?? Theme.base,
+                    callback: AnyView(ProjectDetail(project: self.state.job!.project!))
+                )
+                GenericTappableRowWithIcon(
+                    title: self.state.job!.title ?? self.state.job!.jid.string,
+                    icon: PageConfiguration.EntityType.jobs.iconSelectedString,
+                    iconColour: self.state.job!.backgroundColor,
+                    callback: AnyView(JobDetail(job: self.state.job!))
+                )
+            }
+        }
+    }
+
+    struct TasksCreatedToday: View {
+        @EnvironmentObject private var state: AppState
+        private let label: String = "New Today"
+
+        var body: some View {
+            NavigationLink {
+                if let job = self.state.job {
+                    Tabs.Content.List.TasksWithPredicate(
+                        label: self.label,
+                        inSheet: false,
+                        predicate: NSPredicate(
+                            format: "owner == %@ && created > %@ && created <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
+                            job,
+                            self.state.date.startOfDay! as CVarArg,
+                            self.state.date.endOfDay! as CVarArg
+                        )
+                    )
+                    .background(Theme.cPurple)
+                }
+            } label: {
+                HStack {
+                    Text(self.label)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .opacity(0.3)
+                }
+                .padding(4)
+                .background(Theme.textBackground)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    struct TasksCompletedToday: View {
+        @EnvironmentObject private var state: AppState
+        private let label: String = "Completed Today"
+
+        var body: some View {
+            NavigationLink {
+                if let job = self.state.job {
+                    Tabs.Content.List.TasksWithPredicate(
+                        label: self.label,
+                        inSheet: false,
+                        predicate: NSPredicate(
+                            format: "owner == %@ && completedDate > %@ && completedDate <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
+                            job,
+                            self.state.date.startOfDay! as CVarArg,
+                            self.state.date.endOfDay! as CVarArg
+                        )
+                    )
+                    .background(Theme.cPurple)
+                }
+            } label: {
+                HStack {
+                    Text(self.label)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .opacity(0.3)
+                }
+                .padding(4)
+                .background(Theme.textBackground)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    struct Interactions: View {
+        @EnvironmentObject private var state: AppState
+        @Binding public var recentInteractions: [String]
+        @Binding public var job: Job?
+
+        var body: some View {
+            if self.state.job != nil {
+                SectionTitle(
+                    label: "Interactions",
+                    fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : Theme.lightWhite,
+                    alignment: .trailing
+                )
+                .padding(4)
+                .background(Theme.textBackground)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    ForEach(self.recentInteractions, id: \.self) { timestamp in
+                        GenericTappableRowWithIcon(
+                            title: timestamp,
+                            icon: "calendar",
+                            callback: AnyView(
+                                Tabs.Content.List.Records(
+                                    job: self.$job,
+                                    date: DateHelper.date(from: timestamp, format: "MMM, dd, yyyy") ?? Date(),
+                                    inSheet: false,
+                                    pageTitle: timestamp
+                                )
+                                .background(Theme.cPurple)
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -1237,26 +1348,51 @@ extension Home.QuickHistory.JobOverviewWidget {
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         self.recentInteractions = []
+        self.tasksCreatedToday = []
         if let job = self.state.job {
             self.job = job
-            let interactions = CoreDataRecords(moc: self.state.moc).find(for: job)
-            let grouped = Dictionary(grouping: interactions, by: {($0.timestamp ?? Date()).formatted(date: .abbreviated, time: .omitted)})
-            let sorted = Array(grouped)
-                .sorted(by: {
-                    let df = DateFormatter()
-                    df.dateStyle = .medium
-                    df.timeStyle = .none
-                    if let d1 = df.date(from: $0.key) {
-                        if let d2 = df.date(from: $1.key) {
-                            return d1 > d2
-                        }
-                    }
-                    return false
-                })
+            self.populate(items: CoreDataRecords(moc: self.state.moc).find(for: job))
+            self.populate(items: CoreDataTasks(moc: self.state.moc).find(for: self.state.date))
+        }
+    }
 
-            for group in sorted {
-                self.recentInteractions.append(group.key)
-            }
+    private func populate(items: [LogRecord]) -> Void {
+        let grouped = Dictionary(grouping: items, by: {($0.timestamp ?? Date()).formatted(date: .abbreviated, time: .omitted)})
+        let sorted = Array(grouped)
+            .sorted(by: {
+                let df = DateFormatter()
+                df.dateStyle = .medium
+                df.timeStyle = .none
+                if let d1 = df.date(from: $0.key) {
+                    if let d2 = df.date(from: $1.key) {
+                        return d1 > d2
+                    }
+                }
+                return false
+            })
+
+        for group in sorted {
+            self.recentInteractions.append(group.key)
+        }
+    }
+
+    private func populate(items: [LogTask]) -> Void {
+        let grouped = Dictionary(grouping: items, by: {($0.created ?? Date()).formatted(date: .abbreviated, time: .omitted)})
+        let sorted = Array(grouped)
+            .sorted(by: {
+                let df = DateFormatter()
+                df.dateStyle = .medium
+                df.timeStyle = .none
+                if let d1 = df.date(from: $0.key) {
+                    if let d2 = df.date(from: $1.key) {
+                        return d1 > d2
+                    }
+                }
+                return false
+            })
+
+        for group in sorted {
+            self.tasksCreatedToday.append(group.key)
         }
     }
 }

@@ -114,7 +114,7 @@ struct Forecast: View, Identifiable {
                     Button {
                         self.state.date = DateHelper.startOfDay(self.date)
                         self.isUpcomingTaskListPresented.toggle()
-                        print("DERPO date=\(self.state.date) tz=\(TimeZone.autoupdatingCurrent) x=\(Calendar.autoupdatingCurrent.startOfDay(for: self.state.date).description(with: .autoupdatingCurrent))")
+//                        print("DERPO date=\(self.state.date) tz=\(TimeZone.autoupdatingCurrent) x=\(Calendar.autoupdatingCurrent.startOfDay(for: self.state.date).description(with: .autoupdatingCurrent))")
 
                         if self.isSelected {
                             if let cb = self.callback { cb() }

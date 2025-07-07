@@ -63,6 +63,9 @@ extension Tabs.Content {
                 .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle(self.pageTitle)
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarTitleDisplayMode(.inline)
             }
 
             init(job: Binding<Job?>, date: Date, inSheet: Bool, pageTitle: String = "Records") {
@@ -111,6 +114,9 @@ extension Tabs.Content {
                 .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Jobs")
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarTitleDisplayMode(.inline)
             }
 
             init(job: Binding<Job?>, date: Date, inSheet: Bool) {
@@ -121,7 +127,7 @@ extension Tabs.Content {
                 _favouriteItems = CoreDataJob.fetchAll(favsOnly: true)
             }
         }
-
+        
         struct Tasks: View {
             public var inSheet: Bool
             @FetchRequest private var items: FetchedResults<LogTask>
@@ -143,12 +149,50 @@ extension Tabs.Content {
                 .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Tasks")
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarTitleDisplayMode(.inline)
             }
 
             init(date: Date, inSheet: Bool) {
                 self.date = date
                 self.inSheet = inSheet
                 _items = CoreDataTasks.recentTasksWidgetData()
+            }
+        }
+
+        struct TasksWithPredicate: View {
+            public var label: String
+            public var inSheet: Bool
+            public var predicate: NSPredicate
+            @FetchRequest private var items: FetchedResults<LogTask>
+
+            var body: some View {
+                SwiftUI.List {
+                    if items.count > 0 {
+                        ForEach(items, id: \.objectID) { task in
+                            Individual.SingleTaskDetailedChecklistItem(task: task)
+                        }
+                    } else {
+                        StatusMessage.Warning(message: "No tasks found")
+                    }
+                }
+                .listStyle(.plain)
+                .listRowInsets(.none)
+                .listRowSpacing(.none)
+                .listRowSeparator(.hidden)
+                .listSectionSpacing(0)
+                .navigationTitle(self.label)
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarTitleDisplayMode(.inline)
+            }
+
+            init(label: String, inSheet: Bool, predicate: NSPredicate) {
+                self.label = label
+                self.inSheet = inSheet
+                self.predicate = predicate
+                _items = CoreDataTasks.fetch(with: predicate)
             }
         }
 
