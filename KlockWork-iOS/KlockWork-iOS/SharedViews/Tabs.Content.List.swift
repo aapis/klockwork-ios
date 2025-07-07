@@ -63,6 +63,9 @@ extension Tabs.Content {
                 .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle(self.pageTitle)
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarTitleDisplayMode(.inline)
             }
 
             init(job: Binding<Job?>, date: Date, inSheet: Bool, pageTitle: String = "Records") {
@@ -111,6 +114,9 @@ extension Tabs.Content {
                 .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Jobs")
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarTitleDisplayMode(.inline)
             }
 
             init(job: Binding<Job?>, date: Date, inSheet: Bool) {
@@ -143,6 +149,9 @@ extension Tabs.Content {
                 .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Tasks")
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarTitleDisplayMode(.inline)
             }
 
             init(date: Date, inSheet: Bool) {
