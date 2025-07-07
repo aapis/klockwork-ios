@@ -113,7 +113,16 @@ extension Today {
                         Button {
                             self.isCalendarPresented.toggle()
                         } label: {
-                            PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMMM dd"))
+                            HStack(spacing: 0) {
+                                VStack(alignment: .trailing) {
+                                    Text(DateHelper.todayShort(self.state.date, format: "YYYY"))
+                                    Text(self.state.date.formatted(Date.FormatStyle().weekday(.wide)))
+                                }
+                                .font(.system(.caption, design: .monospaced))
+                                .foregroundStyle(Theme.lightWhite)
+                                PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMM dd"))
+                            }
+                            .padding([.leading, .trailing], 8)
                         }
                         .buttonStyle(.plain)
                         .opacity(self.viewMode == 0 || self.viewMode == 1 ? 1 : 0.5)
