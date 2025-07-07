@@ -348,7 +348,6 @@ extension Home {
                         :
                             self.state.theme.tint
                     )
-                    .foregroundStyle(self.state.theme.tint)
                     .clipShape(.capsule(style: .continuous))
                     .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
                     .padding()
@@ -610,7 +609,7 @@ extension Home {
                             .padding([.top, .bottom], 1)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .record ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -628,7 +627,7 @@ extension Home {
                             .padding(8)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .search ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .search ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -647,7 +646,7 @@ extension Home {
                             .padding([.top, .bottom], 1)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -666,7 +665,7 @@ extension Home {
                             .padding([.top, .bottom], 6)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white : Theme.lightWhite)
+                    .foregroundStyle(self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
                     .background(
                         ZStack(alignment: .bottom) {
                             (self.selectedWidgetTab == .jobs ? self.state.job?.backgroundColor ?? Theme.textBackground : .clear)
@@ -812,7 +811,6 @@ extension Home.QuickAccessTabs {
                 .frame(height: 130)
             }
             .tint(self.state.theme.tint)
-            .foregroundStyle(self.state.theme.tint)
             .padding(4)
             .background(
                 ZStack {
@@ -838,9 +836,9 @@ extension Home.QuickAccessTabs {
                         }
                         Spacer()
                         Image(systemName: "chevron.right")
-                            .foregroundStyle((self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint).opacity(0.3))
+                            .foregroundStyle((self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white).opacity(0.3))
                     }
-                    .foregroundStyle(self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint)
+                    .foregroundStyle(self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white)
                     .padding(4)
                     .background(Theme.textBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -970,7 +968,7 @@ extension Home.QuickAccessTabs {
                 ((self.item as? Job)?.backgroundColor ?? (self.item as? Note)?.mJob?.backgroundColor ?? Theme.textBackground).isBright() ?
                     Theme.base
                 :
-                    self.state.theme.tint
+                        .white
             )
             .background(
                 (self.item as? Job)?.backgroundColor ?? (self.item as? Note)?.mJob?.backgroundColor ?? Theme.textBackground
@@ -1078,7 +1076,7 @@ extension Home.QuickHistory {
                             Spacer()
                         }
                         .font(.caption)
-                        .foregroundStyle(self.state.job!.backgroundColor.isBright() ? Theme.base : self.state.theme.tint)
+                        .foregroundStyle(self.state.job!.backgroundColor.isBright() ? Theme.base : .white)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                     } else {
                         VStack(alignment: .leading, spacing: 1) {
@@ -1304,7 +1302,6 @@ extension Home.QuickHistory {
                 .font(.caption)
                 .padding(4)
                 .background(self.colour)
-//                .clipShape(RoundedRectangle(cornerRadius: 4))
             }
             .buttonStyle(.plain)
         }
