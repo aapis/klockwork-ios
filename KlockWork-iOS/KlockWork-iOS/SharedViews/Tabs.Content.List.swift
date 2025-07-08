@@ -234,7 +234,7 @@ extension Tabs.Content {
             }
         }
 
-        // MARK: HierarchyExplorer
+        // MARK: Tabs.Content.List.HierarchyExplorer
         struct HierarchyExplorer: View {
             @EnvironmentObject private var state: AppState
             public var inSheet: Bool
@@ -419,6 +419,8 @@ extension Tabs.Content {
                 @State private var newTaskContent: String = "" // @TODO: move this to a new struct
                 @State private var newNoteTitle: String = "" // @TODO: move this to a new struct
                 @State private var id: UUID = UUID()
+                @FocusState private var isCreateTaskFieldActive: Bool
+                @FocusState private var isCreateNoteFieldActive: Bool
 
                 var body: some View {
                     VStack(alignment: .leading, spacing: 0) {
@@ -456,7 +458,7 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        RowAddButton(isPresented: $isCreateTaskPanelPresented)
+                                        RowAddButton(title: "+ Task", isPresented: $isCreateTaskPanelPresented)
                                     }
                                 }
 
@@ -479,10 +481,11 @@ extension Tabs.Content {
                                                         self.isCreateTaskPanelPresented.toggle()
                                                     }
                                                 }
+                                                .focused(self.$isCreateTaskFieldActive)
                                                 .padding()
                                         }
                                     }
-                                    .background(.orange)
+                                    .background(.white)
                                     .onDisappear(perform: self.actionPostSave)
                                 }
 
@@ -521,7 +524,7 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        RowAddButton(isPresented: $isCreateNotePanelPresented)
+                                        RowAddButton(title: "+ Note", isPresented: $isCreateNotePanelPresented)
                                     }
                                 }
 
@@ -544,10 +547,11 @@ extension Tabs.Content {
                                                         self.isCreateNotePanelPresented.toggle()
                                                     }
                                                 }
+                                                .focused(self.$isCreateNoteFieldActive)
                                                 .padding()
                                         }
                                     }
-                                    .background(.orange)
+                                    .background(.white)
                                     .onDisappear(perform: self.actionPostSave)
                                 }
 
@@ -645,6 +649,12 @@ extension Tabs.Content {
                     }
                     .id(self.id)
                     .onAppear(perform: self.actionOpenIfSelected)
+                    .onChange(of: self.isCreateNotePanelPresented) {
+                        self.actionOnChangePresentation()
+                    }
+                    .onChange(of: self.isCreateTaskPanelPresented) {
+                        self.actionOnChangePresentation()
+                    }
                 }
 
                 init(entity: Job) {
@@ -681,6 +691,24 @@ extension Tabs.Content {
                             self.isPresented = true
                         } else {
                             self.isPresented = false
+                        }
+                    }
+                }
+                
+                /// Fires when presentation changes
+                /// - Returns: Void
+                private func actionOnChangePresentation() -> Void {
+                    if self.isPresented {
+                        if self.isCreateNotePanelPresented {
+                            self.isCreateNoteFieldActive = true
+                        } else {
+                            self.isCreateNoteFieldActive = false
+                        }
+
+                        if self.isCreateTaskPanelPresented {
+                            self.isCreateTaskFieldActive = true
+                        } else {
+                            self.isCreateTaskFieldActive = false
                         }
                     }
                 }

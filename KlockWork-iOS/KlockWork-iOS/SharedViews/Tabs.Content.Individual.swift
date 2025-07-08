@@ -907,6 +907,34 @@ extension Tabs.Content {
             @State private var isJobPresented: Bool = false
 
             var body: some View {
+                HStack(alignment: .top, spacing: 0) {
+                    self.statusBar
+                    self.main
+                }
+                .listRowBackground(
+                    Common.TypedListRowBackground(colour: self.task.owner?.backgroundColor ?? Theme.rowColour, type: .tasks)
+                )
+            }
+
+            var statusBar: some View {
+                VStack(alignment: .center, spacing: 0) {
+                    Spacer()
+                    Image(systemName: "checkmark.seal.fill")
+                        .padding(2)
+                    // Orange indicates job is in your current plan
+                        .foregroundStyle(self.isCompleted ? .white : self.state.plan != nil && (self.state.plan!.jobs?.allObjects as! [Job]).contains(where: {$0 == self.task.owner}) ?  .orange : Theme.lightBase)
+                        .blendMode(self.isCompleted || self.state.plan != nil ? .normal : .softLight)
+                }
+                .background(
+                    ZStack {
+                        LinearGradient(colors: [.clear, (self.isCompleted ? .green : .gray.opacity(0.6))], startPoint: .top, endPoint: .bottom)
+                    }
+                )
+                .frame(width: 30)
+                .padding(.trailing, 4)
+            }
+
+            var main: some View {
                 VStack(alignment: .leading, spacing: 1) {
                     NavigationLink {
                         TaskDetail(task: task)
@@ -917,6 +945,7 @@ extension Tabs.Content {
                             Spacer()
                         }
                         .padding(.bottom, 8)
+                        .padding(.top, 4)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -972,11 +1001,9 @@ extension Tabs.Content {
                     .font(.system(.caption, design: .monospaced))
                     .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                 }
-                .listRowBackground(
-                    Common.TypedListRowBackground(colour: self.task.owner?.backgroundColor ?? Theme.rowColour, type: .tasks)
-                )
-                .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
-                .opacity(isCompleted ? 0.5 : 1.0)
+
+                .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? Theme.base : Theme.lightWhite)
+                .opacity(self.isCompleted ? 0.5 : 1.0)
                 .onAppear(perform: self.actionOnAppear)
                 .swipeActions(edge: .leading) {
                     Button {
