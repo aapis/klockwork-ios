@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RowAddButton: View {
+    @EnvironmentObject private var state: AppState
     public var title: String = "Add"
     @Binding public var isPresented: Bool
     public var animationDuration: CGFloat = 0.1
@@ -26,7 +27,7 @@ struct RowAddButton: View {
                     .font(.caption)
                     .padding(6)
                     .padding([.leading, .trailing], 8)
-                    .background(self.isPresented ? .orange : .white)
+                    .background(self.isPresented ? self.state.theme.tint : .white)
                     .foregroundStyle(Theme.base)
                     .clipShape(.capsule(style: .continuous))
             }
