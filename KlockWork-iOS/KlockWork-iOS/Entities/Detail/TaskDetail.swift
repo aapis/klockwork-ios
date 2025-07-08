@@ -41,6 +41,7 @@ struct TaskDetail: View {
                     TextField("What needs to be done?", text: $content, axis: .vertical)
                         .lineLimit(5...10)
                         .listRowBackground(Theme.textBackground)
+                        .textSelection(.enabled)
                     Section {
                         if self.isCompleted || self.isCancelled {
                             Button {
