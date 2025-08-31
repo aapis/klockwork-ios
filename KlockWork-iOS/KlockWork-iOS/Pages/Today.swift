@@ -116,7 +116,7 @@ extension Today {
                             HStack(spacing: 0) {
                                 VStack(alignment: .trailing) {
                                     Text(DateHelper.todayShort(self.state.date, format: "YYYY"))
-                                    Text(self.state.date.formatted(Date.FormatStyle().weekday(.wide)))
+                                    Text(self.state.date.formatted(Date.FormatStyle().weekday(.abbreviated)))
                                 }
                                 .font(.system(.caption, design: .monospaced))
                                 .foregroundStyle(Theme.lightWhite)

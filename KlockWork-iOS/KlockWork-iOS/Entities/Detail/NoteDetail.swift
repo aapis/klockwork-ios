@@ -34,7 +34,21 @@ struct NoteDetail: View {
 
                 ZStack {
                     VStack(alignment: .leading, spacing: 0) {
-                        Editor(job: $job, title: $title)
+                        // @TODO: move HStack group into NoteDetail.Editor
+                        HStack(spacing: 0) {
+                            Editor(job: $job, title: $title)
+                            Button {
+                                self.starred.toggle()
+                            } label: {
+                                HStack {
+                                    Image(systemName: self.starred ? "star.fill" : "star")
+                                        .frame(maxHeight: 20)
+                                }
+                                .padding(14)
+                                .foregroundStyle(self.starred ? self.state.theme.tint : .gray)
+                            }
+                            .buttonStyle(.plain)
+                        }
                         HStack(alignment: .top, spacing: 0) {
                             TextEditor(text: $content)
                                 .focused($contentFieldFocused)

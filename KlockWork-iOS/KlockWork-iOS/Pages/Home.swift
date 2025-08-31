@@ -100,7 +100,7 @@ extension Home {
                                 HStack(spacing: 0) {
                                     VStack(alignment: .trailing) {
                                         Text(DateHelper.todayShort(self.state.date, format: "YYYY"))
-                                        Text(self.state.date.formatted(Date.FormatStyle().weekday(.wide)))
+                                        Text(self.state.date.formatted(Date.FormatStyle().weekday(.abbreviated)))
                                     }
                                     .font(.system(.caption, design: .monospaced))
                                     .foregroundStyle(Theme.lightWhite)
@@ -314,7 +314,7 @@ extension Home {
 
         var body: some View {
             VStack(alignment: .leading) {
-                QuickLookback()
+//                QuickLookback()
                 QuickLookup()
             }
         }
@@ -494,6 +494,7 @@ extension Home {
                 }
             }
         }
+
         // MARK: QuickHistory.JobOverviewWidget
         struct JobOverviewWidget: View {
             @EnvironmentObject private var state: AppState
@@ -579,6 +580,7 @@ extension Home {
                         iconColour: self.state.job!.backgroundColor,
                         callback: AnyView(JobDetail(job: self.state.job!))
                     )
+                    FavouriteThisJob()
                 }
             }
         }
@@ -653,6 +655,57 @@ extension Home {
             }
         }
 
+        // MARK: Home.QuickHistory.FavouriteThisJob
+        struct FavouriteThisJob: View {
+            @EnvironmentObject private var state: AppState
+            @State private var starred: Bool = false
+
+            var body: some View {
+                Button {
+                    self.starred.toggle()
+                    self.state.job?.starred = self.starred
+                    PersistenceController.shared.save()
+                } label: {
+                    HStack {
+                        Image(systemName: self.starred ? "star.fill" : "star")
+                        Text(self.starred ? "Remove Favourite" : "Favourite")
+                        Spacer()
+                    }
+                    .padding(4)
+                    .background(Theme.textBackground)
+                }
+                .buttonStyle(.plain)
+                .onAppear(perform: self.actionOnAppear)
+                .onChange(of: self.state.job) {self.actionOnAppear()}
+            }
+        }
+
+        // MARK: Home.QuickHistory.DefaultThisJob
+        // @TODO: isDefault is a prop of Company, need to do more to make this work
+        struct DefaultThisJob: View {
+            @EnvironmentObject private var state: AppState
+            @State private var defaultJob: Job? = nil
+
+            var body: some View {
+                Button {
+                    if let def = self.defaultJob {
+                        PersistenceController.shared.save()
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: self.defaultJob != nil ? "shield.lefthalf.filled" : "shield")
+                        Text(self.defaultJob != nil ? "Default Job" : "Set to Default")
+                        Spacer()
+                    }
+                    .padding(4)
+                    .background(Theme.textBackground)
+                }
+                .buttonStyle(.plain)
+                .onAppear(perform: self.actionOnAppear)
+                .onChange(of: self.state.job) {self.actionOnAppear()}
+            }
+        }
+
         // MARK: QuickHistory.Interactions
         struct Interactions: View {
             @EnvironmentObject private var state: AppState
@@ -706,7 +759,7 @@ extension Home {
                 } label: {
                     HStack {
                         Image(systemName: self.icon)
-                        Text(self.job.title ?? "No title")
+                        Text("\(self.job.project?.abbreviation ?? "404")/\(self.job.title ?? "Invalid title")")
                             .lineLimit(1)
                         Spacer()
                         if self.state.job == self.job {
@@ -1409,6 +1462,24 @@ extension Home.QuickAccessTabs.QuickSearchPanel {
             DateHelper.startOfMonth(for: Date().addingTimeInterval(interval)),
             DateHelper.endOfMonth(for: Date())
         )
+    }
+}
+
+extension Home.QuickHistory.FavouriteThisJob {
+    /// Fires onload
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        self.starred = self.state.job?.starred ?? false
+    }
+}
+
+extension Home.QuickHistory.DefaultThisJob {
+    /// Fires onload
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        if let job = CoreDataJob(moc: self.state.moc).getDefault() {
+            self.defaultJob = job
+        }
     }
 }
 
