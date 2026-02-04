@@ -486,6 +486,7 @@ extension Tabs.Content {
                                         }
                                     }
                                     .background(.white)
+                                    .foregroundStyle(Theme.base)
                                     .onDisappear(perform: self.actionPostSave)
                                 }
 

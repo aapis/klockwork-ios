@@ -47,6 +47,22 @@ struct MiniTitleBarPlan: View {
     }
 }
 
+struct MiniTitleBarCustom: View {
+    public var title: String
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 0) {
+            Text(self.title)
+                .font(.caption)
+            Spacer()
+        }
+        .padding([.top, .bottom], 5)
+        .padding([.leading, .trailing], 8)
+        .background(Theme.darkBtnColour)
+        .foregroundStyle(.gray)
+    }
+}
+
 extension MiniTitleBar {
     /// Sets title of the MTB to the selected tab's label
     /// - Returns: Void

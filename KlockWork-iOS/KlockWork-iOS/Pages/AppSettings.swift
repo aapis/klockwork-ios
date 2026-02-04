@@ -26,10 +26,8 @@ struct AppSettings: View {
                     Text("Royal").tag(3)
                     Text("Red").tag(4)
                 }
-                .listRowBackground(Theme.textBackground)
 
                 ColorPicker("Accent Colour", selection: self.$tint)
-                    .listRowBackground(Theme.textBackground)
                     .onChange(of: self.tint) {
                         self.actionOnChangeTint()
                     }

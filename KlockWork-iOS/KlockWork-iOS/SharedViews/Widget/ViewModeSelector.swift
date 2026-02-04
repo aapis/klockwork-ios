@@ -16,17 +16,6 @@ struct ViewModeSelector: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 0) {
                 Button {
-                    self.viewMode = .calendar
-                    self.storedVm = self.viewMode.id
-                } label: {
-                    Image(systemName: "calendar")
-                }
-                .disabled(self.storedVm == 2)
-                .padding(8)
-                .background(self.storedVm == 2 ? self.state.theme.tint : .black.opacity(0.1))
-                .foregroundStyle(self.storedVm == 2 ? Theme.cPurple : self.state.theme.tint)
-
-                Button {
                     self.viewMode = .tabular
                     self.storedVm = self.viewMode.id
                 } label: {
@@ -36,6 +25,18 @@ struct ViewModeSelector: View {
                 .padding(8)
                 .background(self.storedVm == 0 ? self.state.theme.tint : .black.opacity(0.1))
                 .foregroundStyle(self.storedVm == 0 ? Theme.cPurple : self.state.theme.tint)
+
+                Button {
+                    self.viewMode = .posts
+                    self.storedVm = self.viewMode.id
+                } label: {
+                    Image(systemName: "signpost.left.fill")
+                }
+                .disabled(self.storedVm == 3)
+                .padding([.leading, .trailing], 8)
+                .padding([.top, .bottom], 7)
+                .background(self.storedVm == 3 ? self.state.theme.tint : .black.opacity(0.1))
+                .foregroundStyle(self.storedVm == 3 ? Theme.cPurple : self.state.theme.tint)
 
                 Button {
                     self.viewMode = .hierarchical

@@ -243,14 +243,16 @@ extension Tabs.Content {
                                 .foregroundStyle(.gray)
                         }
                         .padding(10)
-
                         VStack(alignment: .leading, spacing: 0) {
-                            ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { term in
+                            ForEach(Array(self.definitions.enumerated()), id: \.offset) { idx, term in
                                 HStack(alignment: .top) {
-                                    Text("1. ")
+                                    Text("\(idx + 1). ")
                                     Text(term.definition ?? "_TERM_DEFINITION")
                                         .multilineTextAlignment(.leading)
                                     Spacer()
+                                    // BUG: without another element here the spacer breaks the scrollview for some reason
+                                    Image(systemName: "chevron.right")
+                                        .foregroundStyle(.clear)
                                 }
                                 .padding(8)
                                 .background(term.job?.backgroundColor)
@@ -2178,6 +2180,59 @@ extension Tabs.Content {
                     }
                 }
                 .background(Theme.base.opacity(0.8).blendMode(.softLight))
+            }
+        }
+
+        struct Post: View {
+            @Environment(\.colorScheme) var colourScheme
+            @EnvironmentObject private var state: AppState
+            public var record: LogRecord
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 0) {
+                    NavigationLink {
+                        RecordDetail(record: self.record)
+                            .background(self.state.theme.page.primaryColour)
+                            .scrollContentBackground(.hidden)
+                    } label: {
+                        HStack {
+                            HStack {
+                                Image("DefaultAvatar")
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .padding(.leading, 3)
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(self.record.job?.backgroundColor ?? Theme.rowColour, lineWidth: 1)
+                                    }
+                            }
+                            VStack(alignment: .leading) {
+                                Text("Under: \(self.record.job?.titleOrId() ?? "<Error>")")
+                                    .font(.system(.caption, design: .monospaced))
+                                Timestamp(text: self.record.timestamp!.formatted(date: .abbreviated, time: .shortened), fullWidth: false)
+                            }
+                            .padding(8)
+                            Spacer()
+                        }
+                        .foregroundStyle((self.record.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                        .background(
+                            Tabs.Content.Common.TypedListRowBackground(colour: self.record.job?.backgroundColor ?? Theme.rowColour, type: .records)
+                        )
+                        .frame(height: 66)
+                    }
+
+                    VStack(spacing: 0) {
+                        HStack(alignment: .center) {
+                            Text(self.record.message ?? "<Error: Record content not found>")
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                        }
+                        .padding(8)
+                    }
+                    .background(self.colourScheme == .dark ? Theme.textBackground : Theme.lightWhite)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
     }

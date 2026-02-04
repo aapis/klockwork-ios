@@ -11,7 +11,6 @@ import CoreData
 // @TODO: refactor into one that supports any PageConfiguration enum
 struct Tabs: View {
     typealias EntityType = PageConfiguration.EntityType
-
     @EnvironmentObject private var state: AppState
     public var inSheet: Bool
     @Binding public var job: Job?
@@ -19,48 +18,84 @@ struct Tabs: View {
     public var content: AnyView? = nil
     public var buttons: AnyView? = nil
     public var title: AnyView? = nil
+    public var mode: TabsViewMode = .read
     static public let animationDuration: Double = 0.2
+    @AppStorage("home.tabLocation") public var tabLocation: Int = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if buttons == nil {
-                switch self.state.today.tableButtonMode {
-                case .actions:
-                    HStack(alignment: .center, spacing: 8) {
-                        AddButton()
-                            .frame(width: 50, height: 45)
-                            .background(Theme.darkBtnColour)
-
-                        ViewModeSelector()
-                    }
-                case .items:
-                    Buttons(inSheet: inSheet, job: $job, selected: $selected)
-                        .swipe([.left, .right]) { swipe in
-                            self.actionOnSwipe(swipe)
-                        }
+            Divider().background(.white).frame(height: 1)
+            // @TODO: only allowing top/bottom tabs to work on create mode for now don't @ me
+            if self.mode == .create {
+                switch self.tabLocation {
+                case 1:
+                    self.contentRow
+                    self.miniTitleRow
+                    self.buttonRow
+                default:
+                    self.buttonRow
+                    self.miniTitleRow
+                    self.contentRow
                 }
-
             } else {
-                buttons
-            }
-
-            if title == nil {
-                MiniTitleBar(selected: $selected)
-                    .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
-            } else {
-                title
-            }
-
-            if content == nil {
-                Content(inSheet: inSheet, job: $job, selected: $selected)
-                    .swipe([.left, .right]) { swipe in
-                        self.actionOnSwipe(swipe)
-                    }
-            } else {
-                content
+                self.buttonRow
+                self.miniTitleRow
+                self.contentRow
             }
         }
         .background(.clear)
+    }
+
+    @ViewBuilder private var miniTitleRow: some View {
+        if title == nil {
+            MiniTitleBar(selected: $selected)
+                .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
+        } else {
+            title
+        }
+    }
+
+    @ViewBuilder private var contentRow: some View {
+        if content == nil {
+            switch self.mode {
+            case .create:
+                Tabs.TVMCreate(selected: $selected)
+            case .read:
+                Tabs.Content(inSheet: inSheet, job: $job, selected: $selected)
+                    .swipe([.left, .right]) { swipe in
+                        self.actionOnSwipe(swipe)
+                    }
+            case .update:
+                Tabs.TVMUpdate()
+            case .delete:
+                Tabs.TVMDelete()
+            }
+        } else {
+            content
+        }
+    }
+
+    @ViewBuilder private var buttonRow: some View {
+        if buttons == nil {
+            switch self.state.today.tableButtonMode {
+            case .actions:
+                HStack(alignment: .center, spacing: 8) {
+                    AddButton()
+                        .frame(width: 50, height: 45)
+                        .background(Theme.darkBtnColour)
+
+                    ViewModeSelector()
+                }
+            case .items:
+                Buttons(inSheet: inSheet, job: $job, selected: $selected, tabLocation: self.$tabLocation, mode: self.mode)
+                    .swipe([.left, .right]) { swipe in
+                        self.actionOnSwipe(swipe)
+                    }
+            }
+
+        } else {
+            buttons
+        }
     }
 }
 
@@ -91,11 +126,17 @@ extension Tabs {
 }
 
 extension Tabs {
+    enum TabsViewMode {
+        case create, read, update, delete
+    }
+
     struct Buttons: View {
         @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
+        @Binding public var tabLocation: Int
+        public var mode: TabsViewMode
 
         var body: some View {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -112,6 +153,12 @@ extension Tabs {
                                     .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
                             }
                             .buttonStyle(.plain)
+                            .clipShape(
+                                .rect(
+                                    bottomLeadingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0,
+                                    bottomTrailingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0
+                                )
+                            )
                         }
                     }
                     Spacer()
@@ -160,6 +207,44 @@ extension Tabs {
                     .padding()
                 }
             }
+        }
+    }
+
+    struct TVMCreate: View {
+        @EnvironmentObject private var state: AppState
+        @Binding public var selected: EntityType
+
+        var body: some View {
+            switch selected {
+            case .records:
+                RecordDetail()
+            case .jobs:
+                JobDetail()
+            case .tasks:
+                TaskDetail()
+            case .notes:
+                NoteDetail()
+            case .companies:
+                CompanyDetail()
+            case .people:
+                PersonDetail()
+            case .projects:
+                ProjectDetail()
+            case .terms:
+                TermDetail()
+            }
+        }
+    }
+
+    struct TVMUpdate: View {
+        var body: some View {
+            Text("update")
+        }
+    }
+
+    struct TVMDelete: View {
+        var body: some View {
+            Text("delete")
         }
     }
 }
