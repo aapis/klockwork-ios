@@ -14,8 +14,8 @@ struct PersonDetail: View {
     public var page: PageConfiguration.AppPage = .create
     @State private var created: Date = Date()
     @State private var lastUpdate: Date = Date()
-    @State private var name: String = ""
-    @State private var title: String = ""
+    @AppStorage("entity.people.name") private var name: String = ""
+    @AppStorage("entity.people.title") private var title: String = ""
     @State public var company: Company? = nil
     @State private var isCompanySelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false

@@ -30,13 +30,13 @@ struct Today: View {
                 if !inSheet {
                     Header(page: self.page, path: $path)
                 }
-                Divider().background(.white).frame(height: 1)
-                
                 switch(self.viewMode) {
                 case 1:
                     Tabs.Content.List.HierarchyExplorer(inSheet: false)
                 case 2:
                     Widget.ActivityCalendar(searchTerm: $text, showActivity: false)
+                case 3:
+                    Tabs.Content.Posts.Records(job: self.$job, date: self.state.date, inSheet: false)
                 case 0:
                     main
                 default:
@@ -49,6 +49,7 @@ struct Today: View {
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
+            // @TODO: remove weird duplicity here
             .onChange(of: self.state.job) {self.job = self.state.job}
             .onChange(of: self.job) {self.actionOnJobChange()}
         }
@@ -87,7 +88,11 @@ struct PageTitle: View {
     public let text: String
 
     var body: some View {
-        Text(self.text).font(.title2).padding([.leading], 10).bold()
+        Text(self.text)
+            .font(.title2)
+            .padding([.leading], 10)
+            .bold()
+            .foregroundStyle(.white)
     }
 }
 
@@ -125,7 +130,6 @@ extension Today {
                             .padding([.leading, .trailing], 8)
                         }
                         .buttonStyle(.plain)
-                        .opacity(self.viewMode == 0 || self.viewMode == 1 ? 1 : 0.5)
 
                         Spacer()
                         CreateEntitiesButton(isViewModeSelectorVisible: true, page: self.page)
@@ -152,6 +156,7 @@ extension Today {
 
     struct Editor: View {
         @EnvironmentObject private var state: AppState
+        public var prompt: String = "What are you working on?"
         @Binding public var job: Job?
         @Binding public var entityType: EntityType
         @FocusState public var focused: Bool
@@ -160,7 +165,7 @@ extension Today {
         var body: some View {
             if job != nil {
                 QueryField(
-                    prompt: "What are you working on?",
+                    prompt: self.prompt,
                     onSubmit: self.actionOnSubmit,
                     text: $text
                 )

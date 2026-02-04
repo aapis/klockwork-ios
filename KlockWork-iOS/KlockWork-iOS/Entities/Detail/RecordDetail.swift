@@ -12,7 +12,7 @@ struct RecordDetail: View {
     @Environment(\.dismiss) private var dismiss
     public var record: LogRecord?
     @State private var timestamp = Date()
-    @State private var message: String = ""
+    @AppStorage("entity.record.message") public var message: String = ""
     @State public var job: Job?
     @State private var alive: Bool = true
     @State private var isJobSelectorPresented: Bool = false
@@ -21,58 +21,63 @@ struct RecordDetail: View {
     public var page: PageConfiguration.AppPage = .create
 
     var body: some View {
-        VStack {
-            List {
-                Widget.JobSelector.FormField(
-                    job: $job,
-                    isJobSelectorPresented: $isJobSelectorPresented
-                )
-
-                TextField("Record content", text: $message, axis: .vertical)
-                    .lineLimit(5...10)
+        NavigationStack {
+            VStack {
+                List {
+                    Widget.JobSelector.FormField(
+                        job: $job,
+                        isJobSelectorPresented: $isJobSelectorPresented
+                    )
+                    
+                    TextField("What's on your mind?", text: $message, axis: .vertical)
+                        .lineLimit(5...10)
+                        .listRowBackground(Theme.textBackground)
+                    
+                    Section("Settings") {
+                        Toggle("Published", isOn: $alive)
+                    }
                     .listRowBackground(Theme.textBackground)
-                
-                Section("Settings") {
-                    Toggle("Published", isOn: $alive)
-                }
-                .listRowBackground(Theme.textBackground)
-
-                if self.record != nil {
-                    Button("Delete Record", role: .destructive, action: self.actionInitiateDelete)
-                        .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
-                            Button("Yes", role: .destructive) {
-                                self.actionOnDelete()
+                    
+                    if self.record != nil {
+                        Button("Delete Record", role: .destructive, action: self.actionInitiateDelete)
+                            .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                                Button("Yes", role: .destructive) {
+                                    self.actionOnDelete()
+                                }
+                            } message: {
+                                Text("This record will be permanently deleted.")
                             }
-                        } message: {
-                            Text("This record will be permanently deleted.")
-                        }
-                        .listRowBackground(Color.red)
-                        .foregroundStyle(.white)
+                            .listRowBackground(Color.red)
+                            .foregroundStyle(.white)
+                    }
+                }
+                Spacer()
+            }
+//            .foregroundStyle(.white)
+            .scrollContentBackground(.hidden)
+            .navigationTitle(self.record != nil ? "Record" : "New Record")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    // Creates new entity on tap, then sends user back to Today
+                    Button {
+                        self.actionOnSave()
+                    } label: {
+                        Text("Save")
+                    }
+                    .foregroundStyle(self.state.theme.tint)
                 }
             }
-            Spacer()
-        }
-        .onAppear(perform: actionOnAppear)
-        .navigationTitle(self.record != nil ? "Record" : "New Record")
-        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                // Creates new entity on tap, then sends user back to Today
-                Button {
-                    self.actionOnSave()
-                } label: {
-                    Text("Save")
-                }
-                .foregroundStyle(self.state.theme.tint)
+            .sheet(isPresented: $isJobSelectorPresented) {
+                Widget.JobSelector.Single(
+                    job: $job
+                )
+                .presentationBackground(self.page.primaryColour)
             }
         }
-        .sheet(isPresented: $isJobSelectorPresented) {
-            Widget.JobSelector.Single(
-                job: $job
-            )
-            .presentationBackground(self.page.primaryColour)
-        }
+        .onAppear(perform: self.actionOnAppear)
     }
 }
 

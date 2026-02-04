@@ -17,8 +17,10 @@ class AppState: ObservableObject {
     @Published var planning: PlanningPage = PlanningPage()
     @Published var job: Job?
     @Published var plan: Plan?
+    @Published var dueTodayCount: Int = 0
 
     init() {
+        // @TODO: this seems unnecessary and prone to error when state changes. Fix.
         self.activities.state = self
     }
     

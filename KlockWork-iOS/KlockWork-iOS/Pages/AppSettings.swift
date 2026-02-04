@@ -12,13 +12,15 @@ struct AppSettings: View {
     @EnvironmentObject private var state: AppState
     @State private var tint: Color = .yellow
     @AppStorage("home.backgroundColour") public var homeBackgroundColour: Int = 0
+    @AppStorage("home.tabLocation") public var tabLocation: Int = 0
     private let page: PageConfiguration.AppPage = .settings
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             List {
                 Picker("Dashboard background", selection: self.$homeBackgroundColour) {
-                    Text("Default").tag(0)
+                    Text("System").tag(-1)
+                    Text("Orange").tag(0)
                     Text("Blue").tag(1)
                     Text("Green").tag(2)
                     Text("Royal").tag(3)
@@ -31,6 +33,11 @@ struct AppSettings: View {
                     .onChange(of: self.tint) {
                         self.actionOnChangeTint()
                     }
+
+                Picker("Tab location", selection: self.$tabLocation) {
+                    Text("Top (default)").tag(0)
+                    Text("Bottom").tag(1)
+                }
             }
             .scrollContentBackground(.hidden)
             Spacer()

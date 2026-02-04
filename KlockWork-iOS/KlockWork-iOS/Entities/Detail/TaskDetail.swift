@@ -14,7 +14,7 @@ struct TaskDetail: View {
     @State public var task: LogTask?
     @State private var completedDate: Date = Date()
     @State private var cancelledDate: Date = Date()
-    @State private var content: String = ""
+    @AppStorage("entity.task.content") private var content: String = ""
     @State private var created: Date = Date()
     @State private var due: Date = DateHelper.endOfDay() ?? Date()
     @State private var dueTomorrow: Date = DateHelper.endOfTomorrow() ?? Date()
@@ -152,7 +152,7 @@ struct TaskDetail: View {
                 }
             }
             .onAppear(perform: self.actionOnAppear)
-            .navigationTitle("Task")
+            .navigationTitle(self.task != nil ? "Task" : "New Task")
             .background(self.page.primaryColour)
             .scrollContentBackground(.hidden)
             .navigationBarTitleDisplayMode(.inline)

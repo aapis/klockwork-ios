@@ -38,26 +38,30 @@ struct Main: View {
                     Image(systemName: "house")
                     Text("Home")
                 }
+                .badge(self.state.dueTodayCount)
             Today(inSheet: false)
-            .tabItem {
-                Image(systemName: "tray")
-                Text("Today")
-            }
+                .tabItem {
+                    Image(systemName: "tray")
+                    Text("Today")
+                }
             Explore()
-            .tabItem {
-                Image(systemName: "globe.desk")
-                Text("Explore")
-            }
+                .tabItem {
+                    Image(systemName: "globe.desk")
+                    Text("Explore")
+                }
             Find()
-            .tabItem {
-                Image(systemName: "magnifyingglass")
-                Text("Find")
-            }
+                .tabItem {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.white)
+                    Text("Find")
+                }
         }
-        .preferredColorScheme(.dark) // intentionally forcing dark mode on this view for aesthetics
         .tint(self.state.theme.tint)
         .onAppear(perform: self.onApplicationBoot)
         .environmentObject(self.state)
+        .onChange(of: self.state.date) {
+            self.state.dueTodayCount = CoreDataTasks(moc: self.state.moc).dueToday(self.state.date).count
+        }
     }
 }
 

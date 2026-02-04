@@ -14,8 +14,8 @@ struct NoteDetail: View {
     public var note: Note? = nil
     @State private var versions: [NoteVersion] = []
     @State private var current: NoteVersion? = nil
-    @State private var content: String = ""
-    @State private var title: String = ""
+    @AppStorage("entity.note.content") private var content: String = ""
+    @AppStorage("entity.note.title") private var title: String = ""
     @State public var job: Job? = nil
     @State private var starred: Bool = false
     @State private var postedDate: Date = Date()
@@ -26,54 +26,67 @@ struct NoteDetail: View {
     @FocusState private var contentFieldFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
-            ZStack(alignment: .topLeading) {
-                RadialGradient(gradient: Gradient(colors: [.black, .clear]), center: .topTrailing, startRadius: 0, endRadius: 400)
-                    .opacity(0.45)
-                    .blendMode(.softLight)
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 1) {
+                ZStack(alignment: .topLeading) {
+                    RadialGradient(gradient: Gradient(colors: [.black, .clear]), center: .topTrailing, startRadius: 0, endRadius: 400)
+                        .opacity(0.45)
+                        .blendMode(.softLight)
 
-                ZStack {
-                    VStack(alignment: .leading, spacing: 0) {
-                        // @TODO: move HStack group into NoteDetail.Editor
-                        HStack(spacing: 0) {
-                            Editor(job: $job, title: $title)
-                            Button {
-                                self.starred.toggle()
-                            } label: {
-                                HStack {
-                                    Image(systemName: self.starred ? "star.fill" : "star")
-                                        .frame(maxHeight: 20)
+                    ZStack {
+                        VStack(alignment: .leading, spacing: 0) {
+                            // @TODO: move HStack group into NoteDetail.Editor
+                            HStack(spacing: 0) {
+                                Editor(job: $job, title: $title)
+                                Button {
+                                    self.starred.toggle()
+                                } label: {
+                                    HStack {
+                                        Image(systemName: self.starred ? "star.fill" : "star")
+                                            .frame(maxHeight: 20)
+                                    }
+                                    .padding(14)
+                                    .foregroundStyle(self.starred ? self.state.theme.tint : .gray)
                                 }
-                                .padding(14)
-                                .foregroundStyle(self.starred ? self.state.theme.tint : .gray)
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
+                            HStack(alignment: .top, spacing: 0) {
+                                TextEditor(text: $content)
+                                    .focused($contentFieldFocused)
+                                    .padding(8)
+                                    .foregroundStyle(.white)
+                                Spacer()
+                            }
+//                            Spacer()
+//                            PageActionBar.Create(
+//                                page: self.page,
+//                                job: $job,
+//                                onSave: self.actionOnSave
+//                            )
                         }
-                        HStack(alignment: .top, spacing: 0) {
-                            TextEditor(text: $content)
-                                .focused($contentFieldFocused)
-                                .padding(8)
-                                .foregroundStyle(.white)
-                            Spacer()
-                        }
-                        Spacer()
-                        PageActionBar.Create(
-                            page: self.page,
-                            job: $job,
-                            onSave: self.actionOnSave
-                        )
                     }
                 }
             }
+            .foregroundStyle(self.state.theme.tint)
+            .background(self.page.primaryColour)
+            .scrollContentBackground(.hidden)
+            .navigationTitle(self.note != nil ? title.prefix(25) : "New Note")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    // Creates new entity on tap, then sends user back to Today
+                    Button {
+                        self.actionOnSave()
+                    } label: {
+                        Text("Save")
+                    }
+                    .foregroundStyle(self.state.theme.tint)
+                }
+            }
         }
-        .foregroundStyle(self.state.theme.tint)
-        .background(self.page.primaryColour)
-        .scrollContentBackground(.hidden)
         .onAppear(perform: self.actionOnAppear)
-        .navigationTitle(title.prefix(25))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
     }
 
     struct Editor: View {

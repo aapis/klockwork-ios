@@ -15,6 +15,7 @@ public enum TabbedWidget {
 
 // MARK: Home
 struct Home: View {
+    @Environment(\.colorScheme) var colourScheme
     @EnvironmentObject private var state: AppState
     @State private var path = NavigationPath()
     @State private var backgroundColour: Color = Theme.cOrange
@@ -70,7 +71,6 @@ struct Home: View {
             }
             .padding([.leading, .bottom, .trailing], 8)
         }
-        .background(self.backgroundColour)
     }
 }
 
@@ -132,7 +132,6 @@ extension Home {
                             }
                         }
                         .buttonStyle(.plain)
-                        .opacity(self.viewMode == 0 || self.viewMode == 1 ? 1 : 0.5)
                         Spacer()
                     }
                 }

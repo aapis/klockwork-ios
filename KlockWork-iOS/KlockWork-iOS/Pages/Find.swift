@@ -144,12 +144,13 @@ extension Find {
                     }
                 }
             }
-            .onAppear(perform: {
-                date = self.state.date
-            })
-            .onChange(of: date) {
-                self.state.date = DateHelper.startOfDay(self.date)
-            }
+            // @TODO: do we need?
+//            .onAppear(perform: {
+//                date = self.state.date
+//            })
+//            .onChange(of: date) {
+//                self.state.date = DateHelper.startOfDay(self.date)
+//            }
         }
     }
 
@@ -161,18 +162,17 @@ extension Find {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                if results != nil {
-                    ScrollView {
+                if let searchResults = self.results {
+                    ScrollView(.vertical) {
                         VStack(alignment: .leading, spacing: 1) {
-                            if !text.isEmpty {
-                                if let searchResults = results {
-                                    ForEach(searchResults.children) { row in row.view}
-                                }
+                            if !self.text.isEmpty {
+                                ForEach(searchResults.children) { row in row.view }
                             }
                         }
                     }
+                } else {
+                    Spacer()
                 }
-                Spacer()
             }
         }
     }
