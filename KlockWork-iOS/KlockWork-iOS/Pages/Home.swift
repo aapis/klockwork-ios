@@ -821,12 +821,12 @@ extension Home {
             HStack(alignment: .center) {
                 Spacer()
                 AddButton(plain: false)
-                    .foregroundStyle(
-                        self.state.job?.backgroundColor.isBright() ?? false ?
-                            self.backgroundColour
-                        :
-                            self.state.theme.tint
-                    )
+//                    .foregroundStyle(
+//                        self.state.job?.backgroundColor.isBright() ?? false ?
+//                            self.backgroundColour
+//                        :
+//                            self.state.theme.tint
+//                    )
                     .clipShape(.capsule(style: .continuous))
                     .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
                     .padding()
@@ -1565,6 +1565,8 @@ extension Home {
     /// - Returns: Void
     private func actionOnAppear() -> Void {
         switch self.homeBackgroundColourChoice {
+        case -1: self.backgroundColour = Color.iOSBetaBg
+        case 0: self.backgroundColour = Theme.cOrange
         case 1: self.backgroundColour = Theme.cPurple
         case 2: self.backgroundColour = Theme.cGreen
         case 3: self.backgroundColour = Theme.cRoyal
