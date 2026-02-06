@@ -246,6 +246,7 @@ extension Tabs {
             switch selected {
             case .records:
                 RecordDetail()
+                RecordRecent()
             case .jobs:
                 JobDetail()
             case .tasks:

@@ -85,6 +85,9 @@ struct RecordDetail: View {
             }
         }
         .onAppear(perform: self.actionOnAppear)
+        .onChange(of: self.state.job) {
+            self.job = self.state.job
+        }
     }
 }
 
@@ -103,6 +106,8 @@ extension RecordDetail {
 
             self.alive = self.record!.alive
             self.job = self.record!.job
+        } else {
+            self.job = self.state.job
         }
     }
 

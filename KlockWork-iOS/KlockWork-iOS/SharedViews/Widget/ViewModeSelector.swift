@@ -23,8 +23,21 @@ struct ViewModeSelector: View {
                 }
                 .disabled(self.storedVm == 0)
                 .padding(8)
-                .background(self.storedVm == 0 ? self.state.theme.tint : .black.opacity(0.1))
-                .foregroundStyle(self.storedVm == 0 ? Theme.cPurple : self.state.theme.tint)
+                .background(
+                    ZStack(alignment: .bottom) {
+                        (self.storedVm == 0 ? self.state.theme.tint : Theme.darkBtnColour)
+                        VStack {
+                            Spacer()
+                            LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
+                                .blendMode(.softLight)
+                                .opacity(self.storedVm == 0 ? 1 : 0)
+                                .frame(height: 15)
+                        }
+                    }
+                )
+                .foregroundStyle(
+                    .linearGradient(colors: [self.storedVm == 0 ? Theme.base : .gray, self.storedVm == 0 ? Theme.cPurple : .gray], startPoint: .top, endPoint: .bottom)
+                )
 
                 Button {
                     self.viewMode = .posts
@@ -35,8 +48,21 @@ struct ViewModeSelector: View {
                 .disabled(self.storedVm == 3)
                 .padding([.leading, .trailing], 8)
                 .padding([.top, .bottom], 7)
-                .background(self.storedVm == 3 ? self.state.theme.tint : .black.opacity(0.1))
-                .foregroundStyle(self.storedVm == 3 ? Theme.cPurple : self.state.theme.tint)
+                .background(
+                    ZStack(alignment: .bottom) {
+                        (self.storedVm == 3 ? self.state.theme.tint : Theme.darkBtnColour)
+                        VStack {
+                            Spacer()
+                            LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
+                                .blendMode(.softLight)
+                                .opacity(self.storedVm == 3 ? 1 : 0)
+                                .frame(height: 15)
+                        }
+                    }
+                )
+                .foregroundStyle(
+                    .linearGradient(colors: [self.storedVm == 3 ? Theme.base : .gray, self.storedVm == 3 ? Theme.cPurple : .gray], startPoint: .top, endPoint: .bottom)
+                )
 
                 Button {
                     self.viewMode = .hierarchical
@@ -48,8 +74,21 @@ struct ViewModeSelector: View {
                 .padding(8)
                 .padding(.top, 2)
                 .padding(.bottom, 1)
-                .background(self.storedVm == 1 ? self.state.theme.tint : .black.opacity(0.1))
-                .foregroundStyle(self.storedVm == 1 ? Theme.cPurple : self.state.theme.tint)
+                .background(
+                    ZStack(alignment: .bottom) {
+                        (self.storedVm == 1 ? self.state.theme.tint : Theme.darkBtnColour)
+                        VStack {
+                            Spacer()
+                            LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
+                                .blendMode(.softLight)
+                                .opacity(self.storedVm == 1 ? 1 : 0)
+                                .frame(height: 15)
+                        }
+                    }
+                )
+                .foregroundStyle(
+                    .linearGradient(colors: [self.storedVm == 1 ? Theme.base : .gray, self.storedVm == 1 ? Theme.cPurple : .gray], startPoint: .top, endPoint: .bottom)
+                )
             }
             .clipShape(RoundedRectangle(cornerRadius: 4))
         }
