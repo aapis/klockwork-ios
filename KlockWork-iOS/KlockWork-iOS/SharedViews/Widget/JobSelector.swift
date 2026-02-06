@@ -178,10 +178,11 @@ extension Widget {
         /// Allows selection of a single job from the list
         struct Single: View {
             typealias Row = Tabs.Content.Individual.SingleJobDetailedCustomButton
-
             @EnvironmentObject private var state: AppState
             @Environment(\.dismiss) private var dismiss
             public var title: String?
+            @State public var isSheetPresented: Bool = false
+            @State private var searchText: String = ""
             @FetchRequest private var items: FetchedResults<Job>
             @FetchRequest private var recentItems: FetchedResults<Job>
             @Binding public var job: Job?
@@ -191,101 +192,122 @@ extension Widget {
             }
 
             var body: some View {
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack(alignment: .center, spacing: 0) {
-                        Text(self.title!)
-                            .lineLimit(1)
-                            .font(.title2)
-                        Spacer()
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "xmark")
+                ZStack(alignment: .bottom) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        if items.count > 0 {
+                            VStack(alignment: .leading, spacing: 0) {
+                                if !self.searchText.isEmpty {
+                                    UI.FilteredList(items: self.items, text: self.$searchText)
+                                } else {
+                                    List {
+                                        Section {
+                                            ForEach(self.recentItems, id: \.objectID) { jerb in
+                                                Row(job: jerb, callback: { job in
+                                                    self.job = job
+                                                    self.state.job = job
+                                                    dismiss()
+                                                })
+                                                .listRowInsets(.none)
+                                                .listRowSpacing(.none)
+                                                .listRowSeparator(.hidden)
+                                            }
+                                        } header: {
+                                            Text("Recent (\(self.recentItems.count))")
+                                        }
+                                        .listSectionSpacing(0)
+                                        Section {
+                                            ForEach(self.items, id: \.objectID) { jerb in
+                                                Row(job: jerb, callback: { job in
+                                                    self.job = job
+                                                    self.state.job = job
+                                                    dismiss()
+                                                })
+                                                .listRowInsets(.none)
+                                                .listRowSpacing(.none)
+                                                .listRowSeparator(.hidden)
+                                            }
+                                        } header: {
+                                            Text("All (\(self.items.count))")
+                                        }
+                                        .listSectionSpacing(0)
+                                    }
+                                    .listStyle(.inset)
+                                    .scrollContentBackground(.hidden)
+                                }
+                            }
+                        } else {
+                            StatusMessage.Warning(message: "No jobs found")
                         }
                     }
-                    .padding()
-
-                    if items.count > 0 {
-                        // @TODO: this should be a NEW inline search widget
-//                        SearchBar(placeholder: "Find", items: self.items, type: .jobs)
-//                            .padding()
-                        List {
-                            HStack {
-                                Spacer()
-                                SectionTitle(label: "Recent (\(self.recentItems.count))")
-                            }
-                            .listRowBackground(
-                                VStack(spacing: 0) {
-                                    Divider()
-                                        .foregroundStyle(.gray)
-                                    ZStack(alignment: .bottom) {
-                                        Theme.cPurple
-                                        LinearGradient(colors: [.clear, Theme.base], startPoint: .top, endPoint: .bottom)
-                                            .frame(height: 10)
-                                            .blendMode(.softLight)
-                                            .opacity(0.7)
-                                    }
-                                    Divider()
-                                        .foregroundStyle(.gray)
-                                }
-                            )
-                            ForEach(self.recentItems, id: \.objectID) { jerb in
-                                Row(job: jerb, callback: { job in
-                                    self.job = job
-                                    self.state.job = job
-                                    dismiss()
-                                })
-                                .background(
-                                    Tabs.Content.Common.TypedListRowBackground(colour: jerb.backgroundColor, type: .jobs)
-                                )
-                            }
-                            HStack {
-                                Spacer()
-                                SectionTitle(label: "All (\(self.items.count))")
-                            }
-                            .listRowBackground(
-                                VStack(spacing: 0) {
-                                    Divider()
-                                        .foregroundStyle(.gray)
-                                    ZStack(alignment: .bottom) {
-                                        Theme.cPurple
-                                        LinearGradient(colors: [.clear, Theme.base], startPoint: .top, endPoint: .bottom)
-                                            .frame(height: 10)
-                                            .blendMode(.softLight)
-                                            .opacity(0.7)
-                                    }
-                                    Divider()
-                                        .foregroundStyle(Color.lightGray())
-                                }
-                            )
-                            ForEach(self.items, id: \.objectID) { jerb in
-                                Row(job: jerb, callback: { job in
-                                    self.job = job
-                                    self.state.job = job
-                                    dismiss()
-                                })
-                                .background(
-                                    Tabs.Content.Common.TypedListRowBackground(colour: jerb.backgroundColor, type: .jobs)
-                                )
-                            }
-                        }
-                        .listStyle(.plain)
-                        .listRowInsets(.none)
-                        .listRowSpacing(.none)
-                        .listRowSeparator(.hidden)
-                        .listSectionSpacing(0)
-                        .scrollContentBackground(.hidden)
-                    } else {
-                        StatusMessage.Warning(message: "No jobs found")
+                    VStack(alignment: .leading, spacing: 0) {
+                        LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
+                            .frame(height: 50)
+                            .opacity(0.1)
+                        SearchBar.Bar(placeholder: "Type to filter...", text: self.$searchText, sheetPresented: self.$isSheetPresented)
+                            .padding()
+                            .background(Theme.cPurple)
+                            .border(width: 1, edges: [.top], color: self.searchText.count > 0 ? self.state.theme.tint : .gray)
                     }
                 }
             }
 
-            init(title: String? = "What are you working on now?", job: Binding<Job?>) {
+            init(title: String? = "What are you working on?", job: Binding<Job?>) {
                 self.title = title
                 _job = job
-                _items = CoreDataJob.fetchAll()
+                _items = CoreDataJob.fetchAll(sort: [NSSortDescriptor(keyPath: \Job.title, ascending: true)])
                 _recentItems = CoreDataJob.fetchRecent(limit: 8)
+            }
+        }
+
+        struct UI {
+            struct FilteredList: View {
+                typealias Row = Tabs.Content.Individual.SingleJobDetailedCustomButton
+                @EnvironmentObject private var state: AppState
+                @Environment(\.dismiss) private var dismiss
+                public var items: FetchedResults<Job>
+                @AppStorage("home.tabLocation") public var tabLocation: Int = 0
+                @Binding public var text: String
+                @State private var jobs: [Job] = []
+
+                var body: some View {
+                    VStack(alignment: .leading, spacing: 0) {
+                        List {
+                            Section {
+                                if self.jobs.count > 0 {
+                                    ForEach(self.jobs) { job in
+                                        Row(job: job, callback: { job in
+                                            self.state.job = job
+                                            dismiss()
+                                        })
+                                        .listRowInsets(.none)
+                                        .listRowSpacing(.none)
+                                        .listRowSeparator(.hidden)
+                                    }
+                                }
+                            } header: {
+                                Text("\(self.jobs.count) result(s) for \"\(self.text)\"")
+                                    .foregroundStyle(Theme.lightWhite)
+                            }
+                            .listSectionSpacing(0)
+                        }
+                        .listStyle(.inset)
+                        .scrollContentBackground(.hidden)
+                    }
+                    .onAppear(perform: self.actionOnChangeInput)
+                    .onChange(of: self.text) {
+                        self.actionOnChangeInput()
+                    }
+                }
+                
+                /// Fires when self.text changes
+                /// - Returns: Void
+                private func actionOnChangeInput() -> Void {
+                    self.jobs = items.filter {
+                        $0.titleOrId().lowercased().contains(self.text.lowercased()) ||
+                        ($0.overview ?? "").lowercased().contains(self.text.lowercased())
+                    }
+                    .sorted(by: {$0.titleOrId() < $1.titleOrId()})
+                }
             }
         }
     }

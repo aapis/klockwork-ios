@@ -30,7 +30,7 @@ struct PageActionBar: View {
 
     struct Today: View {
         @EnvironmentObject private var state: AppState
-        public var title: String = "What are you working on now?"
+        public var title: String = "What are you working on?"
         public var prompt: String = "Choose a job"
         @Binding public var job: Job?
         @State private var selectedJobs: [Job] = []
@@ -50,6 +50,7 @@ struct PageActionBar: View {
                 ),
                 isPresented: $isPresented
             )
+            .padding([.leading, .trailing], 5) //
             .id(self.id)
             .onAppear(perform: self.actionOnAppear)
             .onChange(of: self.job) { // sheet/group view are essentially static unless we manually refresh them, @TODO: fix this
@@ -68,12 +69,14 @@ struct PageActionBar: View {
                 Spacer()
                 AddButton()
                     .foregroundStyle((self.job?.backgroundColor ?? self.page.primaryColour).isBright() ? self.page.primaryColour : self.state.theme.tint)
+                    .padding(.trailing, 8)
             }
             .background(
                 ZStack {
                     if self.job == nil {
                         self.page.primaryColour
-                        Color.white.blendMode(.softLight)
+//                        Color.white.blendMode(.softLight) // @TODO: implement for light mode
+                        Color.black.blendMode(.overlay).opacity(0.6)
                     } else {
                         self.job?.backgroundColor
                     }

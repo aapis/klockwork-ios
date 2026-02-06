@@ -49,17 +49,22 @@ struct MiniTitleBarPlan: View {
 
 struct MiniTitleBarCustom: View {
     public var title: String
+    public var icon: String? = nil
+    public var fgColour: Color = .gray
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
             Text(self.title)
-                .font(.caption)
             Spacer()
+            if let icon = self.icon {
+                Image(systemName: icon)
+            }
         }
         .padding([.top, .bottom], 5)
         .padding([.leading, .trailing], 8)
         .background(Theme.darkBtnColour)
-        .foregroundStyle(.gray)
+        .foregroundStyle(self.fgColour)
+        .font(.caption)
     }
 }
 

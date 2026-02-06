@@ -130,6 +130,17 @@ struct JobDetail: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        self.jid = ""
+                        self.overview = ""
+                        self.title = ""
+                        self.url = ""
+                    } label: {
+                        Text("Clear")
+                    }
+                    .disabled(self.jid == "" && self.overview == "" && self.title == "" && self.url == "")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
                     Button {

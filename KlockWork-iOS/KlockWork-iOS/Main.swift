@@ -59,6 +59,7 @@ struct Main: View {
         .tint(self.state.theme.tint)
         .onAppear(perform: self.onApplicationBoot)
         .environmentObject(self.state)
+        .environment(\.colorScheme, .dark) // @TODO: Added this back 02/06/26 as temp fix for text formatting issues, REMOVE eventually
         .onChange(of: self.state.date) {
             self.state.dueTodayCount = CoreDataTasks(moc: self.state.moc).dueToday(self.state.date).count
         }

@@ -75,6 +75,17 @@ struct NoteDetail: View {
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        self.content = ""
+                        self.title = ""
+                        self.state.job = nil
+                        self.job = nil
+                    } label: {
+                        Text("Clear")
+                    }
+                    .disabled(self.content == "" || self.title == "")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
                     Button {
@@ -82,7 +93,7 @@ struct NoteDetail: View {
                     } label: {
                         Text("Save")
                     }
-                    .foregroundStyle(self.state.theme.tint)
+                    .disabled(self.content == "" || self.title == "" || self.state.job == nil)
                 }
             }
         }

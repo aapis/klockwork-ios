@@ -28,17 +28,15 @@ struct RecordDetail: View {
                         job: $job,
                         isJobSelectorPresented: $isJobSelectorPresented
                     )
-                    
                     TextField("What's on your mind?", text: $message, axis: .vertical)
-                        .lineLimit(5...10)
+                        .lineLimit(10...20)
                         .listRowBackground(Theme.textBackground)
-                    
-                    Section("Settings") {
-                        Toggle("Published", isOn: $alive)
-                    }
-                    .listRowBackground(Theme.textBackground)
-                    
                     if self.record != nil {
+                        Section("Settings") {
+                            Toggle("Published", isOn: $alive)
+                        }
+                        .listRowBackground(Theme.textBackground)
+
                         Button("Delete Record", role: .destructive, action: self.actionInitiateDelete)
                             .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
                                 Button("Yes", role: .destructive) {
@@ -53,13 +51,22 @@ struct RecordDetail: View {
                 }
                 Spacer()
             }
-//            .foregroundStyle(.white)
             .scrollContentBackground(.hidden)
             .navigationTitle(self.record != nil ? "Record" : "New Record")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        self.message = ""
+                        self.state.job = nil
+                        self.job = nil
+                    } label: {
+                        Text("Clear")
+                    }
+                    .disabled(self.message == "" || self.state.job == nil)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
                     Button {
@@ -67,7 +74,7 @@ struct RecordDetail: View {
                     } label: {
                         Text("Save")
                     }
-                    .foregroundStyle(self.state.theme.tint)
+                    .disabled(self.message == "" || self.state.job == nil)
                 }
             }
             .sheet(isPresented: $isJobSelectorPresented) {

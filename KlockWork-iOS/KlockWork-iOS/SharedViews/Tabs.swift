@@ -24,7 +24,9 @@ struct Tabs: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Divider().background(.white).frame(height: 1)
+            if self.mode == .read {
+                Divider().background(.white).frame(height: 1)
+            }
             // @TODO: only allowing top/bottom tabs to work on create mode for now don't @ me
             if self.mode == .create {
                 switch self.tabLocation {
@@ -139,32 +141,58 @@ extension Tabs {
         public var mode: TabsViewMode
 
         var body: some View {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .center, spacing: 0) {
-                    ForEach(EntityType.allCases, id: \.self) { page in
-                        VStack(spacing: 0) {
-                            Button {
-                                selected = page
-                            } label: {
-                                (page == selected ? page.selectedIcon : page.icon)
-                                    .frame(maxHeight: 20)
-                                    .padding(14)
-                                    .background(page == selected ? Theme.darkBtnColour : .clear)
-                                    .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
-                            }
-                            .buttonStyle(.plain)
-                            .clipShape(
-                                .rect(
-                                    bottomLeadingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0,
-                                    bottomTrailingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0
+            VStack(alignment: .leading, spacing: 0) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .center, spacing: 0) {
+                        ForEach(EntityType.allCases, id: \.self) { page in
+                            VStack(spacing: 0) {
+                                Button {
+                                    selected = page
+                                } label: {
+                                    (page == selected ? page.selectedIcon : page.icon)
+                                        .frame(maxHeight: 20)
+                                        .padding(14)
+                                        .background(
+                                            ZStack(alignment: .bottom) {
+                                                (page == selected ? self.state.theme.tint : .clear)
+                                                VStack {
+                                                    Spacer()
+                                                    LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
+                                                        .blendMode(.softLight)
+                                                        .opacity(page == self.selected ? 1 : 0)
+                                                        .frame(height: 15)
+                                                }
+                                            }
+                                        )
+                                        .foregroundStyle(
+                                            .linearGradient(colors: [page == self.selected ? Theme.base : .gray, page == self.selected ? Theme.cPurple : .gray], startPoint: .top, endPoint: .bottom)
+                                        )
+                                }
+                                .buttonStyle(.plain)
+                                .clipShape(
+                                    .rect(
+                                        bottomLeadingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0,
+                                        bottomTrailingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0
+                                    )
                                 )
-                            )
+                                .shadow(radius: page == selected ? 4 : 0)
+                            }
                         }
+                        Spacer()
                     }
-                    Spacer()
                 }
             }
-            .frame(height: 50)
+            .background(
+                ZStack(alignment: .top) {
+                    VStack {
+                        LinearGradient(colors: [Theme.base, .clear], startPoint: .top, endPoint: .bottom)
+                            .blendMode(.softLight)
+                            .opacity(0.4)
+                            .frame(height: 15)
+                        Spacer()
+                    }
+                }
+            )
         }
     }
 

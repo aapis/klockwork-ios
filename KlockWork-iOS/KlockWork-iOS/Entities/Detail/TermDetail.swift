@@ -74,6 +74,14 @@ struct TermDetail: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        self.name = ""
+                    } label: {
+                        Text("Clear")
+                    }
+                    .disabled(self.name == "")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
                     Button {

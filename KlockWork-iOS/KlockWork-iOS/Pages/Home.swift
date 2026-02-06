@@ -63,6 +63,7 @@ struct Home: View {
                         QuickAccessTabs()
                             .padding(.top, 8)
                         QuickHistory()
+//                        ForSelectedJob() // @TODO: some func moved to TasksGroup, commented out to see if still necessary
                         TasksGroup()
                     }
                 }
@@ -182,6 +183,7 @@ extension Home {
                     self.desTwo
                 }
             }
+            .disabled(self.tasks.isEmpty)
         }
 
         var desOne: some View {
@@ -214,13 +216,15 @@ extension Home {
             .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
         }
 
+        // @TODO: holy shit get rid of this A/B testing shit and self.des property
+        // KEEP this one tho
         var desTwo: some View {
             VStack(alignment: .leading, spacing: 1) {
                 HStack {
                     SectionTitle(
                         label: self.label,
                         uppercase: false,
-                        fgColour: Theme.base,
+                        fgColour: self.tasks.count == 0 ? Theme.lightWhite : Theme.base,
                         icon: self.icon,
                         font: .body
                     )
@@ -228,7 +232,7 @@ extension Home {
                     SectionTitle(
                         label: String(self.tasks.count),
                         uppercase: false,
-                        fgColour: Theme.base,
+                        fgColour: self.tasks.count == 0 ? Theme.lightWhite : Theme.base,
                         font: .body
                     )
                     Image(systemName: "chevron.right")
@@ -236,14 +240,15 @@ extension Home {
                 }
                 .bold()
                 .padding(4)
-                .foregroundStyle(Theme.base)
-                .background(self.colour == .clear ? self.tasks.count == 0 ? .gray : self.tasks.count < 10 ? .yellow : self.tasks.count < 20 ? .orange : .red : self.colour)
+                .foregroundStyle(self.tasks.count == 0 ? Theme.lightWhite : Theme.base)
+                .background(self.tasks.count == 0 ? .gray : self.colour == .clear ? self.tasks.count == 0 ? .gray : self.tasks.count < 10 ? .yellow : self.tasks.count < 20 ? .orange : .red : self.colour) // HAHA SO SORRY
             }
             .background(Theme.textBackground)
             .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
         }
     }
 
+    // MARK: Home.QuickAccessButton
     struct QuickAccessButton: View {
         @EnvironmentObject private var state: AppState
         @AppStorage("home.backgroundColour") public var homeBackgroundColourChoice: Int = 0
@@ -307,7 +312,7 @@ extension Home {
         }
     }
 
-    // MARK: QuickHistory
+    // MARK: Home.QuickHistory
     struct QuickHistory: View {
         @EnvironmentObject private var state: AppState
 
@@ -472,6 +477,7 @@ extension Home {
                                 } else {
                                     HStack {
                                         Image(systemName: "hammer.circle")
+                                            .symbolRenderingMode(.hierarchical)
                                         Text("None")
                                             .lineLimit(1)
                                             .font(.caption)
@@ -507,15 +513,16 @@ extension Home {
                         if self.state.job != nil {
                             VStack(alignment: .leading, spacing: 1) {
                                 JobInformation()
-                                SectionTitle(
-                                    label: "Tasks",
-                                    fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : Theme.lightWhite,
-                                    alignment: .trailing
-                                )
-                                .padding(4)
-                                .background(Theme.textBackground)
-                                TasksCreatedToday()
-                                TasksCompletedToday()
+                                // @TODO: functionality moved to task overview widget for a/b testing, remove if still commented
+//                                SectionTitle(
+//                                    label: "Tasks",
+//                                    fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : Theme.lightWhite,
+//                                    alignment: .trailing
+//                                )
+//                                .padding(4)
+//                                .background(Theme.textBackground)
+//                                TasksCreatedToday()
+//                                TasksCompletedToday()
                                 Interactions(recentInteractions: self.$recentInteractions, job: self.$job)
                                 Spacer()
                             }
@@ -758,6 +765,7 @@ extension Home {
                 } label: {
                     HStack {
                         Image(systemName: self.icon)
+                            .symbolRenderingMode(.hierarchical)
                         Text("\(self.job.project?.abbreviation ?? "404")/\(self.job.title ?? "Invalid title")")
                             .lineLimit(1)
                         Spacer()
@@ -812,6 +820,7 @@ extension Home {
         }
     }
 
+    // MARK: Home.QuickCreateWidget
     struct QuickCreateWidget: View {
         @EnvironmentObject private var state: AppState
         @State private var backgroundColour: Color = Theme.cOrange
@@ -821,12 +830,6 @@ extension Home {
             HStack(alignment: .center) {
                 Spacer()
                 AddButton(plain: false)
-//                    .foregroundStyle(
-//                        self.state.job?.backgroundColor.isBright() ?? false ?
-//                            self.backgroundColour
-//                        :
-//                            self.state.theme.tint
-//                    )
                     .clipShape(.capsule(style: .continuous))
                     .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
                     .padding()
@@ -844,6 +847,7 @@ extension Home {
         }
     }
 
+    // MARK: Home.TasksGroup
     struct TasksGroup: View {
         @EnvironmentObject private var state: AppState
         private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
@@ -858,6 +862,88 @@ extension Home {
                 .padding([.leading, .top], 4)
                 VStack(alignment: .leading, spacing: 1) {
                     LazyVGrid(columns: self.col2, alignment: .leading) {
+                        ScrollView(.vertical) {
+                            VStack(spacing: 1) {
+                                Block(
+                                    colour: .indigo,
+                                    label: "Recent",
+                                    icon: "triangle.circle.fill",
+                                    predicate: NSPredicate(
+                                        format: "due > %@ && due <= %@ && owner.project.company.hidden == false",
+                                        DateHelper.daysAhead(-14) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date)! as CVarArg
+                                    ),
+                                    des: 1
+                                )
+                                .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                                if let job = self.state.job {
+                                    Block(
+                                        colour: .indigo,
+                                        label: "In Job",
+                                        icon: "hammer.circle.fill",
+                                        predicate: NSPredicate(
+                                            format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner == %@",
+                                            job as CVarArg
+                                        ),
+                                        des: 1
+                                    )
+                                    if let project = job.project {
+                                        Block(
+                                            colour: .indigo,
+                                            label: "In Project",
+                                            icon: "folder.circle.fill",
+                                            predicate: NSPredicate(
+                                                format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project == %@",
+                                                project as CVarArg
+                                            ),
+                                            des: 1
+                                        )
+                                        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+
+                                        if let company = project.company {
+                                            Block(
+                                                colour: .indigo,
+                                                label: "In Company",
+                                                icon: "building.2.crop.circle.fill",
+                                                predicate: NSPredicate(
+                                                    format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project.company == %@",
+                                                    company as CVarArg,
+                                                ),
+                                                des: 1
+                                            )
+                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                                        }
+                                    }
+                                    Block(
+                                        colour: .indigo,
+                                        label: "New",
+                                        icon: "calendar.circle.fill",
+                                        predicate: NSPredicate(
+                                            format: "owner == %@ && created > %@ && created <= %@ && owner.project.alive == true && owner.project.company.hidden == false && completedDate != nil && cancelledDate != nil",
+                                            job,
+                                            self.state.date.startOfDay! as CVarArg,
+                                            self.state.date.endOfDay! as CVarArg
+                                        ),
+                                        des: 1
+                                    )
+                                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                                    Block(
+                                        colour: .indigo,
+                                        label: "Done",
+                                        icon: "calendar.circle.fill",
+                                        predicate: NSPredicate(
+                                            format: "owner == %@ && completedDate > %@ && completedDate <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
+                                            job,
+                                            self.state.date.startOfDay! as CVarArg,
+                                            self.state.date.endOfDay! as CVarArg
+                                        ),
+                                        des: 1
+                                    )
+                                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                                }
+                            }
+                        }
+                        .frame(height: 85)
                         VStack(spacing: 1) {
                             Block(
                                 colour: .green,
@@ -1052,6 +1138,52 @@ extension Home {
                     Text(String(self.value))
                 }
                 .foregroundStyle((self.state.job?.backgroundColor ?? Theme.base).isBright() ? Theme.base : Theme.lightWhite)
+            }
+        }
+    }
+
+    // MARK: Home.ForSelectedJob
+    struct ForSelectedJob: View {
+        @EnvironmentObject private var state: AppState
+        private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
+
+        var body: some View {
+            if let job = self.state.job {
+                VStack(alignment: .leading) {
+                    SectionTitle(
+                        label: "Selected",
+                        uppercase: true,
+                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                    )
+                    .padding([.leading, .top], 4)
+                    VStack(alignment: .leading, spacing: 1) {
+                        LazyVGrid(columns: self.col2, alignment: .leading) {
+                            VStack(spacing: 1) {
+                                Block(
+                                    colour: .blue,
+                                    label: "Open Tasks",
+                                    icon: "lightbulb.circle.fill",
+                                    predicate: NSPredicate(
+                                        format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner = %@",
+                                        job as CVarArg
+                                    ),
+                                    des: 1
+                                )
+                            }
+                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Theme.lightWhite)
+                }
+                .padding(4)
+                .background(
+                    ZStack {
+                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                    }
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 4))
             }
         }
     }
@@ -1635,6 +1767,7 @@ struct SectionTitle: View {
             }
             if let icon = self.icon {
                 Image(systemName: icon)
+                    .symbolRenderingMode(.hierarchical)
             }
             Text(self.uppercase ? self.label.uppercased() : self.label)
                 .lineLimit(1)

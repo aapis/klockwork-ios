@@ -919,17 +919,18 @@ extension PlanTabs {
                                 Section {
                                     ForEach(row.tasks) { task in
                                         Row(task: task, onAction: self.actionOnAppear, inSheet: self.inSheet)
+                                            .listRowInsets(.none)
+                                            .listRowSpacing(.none)
+                                            .listRowSeparator(.hidden)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
+                                .listSectionSpacing(0)
                             }
                         }
-                        .listStyle(.plain)
-                        .listRowInsets(.none)
-                        .listRowSpacing(.none)
-                        .listRowSeparator(.hidden)
-                        .listSectionSpacing(0)
+                        .listStyle(.inset)
+                        .padding(-16) // removes default list padding
                     } else {
                         HStack {
                             Text("No tasks found")

@@ -684,35 +684,35 @@ extension Tabs.Content {
                     .font(.system(.caption, design: .monospaced))
                     .foregroundStyle((self.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                 }
-                .frame(height: 70)
                 .listRowBackground(
                     Common.TypedListRowBackground(colour: (self.job?.backgroundColor ?? Theme.rowColour), type: .jobs)
                 )
                 .foregroundStyle((self.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                 .onAppear(perform: self.actionOnAppear)
-                .swipeActions(edge: .leading) {
-                    Button {
-                        self.actionOnSwipeComplete(job)
-                    } label: {
-                        Image(systemName: "checkmark.seal.fill")
-                    }
-                    .tint(.green)
-                }
-                .swipeActions(edge: .trailing) {
-                    Button {
-                        self.actionOnSwipeDelay(job)
-                    } label: {
-                        Image(systemName: "clock.fill")
-                    }
-                    .tint(.yellow)
-
-                    Button(role: .destructive) {
-                        self.actionOnSwipeCancel(job)
-                    } label: {
-                        Image(systemName: "calendar.badge.minus")
-                    }
-                    .tint(.red)
-                }
+                // @TODO: wrong swipe actions for jobs
+//                .swipeActions(edge: .leading) {
+//                    Button {
+//                        self.actionOnSwipeComplete(job)
+//                    } label: {
+//                        Image(systemName: "checkmark.seal.fill")
+//                    }
+//                    .tint(.green)
+//                }
+//                .swipeActions(edge: .trailing) {
+//                    Button {
+//                        self.actionOnSwipeDelay(job)
+//                    } label: {
+//                        Image(systemName: "clock.fill")
+//                    }
+//                    .tint(.yellow)
+//
+//                    Button(role: .destructive) {
+//                        self.actionOnSwipeCancel(job)
+//                    } label: {
+//                        Image(systemName: "calendar.badge.minus")
+//                    }
+//                    .tint(.red)
+//                }
                 // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
 //                .sheet(isPresented: $isCompanyPresented) {
 //                    if let project = task.owner?.project {
@@ -909,7 +909,7 @@ extension Tabs.Content {
             @State private var isJobPresented: Bool = false
 
             var body: some View {
-                HStack(alignment: .top, spacing: 0) {
+                HStack(alignment: .top, spacing: 8) {
                     self.statusBar
                     self.main
                 }
@@ -921,7 +921,7 @@ extension Tabs.Content {
             var statusBar: some View {
                 VStack(alignment: .center, spacing: 0) {
                     Spacer()
-                    Image(systemName: "checkmark.seal.fill")
+                    Image(systemName: self.isCompleted ? "checkmark.seal.fill" : self.isCancelled ? "xmark.seal" : "seal")
                         .padding(2)
                     // Orange indicates job is in your current plan
                         .foregroundStyle(self.isCompleted ? .white : self.state.plan != nil && (self.state.plan!.jobs?.allObjects as! [Job]).contains(where: {$0 == self.task.owner}) ?  .orange : Theme.lightBase)
@@ -933,7 +933,7 @@ extension Tabs.Content {
                     }
                 )
                 .frame(width: 30)
-                .padding(.trailing, 4)
+//                .padding(.trailing, 4)
             }
 
             var main: some View {
@@ -946,8 +946,8 @@ extension Tabs.Content {
                                 .multilineTextAlignment(.leading)
                             Spacer()
                         }
-                        .padding(.bottom, 8)
-                        .padding(.top, 4)
+//                        .padding(.bottom, 8)
+//                        .padding(.top, 4)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -1003,7 +1003,6 @@ extension Tabs.Content {
                     .font(.system(.caption, design: .monospaced))
                     .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                 }
-
                 .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? Theme.base : Theme.lightWhite)
                 .opacity(self.isCompleted ? 0.5 : 1.0)
                 .onAppear(perform: self.actionOnAppear)

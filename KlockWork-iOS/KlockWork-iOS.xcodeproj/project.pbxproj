@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -272,6 +272,10 @@
 		53F926332BFEA0F900948076 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../../KlockWork/KlockWork/Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		537059D82F344A1E00464BF9 /* Recent */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Recent; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		53D4CB502BFE930100AFEDEA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -524,6 +528,7 @@
 		53D4CB7A2BFE93B000AFEDEA /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				537059D82F344A1E00464BF9 /* Recent */,
 				53776C592F32DB7D00021705 /* OmniCreator.swift */,
 				53C059B92C33BCB20066111C /* Filter */,
 				53D4CB752BFE93B000AFEDEA /* Detail */,
@@ -604,6 +609,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				537059D82F344A1E00464BF9 /* Recent */,
 			);
 			name = "KlockWork-iOS";
 			productName = "KlockWork-iOS";
@@ -920,7 +928,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -965,7 +973,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				ENABLE_HARDENED_RUNTIME = YES;
