@@ -32,6 +32,17 @@ struct Main: View {
     }
 
     var body: some View {
+        SuperiorTabView()
+            .tint(self.state.theme.tint)
+            .onAppear(perform: self.onApplicationBoot)
+            .environmentObject(self.state)
+            .environment(\.colorScheme, .dark) // @TODO: Added this back 02/06/26 as temp fix for text formatting issues, REMOVE eventually
+            .onChange(of: self.state.date) {
+                self.state.dueTodayCount = CoreDataTasks(moc: self.state.moc).dueToday(self.state.date).count
+            }
+    }
+
+    var body2: some View {
         TabView {
             Home(inSheet: false)
                 .tabItem {
@@ -52,7 +63,6 @@ struct Main: View {
             Find()
                 .tabItem {
                     Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.white)
                     Text("Find")
                 }
         }

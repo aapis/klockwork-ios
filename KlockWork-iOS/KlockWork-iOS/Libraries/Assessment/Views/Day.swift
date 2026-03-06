@@ -20,7 +20,7 @@ struct Day: View, Identifiable {
     var body: some View {
         Button {
             self.state.date = DateHelper.startOfDay(assessment.date)
-            isPresented.toggle()
+            self.isPresented.toggle()
         } label: {
             if self.assessment.dayNumber > 0 {
                 Text(String(self.assessment.dayNumber))
@@ -53,12 +53,10 @@ struct SelectorDay: View, Identifiable {
     public var day: Int
     public var onCloseCallback: () -> Void
     @State private var bgColour: Color = .clear
-    @AppStorage("today.viewMode") private var viewMode: Int = 0
     private let gridSize: CGFloat = 40
 
     var body: some View {
         Button {
-            self.viewMode = 0
             self.state.date = DateHelper.dateForDayNumber(self.day)
         } label: {
             Text(String(self.day))

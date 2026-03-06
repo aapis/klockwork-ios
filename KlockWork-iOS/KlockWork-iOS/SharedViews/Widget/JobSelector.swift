@@ -34,9 +34,8 @@ extension Widget {
             }
         }
 
-        // @TODO: implement a Hierarchical selector, where jobs are grouped with their companies and projects
-
         /// Allows selection of multiple jobs from the list
+        // MARK: Widget.JobSelector.Single
         struct Multi: View {
             typealias Row = Tabs.Content.Individual.SingleJobCustomButtonTwoState
 
@@ -176,6 +175,7 @@ extension Widget {
         }
 
         /// Allows selection of a single job from the list
+        // MARK: Widget.JobSelector.Single
         struct Single: View {
             typealias Row = Tabs.Content.Individual.SingleJobDetailedCustomButton
             @EnvironmentObject private var state: AppState
@@ -185,6 +185,7 @@ extension Widget {
             @State private var searchText: String = ""
             @FetchRequest private var items: FetchedResults<Job>
             @FetchRequest private var recentItems: FetchedResults<Job>
+            @FetchRequest private var favouriteItems: FetchedResults<Job>
             @Binding public var job: Job?
 
             private var columns: [GridItem] {
@@ -200,8 +201,38 @@ extension Widget {
                                     UI.FilteredList(items: self.items, text: self.$searchText)
                                 } else {
                                     List {
+                                        if let dJob = CoreDataJob(moc: self.state.moc).getDefault() {
+                                            Section {
+                                                Row(
+                                                    job: dJob,
+                                                    callback: { job in
+                                                        self.job = job
+                                                        self.state.job = job
+                                                        self.dismiss()
+                                                    }
+                                                )
+                                            } header: {
+                                                Text("Default")
+                                            }
+                                            .listSectionSpacing(0)
+                                        }
                                         Section {
                                             ForEach(self.recentItems, id: \.objectID) { jerb in
+                                                Row(job: jerb, callback: { job in
+                                                    self.job = job
+                                                    self.state.job = job
+                                                    self.dismiss()
+                                                })
+                                                .listRowInsets(.none)
+                                                .listRowSpacing(.none)
+                                                .listRowSeparator(.hidden)
+                                            }
+                                        } header: {
+                                            Text("Recent (\(self.recentItems.count))")
+                                        }
+                                        .listSectionSpacing(0)
+                                        Section {
+                                            ForEach(self.favouriteItems, id: \.objectID) { jerb in
                                                 Row(job: jerb, callback: { job in
                                                     self.job = job
                                                     self.state.job = job
@@ -212,7 +243,7 @@ extension Widget {
                                                 .listRowSeparator(.hidden)
                                             }
                                         } header: {
-                                            Text("Recent (\(self.recentItems.count))")
+                                            Text("Favourites (\(self.recentItems.count))")
                                         }
                                         .listSectionSpacing(0)
                                         Section {
@@ -256,10 +287,15 @@ extension Widget {
                 _job = job
                 _items = CoreDataJob.fetchAll(sort: [NSSortDescriptor(keyPath: \Job.title, ascending: true)])
                 _recentItems = CoreDataJob.fetchRecent(limit: 8)
+                _favouriteItems = CoreDataJob.fetchAll(favsOnly: true)
             }
         }
 
+        // MARK: Widget.JobSelector.UI
         struct UI {
+            // @TODO: implement a Hierarchical selector, where jobs are grouped with their companies and projects
+
+            // MARK: Widget.JobSelector.UI.FilteredList
             struct FilteredList: View {
                 typealias Row = Tabs.Content.Individual.SingleJobDetailedCustomButton
                 @EnvironmentObject private var state: AppState
@@ -300,11 +336,14 @@ extension Widget {
                 }
                 
                 /// Fires when self.text changes
+                /// Searches for title/JID/overview as well as project and company name matches.
                 /// - Returns: Void
                 private func actionOnChangeInput() -> Void {
                     self.jobs = items.filter {
                         $0.titleOrId().lowercased().contains(self.text.lowercased()) ||
-                        ($0.overview ?? "").lowercased().contains(self.text.lowercased())
+                        ($0.overview ?? "").lowercased().contains(self.text.lowercased()) ||
+                        ($0.project?.name?.lowercased() ?? "").contains(self.text.lowercased()) ||
+                        ($0.project?.company?.name?.lowercased() ?? "").contains(self.text.lowercased())
                     }
                     .sorted(by: {$0.titleOrId() < $1.titleOrId()})
                 }

@@ -43,9 +43,12 @@ extension Tabs.Content {
                         }
                         .padding(8)
                         .background(self.items.count == 0 ? Theme.textBackground : .clear)
-
-                        PageActionBar.Today(job: $job, isPresented: $isPresented)
-                            .padding(.bottom, self.job != nil ? 50 : 0)
+                        // @TODO: a/b testing with Home.QuickCreateWidget
+//                        PageActionBar.Today(job: $job, isPresented: $isPresented)
+//                            .padding(.bottom, self.job != nil ? 50 : 0)
+                        Home.QuickCreateWidget()
+                            .padding(.trailing)
+                            .padding(.bottom, self.state.job != nil ? 16 : 0)
 
                         if self.job != nil {
                             LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)

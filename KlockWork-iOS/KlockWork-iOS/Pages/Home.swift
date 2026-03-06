@@ -21,8 +21,12 @@ struct Home: View {
     @State private var backgroundColour: Color = Theme.cOrange
     @State private var date: Date = Date()
     @State private var text: String = "" // @TODO: remove code that requires this
+    @State private var job: Job? = nil
+    @State private var selected: PageConfiguration.EntityType = .records
     @AppStorage("home.backgroundColour") public var homeBackgroundColourChoice: Int = 0
     @AppStorage("home.isQuickRecordFocused") private var isQuickRecordFocused: Bool = false
+    @AppStorage("home.backgroundWallpaper") public var homeWallpaper: String = ""
+    @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
     @AppStorage("today.viewMode") private var viewMode: Int = 0
     public var inSheet: Bool
     private let page: PageConfiguration.AppPage = .today
@@ -32,17 +36,27 @@ struct Home: View {
             VStack(alignment: .leading, spacing: 0){
                 if !self.inSheet {
                     Header(page: self.page, path: $path)
-                    Divider().background(.gray).frame(height: 1)
+
                 }
+                Divider().background(.white).frame(height: 1)
 
                 switch(self.viewMode) {
                 case 2:
                     Widget.ActivityCalendar(searchTerm: $text, showActivity: false)
                 default:
-                    self.main
+                    Tabs(inSheet: self.inSheet, job: self.$job, selected: self.$selected, mode: .dashboard)
                 }
             }
-            .background(self.backgroundColour)
+            .background(
+                ZStack {
+                    if !self.shouldUseWPImage {
+                        self.backgroundColour
+                    } else {
+                        Image("wallpaper-\(self.homeWallpaper)")
+                    }
+                }
+                .ignoresSafeArea(.all)
+            )
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(self.inSheet ? .visible : .hidden)
@@ -60,15 +74,14 @@ struct Home: View {
             ZStack(alignment: .bottom) {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading) {
-                        QuickAccessTabs()
+                        Home.QuickAccessTabs()
                             .padding(.top, 8)
-                        QuickHistory()
-//                        ForSelectedJob() // @TODO: some func moved to TasksGroup, commented out to see if still necessary
-                        TasksGroup()
+                        Home.QuickHistory()
+                        Home.TaskFilters()
+                        Widget.Tasks.DailyOverview()
                     }
                 }
-
-                QuickCreateWidget()
+                Home.QuickCreateWidget()
             }
             .padding([.leading, .bottom, .trailing], 8)
         }
@@ -94,46 +107,29 @@ extension Home {
                         .frame(height: 45)
 
                     HStack(spacing: 0) {
-                        Button {
-                            self.isCalendarPresented.toggle()
-                        } label: {
+                        VStack(alignment: .leading, spacing: 0) {
                             HStack {
-                                HStack(spacing: 0) {
-                                    VStack(alignment: .trailing) {
-                                        Text(DateHelper.todayShort(self.state.date, format: "YYYY"))
-                                        Text(self.state.date.formatted(Date.FormatStyle().weekday(.abbreviated)))
-                                    }
-                                    .font(.system(.caption, design: .monospaced))
-                                    .foregroundStyle(Theme.lightWhite)
-                                    PageTitle(text: DateHelper.todayShort(self.state.date, format: "MMM dd"))
-                                }
-                                .padding([.leading, .trailing], 8)
-
-                                Spacer()
                                 Button {
-                                    self.state.job = nil
-                                    self.state.date = Date.now
+                                    self.isCalendarPresented.toggle()
                                 } label: {
-                                    Image(systemName: "arrow.clockwise")
-                                        .padding([.leading, .trailing], 8)
-                                        .padding([.top, .bottom], 6)
+                                    Text("\(self.state.date.formatted(Date.FormatStyle().weekday())), \(DateHelper.todayShort(self.state.date, format: "MMMM dd"))")
+                                        .font(.title)
+                                        .bold()
+                                        .multilineTextAlignment(.leading)
                                 }
                                 .buttonStyle(.plain)
-                                .foregroundStyle(self.state.theme.tint)
-
-                                NavigationLink {
-                                    AppSettings()
-                                } label: {
-                                    Image(systemName: "gear")
-                                        .font(.title3)
-                                }
-                                
-                                Forecast(date: DateHelper.startOfDay(self.state.date), isForecastMember: false, page: self.page)
-                                    .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
+                                .padding([.leading, .trailing])
+                                Spacer()
+                            }
+                            HStack(alignment: .top, spacing: 0) {
+                                Text(DateHelper.todayShort(self.state.date, format: "dd/MM/YYYY"))
+                                    .font(.caption)
+                                    .fontDesign(.monospaced)
+                                    .padding([.leading, .bottom])
+                                    .foregroundStyle(self.state.theme.tint)
+                                Spacer()
                             }
                         }
-                        .buttonStyle(.plain)
-                        Spacer()
                     }
                 }
             }
@@ -155,21 +151,106 @@ extension Home {
         }
     }
 
-    struct Block: View {
+    struct RecordBlock: View {
         @EnvironmentObject private var state: AppState
-        @FetchRequest private var tasks: FetchedResults<LogTask>
+        @FetchRequest private var items: FetchedResults<LogRecord>
         public var colour: Color = .clear
+        public var fgColour: Color? = nil
         public var label: String = "Block"
         public var icon: String = "circle.circle.fill"
         public var predicate: NSPredicate
         public var target: AnyView? = nil
-        public var des: Int = 0
+        public var infoView: AnyView? = nil
+        public var des: Int = 0 // @TODO: delete entirely
+        public var help: String? = nil
+
+        var body: some View {
+            NavigationLink {
+                PlanTabs.RecordsByPredicate(predicate: self.predicate)
+                    .navigationTitle(self.label)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            if let view = self.infoView {
+                                NavigationLink {
+                                    view
+                                } label: {
+                                    Image(systemName: "info.circle")
+                                }
+                            }
+                        }
+                    }
+            } label: {
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack {
+                        SectionTitle(
+                            label: self.label,
+                            uppercase: false,
+                            fgColour: self.fgColour != nil ? self.fgColour! : self.items.count == 0 ? .white : Theme.base,
+                            icon: self.icon,
+                            font: .body
+                        )
+                        Spacer()
+                        SectionTitle(
+                            label: String(self.items.count),
+                            uppercase: false,
+                            fgColour: self.fgColour != nil ? self.fgColour! : self.items.count == 0 ? .white : Theme.base,
+                            font: .body
+                        )
+                        Image(systemName: "chevron.right")
+                            .opacity(0.3)
+                    }
+                    .bold()
+                    .padding(4)
+                    if let path = self.help {
+                        Divider().background(.gray).frame(height: 1)
+                        HStack {
+                            Spacer()
+                            Text(path.uppercased())
+                                .multilineTextAlignment(.trailing)
+                                .font(.caption)
+                                .monospaced()
+                                .foregroundStyle(self.fgColour == Theme.base ? Theme.lightBase : Theme.lightWhite)
+                        }
+                        .padding(2)
+                    }
+                }
+                .foregroundStyle(self.fgColour != nil ? self.fgColour! : self.items.count == 0 ? Theme.lightWhite : Theme.base)
+                .background(self.items.count == 0 ? .gray : self.colour == .clear ? self.items.count == 0 ? .gray : self.items.count < 10 ? .yellow : self.items.count < 20 ? .orange : .red : self.colour) // HAHA SO SORRY THO
+                .clipShape(.rect(cornerRadius: 4))
+            }
+            .disabled(self.items.isEmpty)
+        }
+    }
+
+    struct TaskBlock: View {
+        @EnvironmentObject private var state: AppState
+        @FetchRequest private var tasks: FetchedResults<LogTask>
+        public var colour: Color = .clear
+        public var fgColour: Color? = nil
+        public var label: String = "Block"
+        public var icon: String = "circle.circle.fill"
+        public var predicate: NSPredicate
+        public var target: AnyView? = nil
+        public var infoView: AnyView? = nil
+        public var des: Int = 0 // @TODO: delete entirely
+        public var help: String? = nil
 
         var body: some View {
             NavigationLink {
                 if self.des == 1 {
-                    PlanTabs.FromPredicate(predicate: self.predicate)
+                    PlanTabs.TasksByPredicate(predicate: self.predicate)
                         .navigationTitle(self.label)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                if let view = self.infoView {
+                                    NavigationLink {
+                                        view
+                                    } label: {
+                                        Image(systemName: "info.circle")
+                                    }
+                                }
+                            }
+                        }
                 } else {
                     if let trgt = self.target {
                         trgt
@@ -204,6 +285,7 @@ extension Home {
                     Image(systemName: "chevron.right")
                         .font(.subheadline)
                         .opacity(0.3)
+                        .font(.caption)
                 }
             }
             .padding()
@@ -213,7 +295,6 @@ extension Home {
                     LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                 }
             )
-            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
         }
 
         // @TODO: holy shit get rid of this A/B testing shit and self.des property
@@ -224,7 +305,7 @@ extension Home {
                     SectionTitle(
                         label: self.label,
                         uppercase: false,
-                        fgColour: self.tasks.count == 0 ? Theme.lightWhite : Theme.base,
+                        fgColour: self.fgColour != nil ? self.fgColour! : self.tasks.count == 0 ? .white : Theme.base,
                         icon: self.icon,
                         font: .body
                     )
@@ -232,7 +313,7 @@ extension Home {
                     SectionTitle(
                         label: String(self.tasks.count),
                         uppercase: false,
-                        fgColour: self.tasks.count == 0 ? Theme.lightWhite : Theme.base,
+                        fgColour: self.fgColour != nil ? self.fgColour! : self.tasks.count == 0 ? .white : Theme.base,
                         font: .body
                     )
                     Image(systemName: "chevron.right")
@@ -240,11 +321,22 @@ extension Home {
                 }
                 .bold()
                 .padding(4)
-                .foregroundStyle(self.tasks.count == 0 ? Theme.lightWhite : Theme.base)
-                .background(self.tasks.count == 0 ? .gray : self.colour == .clear ? self.tasks.count == 0 ? .gray : self.tasks.count < 10 ? .yellow : self.tasks.count < 20 ? .orange : .red : self.colour) // HAHA SO SORRY
+                if let path = self.help {
+                    Divider().background(.gray).frame(height: 1)
+                    HStack {
+                        Spacer()
+                        Text(path.uppercased())
+                            .multilineTextAlignment(.trailing)
+                            .font(.caption)
+                            .monospaced()
+                            .foregroundStyle(self.fgColour == Theme.base ? Theme.lightBase : Theme.lightWhite)
+                    }
+                    .padding(2)
+                }
             }
-            .background(Theme.textBackground)
-            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
+            .foregroundStyle(self.fgColour != nil ? self.fgColour! : self.tasks.count == 0 ? Theme.lightWhite : Theme.base)
+            .background(self.tasks.count == 0 ? .gray : self.colour == .clear ? self.tasks.count == 0 ? .gray : self.tasks.count < 10 ? .yellow : self.tasks.count < 20 ? .orange : .red : self.colour) // HAHA SO SORRY THO
+            .clipShape(.rect(cornerRadius: 4))
         }
     }
 
@@ -312,18 +404,120 @@ extension Home {
         }
     }
 
+    // MARK: Home.RecentlyMentioned
+    struct RecentlyMentioned: View {
+        @EnvironmentObject private var state: AppState
+        public var date: Date
+        @FetchRequest private var mentions: FetchedResults<LogRecord>
+        @State private var names: Set<Person> = []
+        @State private var person: Person?
+        private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
+
+        var body: some View {
+            VStack(alignment: .leading) {
+                SectionTitle(
+                    label: "Recently Mentioned",
+                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
+                )
+                .padding([.leading, .top], 4)
+                LazyVGrid(columns: self.col2, alignment: .leading) {
+                    ScrollView(.vertical) {
+                        VStack(alignment: .leading, spacing: 1) {
+                            ForEach(self.names.sorted(by: {$0.shortUsername < $1.shortUsername}), id: \.self) { person in
+                                Home.QuickHistory.GenericTappableButtonWithIcon(
+                                    title: person.shortUsername,
+                                    icon: "person.crop.circle.fill",
+                                    colour: person.company?.backgroundColor ?? Theme.rowColour,
+                                    callback: {
+                                        self.state.person = person
+                                    }
+                                )
+                                .foregroundStyle((person.company?.backgroundColor ?? Theme.rowColour).isBright() ? Theme.base : .white)
+                            }
+                        }
+                    }
+                    .frame(height: 130)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        if self.state.person != nil {
+                            Home.QuickHistory.GenericTappableRowWithIcon(
+                                title: self.state.person?.longUsername ?? "",
+                                icon: "person.crop.circle.fill",
+                                iconColour: Theme.lightWhite
+                            )
+                            ForEach(self.state.person!.records?.allObjects as! [LogRecord], id: \.self) { record in
+                                if let message = record.message {
+                                    Home.QuickHistory.GenericTappableRowWithIcon(
+                                        title: message,
+                                        icon: PageConfiguration.EntityType.records.iconSelectedString,
+                                        iconColour: Theme.lightWhite,
+                                        callback: AnyView(
+                                            RecordDetail(record: record)
+                                                .background(Theme.cPurple)
+                                        )
+                                    )
+                                }
+                            }
+                        } else {
+                            Home.QuickHistory.GenericTappableRowWithIcon(
+                                title: "...",
+                                icon: PageConfiguration.EntityType.companies.iconSelectedString,
+                                iconColour: Theme.lightWhite
+                            )
+                            .foregroundStyle(Theme.lightWhite)
+                        }
+                        Spacer()
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                }
+            }
+            .font(.caption)
+            .padding(4)
+            .background(
+                ZStack {
+                    self.state.job?.backgroundColor ?? Theme.textBackground
+                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .onAppear(perform: self.actionOnAppear)
+        }
+
+        init(date: Date) {
+            self.date = date
+            _mentions = CoreDataRecords.fetchRecent()
+        }
+        
+        /// Onload handler. Creates list of names
+        /// - Returns: Void
+        private func actionOnAppear() -> Void {
+            self.names = []
+
+            for row in self.mentions {
+                if let people = row.people?.allObjects as? [Person] {
+                    for person in people {
+                        self.names.insert(person)
+                    }
+                }
+            }
+        }
+    }
+
     // MARK: Home.QuickHistory
     struct QuickHistory: View {
         @EnvironmentObject private var state: AppState
 
         var body: some View {
             VStack(alignment: .leading) {
+                // @TODO: purpose unclear, either finish or remove
 //                QuickLookback()
                 QuickLookup()
             }
         }
 
         // MARK: QuickHistory.QuickLookback
+        // @TODO: purpose unclear, either finish or remove
         struct QuickLookback: View {
             @EnvironmentObject private var state: AppState
             private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
@@ -333,7 +527,7 @@ extension Home {
                 VStack(alignment: .leading) {
                     SectionTitle(
                         label: "Today In History",
-                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
                     )
                     .padding([.leading, .top], 4)
                     LazyVGrid(columns: self.col2, alignment: .leading) {
@@ -402,17 +596,19 @@ extension Home {
         struct QuickLookup: View {
             @EnvironmentObject private var state: AppState
             private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
             var body: some View {
                 VStack(alignment: .leading) {
                     SectionTitle(
-                        label: "Quick Find",
-                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                        label: "Interactions",
+                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
                     )
                     .padding([.leading, .top], 4)
                     LazyVGrid(columns: self.col2, alignment: .leading) {
                         RecentJobsWidget()
-                        JobOverviewWidget()
+                        JobOverviewWidget(showTasksCreatedToday: false, showTasksCompletedToday: false)
+                            .frame(height: 260)
                     }
                 }
                 .padding(4)
@@ -431,6 +627,7 @@ extension Home {
             @EnvironmentObject private var state: AppState
             @State private var suggestedJobs: [Job] = []
             @FetchRequest private var recentJobs: FetchedResults<Job>
+            @FetchRequest private var favouriteJobs: FetchedResults<Job>
             @FetchRequest private var suggestedJobsFromTasks: FetchedResults<LogTask>
 
             var body: some View {
@@ -487,14 +684,28 @@ extension Home {
                                     .background(.gray.opacity(0.4))
                                     .foregroundStyle(Theme.base)
                                 }
+                                if self.favouriteJobs.count > 0 {
+                                    SectionTitle(
+                                        label: "",
+                                        uppercase: false,
+                                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite,
+                                        icon: "star",
+                                        alignment: .trailing
+                                    )
+                                        .padding(4)
+                                    ForEach(self.favouriteJobs.sorted(by: {$0.lastUpdate ?? Date() > $1.lastUpdate ?? Date()}), id: \.self) { job in
+                                        TappableRowWithIcon(job: job, icon: "hammer.circle.fill")
+                                    }
+                                }
                             }
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
+                        Spacer()
                     }
                     .padding(1)
                     .background(Theme.textBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
-                    .frame(height: 130)
+                    .frame(height: 260)
                     .onAppear(perform: self.actionOnAppear)
                 }
             }
@@ -503,6 +714,10 @@ extension Home {
         // MARK: QuickHistory.JobOverviewWidget
         struct JobOverviewWidget: View {
             @EnvironmentObject private var state: AppState
+            public var showJobInformation: Bool = true
+            public var showTasksCreatedToday: Bool = true
+            public var showTasksCompletedToday: Bool = true
+            public var showInteractions: Bool = true
             @State private var recentInteractions: [String] = []
             @State private var tasksCreatedToday: [String] = []
             @State private var job: Job? = nil
@@ -512,18 +727,27 @@ extension Home {
                     ScrollView(.vertical) {
                         if self.state.job != nil {
                             VStack(alignment: .leading, spacing: 1) {
-                                JobInformation()
-                                // @TODO: functionality moved to task overview widget for a/b testing, remove if still commented
-//                                SectionTitle(
-//                                    label: "Tasks",
-//                                    fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : Theme.lightWhite,
-//                                    alignment: .trailing
-//                                )
-//                                .padding(4)
-//                                .background(Theme.textBackground)
-//                                TasksCreatedToday()
-//                                TasksCompletedToday()
-                                Interactions(recentInteractions: self.$recentInteractions, job: self.$job)
+                                if self.showJobInformation {
+                                    JobInformation()
+                                }
+                                if self.showTasksCreatedToday || self.showTasksCompletedToday {
+                                    SectionTitle(
+                                        label: "Tasks",
+                                        fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : .white,
+                                        alignment: .trailing
+                                    )
+                                    .padding(4)
+                                    .background(Theme.textBackground)
+                                    if self.showTasksCreatedToday {
+                                        TasksCreatedToday()
+                                    }
+                                    if self.showTasksCompletedToday {
+                                        TasksCompletedToday()
+                                    }
+                                }
+                                if self.showInteractions {
+                                    Interactions(recentInteractions: self.$recentInteractions, job: self.$job)
+                                }
                                 Spacer()
                             }
                             .font(.caption)
@@ -558,7 +782,6 @@ extension Home {
                 .onChange(of: self.state.job) {
                     self.actionOnAppear()
                 }
-                .frame(height: 130)
             }
         }
 
@@ -610,6 +833,17 @@ extension Home {
                             )
                         )
                         .background(Theme.cPurple)
+                    } else {
+                        Tabs.Content.List.TasksWithPredicate(
+                            label: self.label,
+                            inSheet: false,
+                            predicate: NSPredicate(
+                                format: "created > %@ && created <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
+                                self.state.date.startOfDay! as CVarArg,
+                                self.state.date.endOfDay! as CVarArg
+                            )
+                        )
+                        .background(Theme.cPurple)
                     }
                 } label: {
                     HStack {
@@ -618,6 +852,7 @@ extension Home {
                         Spacer()
                         Image(systemName: "chevron.right")
                             .opacity(0.3)
+                            .font(.caption)
                     }
                     .padding(4)
                     .background(Theme.textBackground)
@@ -640,6 +875,17 @@ extension Home {
                             predicate: NSPredicate(
                                 format: "owner == %@ && completedDate > %@ && completedDate <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
                                 job,
+                                self.state.date.startOfDay! as CVarArg,
+                                self.state.date.endOfDay! as CVarArg
+                            )
+                        )
+                        .background(Theme.cPurple)
+                    } else {
+                        Tabs.Content.List.TasksWithPredicate(
+                            label: self.label,
+                            inSheet: false,
+                            predicate: NSPredicate(
+                                format: "completedDate > %@ && completedDate <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
                                 self.state.date.startOfDay! as CVarArg,
                                 self.state.date.endOfDay! as CVarArg
                             )
@@ -694,7 +940,7 @@ extension Home {
 
             var body: some View {
                 Button {
-                    if let def = self.defaultJob {
+                    if let _ = self.defaultJob {
                         PersistenceController.shared.save()
                     }
                 } label: {
@@ -721,8 +967,8 @@ extension Home {
             var body: some View {
                 if self.state.job != nil {
                     SectionTitle(
-                        label: "Interactions",
-                        fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : Theme.lightWhite,
+                        label: "By Date",
+                        fgColour: self.state.job!.backgroundColor.isBright() ? Theme.base : .white,
                         alignment: .trailing
                     )
                     .padding(4)
@@ -733,6 +979,7 @@ extension Home {
                             GenericTappableRowWithIcon(
                                 title: timestamp,
                                 icon: "calendar",
+                                iconColour: self.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite,
                                 callback: AnyView(
                                     Tabs.Content.List.Records(
                                         job: self.$job,
@@ -771,6 +1018,7 @@ extension Home {
                         Spacer()
                         if self.state.job == self.job {
                             Image(systemName: "chevron.right")
+                                .font(.caption)
                         }
                     }
                     .font(.caption)
@@ -801,15 +1049,58 @@ extension Home {
                         if self.iconColour != nil {
                             Image(systemName: self.icon)
                                 .foregroundStyle(self.iconColour!)
+                                .symbolRenderingMode(.hierarchical)
                         } else {
                             Image(systemName: self.icon)
+                                .symbolRenderingMode(.hierarchical)
                         }
                         Text(self.title)
                             .lineLimit(1)
+                            .multilineTextAlignment(.leading)
                         Spacer()
                         if self.callback != nil {
                             Image(systemName: "chevron.right")
                         }
+                    }
+                    .font(.caption)
+                    .padding(4)
+                    .background(self.colour)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+
+        // MARK: QuickHistory.GenericTappableButtonWithIcon
+        struct GenericTappableButtonWithIcon: View {
+            @EnvironmentObject private var state: AppState
+            public var title: String
+            public var icon: String = "hammer.circle.fill"
+            public var colour: Color = Theme.textBackground
+            public var iconColour: Color? = nil
+            public var callback: (() -> Void)?
+
+            var body: some View {
+                Button {
+                    if self.callback != nil {
+                        self.callback!()
+                    }
+                } label: {
+                    HStack {
+                        if self.iconColour != nil {
+                            Image(systemName: self.icon)
+                                .foregroundStyle(self.iconColour!)
+                                .symbolRenderingMode(.hierarchical)
+                        } else {
+                            Image(systemName: self.icon)
+                                .symbolRenderingMode(.hierarchical)
+                        }
+                        Text(self.title)
+                            .lineLimit(1)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+//                        if self.callback != nil {
+//                            Image(systemName: "chevron.right")
+//                        }
                     }
                     .font(.caption)
                     .padding(4)
@@ -823,129 +1114,434 @@ extension Home {
     // MARK: Home.QuickCreateWidget
     struct QuickCreateWidget: View {
         @EnvironmentObject private var state: AppState
-        @State private var backgroundColour: Color = Theme.cOrange
-        @AppStorage("home.backgroundColour") public var homeBackgroundColourChoice: Int = 0
+        public var isGuestView: Bool = false
 
         var body: some View {
             HStack(alignment: .center) {
-                Spacer()
-                AddButton(plain: false)
-                    .clipShape(.capsule(style: .continuous))
-                    .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
-                    .padding()
-                Spacer()
-            }
-            .onAppear(perform: {
-                switch self.homeBackgroundColourChoice {
-                case 1: self.backgroundColour = Theme.cPurple
-                case 2: self.backgroundColour = Theme.cGreen
-                case 3: self.backgroundColour = Theme.cRoyal
-                case 4: self.backgroundColour = Theme.cRed
-                default: self.backgroundColour = Theme.cOrange
+                if !self.isGuestView {
+                    Spacer()
                 }
-            })
+                HStack(spacing: 0) {
+                    AddButton(plain: false)
+                    // Button action doesn't always fire properly in this context so hiding it there for now
+                    if !self.isGuestView {
+                        Divider().background(Theme.base).frame(width: 1)
+                        ResetButton()
+                    }
+                    Divider().background(Theme.base).frame(width: 1)
+                    NavigationMenuButton()
+                }
+                .background(Theme.cPurple)
+                .clipShape(.capsule(style: .continuous))
+                .frame(height: 40)
+                .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
+            }
+        }
+
+        struct ResetButton: View {
+            @EnvironmentObject private var state: AppState
+            @State private var backgroundColour: Color = Theme.cOrange
+            @State private var isJobSelectorPresented: Bool = false
+            @State private var job: Job? = nil // @TODO: refactor code that requires this
+
+            var body: some View {
+                Button {
+                    if self.state.job != nil {
+                        self.state.job = nil
+                        self.state.date = Date.now
+                        self.state.today.associatedEntityStorage.clear()
+                    } else {
+                        self.isJobSelectorPresented.toggle()
+                    }
+                } label: {
+                    Image(systemName: self.state.job != nil ? "xmark.circle.fill" : "hammer.circle.fill")
+                }
+                .buttonStyle(.plain)
+                .font(.title3)
+                .bold()
+                .frame(height: 40)
+                .padding([.leading, .trailing], 14)
+                .background(
+                    ZStack(alignment: .leading) {
+                        (self.state.job != nil ? self.state.job!.backgroundColor : self.state.theme.tint)
+                        LinearGradient(colors: [.white, .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            .blendMode(.softLight)
+                        LinearGradient(colors: [Theme.base, .clear], startPoint: .leading, endPoint: .trailing)
+                            .blendMode(.softLight)
+                            .frame(width: 15)
+                    }
+                )
+                .foregroundStyle(
+                    .linearGradient(colors: [Theme.base, Theme.cPurple], startPoint: .top, endPoint: .bottom)
+                )
+                .onAppear(perform: {
+                    self.job = self.state.job
+                })
+                .sheet(isPresented: self.$isJobSelectorPresented) {
+                    Widget.JobSelector.Single(title: "Where do you go", job: $job)
+                        .presentationBackground(
+                            LinearGradient(colors: [Theme.cPurple, Theme.base], startPoint: .top, endPoint: .bottom)
+                        )
+                }
+            }
+        }
+
+        struct NavigationMenuButton: View {
+            @EnvironmentObject private var state: AppState
+
+            var body: some View {
+                Menu("", systemImage: "line.3.horizontal.circle.fill") {
+                    NavigationLink {
+                        AppSettings()
+                    } label: {
+                        HStack {
+                            Image(systemName: "gearshape.fill")
+                            Text("Settings")
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    Divider()
+                    Button {
+                        self.state.view = AnyView(Find())
+                    } label: {
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                            Text("Find")
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    Button {
+                        self.state.view = AnyView(Explore())
+                    } label: {
+                        HStack {
+                            Image(systemName: "globe.desk.fill")
+                            Text("Explore")
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    Button {
+                        self.state.view = AnyView(Today(inSheet: false))
+                    } label: {
+                        HStack {
+                            Image(systemName: "tray.fill")
+                            Text("Today")
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    Button {
+                        self.state.view = AnyView(Home(inSheet: false))
+                    } label: {
+                        HStack {
+                            Image(systemName: "house.fill")
+                            Text("Home")
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+                .font(.title2)
+                .bold()
+                .frame(height: 40)
+                .padding(.leading)
+                .padding(.trailing, 8)
+                .background(
+                    ZStack(alignment: .leading) {
+                        self.state.theme.tint
+                        LinearGradient(colors: [.white, .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            .blendMode(.softLight)
+                        LinearGradient(colors: [Theme.base, .clear], startPoint: .leading, endPoint: .trailing)
+                            .blendMode(.softLight)
+                            .frame(width: 15)
+                    }
+                )
+                .foregroundStyle(
+                    .linearGradient(colors: [Theme.base, Theme.cPurple], startPoint: .top, endPoint: .bottom)
+                )
+            }
         }
     }
 
-    // MARK: Home.TasksGroup
-    struct TasksGroup: View {
+    // MARK: Home.RecordFilters
+    struct RecordFilters: View {
         @EnvironmentObject private var state: AppState
-        private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
+        @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
         var body: some View {
             VStack(alignment: .leading) {
                 SectionTitle(
-                    label: "Task Overview",
+                    label: "Filters",
                     uppercase: true,
-                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
+                )
+                .padding([.leading, .top], 4)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    ScrollView(.vertical) {
+                        VStack(spacing: 1) {
+                            if let job = self.state.job {
+                                RecordBlock(
+                                    colour: .indigo,
+                                    fgColour: Theme.base,
+                                    label: job.titleOrId(),
+                                    icon: "hammer.circle.fill",
+                                    predicate: NSPredicate(
+                                        format: "job == %@ && alive == true",
+                                        job as CVarArg
+                                    ),
+                                    infoView: AnyView(Home.DetailedInformation()),
+                                    des: 1,
+                                    help: "~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")/\(job.titleOrId())"
+                                )
+                                if let project = job.project {
+                                    RecordBlock(
+                                        colour: project.backgroundColor,
+                                        fgColour: project.backgroundColor.isBright() ? Theme.base : .white,
+                                        label: "\(project.name ?? "_PROJECT")",
+                                        icon: "folder.circle.fill",
+                                        predicate: NSPredicate(
+                                            format: "job.project == %@ && alive == true",
+                                            project as CVarArg
+                                        ),
+                                        infoView: AnyView(Home.DetailedInformation()),
+                                        des: 1,
+                                        help: "~/\(project.company?.abbreviation ?? "_COMPANY")/\(project.abbreviation ?? "_PROJECT")"
+                                    )
+                                    if let company = project.company {
+                                        RecordBlock(
+                                            colour: company.backgroundColor,
+                                            fgColour: company.backgroundColor.isBright() ? Theme.base : .white,
+                                            label: "\(company.name ?? "_COMPANY")",
+                                            icon: "building.2.crop.circle.fill",
+                                            predicate: NSPredicate(
+                                                format: "job.project.company == %@ && alive == true",
+                                                company as CVarArg,
+                                            ),
+                                            infoView: AnyView(Home.DetailedInformation()),
+                                            des: 1,
+                                            help: "~/\(company.abbreviation ?? "_COMPANY")"
+                                        )
+                                    }
+                                }
+                            }
+                            RecordBlock(
+                                colour: .indigo,
+                                fgColour: Theme.base,
+                                label: "\(DateHelper.todayShort(DateHelper.daysAhead(-14, from: self.state.date), format: "MMM dd")) - \(DateHelper.todayShort(self.state.date, format: "MMM dd"))",
+                                icon: "triangle.circle.fill",
+                                predicate: NSPredicate(
+                                    format: "timestamp > %@ && timestamp <= %@",
+                                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                                    DateHelper.endOfDay(self.state.date)! as CVarArg
+                                ),
+                                infoView: AnyView(Home.DetailedInformation()),
+                                des: 1,
+                                help: "Published only"
+                            )
+                            .foregroundStyle(Theme.lightWhite)
+                        }
+                        .font(.caption)
+                        Spacer()
+                    }
+                    .frame(maxHeight: 130)
+                }
+            }
+            .padding(4)
+            .background(
+                ZStack {
+                    (self.state.job?.backgroundColor ?? Theme.textBackground)
+                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+    }
+
+    // MARK: Home.TaskFilters
+    struct TaskFilters: View {
+        @EnvironmentObject private var state: AppState
+        @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+
+        var body: some View {
+            VStack(alignment: .leading) {
+                SectionTitle(
+                    label: "Filters",
+                    uppercase: true,
+                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
+                )
+                .padding([.leading, .top], 4)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    ScrollView(.vertical) {
+                        VStack(spacing: 1) {
+                            if let job = self.state.job {
+                                TaskBlock(
+                                    colour: .indigo,
+                                    fgColour: Theme.base,
+                                    label: job.titleOrId(),
+                                    icon: "hammer.circle.fill",
+                                    predicate: NSPredicate(
+                                        format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner == %@",
+                                        job as CVarArg
+                                    ),
+                                    infoView: AnyView(Home.DetailedInformation()),
+                                    des: 1,
+                                    help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")/\(job.titleOrId())"
+                                )
+                                if let project = job.project {
+                                    TaskBlock(
+                                        colour: project.backgroundColor,
+                                        fgColour: project.backgroundColor.isBright() ? Theme.base : .white,
+                                        label: "\(project.name ?? "_PROJECT")",
+                                        icon: "folder.circle.fill",
+                                        predicate: NSPredicate(
+                                            format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project == %@",
+                                            project as CVarArg
+                                        ),
+                                        infoView: AnyView(Home.DetailedInformation()),
+                                        des: 1,
+                                        help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")"
+                                    )
+                                    if let company = project.company {
+                                        TaskBlock(
+                                            colour: company.backgroundColor,
+                                            fgColour: company.backgroundColor.isBright() ? Theme.base : .white,
+                                            label: "\(company.name ?? "_COMPANY")",
+                                            icon: "building.2.crop.circle.fill",
+                                            predicate: NSPredicate(
+                                                format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project.company == %@",
+                                                company as CVarArg,
+                                            ),
+                                            infoView: AnyView(Home.DetailedInformation()),
+                                            des: 1,
+                                            help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")"
+                                        )
+                                    }
+                                }
+                                TaskBlock(
+                                    colour: .indigo,
+                                    fgColour: Theme.base,
+                                    label: "New",
+                                    icon: "triangle.circle.fill",
+                                    predicate: NSPredicate(
+                                        format: "owner == %@ && created > %@ && created <= %@ && owner.project.alive == true && owner.project.company.hidden == false && completedDate != nil && cancelledDate != nil",
+                                        job,
+                                        self.state.date.startOfDay! as CVarArg,
+                                        self.state.date.endOfDay! as CVarArg
+                                    ),
+                                    infoView: AnyView(Home.DetailedInformation()),
+                                    des: 1,
+                                    help: "Created today"
+                                )
+                                TaskBlock(
+                                    colour: .indigo,
+                                    fgColour: Theme.base,
+                                    label: "Done",
+                                    icon: "triangle.circle.fill",
+                                    predicate: NSPredicate(
+                                        format: "owner == %@ && completedDate > %@ && completedDate <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
+                                        job,
+                                        self.state.date.startOfDay! as CVarArg,
+                                        self.state.date.endOfDay! as CVarArg
+                                    ),
+                                    infoView: AnyView(Home.DetailedInformation()),
+                                    des: 1,
+                                    help: "Completed today"
+                                )
+                            }
+                            TaskBlock(
+                                colour: .indigo,
+                                fgColour: Theme.base,
+                                label: "\(DateHelper.todayShort(DateHelper.daysAhead(-14, from: self.state.date), format: "MMM dd")) - \(DateHelper.todayShort(self.state.date, format: "MMM dd"))",
+                                icon: "triangle.circle.fill",
+                                predicate: NSPredicate(
+                                    format: "((due > %@ && due <= %@) || (completedDate > %@ && completedDate <= %@)) && owner.project.company.hidden == false",
+                                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                                    DateHelper.endOfDay(self.state.date)! as CVarArg,
+                                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                                    DateHelper.endOfDay(self.state.date)! as CVarArg
+                                ),
+                                infoView: AnyView(Home.DetailedInformation()),
+                                des: 1,
+                                help: "All statuses"
+                            )
+                            .foregroundStyle(Theme.lightWhite)
+                        }
+                        .font(.caption)
+                        Spacer()
+                    }
+                    .frame(maxHeight: 130)
+                }
+            }
+            .padding(4)
+            .background(
+                ZStack {
+                    (self.state.job?.backgroundColor ?? Theme.textBackground)
+                    LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+    }
+
+    // MARK: Home.DetailedInformation
+    struct DetailedInformation: View {
+        @EnvironmentObject private var state: AppState
+        private var page: PageConfiguration.AppPage = .settings
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 1) {
+                    SectionTitle(
+                        label: "Job",
+                        icon: "hammer.circle.fill"
+                    )
+                    Home.QuickHistory.JobOverviewWidget()
+                    SectionTitle(
+                        label: "Project",
+                        icon: "folder.circle.fill"
+                    )
+//                        Home.QuickHistory.ProjectOverviewWidget()
+                    SectionTitle(
+                        label: "Company",
+                        icon: "building.2.crop.circle.fill"
+                    )
+//                        Home.QuickHistory.CompanyOverviewWidget()
+                }
+                Spacer()
+            }
+            .padding()
+            .background(self.page.primaryColour.ignoresSafeArea(.all))
+//                .background(
+//                    ZStack {
+//                        LinearGradient(colors: [Theme.base, Theme.cPurple], startPoint: .top, endPoint: .bottom)
+//                    }
+//                        .ignoresSafeArea(.all)
+//                )
+        }
+    }
+
+    // MARK: Home.TasksGroup
+    struct TasksGroupOLD: View {
+        @EnvironmentObject private var state: AppState
+        private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
+        @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+
+        var body: some View {
+            VStack(alignment: .leading) {
+                SectionTitle(
+                    label: "Daily Overview",
+                    uppercase: true,
+                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
                 )
                 .padding([.leading, .top], 4)
                 VStack(alignment: .leading, spacing: 1) {
                     LazyVGrid(columns: self.col2, alignment: .leading) {
-                        ScrollView(.vertical) {
-                            VStack(spacing: 1) {
-                                Block(
-                                    colour: .indigo,
-                                    label: "Recent",
-                                    icon: "triangle.circle.fill",
-                                    predicate: NSPredicate(
-                                        format: "due > %@ && due <= %@ && owner.project.company.hidden == false",
-                                        DateHelper.daysAhead(-14) as CVarArg,
-                                        DateHelper.endOfDay(self.state.date)! as CVarArg
-                                    ),
-                                    des: 1
-                                )
-                                .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
-                                if let job = self.state.job {
-                                    Block(
-                                        colour: .indigo,
-                                        label: "In Job",
-                                        icon: "hammer.circle.fill",
-                                        predicate: NSPredicate(
-                                            format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner == %@",
-                                            job as CVarArg
-                                        ),
-                                        des: 1
-                                    )
-                                    if let project = job.project {
-                                        Block(
-                                            colour: .indigo,
-                                            label: "In Project",
-                                            icon: "folder.circle.fill",
-                                            predicate: NSPredicate(
-                                                format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project == %@",
-                                                project as CVarArg
-                                            ),
-                                            des: 1
-                                        )
-                                        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
-
-                                        if let company = project.company {
-                                            Block(
-                                                colour: .indigo,
-                                                label: "In Company",
-                                                icon: "building.2.crop.circle.fill",
-                                                predicate: NSPredicate(
-                                                    format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project.company == %@",
-                                                    company as CVarArg,
-                                                ),
-                                                des: 1
-                                            )
-                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
-                                        }
-                                    }
-                                    Block(
-                                        colour: .indigo,
-                                        label: "New",
-                                        icon: "calendar.circle.fill",
-                                        predicate: NSPredicate(
-                                            format: "owner == %@ && created > %@ && created <= %@ && owner.project.alive == true && owner.project.company.hidden == false && completedDate != nil && cancelledDate != nil",
-                                            job,
-                                            self.state.date.startOfDay! as CVarArg,
-                                            self.state.date.endOfDay! as CVarArg
-                                        ),
-                                        des: 1
-                                    )
-                                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
-                                    Block(
-                                        colour: .indigo,
-                                        label: "Done",
-                                        icon: "calendar.circle.fill",
-                                        predicate: NSPredicate(
-                                            format: "owner == %@ && completedDate > %@ && completedDate <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
-                                            job,
-                                            self.state.date.startOfDay! as CVarArg,
-                                            self.state.date.endOfDay! as CVarArg
-                                        ),
-                                        des: 1
-                                    )
-                                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
-                                }
-                            }
-                        }
-                        .frame(height: 85)
                         VStack(spacing: 1) {
-                            Block(
+                            TaskBlock(
                                 colour: .green,
                                 label: "Today",
                                 icon: "circle.circle.fill",
@@ -992,7 +1588,7 @@ extension Home {
                             .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
                         }
                         VStack(alignment: .leading, spacing: 1) {
-                            Block(
+                            TaskBlock(
                                 colour: .blue,
                                 label: "Upcoming",
                                 icon: "tray.circle.fill",
@@ -1039,7 +1635,7 @@ extension Home {
                             .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
                         }
                         VStack(alignment: .leading, spacing: 1) {
-                            Block(
+                            TaskBlock(
                                 colour: .red,
                                 label: "Overdue",
                                 icon: "exclamationmark.circle.fill",
@@ -1082,7 +1678,7 @@ extension Home {
                             .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 4, bottomTrailingRadius: 4))
                         }
                         VStack(alignment: .leading, spacing: 1) {
-                            Block(
+                            TaskBlock(
                                 label: "Delayed",
                                 icon: "archivebox.circle.fill",
                                 predicate: NSPredicate(
@@ -1153,13 +1749,13 @@ extension Home {
                     SectionTitle(
                         label: "Selected",
                         uppercase: true,
-                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                        fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
                     )
                     .padding([.leading, .top], 4)
                     VStack(alignment: .leading, spacing: 1) {
                         LazyVGrid(columns: self.col2, alignment: .leading) {
                             VStack(spacing: 1) {
-                                Block(
+                                TaskBlock(
                                     colour: .blue,
                                     label: "Open Tasks",
                                     icon: "lightbulb.circle.fill",
@@ -1183,7 +1779,7 @@ extension Home {
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
                     }
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .clipShape(.rect(cornerRadius: 4))
             }
         }
     }
@@ -1192,17 +1788,18 @@ extension Home {
     struct QuickAccessTabs: View {
         @EnvironmentObject private var state: AppState
         @State private var selectedWidgetTab: TabbedWidget = .record
+        @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 // Tabs
-                HStack(spacing: 1) {
+                HStack(alignment: .bottom, spacing: 1) {
                     Button {
                         self.selectedWidgetTab = .record
                     } label: {
                         Image(systemName: self.selectedWidgetTab == .record ? PageConfiguration.EntityType.records.iconSelectedString : PageConfiguration.EntityType.records.iconString)
                             .padding(8)
-                            .padding([.top, .bottom], 1)
+                            .padding([.top, .bottom], 2)
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(self.selectedWidgetTab == .record ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
@@ -1239,7 +1836,7 @@ extension Home {
                     } label: {
                         Image(systemName: self.selectedWidgetTab == .notes ? PageConfiguration.EntityType.notes.iconSelectedString : PageConfiguration.EntityType.notes.iconString)
                             .padding(8)
-                            .padding([.top, .bottom], 1)
+                            .padding([.top, .bottom], 2)
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(self.selectedWidgetTab == .notes ? self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : self.state.theme.tint : Theme.lightWhite)
@@ -1272,8 +1869,16 @@ extension Home {
                     )
                     .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
                 }
-                .font(.system(.body, design: .monospaced))
                 .padding(.leading, 8)
+//                .background(
+//                    ZStack(alignment: .bottom) {
+//                        Theme.textBackground
+//                        LinearGradient(colors: [.clear, (self.selectedWidgetTab == .jobs && self.state.job != nil ? Color.black : Color.clear).opacity(0.7)], startPoint: .top, endPoint: .bottom)
+//                            .blendMode(.softLight)
+//                            .frame(height: 15)
+//                    }
+//                )
+//                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4))
 
                 // View bodies
                 if self.selectedWidgetTab == .record {
@@ -1295,14 +1900,15 @@ extension Home {
             @State private var defaultJob: Job? = nil
             @FocusState public var hasFocus: Bool
             @AppStorage("home.isQuickRecordFocused") private var isQuickRecordFocused: Bool = false
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
             private let page: PageConfiguration.AppPage = .today
 
             var body: some View {
                 VStack(alignment: .leading) {
                     HStack {
                         SectionTitle(
-                            label: "Quick Record",
-                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                            label: "Scratchpad",
+                            fgColour: (self.state.job?.backgroundColor.isBright() ?? self.defaultJob?.backgroundColor.isBright() ?? false) ? Theme.base : .white
                         )
                         .padding([.leading, .top], 4)
                         Spacer()
@@ -1310,21 +1916,23 @@ extension Home {
                             if self.state.job == nil {
                                 SectionTitle(
                                     label: "~/\(dJob.project?.company?.abbreviation ?? "404")/\(dJob.project?.abbreviation ?? "404")/\(dJob.title ?? dJob.jid.string)",
-                                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite
+                                    fgColour: self.state.job?.backgroundColor.isBright() ?? self.defaultJob?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite
                                 )
                                 .padding([.trailing], 4)
+                                .monospaced()
                             } else {
                                 SectionTitle(
                                     label: "~/\(self.state.job!.project?.company?.abbreviation ?? "404")/\(self.state.job!.project?.abbreviation ?? "404")/\(self.state.job!.title ?? self.state.job!.jid.string)",
-                                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite
+                                    fgColour: self.state.job?.backgroundColor.isBright() ?? self.defaultJob?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite
                                 )
                                 .padding([.trailing], 4)
+                                .monospaced()
                             }
                         }
                     }
                     HStack {
                         ZStack(alignment: .trailing) {
-                            TextField("", text: $content, prompt: Text("What needs to be done?").foregroundStyle((self.state.job?.backgroundColor ?? .clear).isBright() ? Theme.lightBase.opacity(0.5) : Theme.lightWhite.opacity(0.5)))
+                            TextField("", text: $content, prompt: Text("What's on your mind?").foregroundStyle((self.state.job?.backgroundColor ?? self.defaultJob?.backgroundColor ?? .clear).isBright() || self.hasFocus ? Theme.lightBase.opacity(0.5) : Theme.lightWhite.opacity(0.5)))
                                 .onSubmit(self.actionOnSubmit)
                                 .padding()
                                 .lineLimit(1...3)
@@ -1340,24 +1948,27 @@ extension Home {
                                         self.isQuickRecordFocused = true
                                     }
                                 }
-                                .foregroundStyle(self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white)
+                                .foregroundStyle(Theme.base)
 
                             if self.content != "" {
                                 Button {
                                     self.content = ""
+                                    self.hasFocus = false
                                 } label: {
                                     Image(systemName: "xmark.circle.fill")
-                                        .bold()
+                                        .font(.title2)
                                         .padding(.trailing)
                                 }
                                 .buttonStyle(.plain)
+                                .foregroundStyle(self.hasFocus ? .red : .iOSBetaBg)
                             }
                         }
                     }
                     .background(
                         ZStack {
                             Theme.textBackground.opacity(self.hasFocus ? 1 : 0.5)
-                            LinearGradient(colors: [.clear, Theme.textBackground.opacity(self.hasFocus ? 1 : 0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            LinearGradient(colors: [.clear, Theme.textBackground.opacity(self.hasFocus ? 1 : 0)], startPoint: .top, endPoint: .bottom)
+                                .blendMode(.softLight)
                         }
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -1366,7 +1977,7 @@ extension Home {
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? (self.defaultJob != nil ? self.defaultJob!.backgroundColor : Theme.textBackground))
                         LinearGradient(colors: [.clear, Theme.textBackground.opacity(self.hasFocus ? 1 : 0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -1375,18 +1986,179 @@ extension Home {
             }
         }
 
+        // MARK: Home.QuickAccessTabs.QuickTaskList
+        struct QuickTaskList: View {
+            @EnvironmentObject private var state: AppState
+            @State private var id: UUID = UUID()
+            @State private var content: String = ""
+            @State private var defaultJob: Job? = nil
+            @State private var tasks: [LogTask] = []
+            @AppStorage("home.widget.quicktasklist.showSuggested") private var showSuggested: Bool = false
+            @FocusState private var hasFocus: Bool
+            @FetchRequest private var suggestedTasks: FetchedResults<LogTask>
+
+            var body: some View {
+                VStack(alignment: .leading) {
+                    HStack(alignment: .center) {
+                        SectionTitle(
+                            label: "Scratchtasks",
+                            fgColour: (self.state.job?.backgroundColor.isBright() ?? self.defaultJob?.backgroundColor.isBright() ?? false) ? Theme.base : .white
+                        )
+                        .padding([.leading, .top], 4)
+                        Spacer()
+                        if let dJob = self.defaultJob {
+                            if self.state.job == nil {
+                                SectionTitle(
+                                    label: "~/\(dJob.project?.company?.abbreviation ?? "404")/\(dJob.project?.abbreviation ?? "404")/\(dJob.title ?? dJob.jid.string)",
+                                    fgColour: self.state.job?.backgroundColor.isBright() ?? self.defaultJob?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite
+                                )
+                                .padding([.trailing], 4)
+                                .monospaced()
+                            } else {
+                                SectionTitle(
+                                    label: "~/\(self.state.job!.project?.company?.abbreviation ?? "404")/\(self.state.job!.project?.abbreviation ?? "404")/\(self.state.job!.title ?? self.state.job!.jid.string)",
+                                    fgColour: self.state.job?.backgroundColor.isBright() ?? self.defaultJob?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite
+                                )
+                                .padding([.trailing], 4)
+                                .monospaced()
+                            }
+                        }
+                    }
+                    VStack(alignment: .leading, spacing: 1) {
+                        VStack(alignment: .leading) {
+                            ZStack(alignment: .trailing) {
+                                TextField("", text: $content, prompt: Text("Oranges, mangoes, revolution @ 1500...").foregroundStyle((self.state.job?.backgroundColor ?? self.defaultJob?.backgroundColor ?? .clear).isBright() || self.hasFocus ? Theme.lightBase.opacity(0.5) : Theme.lightWhite.opacity(0.5)))
+                                    .onSubmit(self.actionOnSubmit)
+                                    .padding()
+                                    .lineLimit(1...3)
+                                    .textSelection(.enabled)
+                                    .submitLabel(.go)
+                                    .multilineTextAlignment(.leading)
+                                    .textFieldStyle(.plain)
+                                    .focused(self.$hasFocus)
+                                    .foregroundStyle(Theme.base)
+                                if self.content != "" {
+                                    Button {
+                                        self.content = ""
+                                        self.hasFocus = false
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title2)
+                                            .padding(.trailing)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .foregroundStyle(self.hasFocus ? .red : .iOSBetaBg)
+                                }
+                            }
+                        }
+                        .background(
+                            ZStack(alignment: .bottom) {
+                                Theme.textBackground.opacity(self.hasFocus ? 1 : 0.5)
+                                LinearGradient(colors: [.clear, Theme.textBackground.opacity(self.hasFocus ? 1 : 0)], startPoint: .top, endPoint: .bottom)
+                                    .blendMode(.softLight)
+
+                            }
+                        )
+                        .clipShape(.rect(topLeadingRadius: 4, topTrailingRadius: 4))
+
+                        ScrollView(.vertical) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                if self.tasks.count == 0 {
+                                    Tabs.Content.Individual.MythicalSingleBlank(label: "...")
+                                } else {
+                                    ForEach(self.tasks, id: \.self) { task in
+                                        Tabs.Content.Individual.MythicalSingleTask(task: task, callback: self.findTasks)
+                                    }
+                                }
+                            }
+                        }
+                        .frame(maxHeight: 130)
+                        .padding([.top, .bottom], 8)
+                        .padding([.leading, .trailing], 4)
+                        .background(
+                            ZStack {
+                                LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
+                            }
+                        )
+
+                        Button {
+                            self.showSuggested.toggle()
+                        } label: {
+                            HStack(alignment: .center) {
+                                Spacer()
+                                Text(self.showSuggested ? "HIDE SUGGESTED" : "SHOW SUGGESTED")
+                                Image(systemName: self.showSuggested ? "chevron.up" : "chevron.down")
+                                Spacer()
+                            }
+                            .padding(4)
+                        }
+                        .buttonStyle(.plain)
+                        .font(.caption)
+                        .monospaced()
+                        .background(
+                            ZStack {
+                                self.state.theme.tint
+                                LinearGradient(colors: [.clear, Theme.base], startPoint: .top, endPoint: .bottom)
+                                    .blendMode(.softLight)
+                            }
+                        )
+                        .clipShape(.rect(cornerRadius: 4))
+
+                        if self.showSuggested && self.suggestedTasks.count > 0 {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ForEach(self.suggestedTasks, id: \.self) { task in
+                                    Tabs.Content.Individual.MythicalSingleSuggestedTask(
+                                        task: task,
+                                        callback: {
+                                            self.content = task.title ?? task.content ?? "_INVALID"
+                                            self.hasFocus = true
+                                        }
+                                    )
+                                }
+                            }
+                            .padding([.top, .bottom], 8)
+                            .padding([.leading, .trailing], 4)
+                        }
+                    }
+                }
+                .foregroundStyle(Theme.base)
+                .id(self.id)
+                .tint(self.state.theme.tint)
+                .padding(4)
+                .background(
+                    ZStack {
+                        (self.state.job?.backgroundColor ?? (self.defaultJob != nil ? self.defaultJob!.backgroundColor : Theme.textBackground))
+                        LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    }
+                )
+                .clipShape(.rect(cornerRadius: 4))
+                .onAppear(perform: self.actionOnAppear)
+                .onChange(of: self.state.job) {
+                    self.actionOnAppear()
+                }
+            }
+
+            init() {
+                _suggestedTasks = CoreDataTasks.fetch(
+                    with: NSPredicate(format: "isSuggested == true"),
+                    sort: [NSSortDescriptor(keyPath: \LogTask.created?, ascending: true)]
+                )
+            }
+        }
+
         // MARK: Home.QuickAccessTabs.QuickSearchPanel
         struct QuickSearchPanel: View {
             @EnvironmentObject private var state: AppState
             @FetchRequest public var savedSearchTerms: FetchedResults<SavedSearch>
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack {
                         SectionTitle(
-                            label: "Quick Search",
+                            label: "\(self.savedSearchTerms.count) Saved Searches",
                             uppercase: true,
-                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
                         )
                         Spacer()
                     }
@@ -1394,8 +2166,16 @@ extension Home {
                     .padding(.bottom, 8)
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(spacing: 1) {
-                            ForEach(self.savedSearchTerms, id: \.self) { term in
-                                SavedTerm(savedSearch: term)
+                            if self.savedSearchTerms.count > 0 {
+                                ForEach(self.savedSearchTerms, id: \.self) { term in
+                                    SavedTerm(savedSearch: term)
+                                }
+                            } else {
+                                SectionTitle(
+                                    label: "Nothing yet",
+                                    fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
+                                )
+                                .padding([.leading, .top], 4)
                             }
                         }
                     }
@@ -1422,11 +2202,13 @@ extension Home {
                     } label: {
                         HStack {
                             Image(systemName: "magnifyingglass.circle.fill")
+                                .symbolRenderingMode(.hierarchical)
                             if let term = self.savedSearch.term {
                                 Text(term)
                             }
                             Spacer()
                             Image(systemName: "chevron.right")
+                                .font(.caption)
                                 .foregroundStyle((self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white).opacity(0.3))
                         }
                         .foregroundStyle(self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white)
@@ -1442,13 +2224,14 @@ extension Home {
         struct FavouriteNotes: View {
             @EnvironmentObject private var state: AppState
             @FetchRequest private var items: FetchedResults<Note>
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
             var body: some View {
                 VStack(alignment: .leading) {
                     HStack {
                         SectionTitle(
-                            label: "Favourite Notes",
-                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                            label: "Favourites",
+                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
                         )
                         .padding([.leading, .top], 4)
                         Spacer()
@@ -1471,7 +2254,43 @@ extension Home {
                     }
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 4))
-    //            .onAppear(perform: self.actionOnAppear)
+            }
+        }
+
+        // MARK: Home.QuickAccessTabs.RecentNotes
+        struct RecentNotes: View {
+            @EnvironmentObject private var state: AppState
+            @FetchRequest private var items: FetchedResults<Note>
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+
+            var body: some View {
+                VStack(alignment: .leading) {
+                    HStack {
+                        SectionTitle(
+                            label: "Recent",
+                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
+                        )
+                        .padding([.leading, .top], 4)
+                        Spacer()
+                    }
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(spacing: 1) {
+                            ForEach(self.items, id: \.self) { entity in
+                                FavouriteItem(item: entity, link: AnyView(NoteDetail(note: entity)))
+                            }
+                        }
+                    }
+                    .frame(height: 130)
+                }
+                .tint(self.state.theme.tint)
+                .padding(4)
+                .background(
+                    ZStack {
+                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    }
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 4))
             }
         }
 
@@ -1479,13 +2298,14 @@ extension Home {
         struct FavouriteJobs: View {
             @EnvironmentObject private var state: AppState
             @FetchRequest private var items: FetchedResults<Job>
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
             var body: some View {
                 VStack(alignment: .leading) {
                     HStack {
                         SectionTitle(
-                            label: "Favourite Jobs",
-                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : Theme.lightWhite
+                            label: "Favourites",
+                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
                         )
                         .padding([.leading, .top], 4)
                         Spacer()
@@ -1510,7 +2330,84 @@ extension Home {
                     }
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 4))
-    //            .onAppear(perform: self.actionOnAppear)
+            }
+        }
+
+        // MARK: Home.QuickAccessTabs.RecentJobs
+        struct RecentJobs: View {
+            @EnvironmentObject private var state: AppState
+            @FetchRequest private var items: FetchedResults<Job>
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+
+            var body: some View {
+                VStack(alignment: .leading) {
+                    HStack {
+                        SectionTitle(
+                            label: "Recent",
+                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
+                        )
+                        .padding([.leading, .top], 4)
+                        Spacer()
+                    }
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(spacing: 1) {
+                            ForEach(self.items, id: \.self) { entity in
+                                HStack(spacing: 0) {
+                                    FavouriteItem(item: entity, link: nil)
+                                }
+                            }
+                        }
+                    }
+                    .frame(height: 130)
+                }
+                .tint(self.state.theme.tint)
+                .padding(4)
+                .background(
+                    ZStack {
+                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    }
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+            }
+        }
+
+        // MARK: Home.QuickAccessTabs.RecentRecords
+        struct RecentRecords: View {
+            @EnvironmentObject private var state: AppState
+            @FetchRequest private var items: FetchedResults<Job>
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+
+            var body: some View {
+                VStack(alignment: .leading) {
+                    HStack {
+                        SectionTitle(
+                            label: "Recent",
+                            fgColour: self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white
+                        )
+                        .padding([.leading, .top], 4)
+                        Spacer()
+                    }
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(spacing: 1) {
+                            ForEach(self.items, id: \.self) { entity in
+                                HStack(spacing: 0) {
+                                    FavouriteItem(item: entity, link: nil)
+                                }
+                            }
+                        }
+                    }
+                    .frame(height: 130)
+                }
+                .tint(self.state.theme.tint)
+                .padding(4)
+                .background(
+                    ZStack {
+                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    }
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 4))
             }
         }
 
@@ -1519,6 +2416,7 @@ extension Home {
             @EnvironmentObject private var state: AppState
             public var item: NSManagedObject
             public var link: AnyView?
+            @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
             var body: some View {
                 if self.link == nil {
@@ -1542,6 +2440,7 @@ extension Home {
             var label: some View {
                 HStack {
                     Image(systemName: "hammer.circle.fill")
+                        .symbolRenderingMode(.hierarchical)
                     switch self.item {
                     case is Note:
                         Text((self.item as! Note).title ?? "Invalid note title")
@@ -1555,6 +2454,7 @@ extension Home {
                     Spacer()
                     Image(systemName: "chevron.right")
                         .opacity(0.3)
+                        .font(.caption)
                 }
                 .padding(4)
                 .foregroundStyle(
@@ -1575,6 +2475,18 @@ extension Home {
 extension Home.QuickAccessTabs.FavouriteNotes {
     init() {
         _items = CoreDataNotes.fetchNotes(favouritesOnly: true)
+    }
+}
+
+extension Home.QuickAccessTabs.RecentNotes {
+    init() {
+        _items = CoreDataNotes.fetchRecentNotes(limit: 8)
+    }
+}
+
+extension Home.QuickAccessTabs.RecentJobs {
+    init() {
+        _items = CoreDataJob.fetchRecent(limit: 8)
     }
 }
 
@@ -1672,6 +2584,7 @@ extension Home.QuickHistory.RecentJobsWidget {
     /// Init
     init() {
         _recentJobs = CoreDataJob.fetchRecent(limit: 8)
+        _favouriteJobs = CoreDataJob.fetchAll(favsOnly: true)
         _suggestedJobsFromTasks = CoreDataTasks.fetchDue()
     }
     
@@ -1708,15 +2621,93 @@ extension Home {
     }
 }
 
-extension Home.Block {
-    init(colour: Color = .clear, label: String, icon: String, predicate: NSPredicate, target: AnyView? = nil, des: Int = 0) {
+extension Home.RecordBlock {
+    init(colour: Color = .clear, fgColour: Color? = nil, label: String, icon: String, predicate: NSPredicate, target: AnyView? = nil, infoView: AnyView? = nil, des: Int = 0, help: String? = nil) {
         self.colour = colour
+        self.fgColour = fgColour
         self.label = label
         self.icon = icon
         self.target = target
         self.predicate = predicate
         self.des = des
+        self.help = help
+        self.infoView = infoView
+        _items = CoreDataRecords.fetch(with: predicate)
+    }
+}
+
+extension Home.TaskBlock {
+    init(colour: Color = .clear, fgColour: Color? = nil, label: String, icon: String, predicate: NSPredicate, target: AnyView? = nil, infoView: AnyView? = nil, des: Int = 0, help: String? = nil) {
+        self.colour = colour
+        self.fgColour = fgColour
+        self.label = label
+        self.icon = icon
+        self.target = target
+        self.predicate = predicate
+        self.des = des
+        self.help = help
+        self.infoView = infoView
         _tasks = CoreDataTasks.fetch(with: predicate)
+    }
+}
+
+extension Home.QuickAccessTabs.QuickTaskList {
+    /// Fires when view appears
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        if let job = CoreDataJob(moc: self.state.moc).getDefault() {
+            self.defaultJob = job
+        }
+
+        self.findTasks()
+    }
+    
+    /// Find open tasks associated with this job
+    /// - Returns: Void
+    private func findTasks() -> Void {
+        self.tasks = []
+        var current: Job? = self.state.job
+
+        if let job = self.state.job {
+            current = job
+        } else if self.defaultJob != nil {
+            current = self.defaultJob!
+        }
+
+        if current != nil {
+            self.tasks = CoreDataTasks(moc: self.state.moc).find(
+                with: NSPredicate(
+                    format: "owner == %@ && created > %@ && created <= %@",
+                    current!,
+                    (self.state.date.startOfDay ?? Date()) as CVarArg,
+                    (self.state.date.endOfDay ?? Date()) as CVarArg
+                ),
+                limit: 8
+            )
+
+            self.id = UUID() // hack to refresh UI
+        }
+    }
+
+    /// Fires on submit/return
+    /// - Returns: Void
+    private func actionOnSubmit() -> Void {
+        if !self.content.isEmpty {
+            CoreDataTasks(moc: self.state.moc).create(
+                content: "",
+                title: self.content,
+                created: Date(),
+                due: Date().endOfDay!,
+                job: self.state.job != nil ? self.state.job : self.defaultJob,
+                saveByDefault: false
+            )
+
+            PersistenceController.shared.save()
+            self.findTasks()
+        }
+
+        self.content = ""
+        self.hasFocus = false
     }
 }
 
@@ -1736,19 +2727,20 @@ extension Home.QuickAccessTabs.QuickRecordPanel {
             if let job = CoreDataJob(moc: self.state.moc).getDefault() {
                 CoreDataRecords(moc: self.state.moc).createWithJob(
                     job: job,
-                    date: self.state.date,
+                    date: Date(), // using current date instead of self.state.date intentionally
                     text: self.content
                 )
             }
         } else {
             CoreDataRecords(moc: self.state.moc).createWithJob(
                 job: self.state.job!,
-                date: self.state.date,
+                date: Date(), // using current date instead of self.state.date intentionally
                 text: self.content
             )
         }
 
         self.content = ""
+        self.hasFocus = false
     }
 }
 

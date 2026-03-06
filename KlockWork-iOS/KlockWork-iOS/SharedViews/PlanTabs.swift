@@ -591,6 +591,12 @@ extension PlanTabs {
         var tasks: [LogTask]
     }
 
+    struct RecordRow: Identifiable, Hashable {
+        var id: UUID = UUID()
+        var date: String
+        var items: [LogRecord]
+    }
+
     struct Upcoming: View {
         typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
         
@@ -610,11 +616,14 @@ extension PlanTabs {
                             ForEach(self.upcoming, id: \.id) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, onAction: self.actionOnAppear, inSheet: self.inSheet)
+                                        Row(task: task, onAction: self.actionOnAppear, includeDueDate: true, inSheet: self.inSheet)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
+                                .padding([.leading, .trailing], -16)
+                                .padding([.top], -16)
+                                .padding([.bottom], -12)
                             }
                         }
                         .background(Theme.base.opacity(0.6))
@@ -771,11 +780,14 @@ extension PlanTabs {
                             ForEach(self.overdue, id: \.id) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, onAction: self.actionOnAppear, inSheet: self.inSheet)
+                                        Row(task: task, onAction: self.actionOnAppear, includeDueDate: true, inSheet: self.inSheet)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
+                                .padding([.leading, .trailing], -16)
+                                .padding([.top], -16)
+                                .padding([.bottom], -12)
                             }
                         }
                         .listStyle(.plain)
@@ -897,40 +909,54 @@ extension PlanTabs {
         }
     }
 
-    // MARK: FromPredicate
-    struct FromPredicate: View {
+    // MARK: TasksByPredicate
+    struct TasksByPredicate: View {
         typealias Row = Tabs.Content.Individual.SingleTaskDetailedChecklistItem
-
         @EnvironmentObject private var state: AppState
         @FetchRequest private var tasks: FetchedResults<LogTask>
         @State private var overdue: [UpcomingRow] = []
         @State private var id: UUID = UUID()
+        @State private var job: Job? = nil // @TODO: replace with state.job
+        @State private var recentInteractions: [String] = []
         public var page: PageConfiguration.AppPage = .planning
         public var inSheet: Bool = false
         public var predicate: NSPredicate
+        @AppStorage("home.backgroundColour") private var homeBackgroundColourChoice: Int = 0
+        @AppStorage("home.backgroundWallpaper") private var homeWallpaper: String = ""
+        @AppStorage("home.shouldUseWPImage") private var shouldUseWPImage: Bool = false
 
         var body: some View {
             NavigationStack {
-                VStack(alignment: .leading, spacing: 1) {
-                    TaskForecast(callback: self.actionForecastCallback, daysToShow: 14, page: self.page)
+                VStack(alignment: .leading, spacing: 0) {
+                    TaskForecast(callback: self.actionForecastCallback, daysToShow: -14, page: self.page)
                     if !self.tasks.isEmpty {
                         List {
                             ForEach(self.overdue) { row in
                                 Section {
                                     ForEach(row.tasks) { task in
-                                        Row(task: task, onAction: self.actionOnAppear, inSheet: self.inSheet)
-                                            .listRowInsets(.none)
-                                            .listRowSpacing(.none)
-                                            .listRowSeparator(.hidden)
+                                        Row(
+                                            task: task,
+                                            onAction: self.actionOnAppear,
+                                            includeDueDate: true,
+                                            includeCompletedDate: true,
+                                            inSheet: self.inSheet
+                                        )
+                                        .listRowInsets(.none)
+                                        .listRowSpacing(.none)
+                                        .listRowSeparator(.hidden)
+                                        .listRowBackground(Color.clear)
                                     }
                                 } header: {
                                     Timestamp(text: "\(row.tasks.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
                                 }
                                 .listSectionSpacing(0)
+                                .padding([.leading, .trailing], -16)
+                                .padding([.top], -16)
+                                .padding([.bottom], -13)
                             }
                         }
                         .listStyle(.inset)
-                        .padding(-16) // removes default list padding
+                        Spacer()
                     } else {
                         HStack {
                             Text("No tasks found")
@@ -944,7 +970,16 @@ extension PlanTabs {
                     }
                 }
             }
-            .background(self.page.primaryColour)
+            .background(
+                ZStack {
+                    if !self.shouldUseWPImage {
+                        self.page.primaryColour
+                    } else {
+                        Image("wallpaper-\(self.homeWallpaper)")
+                    }
+                }
+                .ignoresSafeArea(.all)
+            )
             .id(self.id)
             .onAppear(perform: self.actionOnAppear)
             .onChange(of: self.state.date) {
@@ -964,6 +999,7 @@ extension PlanTabs {
         private func actionOnAppear() -> Void {
             self.id = UUID()
             self.overdue = []
+            self.job = self.state.job
             let grouped = Dictionary(grouping: self.tasks, by: {$0.due?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
             let sorted = Array(grouped)
                 .sorted(by: {
@@ -972,7 +1008,7 @@ extension PlanTabs {
                     df.timeStyle = .none
                     if let d1 = df.date(from: $0.key) {
                         if let d2 = df.date(from: $1.key) {
-                            return d1 < d2
+                            return d1 > d2
                         }
                     }
                     return false
@@ -1037,6 +1073,175 @@ extension PlanTabs {
         private func actionOnSwipeCancel(_ task: LogTask) -> Void {
             CoreDataTasks(moc: self.state.moc).cancel(task)
             self.actionOnAppear()
+        }
+
+        /// Forecast tap callback handler
+        /// - Returns: Void
+        private func actionForecastCallback() -> Void {
+            self.id = UUID()
+        }
+    }
+
+    // MARK: RecordsByPredicate
+    struct RecordsByPredicate: View {
+        typealias Row = Tabs.Content.Individual.SingleRecordDetailedLink
+        @EnvironmentObject private var state: AppState
+        @FetchRequest private var tasks: FetchedResults<LogRecord>
+        @State private var overdue: [RecordRow] = []
+        @State private var id: UUID = UUID()
+        @State private var job: Job? = nil // @TODO: replace with state.job
+        @State private var recentInteractions: [String] = []
+        public var page: PageConfiguration.AppPage = .planning
+        public var inSheet: Bool = false
+        public var predicate: NSPredicate
+        @AppStorage("home.backgroundColour") private var homeBackgroundColourChoice: Int = 0
+        @AppStorage("home.backgroundWallpaper") private var homeWallpaper: String = ""
+        @AppStorage("home.shouldUseWPImage") private var shouldUseWPImage: Bool = false
+
+        var body: some View {
+            NavigationStack {
+                VStack(alignment: .leading, spacing: 1) {
+                    TaskForecast(callback: self.actionForecastCallback, daysToShow: -14, page: self.page)
+                        .padding(.bottom)
+                    if !self.tasks.isEmpty {
+                        List {
+                            ForEach(self.overdue) { row in
+                                Section {
+                                    ForEach(row.items) { item in
+                                        Row(
+                                            record: item,
+                                            onAction: self.actionOnAppear,
+                                            inSheet: self.inSheet
+                                        )
+                                            .listRowInsets(.none)
+                                            .listRowSpacing(.none)
+                                            .listRowSeparator(.hidden)
+//                                            .listRowBackground(Color.clear)
+                                    }
+                                } header: {
+                                    Timestamp(text: "\(row.items.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
+                                }
+                                .listSectionSpacing(0)
+                            }
+                        }
+                        .listStyle(.inset)
+                        Spacer()
+                    } else {
+                        HStack {
+                            Text("No tasks found")
+                            Spacer()
+                        }
+                        .padding()
+                        .background(Theme.textBackground)
+                        .clipShape(.rect(cornerRadius: 16))
+                        .padding(8)
+                        Spacer()
+                    }
+                }
+            }
+            .background(
+                ZStack {
+                    if !self.shouldUseWPImage {
+                        self.page.primaryColour
+                    } else {
+                        Image("wallpaper-\(self.homeWallpaper)")
+                    }
+                }
+                .ignoresSafeArea(.all)
+            )
+            .id(self.id)
+            .onAppear(perform: self.actionOnAppear)
+            .onChange(of: self.state.date) {
+                self.actionOnSelectDate()
+            }
+            .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
+        }
+
+        init(predicate: NSPredicate) {
+            self.predicate = predicate
+            _tasks = CoreDataRecords.fetch(with: predicate)
+        }
+
+        /// Onload handler
+        /// - Returns: Void
+        private func actionOnAppear() -> Void {
+            self.id = UUID()
+            self.overdue = []
+            self.job = self.state.job
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.timestamp?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
+            let sorted = Array(grouped)
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 > d2
+                        }
+                    }
+                    return false
+                })
+
+            for group in sorted {
+                self.overdue.append(RecordRow(date: group.key, items: group.value))
+            }
+        }
+
+        /// Select date handler
+        /// @TODO: refactor
+        /// - Returns: Void
+        private func actionOnSelectDate() -> Void {
+            self.id = UUID()
+            self.overdue = []
+            let grouped = Dictionary(grouping: self.tasks, by: {$0.timestamp?.formatted(date: .abbreviated, time: .omitted) ?? "No Date"})
+            let sorted = Array(grouped)
+                .sorted(by: {
+                    let df = DateFormatter()
+                    df.dateStyle = .medium
+                    df.timeStyle = .none
+                    if let d1 = df.date(from: $0.key) {
+                        if let d2 = df.date(from: $1.key) {
+                            return d1 > d2
+                        }
+                    }
+                    return false
+                })
+
+            for group in sorted {
+                if group.key == self.state.date.formatted(date: .abbreviated, time: .omitted) {
+                    self.overdue.append(RecordRow(date: group.key, items: group.value))
+                }
+            }
+        }
+
+        /// Callback which handles the Complete swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeComplete(_ task: LogTask) -> Void {
+//            CoreDataTasks(moc: self.state.moc).complete(task)
+//            self.actionOnAppear()
+        }
+
+        /// Callback which handles the Delay swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeDelay(_ task: LogTask) -> Void {
+//            if let due = task.due {
+//                if let newDate = DateHelper.endOfTomorrow(due) {
+//                    CoreDataTasks(moc: self.state.moc).due(on: newDate, task: task)
+//                }
+//            }
+//
+//            self.actionOnAppear()
+        }
+
+        /// Callback which handles the Cancel swipe action
+        /// - Parameter task: LogTask
+        /// - Returns: Void
+        private func actionOnSwipeCancel(_ task: LogTask) -> Void {
+//            CoreDataTasks(moc: self.state.moc).cancel(task)
+//            self.actionOnAppear()
         }
 
         /// Forecast tap callback handler

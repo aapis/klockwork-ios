@@ -52,15 +52,15 @@ extension Tabs.Content {
                     if items.count > 0 {
                         ForEach(items) { record in
                             Individual.SingleRecordDetailedLink(record: record)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No records found for \(self.state.date.formatted(date: .abbreviated, time: .omitted))")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle(self.pageTitle)
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -90,12 +90,18 @@ extension Tabs.Content {
                     if let job = self.state.job {
                         Separator(label: "Current")
                         Individual.SingleJobDetailedLink(job: job)
+                            .listRowInsets(.none)
+                            .listRowSpacing(.none)
+                            .listRowSeparator(.hidden)
                     }
 
                     if self.favouriteItems.count > 0 {
                         Separator(label: "Starred (\(self.favouriteItems.count))", description: "All time")
                         ForEach(self.favouriteItems, id: \.self) { jerb in
                             Individual.SingleJobDetailedLink(job: jerb)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     }
 
@@ -103,15 +109,15 @@ extension Tabs.Content {
                         Separator(label: "Recent (\(self.items.count))", description: "< 30 days")
                         ForEach(items) { jerb in
                             Individual.SingleJobDetailedLink(job: jerb)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No jobs found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Jobs")
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -137,16 +143,20 @@ extension Tabs.Content {
                 SwiftUI.List {
                     if items.count > 0 {
                         ForEach(items, id: \.objectID) { task in
-                            Individual.SingleTaskDetailedChecklistItem(task: task)
+                            Individual.SingleTaskDetailedChecklistItem(task: task, includeDueDate: true)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                                .padding([.leading, .trailing], -16)
+                                .padding([.top], -16)
+                                .padding([.bottom], -12)
                         }
                     } else {
                         StatusMessage.Warning(message: "No tasks found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Tasks")
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -171,16 +181,20 @@ extension Tabs.Content {
                 SwiftUI.List {
                     if items.count > 0 {
                         ForEach(items, id: \.objectID) { task in
-                            Individual.SingleTaskDetailedChecklistItem(task: task)
+                            Individual.SingleTaskDetailedChecklistItem(task: task, includeDueDate: true)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                                .padding([.leading, .trailing], -16)
+                                .padding([.top], -16)
+                                .padding([.bottom], -12)
                         }
                     } else {
                         StatusMessage.Warning(message: "No tasks found")
                     }
                 }
-                .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
+                .listStyle(.inset)
                 .listSectionSpacing(0)
                 .navigationTitle(self.label)
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -208,21 +222,24 @@ extension Tabs.Content {
                         Separator(label: "Starred (\(self.favouriteItems.count))", description: "All time")
                         ForEach(self.favouriteItems, id: \.self) { note in
                             Individual.SingleNoteDetailedLink(note: note)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     }
                     if items.count > 0 {
                         Separator(label: "All (\(self.items.count))")
                         ForEach(items) { note in
                             Individual.SingleNoteDetailedLink(note: note)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No notes found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .navigationTitle("Notes")
             }
 
@@ -257,7 +274,6 @@ extension Tabs.Content {
                     }
                 }
                 .navigationTitle("Hierarchy Explorer")
-                .background(self.page.primaryColour)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
                 .navigationBarTitleDisplayMode(.inline)
@@ -892,15 +908,15 @@ extension Tabs.Content {
                     if items.count > 0 {
                         ForEach(items, id: \Company.objectID) { item in
                             Individual.SingleCompanyDetailedLink(entity: item)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No companies found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Companies")
             }
@@ -922,15 +938,15 @@ extension Tabs.Content {
                     if items.count > 0 {
                         ForEach(items, id: \Person.objectID) { item in
                             Individual.SinglePersonDetailedLink(person: item)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No people found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("People")
             }
@@ -952,15 +968,15 @@ extension Tabs.Content {
                     if items.count > 0 {
                         ForEach(items, id: \Project.objectID) { item in
                             Individual.SingleProjectDetailedLink(entity: item)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No projects found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Projects")
             }

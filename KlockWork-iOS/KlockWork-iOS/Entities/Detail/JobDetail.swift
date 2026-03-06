@@ -139,7 +139,7 @@ struct JobDetail: View {
                     } label: {
                         Text("Clear")
                     }
-                    .disabled(self.jid == "" && self.overview == "" && self.title == "" && self.url == "")
+                    .disabled(self.jid == "")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
@@ -233,7 +233,7 @@ extension JobDetail {
                 overview: self.overview,
                 shredable: self.shredable,
                 title: self.title,
-                uri: URL(string: self.url)!.absoluteString,
+                uri: URL(string: self.url)?.absoluteString ?? "",
                 project: self.project == nil ? DefaultObjects.project : self.project,
                 starred: self.starred,
                 saveByDefault: false

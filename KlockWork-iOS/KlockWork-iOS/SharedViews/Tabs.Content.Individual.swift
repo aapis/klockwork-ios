@@ -66,7 +66,7 @@ extension Tabs.Content {
             @State private var isProjectPresented: Bool = false
             @State private var isDeleteAlertPresented: Bool = false
             private let page: PageConfiguration.AppPage = .create
-
+            
             var body: some View {
                 VStack(alignment: .leading, spacing: 1) {
                     if self.record != nil {
@@ -78,9 +78,10 @@ extension Tabs.Content {
                             HStack(alignment: .center) {
                                 Text(self.record?.message ?? "_RECORD_CONTENT")
                                     .multilineTextAlignment(.leading)
+                                //                                    .lineLimit(1)
                                 Spacer()
                             }
-                            .padding(.bottom, 8)
+                            //                            .padding(.bottom, 8)
                         }
 
                         if self.record?.timestamp != nil {
@@ -89,7 +90,7 @@ extension Tabs.Content {
                         }
                     }
                 }
-                .frame(minHeight: 45)
+//                .frame(minHeight: 45)
                 .listRowBackground(
                     Common.TypedListRowBackground(colour: (self.record?.job?.backgroundColor ?? Theme.rowColour), type: .records)
                 )
@@ -689,30 +690,6 @@ extension Tabs.Content {
                 )
                 .foregroundStyle((self.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
                 .onAppear(perform: self.actionOnAppear)
-                // @TODO: wrong swipe actions for jobs
-//                .swipeActions(edge: .leading) {
-//                    Button {
-//                        self.actionOnSwipeComplete(job)
-//                    } label: {
-//                        Image(systemName: "checkmark.seal.fill")
-//                    }
-//                    .tint(.green)
-//                }
-//                .swipeActions(edge: .trailing) {
-//                    Button {
-//                        self.actionOnSwipeDelay(job)
-//                    } label: {
-//                        Image(systemName: "clock.fill")
-//                    }
-//                    .tint(.yellow)
-//
-//                    Button(role: .destructive) {
-//                        self.actionOnSwipeCancel(job)
-//                    } label: {
-//                        Image(systemName: "calendar.badge.minus")
-//                    }
-//                    .tint(.red)
-//                }
                 // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
 //                .sheet(isPresented: $isCompanyPresented) {
 //                    if let project = task.owner?.project {
@@ -901,110 +878,162 @@ extension Tabs.Content {
             public var onActionCancel: (() -> Void)? = nil
             public var onAction: (() -> Void)? = nil
             public var includeDueDate: Bool = false
+            public var includeCompletedDate: Bool = false
             public var inSheet: Bool = false
             @State private var isCompleted: Bool = false
             @State private var isCancelled: Bool = false
             @State private var isCompanyPresented: Bool = false
             @State private var isProjectPresented: Bool = false
             @State private var isJobPresented: Bool = false
+            @State private var dayDiff: CGFloat = 0
+            @State private var rating: TaskClosureRating = .common
+            @State private var openDelta: CGFloat = 0
 
             var body: some View {
-                HStack(alignment: .top, spacing: 8) {
-                    self.statusBar
-                    self.main
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .top, spacing: 0) {
+                        self.statusBar
+                        self.main
+                    }
+                    self.extendedDetails
                 }
-                .listRowBackground(
-                    Common.TypedListRowBackground(colour: self.task.owner?.backgroundColor ?? Theme.rowColour, type: .tasks)
+                .background(
+                    ZStack(alignment: .topLeading) {
+                        self.task.completedDate != nil ? Theme.cGreen : (self.task.owner?.backgroundColor ?? self.state.theme.page.primaryColour)
+                        LinearGradient(colors: [.white, .clear], startPoint: .top, endPoint: .bottom)
+                            .opacity(0.3)
+                            .blendMode(.softLight)
+                    }
+                )
+                // Remove at your peril
+                .clipShape(.rect)
+            }
+
+            var extendedDetails: some View {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(alignment: .center) {
+                        Text("Created")
+                        Spacer()
+                        Text("\(self.task.created!.formatted(date: .abbreviated, time: .complete))")
+                            .lineLimit(1)
+                    }
+                    if self.task.due != nil {
+                        HStack(alignment: .center) {
+                            Text("Due")
+                            Spacer()
+                            Text("\(self.task.due!.formatted(date: self.includeDueDate ? .abbreviated : .omitted, time: .complete))")
+                                .lineLimit(1)
+                        }
+                    }
+                    if self.task.completedDate != nil && self.includeCompletedDate {
+                        HStack(alignment: .center) {
+                            Text("Completed")
+                            Spacer()
+                            Text("\(self.task.completedDate!.formatted(date: .abbreviated, time: .complete))")
+                                .lineLimit(1)
+                        }
+                    }
+                    HStack(alignment: .center) {
+                        Spacer()
+                        StatusCapsule(label: "OΔ", value: self.openDelta)
+                        // Hide rating until complete to disincentivize completing tasks for "reward" alone, could be optional in future
+                        if self.task.completedDate != nil {
+                            StatusCapsule(label: "R", value: self.dayDiff, rating: self.rating)
+                        }
+                    }
+                }
+                .padding(4)
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(self.task.completedDate != nil ? Theme.lightWhite : (self.task.owner?.backgroundColor ?? .white).isBright() ? Theme.lightBase : Theme.lightWhite)
+                .background(
+                    ZStack(alignment: .top) {
+                        self.task.completedDate != nil ? Theme.cGreen : Theme.textBackground
+//                        Theme.cPurple
+//                        self.task.owner?.backgroundColor ?? self.state.theme.page.primaryColour
+                        LinearGradient(colors: [Theme.base, .clear], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 15)
+                            .blendMode(.softLight)
+                            .opacity(0.3)
+                    }
                 )
             }
 
             var statusBar: some View {
                 VStack(alignment: .center, spacing: 0) {
-                    Spacer()
                     Image(systemName: self.isCompleted ? "checkmark.seal.fill" : self.isCancelled ? "xmark.seal" : "seal")
-                        .padding(2)
+                        .padding(.top, 4)
                     // Orange indicates job is in your current plan
                         .foregroundStyle(self.isCompleted ? .white : self.state.plan != nil && (self.state.plan!.jobs?.allObjects as! [Job]).contains(where: {$0 == self.task.owner}) ?  .orange : Theme.lightBase)
                         .blendMode(self.isCompleted || self.state.plan != nil ? .normal : .softLight)
+                    Spacer()
                 }
+                .frame(width: 34)
                 .background(
-                    ZStack {
-                        LinearGradient(colors: [.clear, (self.isCompleted ? .green : .gray.opacity(0.6))], startPoint: .top, endPoint: .bottom)
+                    ZStack(alignment: .topLeading) {
+                        LinearGradient(colors: [.clear, (self.isCompleted ? .green : .gray.opacity(0.6))], startPoint: .bottom, endPoint: .top)
                     }
                 )
-                .frame(width: 30)
-//                .padding(.trailing, 4)
             }
 
             var main: some View {
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: 0) {
                     NavigationLink {
                         TaskDetail(task: task)
                     } label: {
-                        HStack(alignment: .center) {
-                            Text(task.content ?? "_TASK_CONTENT")
-                                .multilineTextAlignment(.leading)
-                            Spacer()
-                        }
-//                        .padding(.bottom, 8)
-//                        .padding(.top, 4)
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(alignment: .center, spacing: 8) {
-                            if let project = task.owner?.project {
-                                if let company = project.company {
-                                    if company.abbreviation != nil {
-                                        Button {
-                                            self.isCompanyPresented.toggle()
-                                        } label: {
-                                            Text(company.abbreviation!)
-                                                .lineLimit(1)
-                                                .underline(true, pattern: .dot)
+                        HStack(alignment: .top) {
+                            if let title = self.task.title {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(title)
+                                        .bold()
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(2)
+                                    ResourcePath(task: self.task)
+                                    if let content = self.task.content {
+                                        VStack(alignment: .leading, spacing: 0) {
+                                            HStack(alignment: .bottom) {
+                                                Text(content)
+                                                    .italic()
+                                                    .lineLimit(2)
+                                                    .multilineTextAlignment(.leading)
+                                                    .opacity(0.6)
+                                                Spacer()
+                                            }
+                                            Spacer()
                                         }
-                                    }
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
-                                }
-
-                                if project.abbreviation != nil {
-                                    Button {
-                                        self.isProjectPresented.toggle()
-                                    } label: {
-                                        Text(project.abbreviation!)
-                                            .lineLimit(1)
-                                            .underline(true, pattern: .dot)
+                                        .padding(4)
+                                        .padding(.bottom, 0)
+                                        .background(Theme.textBackground)
+                                        .clipShape(.rect(cornerRadius: 4))
                                     }
                                 }
-
-                                if task.owner != nil {
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
-                                    Button {
-                                        self.isJobPresented.toggle()
-                                    } label: {
-                                        Text((task.owner?.title ?? task.owner?.jid.string)!)
-                                            .lineLimit(1)
-                                            .underline(true, pattern: .dot)
+                            } else {
+                                VStack(alignment: .leading) {
+                                    ResourcePath(task: self.task)
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        HStack(alignment: .bottom) {
+                                            Text(self.task.content ?? "_TASK_CONTENT")
+                                                .italic()
+                                                .lineLimit(2)
+                                                .multilineTextAlignment(.leading)
+                                                .opacity(0.6)
+                                            Spacer()
+                                        }
+                                        Spacer()
                                     }
+                                    .padding(4)
+                                    .padding(.bottom, 0)
+                                    .background(Theme.textBackground)
+                                    .clipShape(.rect(cornerRadius: 4))
                                 }
                             }
                             Spacer()
                         }
-
-                        if task.due != nil {
-                            HStack(alignment: .center) {
-                                Text("Due: \(task.due!.formatted(date: self.includeDueDate ? .abbreviated : .omitted, time: .complete))")
-                                    .lineLimit(1)
-                                Spacer()
-                            }
-                        }
                     }
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
                 }
-                .foregroundStyle((task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? Theme.base : Theme.lightWhite)
-                .opacity(self.isCompleted ? 0.5 : 1.0)
+                .padding(4)
+                .background(Common.TypedListRowBackground(colour: self.task.owner?.backgroundColor ?? Theme.rowColour, type: .tasks, hasBorder: false))
+                .foregroundStyle((self.task.owner?.backgroundColor ?? Theme.rowColour).isBright() ? Theme.base : .white)
+                .opacity(self.isCompleted || self.isCancelled ? 0.5 : 1.0)
                 .onAppear(perform: self.actionOnAppear)
                 .swipeActions(edge: .leading) {
                     Button {
@@ -1029,39 +1058,6 @@ extension Tabs.Content {
                     }
                     .tint(.red)
                 }
-                // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
-//                .sheet(isPresented: $isCompanyPresented) {
-//                    if let project = task.owner?.project {
-//                        if let company = project.company {
-//                            if !self.inSheet {
-//                                NavigationStack {
-//                                    CompanyDetail(company: company)
-//                                        .scrollContentBackground(.hidden)
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                .sheet(isPresented: $isProjectPresented) {
-//                    if let project = task.owner?.project {
-//                        if !self.inSheet {
-//                            NavigationStack {
-//                                ProjectDetail(project: project)
-//                                    .scrollContentBackground(.hidden)
-//                            }
-//                        }
-//                    }
-//                }
-//                .sheet(isPresented: $isJobPresented) {
-//                    if let job = task.owner {
-//                        if !self.inSheet {
-//                            NavigationStack {
-//                                JobDetail(job: job)
-//                                    .scrollContentBackground(.hidden)
-//                            }
-//                        }
-//                    }
-//                }
             }
 
             /// Onload handler. Sets state vars isCompleted and isCancelled to default state
@@ -1069,6 +1065,29 @@ extension Tabs.Content {
             private func actionOnAppear() -> Void {
                 self.isCompleted = self.task.completedDate != nil
                 self.isCancelled = self.task.cancelledDate != nil
+                // The difference between two dates determines the rating (older tasks completed get a fancier badge)
+                self.dayDiff = ((self.task.completedDate ?? self.state.date) - (self.task.due ?? self.state.date))/86400
+
+                if !self.task.closureDelta.isZero {
+                    self.dayDiff = self.task.closureDelta
+                }
+
+                if self.isCompleted || self.isCancelled {
+                    self.openDelta = ((self.task.completedDate ?? self.task.cancelledDate ?? self.state.date) - (self.task.created ?? self.state.date))/86400
+                } else {
+                    self.openDelta = (self.state.date - (self.task.created ?? self.state.date))/86400
+                }
+
+                // @TODO: These thresholds should be customizable
+                if self.dayDiff > 2 && self.dayDiff <= 50 {
+                    self.rating = .magic
+                } else if self.dayDiff > 50 && self.dayDiff <= 100 {
+                    self.rating = .rare
+                } else if self.dayDiff > 100 && self.dayDiff < 200 {
+                    self.rating = .epic
+                } else if self.dayDiff > 200 || self.dayDiff < 2 {
+                    self.rating = .legendary
+                }
             }
 
             /// Callback which handles the Complete swipe action
@@ -1123,6 +1142,343 @@ extension Tabs.Content {
                 if let onAction = self.onAction {
                     onAction()
                 }
+            }
+
+            struct ResourcePath: View {
+                public var task: LogTask
+
+                var body: some View {
+                    HStack(alignment: .center, spacing: 8) {
+                        if let project = self.task.owner?.project {
+                            if let company = project.company {
+                                if company.abbreviation != nil {
+                                    Text(company.abbreviation!)
+                                        .lineLimit(1)
+                                }
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                            }
+
+                            if project.abbreviation != nil {
+                                Text(project.abbreviation!)
+                                    .lineLimit(1)
+                            }
+
+                            if self.task.owner != nil {
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                Text((self.task.owner?.title ?? self.task.owner?.jid.string)!)
+                                    .lineLimit(1)
+                            }
+                        }
+                        Spacer()
+                    }
+                    .font(.system(.caption, design: .monospaced))
+                    .padding(4)
+                    .background(Theme.textBackground)
+                    .clipShape(.rect(cornerRadius: 4))
+                }
+            }
+
+            enum TaskClosureRating {
+                case common, magic, rare, epic, legendary
+
+                var colour: Color {
+                    return switch self {
+                    case .common:
+                        Color.white
+                    case .magic:
+                        Color.yellow
+                    case .rare:
+                        Color.green
+                    case .epic:
+                        Color.blue
+                    case .legendary:
+                        Color.purple
+                    }
+                }
+
+                var badge: some View {
+                    Text(self.label)
+                        .padding(2)
+                        .background(self.colour)
+                        .foregroundStyle(Theme.base)
+                }
+
+                var label: String {
+                    return switch self {
+                    case .common:
+                        "COMMON"
+                    case .magic:
+                        "INSPIRED"
+                    case .rare:
+                        "RARE"
+                    case .epic:
+                        "EPIC"
+                    case .legendary:
+                        "LEGENDARY"
+                    }
+                }
+            }
+
+            struct StatusCapsule: View {
+                public var label: String?
+                public var value: CGFloat?
+                public var rating: TaskClosureRating?
+
+                var body: some View {
+                    HStack(alignment: .center, spacing: 0) {
+                        if self.label != nil {
+                            HStack(alignment: .center, spacing: 0) {
+                                Text(self.label!)
+                            }
+                            .padding(2)
+                            .background(
+                                ZStack {
+                                    Color.indigo
+                                    Theme.base.opacity(0.4)
+                                }
+                            )
+                        }
+                        if self.value != nil {
+                            HStack(alignment: .center, spacing: 0) {
+                                Text(String(format: "%.2f", self.value!))
+                            }
+                            .padding(2)
+                            .background(Color.indigo)
+                        }
+                        if self.rating != nil {
+                            self.rating!.badge
+                        }
+                    }
+                    .foregroundStyle(Theme.lightWhite)
+                    .clipShape(.rect(cornerRadius: 4))
+                }
+            }
+        }
+
+        struct SingleChecklistTask: View {
+            @EnvironmentObject private var state: AppState
+            public var task: LogTask
+            public var label: String
+            @State public var icon: String = "circle.dotted.circle.fill"
+            public var owner: Job? = nil
+            public var checklist: Checklist
+            public var callback: (() -> Void)? = nil
+            @State public var isComplete: Bool = false
+            @State public var isCancelled: Bool = false
+            @State private var bgColour: Color = Theme.lightWhite
+            @Binding public var selectedTasks: [LogTask]
+
+            var body: some View {
+                Button {
+                    if self.task.isOpen {
+                        self.selectedTasks.append(self.task)
+                    } else {
+                        self.selectedTasks.removeAll(where: {$0 == self.task})
+                    }
+
+                    self.callback?()
+                    self.isComplete.toggle()
+                } label: {
+                    HStack {
+                        Image(systemName: self.icon)
+                        Text(self.label)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
+                    .font(.title2)
+                    .bold()
+                    .foregroundStyle(self.isComplete || self.isCancelled ? Theme.lightWhite : self.checklist.backgroundColour)
+                    .padding()
+                    .background(self.bgColour)
+                }
+                .buttonStyle(.plain)
+                .clipShape(.rect(cornerRadius: 32))
+                .padding([.leading, .trailing])
+                .padding([.top, .bottom], 10)
+                .shadow(radius: 4)
+                .opacity(self.isComplete || self.isCancelled ? 0.4 : 1)
+                .onAppear(perform: self.actionOnAppear)
+                .onChange(of: self.isComplete) {
+                    self.actionOnAppear()
+                }
+            }
+            
+            /// Onload handler. Sets state values
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+                if self.task.isOpen {
+                    self.icon = "circle.dotted.circle.fill"
+
+                    if self.owner != nil {
+                        self.bgColour = self.owner!.backgroundColor
+                    } else if self.checklist.backgroundColour.isBright() {
+                        self.bgColour = Theme.lightBase
+                    }
+                } else {
+                    self.icon = "checkmark.circle.fill"
+                }
+            }
+        }
+
+        struct MythicalSingleBlank: View {
+            public var label: String
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .center, spacing: 0) {
+                        Button {
+
+                        } label: {
+                            Image(systemName: "circle.dotted")
+                                .foregroundStyle(.white)
+                                .blendMode(.softLight)
+                                .font(.title2)
+                        }
+                        .padding(4)
+                        .padding(.trailing)
+                        .background(
+                            ZStack(alignment: .trailing) {
+                                LinearGradient(colors: [.clear, Theme.base], startPoint: .leading, endPoint: .trailing)
+                                    .blendMode(.softLight)
+                                    .frame(width: 15)
+                            }
+                        )
+                        .buttonStyle(.plain)
+                        .disabled(true)
+                        NavigationLink {
+
+                        } label: {
+                            HStack(alignment: .center) {
+                                Text(self.label)
+                                    .multilineTextAlignment(.leading)
+                                    .bold()
+                                Spacer()
+                            }
+                        }
+                        .disabled(true)
+                        .buttonStyle(.plain)
+                        .padding(4)
+                    }
+                }
+                .background(.gray)
+                .foregroundStyle(Theme.base)
+                .clipShape(.rect(cornerRadius: 8))
+            }
+        }
+
+        // MARK: Tabs.Content.Individual.MythicalSingleSuggestedTask
+        struct MythicalSingleSuggestedTask: View {
+            @EnvironmentObject private var state: AppState
+            public var task: LogTask
+            public var callback: (() -> Void)?
+
+            var body: some View {
+                HStack(alignment: .center) {
+                    Button {
+                        self.callback?()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundStyle(self.state.theme.tint)
+                            .font(.title2)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(4)
+                    .background(
+                        ZStack(alignment: .trailing) {
+                            Theme.darkBtnColour
+                            LinearGradient(colors: [.clear, Theme.base], startPoint: .leading, endPoint: .trailing)
+                                .blendMode(.softLight)
+                                .frame(width: 15)
+                        }
+                    )
+                    if let title = self.task.title {
+                        Text(title)
+                            .lineLimit(1)
+                            .bold()
+                    }
+                    Spacer()
+                }
+                .background(.indigo)
+                .clipShape(.rect(cornerRadius: 8))
+            }
+        }
+
+        struct MythicalSingleTask: View {
+            @EnvironmentObject private var state: AppState
+            public var task: LogTask
+            public var callback: (() -> Void)?
+
+            var body: some View {
+                HStack(alignment: .center, spacing: 0) {
+                    Button {
+                        let model = CoreDataTasks(moc: self.state.moc)
+
+                        if self.task.completedDate != nil || self.task.cancelledDate != nil {
+                            model.reopen(self.task)
+                        } else {
+                            model.complete(self.task, legacyAuditTrail: false)
+                        }
+
+                        self.callback?()
+                    } label: {
+                        Image(systemName: self.task.completedDate != nil ? "checkmark.circle.fill" : self.task.cancelledDate != nil ? "xmark.circle.fill" : "checkmark.circle.dotted")
+                            .foregroundStyle(self.task.completedDate != nil ? Theme.cGreen : self.task.cancelledDate != nil ? .red : Theme.base)
+                            .blendMode(self.task.completedDate != nil || self.task.cancelledDate != nil ? .normal : .overlay)
+                            .font(.title2)
+                        if self.task.completedDate != nil {
+                            Text(DateHelper.todayShort(self.task.completedDate!, format: "@ hh:mm"))
+                                .monospaced()
+                                .font(.caption)
+                                .padding(4)
+                                .background(Theme.textBackground)
+                                .foregroundStyle(Theme.lightBase)
+                                .clipShape(.rect(cornerRadius: 4))
+                        } else if self.task.cancelledDate != nil {
+                            Text(DateHelper.todayShort(self.task.cancelledDate!, format: "@ hh:mm"))
+                                .monospaced()
+                                .font(.caption)
+                                .padding(4)
+                                .background(Theme.textBackground)
+                                .foregroundStyle(.red)
+                                .clipShape(.rect(cornerRadius: 4))
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .padding(4)
+                    .background(
+                        ZStack(alignment: .trailing) {
+                            (self.task.completedDate != nil ? .green : self.task.cancelledDate != nil ? Theme.cRed : self.state.theme.tint)
+                            LinearGradient(colors: [.clear, Theme.base], startPoint: .leading, endPoint: .trailing)
+                                .blendMode(.softLight)
+                                .frame(width: 15)
+                        }
+                    )
+                    NavigationLink {
+                        TaskDetail(task: self.task)
+                    } label: {
+                        HStack(alignment: .center) {
+                            if let title = self.task.title {
+                                Text(title)
+                                    .lineLimit(1)
+                                    .bold(self.task.completedDate == nil && self.task.cancelledDate == nil)
+                                    .strikethrough(self.task.completedDate != nil || self.task.cancelledDate != nil)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .bold()
+                                .foregroundStyle(Theme.base.opacity(0.3))
+                        }
+                        .padding(4)
+                        .background(.indigo) // seems to be required so whole row is tappable
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(self.task.completedDate != nil || self.task.cancelledDate != nil ? Theme.lightBase : Theme.base)
+                }
+                .background(.indigo)
+                .clipShape(.rect(cornerRadius: 8))
             }
         }
 

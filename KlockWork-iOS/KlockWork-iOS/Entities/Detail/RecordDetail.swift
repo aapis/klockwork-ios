@@ -11,7 +11,8 @@ struct RecordDetail: View {
     @EnvironmentObject private var state: AppState
     @Environment(\.dismiss) private var dismiss
     public var record: LogRecord?
-    @State private var timestamp = Date()
+    @State private var timestamp: Date = Date()
+    @State private var lastUpdate: Date = Date()
     @AppStorage("entity.record.message") public var message: String = ""
     @State public var job: Job?
     @State private var alive: Bool = true
@@ -31,22 +32,48 @@ struct RecordDetail: View {
                     TextField("What's on your mind?", text: $message, axis: .vertical)
                         .lineLimit(10...20)
                         .listRowBackground(Theme.textBackground)
-                    if self.record != nil {
-                        Section("Settings") {
-                            Toggle("Published", isOn: $alive)
-                        }
-                        .listRowBackground(Theme.textBackground)
 
-                        Button("Delete Record", role: .destructive, action: self.actionInitiateDelete)
-                            .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
-                                Button("Yes", role: .destructive) {
-                                    self.actionOnDelete()
+                    if self.record == nil {
+                        // Add mentions, update $message when person is added/removed
+                        // Widget.PersonSelector.Single()
+                    } else {
+                        if let people = self.record?.people?.allObjects as? [Person] {
+                            Section("Mentions") {
+                                ForEach(people, id: \.self) { person in
+                                    Text(person.longUsername)
                                 }
-                            } message: {
-                                Text("This record will be permanently deleted.")
+                                .listRowBackground(Theme.textBackground)
                             }
-                            .listRowBackground(Color.red)
-                            .foregroundStyle(.white)
+                        }
+                    }
+
+                    Section("Settings") {
+                        Toggle("Published", isOn: $alive)
+                            .listRowBackground(Theme.textBackground)
+                        DatePicker(
+                            "Created",
+                            selection: $timestamp,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .listRowBackground(Theme.textBackground)
+                        DatePicker(
+                            "Last updated",
+                            selection: $lastUpdate,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .listRowBackground(Theme.textBackground)
+                        if self.record != nil {
+                            Button("Delete Record", role: .destructive, action: self.actionInitiateDelete)
+                                .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                                    Button("Yes", role: .destructive) {
+                                        self.actionOnDelete()
+                                    }
+                                } message: {
+                                    Text("This record will be permanently deleted.")
+                                }
+                                .listRowBackground(Color.red)
+                                .foregroundStyle(.white)
+                        }
                     }
                 }
                 Spacer()
@@ -65,7 +92,6 @@ struct RecordDetail: View {
                     } label: {
                         Text("Clear")
                     }
-                    .disabled(self.message == "" || self.state.job == nil)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
@@ -74,7 +100,7 @@ struct RecordDetail: View {
                     } label: {
                         Text("Save")
                     }
-                    .disabled(self.message == "" || self.state.job == nil)
+                    .disabled(self.message == "" && self.state.job == nil)
                 }
             }
             .sheet(isPresented: $isJobSelectorPresented) {
@@ -100,6 +126,10 @@ extension RecordDetail {
                 self.timestamp = tmstmp
             }
 
+            if let updated = self.record!.lastUpdate {
+                self.lastUpdate = updated
+            }
+
             if let msg = self.record!.message {
                 self.message = msg
             }
@@ -108,6 +138,8 @@ extension RecordDetail {
             self.job = self.record!.job
         } else {
             self.job = self.state.job
+            self.timestamp = self.state.date // allows creating records for the selected date
+            self.lastUpdate = self.timestamp
         }
     }
 
@@ -118,6 +150,7 @@ extension RecordDetail {
             self.record!.message = self.message
             self.record!.job = self.job
             self.record!.alive = self.alive
+            self.record!.timestamp = self.timestamp
         } else {
             CoreDataRecords(moc: self.state.moc).create(
                 message: self.message,

@@ -84,7 +84,7 @@ struct PersonDetail: View {
                     } label: {
                         Text("Clear")
                     }
-                    .disabled(self.name == "" && self.title == "")
+                    .disabled(self.name == "")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today

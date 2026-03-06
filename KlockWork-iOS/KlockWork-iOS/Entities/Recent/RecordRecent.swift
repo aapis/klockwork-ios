@@ -22,9 +22,7 @@ struct RecordRecent: View {
                 MiniTitleBarCustom(
                     title: "RECENT",
                     icon: self.isOpen ? "minus" : "plus",
-                    fgColour: self.isOpen ? self.state.theme.tint : .gray
                 )
-                    .border(width: 1, edges: [.bottom], color: self.isOpen ? self.state.theme.tint : .gray)
             }
             .buttonStyle(.plain)
 

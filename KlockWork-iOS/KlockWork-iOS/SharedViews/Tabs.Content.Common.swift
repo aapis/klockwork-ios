@@ -13,6 +13,7 @@ extension Tabs.Content {
             @EnvironmentObject private var state: AppState
             public let colour: Color
             public let type: PageConfiguration.EntityType
+            public var hasBorder: Bool = true
 
             var body: some View {
                 ZStack(alignment: .topTrailing) {
@@ -25,7 +26,7 @@ extension Tabs.Content {
                         .opacity(0.3)
                         .shadow(color: self.colour.isBright() ? .black.opacity(0.1) : .white.opacity(0.2), radius: 4, x: 1, y: 1)
                 }
-                .border(width: 1, edges: [.bottom], color: (self.colour.isBright() ? Theme.base : Color.white).opacity(0.3))
+                .border(width: self.hasBorder ? 1 : 0, edges: [.bottom], color: (self.colour.isBright() ? Theme.base : Color.white).opacity(0.3))
                 .frame(minHeight: 10)
             }
         }

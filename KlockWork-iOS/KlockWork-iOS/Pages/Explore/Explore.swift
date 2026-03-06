@@ -20,6 +20,9 @@ struct Explore: View {
     @State private var path = NavigationPath()
     @State private var entityCounts: [EntityTypePair] = []
     @State private var searchText: String = ""
+    @AppStorage("home.backgroundColour") public var homeBackgroundColourChoice: Int = 0
+    @AppStorage("home.backgroundWallpaper") public var homeWallpaper: String = ""
+    @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -28,13 +31,23 @@ struct Explore: View {
                 Divider().background(.white).frame(height: 1)
                 Widgets(text: $searchText)
                 Home.QuickCreateWidget()
+                    .padding(.trailing)
             }
-            .background(page.primaryColour)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden)
             .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
+            .background(
+                ZStack {
+                    if !self.shouldUseWPImage {
+                        self.page.primaryColour
+                    } else {
+                        Image("wallpaper-\(self.homeWallpaper)")
+                    }
+                }
+                .ignoresSafeArea(.all)
+            )
         }
         .tint(self.state.theme.tint)
     }
@@ -81,7 +94,7 @@ struct Explore: View {
                 List {
                     Section("Visualize your data") {
                         NavigationLink {
-                            Widget.ActivityCalendar(searchTerm: $text)
+                            Widget.ActivityCalendar(searchTerm: $text, inSheet: true)
                         } label: {
                             HStack {
                                 Image(systemName: "calendar")
@@ -125,12 +138,21 @@ struct Explore: View {
                             }
                         }
                         .listRowBackground(Theme.textBackground)
+                        NavigationLink {
+                            ChecklistActivity()
+                        } label: {
+                            HStack {
+                                Image(systemName: "checkmark.circle")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Checklists")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
                 Spacer()
             }
             .scrollContentBackground(.hidden)
-            .background(Theme.cGreen)
         }
     }
 }

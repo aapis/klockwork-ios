@@ -84,7 +84,7 @@ struct NoteDetail: View {
                     } label: {
                         Text("Clear")
                     }
-                    .disabled(self.content == "" || self.title == "")
+                    .disabled(self.content == "")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
@@ -93,7 +93,7 @@ struct NoteDetail: View {
                     } label: {
                         Text("Save")
                     }
-                    .disabled(self.content == "" || self.title == "" || self.state.job == nil)
+                    .disabled(self.content == "" || self.title == "")
                 }
             }
         }

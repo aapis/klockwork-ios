@@ -17,7 +17,9 @@ class AppState: ObservableObject {
     @Published var planning: PlanningPage = PlanningPage()
     @Published var job: Job?
     @Published var plan: Plan?
+    @Published var person: Person?
     @Published var dueTodayCount: Int = 0
+    @Published var view: AnyView = AnyView(Home(inSheet: false))
 
     init() {
         // @TODO: this seems unnecessary and prone to error when state changes. Fix.
@@ -40,9 +42,18 @@ struct TodayPage {
     var job: Job? = nil
     var mode: PageMode = .read
     var tableButtonMode: TableButtonDisplayMode = .items
+    var associatedEntityStorage: AssociatedEntityStorage = AssociatedEntityStorage()
 
     enum TableButtonDisplayMode {
         case actions, items
+    }
+
+    struct AssociatedEntityStorage {
+        var person: [Person] = []
+
+        mutating public func clear() -> Void {
+            self.person = []
+        }
     }
 }
 

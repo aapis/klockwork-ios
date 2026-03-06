@@ -24,11 +24,16 @@ extension Widget {
         @EnvironmentObject private var state: AppState
         @Binding public var searchTerm: String
         public var showActivity: Bool = true
+        public var showRecords: Bool = true
+        public var inSheet: Bool = false
+        public var page: PageConfiguration.AppPage = .explore
         @State public var month: String = "_DEFAULT_MONTH"
+        @State private var job: Job? = nil // @TODO: remove the code that requires this
         @State private var date: Date = Date()
         @State private var legendId: UUID = UUID() // @TODO: remove this gross hack once views refresh properly
         @State private var calendarId: UUID = UUID() // @TODO: remove this gross hack once views refresh properly
-        public var weekdays: [DayOfWeek] = [
+        @State private var selected: PageConfiguration.EntityType = .records
+        private let weekdays: [DayOfWeek] = [
             DayOfWeek(symbol: "Sun"),
             DayOfWeek(symbol: "Mon"),
             DayOfWeek(symbol: "Tues"),
@@ -37,15 +42,18 @@ extension Widget {
             DayOfWeek(symbol: "Fri"),
             DayOfWeek(symbol: "Sat")
         ]
-        public var columns: [GridItem] {
+        private var columns: [GridItem] {
             return Array(repeating: GridItem(.flexible(), spacing: 1), count: 7)
         }
+        @AppStorage("home.backgroundWallpaper") private var homeWallpaper: String = ""
+        @AppStorage("home.shouldUseWPImage") private var shouldUseWPImage: Bool = false
+        @AppStorage("today.viewMode") private var viewMode: Int = 0
 
         var body: some View {
             NavigationStack {
                 VStack {
                     Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 0) {
-                        MonthNav(date: $date)
+                        MonthNav(date: $date, page: self.page)
 
                         // Day of week
                         GridRow {
@@ -70,10 +78,46 @@ extension Widget {
                             // List of days representing 1 month
                             Month(month: $month, id: $calendarId, searchTerm: searchTerm, showActivity: self.showActivity)
                                 .id(self.calendarId)
-
-                            Spacer() // @TODO: put a new set of stats or something here?
+                            Spacer()
                         }
                         .background(Theme.rowColour)
+
+                        if self.showRecords {
+                            MiniTitleBarCustom(title: "QUICK LOOK")
+                            VStack(alignment: .leading, spacing: 4) {
+                                Home.RecordBlock(
+                                    colour: .indigo,
+                                    fgColour: Theme.base,
+                                    label: "Records \(DateHelper.todayShort(DateHelper.daysAhead(-14, from: self.state.date), format: "MMM dd")) - \(DateHelper.todayShort(self.state.date, format: "MMM dd"))",
+                                    icon: "tray.circle.fill",
+                                    predicate: NSPredicate(
+                                        format: "timestamp > %@ && timestamp <= %@",
+                                        DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date)! as CVarArg
+                                    ),
+                                    infoView: AnyView(Home.DetailedInformation()),
+                                    des: 1,
+                                    help: "Published only"
+                                )
+                                Home.TaskBlock(
+                                    colour: .indigo,
+                                    fgColour: Theme.base,
+                                    label: "Tasks \(DateHelper.todayShort(DateHelper.daysAhead(-14, from: self.state.date), format: "MMM dd")) - \(DateHelper.todayShort(self.state.date, format: "MMM dd"))",
+                                    icon: "checkmark.circle.fill",
+                                    predicate: NSPredicate(
+                                        format: "((due > %@ && due <= %@) || (completedDate > %@ && completedDate <= %@)) && owner.project.company.hidden == false",
+                                        DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date)! as CVarArg,
+                                        DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                                        DateHelper.endOfDay(self.state.date)! as CVarArg
+                                    ),
+                                    infoView: AnyView(Home.DetailedInformation()),
+                                    des: 1,
+                                    help: "All statuses"
+                                )
+                            }
+                            .padding()
+                        }
 
                         if self.showActivity {
                             // Legend
@@ -85,11 +129,16 @@ extension Widget {
                     Spacer()
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .background(Theme.cGreen)
+                .toolbar(self.inSheet ? .visible : .hidden)
+                .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
                 .scrollDismissesKeyboard(.immediately)
                 .onAppear(perform: self.actionOnAppear)
-                .onChange(of: self.date) { self.actionChangeDate()}
+                .onChange(of: self.date) {
+                    self.actionChangeDate()
+                    // Resets view mode to tabular
+//                    self.viewMode = 2
+                }
                 .navigationTitle("Activity Calendar")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -110,12 +159,14 @@ extension Widget {
         struct MonthNav: View {
             @EnvironmentObject private var state: AppState
             @Binding public var date: Date
+            public var page: PageConfiguration.AppPage = .explore
             @State private var isCurrentMonth: Bool = false // @TODO: implement
+            @AppStorage("home.shouldUseWPImage") private var shouldUseWPImage: Bool = false
 
             var body: some View {
                 GridRow {
                     HStack {
-                        MonthNavButton(orientation: .leading, date: $date)
+                        MonthNavButton(orientation: .leading, page: self.page, date: $date)
                         Spacer()
 
                         DatePicker(
@@ -129,29 +180,29 @@ extension Widget {
                         .foregroundStyle(self.isCurrentMonth ? Theme.cGreen : .gray)
                         .padding([.leading, .trailing])
                         .padding([.top, .bottom], 12)
-
                         .shadow(color: .white.opacity(0.1), radius: 7, x: 0, y: 0)
-
                         Spacer()
-                        MonthNavButton(orientation: .trailing, date: $date)
+                        MonthNavButton(orientation: .trailing, page: self.page, date: $date)
                     }
                 }
                 .border(width: 1, edges: [.bottom], color: .gray)
-                .background(Theme.cGreen)
+                .background(self.shouldUseWPImage ? Theme.textBackground : self.page.primaryColour)
             }
         }
 
         struct MonthNavButton: View {
             @EnvironmentObject private var state: AppState
             public var orientation: UnitPoint
+            public var page: PageConfiguration.AppPage = .explore
             @Binding public var date: Date
             @State private var previousMonth: String = ""
             @State private var nextMonth: String = ""
+            @AppStorage("home.shouldUseWPImage") private var shouldUseWPImage: Bool = false
 
             var body: some View {
                 HStack {
                     ZStack {
-                        LinearGradient(gradient: Gradient(colors: [Theme.textBackground, Theme.cGreen]), startPoint: self.orientation, endPoint: self.orientation == .leading ? .trailing : .leading)
+                        LinearGradient(gradient: Gradient(colors: [self.shouldUseWPImage ? .clear : Theme.textBackground, self.shouldUseWPImage ? .clear : Theme.cGreen]), startPoint: self.orientation, endPoint: self.orientation == .leading ? .trailing : .leading)
                         Button {
                             self.actionOnTap()
                         } label: {
@@ -160,7 +211,7 @@ extension Widget {
                             }
                             .padding([.leading, .trailing], 16)
                             .padding([.top, .bottom], 12)
-                            .background(Theme.cPurple)
+                            .background(self.page.primaryColour)
                         }
                         .clipShape(.capsule(style: .continuous))
                         .shadow(color: .black.opacity(0.2), radius: 2, x: 1, y: 1)

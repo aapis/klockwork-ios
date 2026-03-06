@@ -9,6 +9,9 @@ import SwiftUI
 
 struct Find: View {
     @EnvironmentObject private var state: AppState
+    @AppStorage("home.backgroundColour") public var homeBackgroundColourChoice: Int = 0
+    @AppStorage("home.backgroundWallpaper") public var homeWallpaper: String = ""
+    @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
     @State public var text: String = ""
     @State private var results: SearchLibrary.SearchResults?
     @State private var recentSearchTerms: [String] = [] // @TODO: store recent searches and track as another app use metric
@@ -53,7 +56,7 @@ struct Find: View {
                                             HStack {
                                                 Text("Clear list")
                                                 Spacer()
-                                                Image(systemName: "arrow.clockwise.square.fill")
+                                                Image(systemName: "xmark.app.fill")
                                             }
                                         }
                                         .listRowBackground(Color.red)
@@ -71,17 +74,20 @@ struct Find: View {
                                             self.text = saved.term ?? "Not found"
                                             self.actionOnSubmit()
                                         } label: {
-                                            HStack(alignment: .center, spacing: 0) {
+                                            HStack(alignment: .center) {
+                                                Image(systemName: "magnifyingglass")
+                                                    .foregroundStyle(self.state.theme.tint)
                                                 Text(saved.term ?? "Not found")
+                                                    .lineLimit(1)
                                                 Spacer()
-                                                Image(systemName: "chevron.right")
                                             }
+                                            .foregroundStyle(.white)
                                         }
+
                                     }
                                     .listRowBackground(Theme.textBackground)
                                 }
                             }
-                            .background(page.primaryColour)
                             .scrollContentBackground(.hidden)
                             Spacer()
                         }
@@ -89,6 +95,8 @@ struct Find: View {
                     LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                         .frame(height: 50)
                         .opacity(0.1)
+                    Home.QuickCreateWidget()
+                        .padding(.trailing)
                 }
 
                 QueryField(
@@ -105,7 +113,16 @@ struct Find: View {
                     self.actionOnSubmit()
                 }
             })
-            .background(page.primaryColour)
+            .background(
+                ZStack {
+                    if !self.shouldUseWPImage {
+                        self.page.primaryColour
+                    } else {
+                        Image("wallpaper-\(self.homeWallpaper)")
+                    }
+                }
+                .ignoresSafeArea(.all)
+            )
             .onChange(of: text) {
                 if text.isEmpty {
                     results?.reset()

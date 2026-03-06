@@ -102,7 +102,7 @@ struct CompanyDetail: View {
                     } label: {
                         Text("Clear")
                     }
-                    .disabled(self.name == "" && self.abbreviation == "")
+                    .disabled(self.name == "")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today

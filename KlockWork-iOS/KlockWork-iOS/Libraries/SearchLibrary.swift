@@ -254,7 +254,7 @@ extension SearchLibrary.SearchEngine {
 
         init(entityType: EntityType, term: String) {
             self.entityType = entityType
-            _results = CoreDataRecords.fetchMatching(term: term)
+            _results = CoreDataRecords.fetchMatching(term)
         }
     }
 

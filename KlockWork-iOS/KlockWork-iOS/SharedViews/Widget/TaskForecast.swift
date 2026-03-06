@@ -35,9 +35,9 @@ struct TaskForecast: View {
 
         var dates = Date()..<Date()
         if self.daysToShow < 0 {
-            dates = DateHelper.daysAhead(self.daysToShow)..<Date()
+            dates = DateHelper.daysAhead(self.daysToShow, from: self.state.date)..<self.state.date
         } else {
-            dates = Date()..<DateHelper.daysAhead(self.daysToShow)
+            dates = self.state.date..<DateHelper.daysAhead(self.daysToShow, from: self.state.date)
         }
         let hrs24: TimeInterval = 60*60*24
 
@@ -114,7 +114,6 @@ struct Forecast: View, Identifiable {
                     Button {
                         self.state.date = DateHelper.startOfDay(self.date)
                         self.isUpcomingTaskListPresented.toggle()
-//                        print("DERPO date=\(self.state.date) tz=\(TimeZone.autoupdatingCurrent) x=\(Calendar.autoupdatingCurrent.startOfDay(for: self.state.date).description(with: .autoupdatingCurrent))")
 
                         if self.isSelected {
                             if let cb = self.callback { cb() }

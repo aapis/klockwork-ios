@@ -14,7 +14,6 @@ struct TaskDetail: View {
     @State public var task: LogTask?
     @State private var completedDate: Date = Date()
     @State private var cancelledDate: Date = Date()
-    @AppStorage("entity.task.content") private var content: String = ""
     @State private var created: Date = Date()
     @State private var due: Date = DateHelper.endOfDay() ?? Date()
     @State private var dueTomorrow: Date = DateHelper.endOfTomorrow() ?? Date()
@@ -27,6 +26,11 @@ struct TaskDetail: View {
     @State private var isJobSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
     @State private var isDeleteAlertPresented: Bool = false
+    @AppStorage("entity.task.title") private var title: String = ""
+    @AppStorage("entity.task.content") private var content: String = ""
+//    @State private var title: String = ""
+//    @State private var content: String = ""
+    @State private var isSuggested: Bool = false
     public var page: PageConfiguration.AppPage = .create
     static public let defaultContent: String = "Sample task content"
 
@@ -38,6 +42,10 @@ struct TaskDetail: View {
                         job: $job,
                         isJobSelectorPresented: $isJobSelectorPresented
                     )
+                    TextField("Title", text: self.$title, axis: .vertical)
+                        .lineLimit(1)
+                        .listRowBackground(Theme.textBackground)
+                        .textSelection(.enabled)
                     TextField("What needs to be done?", text: $content, axis: .vertical)
                         .lineLimit(5...10)
                         .listRowBackground(Theme.textBackground)
@@ -134,6 +142,7 @@ struct TaskDetail: View {
                                 Toggle("Cancelled", isOn: $isCancelled)
                             }
                         }
+                        Toggle("Suggested", isOn: $isSuggested)
                     }
                     .listRowBackground(Theme.textBackground)
 
@@ -162,13 +171,21 @@ struct TaskDetail: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         self.content = ""
+                        self.title = ""
                         self.state.job = nil
                         self.job = nil
                     } label: {
                         Text("Clear")
                     }
-                    .disabled(self.content == "")
                 }
+//                ToolbarItem(placement: .topBarTrailing) {
+//                    // This shouldn't be necessary
+//                    Button {
+//                        self.dismissPage()
+//                    } label: {
+//                        Text("Close")
+//                    }
+//                }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
                     Button {
@@ -176,7 +193,6 @@ struct TaskDetail: View {
                     } label: {
                         Text("Save")
                     }
-                    .disabled(self.content == "")
                 }
             }
             .sheet(isPresented: $isJobSelectorPresented) {
@@ -208,7 +224,9 @@ extension TaskDetail {
             if let dDate = task.due {due = dDate}
             if let uDate = task.lastUpdate {lastUpdate = uDate}
             if let co = task.content {content = co}
+            if let ti = task.title {self.title = ti}
             if let jo = task.owner {job = jo}
+            self.isSuggested = task.isSuggested
         } else {
             self.job = self.state.job
             self.created = self.state.date
@@ -220,9 +238,11 @@ extension TaskDetail {
     private func actionOnSave() -> Void {
         if self.task != nil {
             self.task!.content = self.content
+            self.task!.title = self.title
             self.task!.owner = self.job
             self.task!.lastUpdate = Date()
             self.task!.due = self.due
+            self.task!.isSuggested = self.isSuggested
 
             if isCancelled {
                 self.task!.cancelledDate = Date()
@@ -232,6 +252,7 @@ extension TaskDetail {
         } else {
             CoreDataTasks(moc: self.state.moc).create(
                 content: self.content,
+                title: self.title,
                 created: self.created,
                 due: self.due,
                 job: self.job,
@@ -240,9 +261,7 @@ extension TaskDetail {
         }
 
         PersistenceController.shared.save()
-        // We use 2 on purpose to close the sheet
-        dismiss()
-        dismiss()
+        self.dismissPage()
     }
 
     /// Soft delete a Task
@@ -253,6 +272,10 @@ extension TaskDetail {
         }
 
         PersistenceController.shared.save()
+        self.dismissPage()
+    }
+
+    private func dismissPage() -> Void {
         // We use 2 on purpose to close the sheet
         dismiss()
         dismiss()

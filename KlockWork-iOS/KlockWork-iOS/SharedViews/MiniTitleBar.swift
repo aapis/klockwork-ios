@@ -22,8 +22,14 @@ struct MiniTitleBar: View {
         }
         .padding([.top, .bottom], 5)
         .padding([.leading, .trailing], 8)
-        .background(Theme.darkBtnColour)
-        .foregroundStyle(.gray)
+        .background(
+            ZStack(alignment: .top) {
+                self.state.theme.tint
+                LinearGradient(colors: [Theme.base, .clear], startPoint: .top, endPoint: .bottom)
+                    .blendMode(.softLight)
+            }
+        )
+        .foregroundStyle(Theme.lightBase)
         .onAppear(perform: self.setTitle)
         .onChange(of: self.selected) {self.setTitle()}
     }
@@ -48,9 +54,10 @@ struct MiniTitleBarPlan: View {
 }
 
 struct MiniTitleBarCustom: View {
+    @EnvironmentObject private var state: AppState
     public var title: String
     public var icon: String? = nil
-    public var fgColour: Color = .gray
+    public var fgColour: Color = Theme.lightBase
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
@@ -62,7 +69,13 @@ struct MiniTitleBarCustom: View {
         }
         .padding([.top, .bottom], 5)
         .padding([.leading, .trailing], 8)
-        .background(Theme.darkBtnColour)
+        .background(
+            ZStack(alignment: .top) {
+                self.state.theme.tint
+                LinearGradient(colors: [Theme.base, .clear], startPoint: .top, endPoint: .bottom)
+                    .blendMode(.softLight)
+            }
+        )
         .foregroundStyle(self.fgColour)
         .font(.caption)
     }

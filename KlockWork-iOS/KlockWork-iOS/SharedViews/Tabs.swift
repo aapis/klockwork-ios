@@ -61,9 +61,9 @@ struct Tabs: View {
         if content == nil {
             switch self.mode {
             case .create:
-                Tabs.TVMCreate(selected: $selected)
+                Tabs.TVMCreate(selected: self.$selected)
             case .read:
-                Tabs.Content(inSheet: inSheet, job: $job, selected: $selected)
+                Tabs.Content(inSheet: self.inSheet, job: self.$job, selected: self.$selected)
                     .swipe([.left, .right]) { swipe in
                         self.actionOnSwipe(swipe)
                     }
@@ -71,6 +71,8 @@ struct Tabs: View {
                 Tabs.TVMUpdate()
             case .delete:
                 Tabs.TVMDelete()
+            case .dashboard:
+                Tabs.TVMDashboard(selected: self.$selected)
             }
         } else {
             content
@@ -82,10 +84,9 @@ struct Tabs: View {
             switch self.state.today.tableButtonMode {
             case .actions:
                 HStack(alignment: .center, spacing: 8) {
-                    AddButton()
+                    Home.QuickCreateWidget.AddButton()
                         .frame(width: 50, height: 45)
                         .background(Theme.darkBtnColour)
-
                     ViewModeSelector()
                 }
             case .items:
@@ -129,7 +130,7 @@ extension Tabs {
 
 extension Tabs {
     enum TabsViewMode {
-        case create, read, update, delete
+        case create, read, update, delete, dashboard
     }
 
     struct Buttons: View {
@@ -139,44 +140,43 @@ extension Tabs {
         @Binding public var selected: EntityType
         @Binding public var tabLocation: Int
         public var mode: TabsViewMode
+        @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .center, spacing: 0) {
                         ForEach(EntityType.allCases, id: \.self) { page in
-                            VStack(spacing: 0) {
-                                Button {
-                                    selected = page
-                                } label: {
-                                    (page == selected ? page.selectedIcon : page.icon)
-                                        .frame(maxHeight: 20)
-                                        .padding(14)
-                                        .background(
-                                            ZStack(alignment: .bottom) {
-                                                (page == selected ? self.state.theme.tint : .clear)
-                                                VStack {
-                                                    Spacer()
-                                                    LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
-                                                        .blendMode(.softLight)
-                                                        .opacity(page == self.selected ? 1 : 0)
-                                                        .frame(height: 15)
-                                                }
+                            Button {
+                                selected = page
+                            } label: {
+                                (page == selected ? page.selectedIcon : page.icon)
+                                    .frame(maxHeight: 20)
+                                    .padding(14)
+                                    .background(
+                                        ZStack(alignment: .bottom) {
+                                            (page == selected ? self.state.theme.tint : .clear)
+                                            VStack {
+                                                Spacer()
+                                                LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
+                                                    .blendMode(.softLight)
+                                                    .opacity(page == self.selected ? 1 : 0)
+                                                    .frame(height: 15)
                                             }
-                                        )
-                                        .foregroundStyle(
-                                            .linearGradient(colors: [page == self.selected ? Theme.base : .gray, page == self.selected ? Theme.cPurple : .gray], startPoint: .top, endPoint: .bottom)
-                                        )
-                                }
-                                .buttonStyle(.plain)
-                                .clipShape(
-                                    .rect(
-                                        bottomLeadingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0,
-                                        bottomTrailingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0
+                                        }
                                     )
-                                )
-                                .shadow(radius: page == selected ? 4 : 0)
+                                    .foregroundStyle(
+                                        .linearGradient(colors: [page == self.selected ? Theme.base : self.shouldUseWPImage ? Theme.lightWhite : .gray, page == self.selected ? Theme.cPurple : self.shouldUseWPImage ? Theme.lightWhite : .gray], startPoint: .top, endPoint: .bottom)
+                                    )
                             }
+                            .buttonStyle(.plain)
+                            .clipShape(
+                                .rect(
+                                    bottomLeadingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0,
+                                    bottomTrailingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0
+                                )
+                            )
+                            .shadow(radius: page == selected ? 4 : 0)
                         }
                         Spacer()
                     }
@@ -203,7 +203,7 @@ extension Tabs {
         @Binding public var selected: EntityType
 
         var body: some View {
-            switch selected {
+            switch self.selected {
             case .records:
                 List.Records(job: $job, date: self.state.date, inSheet: self.inSheet)
             case .jobs:
@@ -243,7 +243,7 @@ extension Tabs {
         @Binding public var selected: EntityType
 
         var body: some View {
-            switch selected {
+            switch self.selected {
             case .records:
                 RecordDetail()
                 RecordRecent()
@@ -251,6 +251,7 @@ extension Tabs {
                 JobDetail()
             case .tasks:
                 TaskDetail()
+                TasksRecent()
             case .notes:
                 NoteDetail()
             case .companies:
@@ -274,6 +275,60 @@ extension Tabs {
     struct TVMDelete: View {
         var body: some View {
             Text("delete")
+        }
+    }
+
+    struct TVMDashboard: View {
+        @EnvironmentObject private var state: AppState
+        @Binding public var selected: EntityType
+
+        var body: some View {
+            ZStack(alignment: .bottomTrailing) {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading) {
+                        switch self.selected {
+                        case .records:
+                            Home.QuickAccessTabs.QuickRecordPanel()
+//                            Widget.Tasks.CheckLists() // for testing only
+                            Home.RecordFilters()
+//                            Home.QuickAccessTabs.QuickSearchPanel() // probably not here
+                            Home.QuickHistory()
+                        case .jobs:
+                            HStack(alignment: .top, spacing: 1) {
+                                Home.QuickAccessTabs.RecentJobs()
+                                Home.QuickAccessTabs.FavouriteJobs()
+                            }
+                            Home.QuickHistory()
+                        case .tasks:
+                            Home.QuickAccessTabs.QuickTaskList()
+                            Widget.Tasks.CheckLists()
+                            Home.TaskFilters()
+                            Widget.Tasks.DailyOverview()
+                        case .notes:
+                            HStack(alignment: .top, spacing: 1) {
+                                Home.QuickAccessTabs.RecentNotes()
+                                Home.QuickAccessTabs.FavouriteNotes()
+                            }
+                            Home.QuickHistory()
+                        case .companies:
+                            Home.QuickHistory()
+                        case .people:
+                            Home.RecentlyMentioned(date: DateHelper.daysAhead(-14, from: self.state.date))
+                            Home.QuickHistory()
+                        case .projects:
+                            Home.QuickHistory()
+                        case .terms:
+                            Home.QuickAccessTabs.QuickSearchPanel()
+                            Home.QuickHistory()
+                        }
+                    }
+                    .padding(8)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                }
+                Home.QuickCreateWidget()
+                    .padding(.trailing)
+                    .padding(.bottom, 8)
+            }
         }
     }
 }
