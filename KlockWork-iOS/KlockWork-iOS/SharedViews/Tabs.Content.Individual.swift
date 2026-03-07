@@ -1285,6 +1285,7 @@ extension Tabs.Content {
                         Image(systemName: self.icon)
                         Text(self.label)
                             .multilineTextAlignment(.leading)
+                            .strikethrough(self.isComplete || self.isCancelled)
                         Spacer()
                     }
                     .font(.title2)

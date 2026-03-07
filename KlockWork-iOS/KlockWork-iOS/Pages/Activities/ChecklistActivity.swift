@@ -22,7 +22,8 @@ struct ChecklistActivity: View {
                     if self.checklists.count > 0 {
                         ForEach(self.checklists, id: \.self) { list in
                             NavigationLink {
-                                ChecklistDetail(checklist: list)
+//                                ChecklistDetail(checklist: list)
+                                Widget.Tasks.ChecklistView(checklist: list, inSheet: false)
                             } label: {
                                 HStack {
                                     if list.starred {

@@ -210,6 +210,7 @@ extension Widget {
                                 HStack {
                                     Text(self.checklist.label ?? "_NO_NAME")
                                         .lineLimit(1)
+                                        .strikethrough(self.remainingCount == 0)
                                     Spacer()
                                     Text(String(self.remainingCount))
                                     Image(systemName: self.remainingCount == 0 ? "fireworks" : "chevron.up")
@@ -257,30 +258,35 @@ extension Widget {
         }
 
         // MARK: Widget.Tasks.ChecklistView
+        // @TODO: move to another namespace
         struct ChecklistView: View {
             @EnvironmentObject private var state: AppState
             @AppStorage("home.backgroundWallpaper") private var homeWallpaper: String = ""
             @AppStorage("home.shouldUseWPImage") private var shouldUseWPImage: Bool = false
             public var checklist: Checklist
+            public var inSheet: Bool = true
             @State private var tasks: [LogTask] = []
             @State private var outcomes: [LogTask] = []
             @State private var selected: [LogTask] = []
             @State private var backgroundColour: Color = .clear
+            @State private var id: UUID = UUID()
 
             var body: some View {
                 NavigationStack {
                     VStack(alignment: .leading) {
                         VStack(alignment: .leading, spacing: 0) {
                             VStack(alignment: .leading) {
-                                HStack {
-                                    Spacer()
-                                    Capsule()
-                                        .fill(Theme.lightWhite)
-                                        .frame(width: 100, height: 6)
-                                        .opacity(0.7)
-                                    Spacer()
+                                if self.inSheet {
+                                    HStack {
+                                        Spacer()
+                                        Capsule()
+                                            .fill(Theme.lightWhite)
+                                            .frame(width: 100, height: 6)
+                                            .opacity(0.7)
+                                        Spacer()
+                                    }
+                                    .padding([.leading, .trailing, .bottom])
                                 }
-                                .padding([.leading, .trailing, .bottom])
                                 HStack {
                                     Text(self.checklist.label ?? "_INVALID_LABEL")
                                         .font(.title)
@@ -296,12 +302,23 @@ extension Widget {
                                             .foregroundStyle(self.backgroundColour.isBright() ? Theme.lightBase : Theme.lightWhite)
                                     }
                                     Spacer()
+                                    Button {
+                                        self.actionOnReset()
+                                    } label: {
+                                        Image(systemName: "arrow.clockwise.circle.fill")
+                                            .symbolRenderingMode(.hierarchical)
+                                            .font(.title)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .foregroundStyle(self.state.theme.tint)
+                                    .disabled(self.selected.count == 0)
                                     NavigationLink {
                                         ChecklistDetail(checklist: self.checklist)
                                             .onDisappear(perform: self.actionOnAppear)
                                     } label: {
                                         Image(systemName: "pencil.circle.fill")
-                                            .font(.title2)
+                                            .symbolRenderingMode(.hierarchical)
+                                            .font(.title)
                                     }
                                     .foregroundStyle(self.state.theme.tint)
                                 }
@@ -403,6 +420,9 @@ extension Widget {
                 .onChange(of: self.tasks) {
                     self.actionOnAppear()
                 }
+                .onChange(of: self.outcomes) {
+                    self.actionOnAppear()
+                }
                 // @TODO: do some cool WP overlay of bg colour maybe?
 //                .background(
 //                    ZStack {
@@ -415,34 +435,54 @@ extension Widget {
 //                    .ignoresSafeArea(.all)
 //                )
                 .background(self.backgroundColour)
-                .navigationTitle(self.checklist.label ?? "")
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-
-                        } label: {
-                            Text("Reset")
-                        }
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        NavigationLink {
-                            ChecklistDetail(checklist: self.checklist)
-                        } label: {
-                            Text("Edit")
-                        }
-                    }
-                }
+                .id(self.id)
+//                .navigationTitle(self.checklist.label ?? "")
+//                .toolbar {
+//                    ToolbarItem(placement: .topBarLeading) {
+//                        Button {
+//
+//                        } label: {
+//                            Text("Reset")
+//                        }
+//                    }
+//                    ToolbarItem(placement: .topBarTrailing) {
+//                        NavigationLink {
+//                            ChecklistDetail(checklist: self.checklist)
+//                        } label: {
+//                            Text("Edit")
+//                        }
+//                    }
+//                }
             }
             
             /// Onload handler. Sets list iof tasks.
             /// - Returns: Void
             private func actionOnAppear() -> Void {
                 self.tasks = (self.checklist.tasks?.allObjects as? [LogTask] ?? [])
-                    .sorted(by: {$0.created ?? Date() > $1.created ?? Date()})
+//                    .sorted(by: {$0.created ?? Date() < $1.created ?? Date()})
+                    .sorted(by: {$0.title ?? "" < $1.title ?? ""})
                 self.outcomes = (self.checklist.outcomes?.allObjects as? [LogTask] ?? [])
-                    .sorted(by: {$0.created ?? Date() > $1.created ?? Date()})
+//                    .sorted(by: {$0.created ?? Date() < $1.created ?? Date()})
+                    .sorted(by: {$0.title ?? "" < $1.title ?? ""})
                 self.selected = self.tasks.filter {$0.isComplete == true}
                 self.backgroundColour = self.checklist.backgroundColour
+            }
+            
+            /// Fires when Reset button is tapped.
+            /// - Returns: Void
+            private func actionOnReset() -> Void {
+                for t in self.tasks {
+                    t.completedDate = nil
+                    t.cancelledDate = nil
+                }
+
+                for t in self.outcomes {
+                    t.completedDate = nil
+                    t.cancelledDate = nil
+                }
+
+                PersistenceController.shared.save()
+                self.id = UUID()
             }
         }
 
