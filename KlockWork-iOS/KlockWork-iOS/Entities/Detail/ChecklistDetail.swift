@@ -18,6 +18,8 @@ struct ChecklistDetail: View {
     @State private var outcomes: [LogTask] = []
     @State private var colour: Color = .clear
     @State private var isDeleteConfirmPresented: Bool = false
+    @State private var isTaskSelectorPresented: Bool = false
+    @State private var isOutcomeTaskSelectorPresented: Bool = false
     @State private var starred: Bool = false
     public var checklist: Checklist?
     private let page: PageConfiguration.AppPage = .create
@@ -56,6 +58,12 @@ struct ChecklistDetail: View {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title2)
                             }
+                            Button {
+                                self.isTaskSelectorPresented = true
+                            } label: {
+                                Image(systemName: "magnifyingglass.circle.fill")
+                                    .font(.title2)
+                            }
                         }
                         .padding()
                         .background(Theme.textBackground)
@@ -67,7 +75,8 @@ struct ChecklistDetail: View {
                                         callback: {
                                             self.actionOnSave(shouldDismiss: false)
                                         },
-                                        shouldFocus: false
+                                        shouldFocus: false,
+                                        tasks: self.$tasks
                                     )
                                 }
                             } else {
@@ -105,6 +114,12 @@ struct ChecklistDetail: View {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title2)
                             }
+                            Button {
+                                self.isOutcomeTaskSelectorPresented = true
+                            } label: {
+                                Image(systemName: "magnifyingglass.circle.fill")
+                                    .font(.title2)
+                            }
                         }
                         .padding()
                         .background(Theme.textBackground)
@@ -117,7 +132,8 @@ struct ChecklistDetail: View {
                                         callback: {
                                             self.actionOnSave(shouldDismiss: false)
                                         },
-                                        shouldFocus: false
+                                        shouldFocus: false,
+                                        tasks: self.$outcomes
                                     )
                                 }
                             } else {
@@ -165,6 +181,12 @@ struct ChecklistDetail: View {
             .ignoresSafeArea(.all)
         )
         .onAppear(perform: self.actionOnAppear)
+        .onChange(of: self.tasks) {
+            self.actionOnAppear()
+        }
+        .onChange(of: self.outcomes) {
+            self.actionOnAppear()
+        }
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
@@ -184,6 +206,20 @@ struct ChecklistDetail: View {
                 self.actionOnDelete()
             }
             Button("No", role: .cancel) {}
+        }
+        .sheet(isPresented: self.$isTaskSelectorPresented) {
+            Widget.TaskSelector.Single(
+                showing: self.$isTaskSelectorPresented,
+                tasks: self.$tasks
+            )
+            .presentationBackground(Theme.cPurple)
+        }
+        .sheet(isPresented: self.$isOutcomeTaskSelectorPresented) {
+            Widget.TaskSelector.Single(
+                showing: self.$isOutcomeTaskSelectorPresented,
+                tasks: self.$outcomes
+            )
+            .presentationBackground(Theme.cPurple)
         }
     }
 
@@ -245,6 +281,7 @@ struct ChecklistDetail: View {
         public var task: LogTask
         public var callback: (() -> Void)?
         public var shouldFocus: Bool = true
+        @Binding public var tasks: [LogTask]
         @State private var text: String = ""
         @FocusState public var hasFocus: Bool
 
@@ -260,9 +297,16 @@ struct ChecklistDetail: View {
                     .background(.indigo)
                     HStack(spacing: 0) {
                         Button {
-                            self.state.moc.delete(self.task)
+                            // @TODO: this doesn't quite work yet because the way I draw EditableTask's is stupid rn
+                            if self.task.owner == nil {
+                                /// Delete the object only if it isn't associated with an existing job or other entity
+                                self.state.moc.delete(self.task)
+                                self.dismiss()
+                            } else {
+                                /// Remove task from the checklist when associated with another entity
+                                self.tasks.removeAll(where: {$0 == self.task})
+                            }
                             PersistenceController.shared.save()
-                            self.dismiss()
                         } label: {
                             Image(systemName: "minus.circle.fill")
                         }

@@ -383,13 +383,33 @@ extension Tabs.Content {
                     if self.isPresented {
                         if let pJobs = self.entity.jobs {
                             if let jobs = pJobs.allObjects as? [Job] {
-                                ForEach(jobs.filter({$0.alive == true}).sorted(by: {
-                                    $0.title ?? "" > $1.title ?? ""
-                                }), id: \.objectID) { job in
-                                    ThirdLevel(entity: job)
+                                if jobs.count > 0 {
+                                    ForEach(jobs.filter({$0.alive == true}).sorted(by: {
+                                        $0.title ?? "" < $1.title ?? ""
+                                    }), id: \.objectID) { job in
+                                        ThirdLevel(entity: job)
+                                    }
+                                } else {
+                                    // @TODO: convert to struct
+                                    HStack(spacing: 0) {
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.company?.backgroundColor ?? .white)
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.backgroundColor)
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.backgroundColor)
+                                            .frame(width: 15)
+                                        PageConfiguration.CircleIcon(entity: .jobs)
+                                            .foregroundStyle(.white.opacity(0.5))
+                                        Text("Nothing to show")
+                                            .foregroundStyle(.gray)
+                                            .padding(8)
+                                        Spacer()
+                                    }
+                                    .background(self.entity.backgroundColor)
                                 }
-                            } else {
-                                StatusMessage.Warning(message: "\(self.entity.name ?? "_PROJECT") doesn't have any jobs associated with it.")
                             }
                         }
                     }
@@ -460,10 +480,10 @@ extension Tabs.Content {
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(self.entity.project?.backgroundColor ?? self.entity.backgroundColor)
                                             .frame(width: 15)
-
-                                        HStack(spacing: 0) {
+                                        HStack {
+                                            PageConfiguration.CircleIcon(entity: .tasks)
                                             if self.tasks.isEmpty {
                                                 Text("No Tasks")
                                                     .opacity(0.5)
@@ -527,10 +547,11 @@ extension Tabs.Content {
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(self.entity.project?.backgroundColor ?? self.entity.backgroundColor)
                                             .frame(width: 15)
 
-                                        HStack(spacing: 0) {
+                                        HStack {
+                                            PageConfiguration.CircleIcon(entity: .notes)
                                             if self.notes.isEmpty {
                                                 Text("No Notes")
                                                     .opacity(0.5)
@@ -593,13 +614,12 @@ extension Tabs.Content {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
-                                        if self.terms.isEmpty {
-                                            Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
-                                                .frame(width: 15)
-                                        }
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.project?.backgroundColor ?? self.entity.backgroundColor)
+                                            .frame(width: 15)
 
-                                        HStack(spacing: 0) {
+                                        HStack {
+                                            PageConfiguration.CircleIcon(entity: .terms)
                                             if self.terms.isEmpty {
                                                 Text("No Terms")
                                                     .opacity(0.5)
@@ -607,11 +627,17 @@ extension Tabs.Content {
                                                 NavigationLink {
                                                     TermFilter(job: self.entity)
                                                 } label: {
-                                                    ListRow(
-                                                        name: terms.count == 1 ? "1 Term" : "\(terms.count) Terms",
-                                                        colour: self.entity.backgroundColor,
-                                                        icon: "chevron.right"
-                                                    )
+                                                    ZStack {
+                                                        ListRow(
+                                                            name: self.terms.count == 1 ? "1 Term" : "\(self.terms.count) Terms",
+                                                            colour: self.entity.backgroundColor,
+                                                            icon: "chevron.right"
+                                                        )
+                                                        LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                                            .opacity(0.6)
+                                                            .blendMode(.softLight)
+                                                            .frame(height: 50)
+                                                    }
                                                 }
                                             }
                                         }
@@ -619,14 +645,13 @@ extension Tabs.Content {
                                     }
                                 }
 
-                                /// Record view link
+                                /// Records
                                 ZStack(alignment: .leading) {
                                     self.entity.backgroundColor
                                     LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
                                         .opacity(0.6)
                                         .blendMode(.softLight)
                                         .frame(height: 50)
-
                                     HStack(alignment: .top, spacing: 0) {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
@@ -634,13 +659,11 @@ extension Tabs.Content {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
-                                        if self.records.isEmpty {
-                                            Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
-                                                .frame(width: 15)
-                                        }
-
-                                        HStack(spacing: 0) {
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.project?.backgroundColor ?? self.entity.backgroundColor)
+                                            .frame(width: 15)
+                                        HStack {
+                                            PageConfiguration.CircleIcon(entity: .records)
                                             if self.records.isEmpty {
                                                 Text("No Records")
                                                     .opacity(0.5)
@@ -648,11 +671,17 @@ extension Tabs.Content {
                                                 NavigationLink {
                                                     RecordFilter(job: self.entity)
                                                 } label: {
-                                                    ListRow(
-                                                        name: "\(self.records.count) Records",
-                                                        colour: self.entity.backgroundColor,
-                                                        icon: "chevron.right"
-                                                    )
+                                                    ZStack {
+                                                        ListRow(
+                                                            name: self.records.count == 1 ? "1 Record" : "\(self.records.count) Records",
+                                                            colour: self.entity.backgroundColor,
+                                                            icon: "chevron.right"
+                                                        )
+                                                        LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                                            .opacity(0.6)
+                                                            .blendMode(.softLight)
+                                                            .frame(height: 50)
+                                                    }
                                                 }
                                             }
                                         }
@@ -740,7 +769,8 @@ extension Tabs.Content {
                 /// - Returns: Void
                 private func actionOnCreateTask() -> Void {
                     CoreDataTasks(moc: self.state.moc).create(
-                        content: self.newTaskContent,
+                        content: "",
+                        title: self.newTaskContent,
                         created: Date(),
                         due: DateHelper.endOfDay() ?? Date(),
                         job: self.entity
@@ -766,7 +796,6 @@ extension Tabs.Content {
                 }
 
                 /// Force view refresh
-                /// @TODO: may be unnecessary in later versions, confirm this still works
                 /// - Returns: Void
                 private func actionPostSave() -> Void {
                     if self.didSave {
@@ -793,7 +822,7 @@ extension Tabs.Content {
                             .foregroundStyle(Color.fromStored(self.entity.owner?.project?.colour ?? Theme.rowColourAsDouble))
                             .frame(width: 15)
                         Rectangle()
-                            .foregroundStyle(self.entity.owner?.backgroundColor ?? Theme.rowColour)
+                            .foregroundStyle(self.entity.owner?.project?.backgroundColor ?? Theme.rowColour)
                             .frame(width: 15)
 
                         Button(task: self.entity)
@@ -810,7 +839,7 @@ extension Tabs.Content {
 
             // @TODO: refactor + remove in favour of pattern defined in previous steps
             struct FourthLevelNotes: View {
-                typealias Button = Tabs.Content.Individual.SingleNote
+                typealias Button = Tabs.Content.Individual.SingleNoteDetailedLink
 
                 public let entity: Note
                 @State private var isPresented: Bool = false
@@ -824,7 +853,7 @@ extension Tabs.Content {
                             .foregroundStyle(Color.fromStored(self.entity.mJob?.project?.colour ?? Theme.rowColourAsDouble))
                             .frame(width: 15)
                         Rectangle()
-                            .foregroundStyle(self.entity.mJob?.backgroundColor ?? Theme.rowColour)
+                            .foregroundStyle(self.entity.mJob?.project?.backgroundColor ?? Theme.rowColour)
                             .frame(width: 15)
 
                         Button(note: self.entity)

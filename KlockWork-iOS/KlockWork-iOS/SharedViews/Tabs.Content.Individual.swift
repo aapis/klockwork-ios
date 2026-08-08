@@ -389,6 +389,10 @@ extension Tabs.Content {
                         Rectangle()
                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                             .frame(width: 15)
+//                        Rectangle()
+//                            .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
+//                            .frame(width: 15)
+//                            .clipShape(.rect(topLeadingRadius: self.selected ? 8 : 0, bottomLeadingRadius: self.selected ? 8 : 0))
 
                         // Open Job button
                         Button {
@@ -401,8 +405,7 @@ extension Tabs.Content {
                         } label: {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 3)
-                                    .fill(.black)
-                                    .opacity(0.4)
+                                    .fill(Theme.base.opacity(0.3))
                                 Image(systemName: self.selected ? "minus" : "plus")
                             }
                         }
@@ -424,14 +427,12 @@ extension Tabs.Content {
                         PageConfiguration.EntityType.jobs.icon
                             .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
 
-                        // Chevron
                         Image(systemName: "chevron.right")
-                            .padding(.trailing, 8)
-                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : Theme.lightWhite)
-                            .opacity(0.3)
+                            .padding([.leading, .trailing], 8)
+                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
                     }
                 }
-                .background(self.entity.colour_from_stored())
+                .background(self.entity.backgroundColor)
             }
         }
 
@@ -796,11 +797,30 @@ extension Tabs.Content {
                         .scrollContentBackground(.hidden)
                 } label: {
                     ListRow(
-                        name: task.content ?? "_TASK_CONTENT",
-                        colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour
+                        name: self.task.title ?? self.task.content ?? "_TASK_CONTENT",
+                        colour: self.task.owner?.backgroundColor ?? Theme.rowColour
                     )
                 }
                 .buttonStyle(.plain)
+            }
+        }
+
+        struct SingleTaskSelectable: View {
+            public let task: LogTask
+            public var callback: (() -> Void)? = nil
+
+            var body: some View {
+                VStack(alignment: .leading, spacing: 0) {
+                    Button {
+                        self.callback?()
+                    } label: {
+                        ListRow(
+                            name: self.task.title ?? self.task.content ?? "_TASK_CONTENT",
+                            colour: self.task.owner?.backgroundColor ?? Theme.rowColour
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         }
 
@@ -827,13 +847,13 @@ extension Tabs.Content {
                             .scrollContentBackground(.hidden)
                     } label: {
                         ListRow(
-                            name: task.content ?? "_TASK_CONTENT",
-                            colour: task.owner != nil ? task.owner!.backgroundColor : Theme.rowColour,
+                            name: task.title ?? task.content ?? "_TASK_CONTENT",
+                            colour: task.owner != nil ? task.owner?.backgroundColor ?? Theme.rowColour : Theme.rowColour,
                             padding: (14, 14, 14, 0)
                         )
                     }
                 }
-                .background(self.task.owner!.backgroundColor)
+                .background(self.task.owner?.backgroundColor ?? Theme.rowColour)
                 .opacity(isCompleted ? 0.5 : 1.0)
                 .onAppear(perform: self.actionOnAppear)
             }
@@ -1262,7 +1282,6 @@ extension Tabs.Content {
             public var task: LogTask
             public var label: String
             @State public var icon: String = "circle.dotted.circle.fill"
-            public var owner: Job? = nil
             public var checklist: Checklist
             public var callback: (() -> Void)? = nil
             @State public var isComplete: Bool = false
@@ -1309,14 +1328,12 @@ extension Tabs.Content {
             /// Onload handler. Sets state values
             /// - Returns: Void
             private func actionOnAppear() -> Void {
+                if self.task.owner != nil {
+                    self.bgColour = self.task.owner!.backgroundColor
+                }
+
                 if self.task.isOpen {
                     self.icon = "circle.dotted.circle.fill"
-
-                    if self.owner != nil {
-                        self.bgColour = self.owner!.backgroundColor
-                    } else if self.checklist.backgroundColour.isBright() {
-                        self.bgColour = Theme.lightBase
-                    }
                 } else {
                     self.icon = "checkmark.circle.fill"
                 }
@@ -1378,6 +1395,14 @@ extension Tabs.Content {
             var body: some View {
                 HStack(alignment: .center) {
                     Button {
+                        // @TODO: I have no idea why this doesn't work
+//                        CoreDataTasks(moc: self.state.moc).create(
+//                            content: self.task.content ?? "",
+//                            title: self.task.title ?? "_INVALID_TITLE",
+//                            created: self.state.date,
+//                            due: self.task.due ?? Date.now.endOfDay ?? Date()
+//                        )
+
                         self.callback?()
                     } label: {
                         Image(systemName: "plus.circle.fill")
@@ -1890,8 +1915,7 @@ extension Tabs.Content {
                         } label: {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 3)
-                                    .fill(.black)
-                                    .opacity(0.4)
+                                    .fill(Theme.base.opacity(0.3))
                                 Image(systemName: self.selected ? "minus" : "plus")
                             }
                         }
@@ -1911,13 +1935,11 @@ extension Tabs.Content {
                         .lineLimit(1)
 
                         PageConfiguration.EntityType.companies.icon
-                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
+                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
 
-                        // Chevron
                         Image(systemName: "chevron.right")
-                            .padding(.trailing, 8)
-                            .foregroundStyle(Color.fromStored(entity.colour ?? Theme.rowColourAsDouble).isBright() ? Theme.base : Theme.lightWhite)
-                            .opacity(0.3)
+                            .padding([.leading, .trailing], 8)
+                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
                     }
 
                     if self.selected {
@@ -2409,8 +2431,7 @@ extension Tabs.Content {
                         } label: {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 3)
-                                    .fill(.black)
-                                    .opacity(0.4)
+                                    .fill(Theme.base.opacity(0.3))
                                 Image(systemName: self.selected ? "minus" : "plus")
                             }
                         }
@@ -2432,11 +2453,9 @@ extension Tabs.Content {
                         PageConfiguration.EntityType.projects.icon
                             .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
 
-                        // Chevron
                         Image(systemName: "chevron.right")
-                            .padding(.trailing, 8)
-                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base : Theme.lightWhite)
-                            .opacity(0.3)
+                            .padding([.leading, .trailing], 8)
+                            .foregroundStyle(self.entity.backgroundColor.isBright() ? Theme.base.blendMode(.softLight) : Theme.lightWhite.blendMode(.softLight))
                     }
 
                     if self.selected {
@@ -2553,7 +2572,7 @@ extension Tabs.Content {
                     } label: {
                         HStack {
                             HStack {
-                                Image("DefaultAvatar")
+                                Image("DefaultAvatar1")
                                     .resizable()
                                     .frame(width: 60, height: 60)
                                     .clipShape(RoundedRectangle(cornerRadius: 8))

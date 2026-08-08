@@ -68,30 +68,31 @@ struct ViewModeSelector: View {
                 )
 
                 /// Posts view mode button
-                Button {
-                    self.viewMode = .posts
-                    self.storedVm = self.viewMode.id
-                } label: {
-                    Image(systemName: "signpost.left.fill")
-                }
-                .disabled(self.storedVm == 3)
-                .padding([.leading, .trailing], 8)
-                .padding([.top, .bottom], 7)
-                .background(
-                    ZStack(alignment: .bottom) {
-                        (self.storedVm == 3 ? self.state.theme.tint : Theme.darkBtnColour)
-                        VStack {
-                            Spacer()
-                            LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
-                                .blendMode(.softLight)
-                                .opacity(self.storedVm == 3 ? 1 : 0)
-                                .frame(height: 15)
-                        }
-                    }
-                )
-                .foregroundStyle(
-                    .linearGradient(colors: [self.storedVm == 3 ? Theme.base : self.shouldUseWPImage ? Theme.lightWhite : .gray, self.storedVm == 3 ? Theme.cPurple : self.shouldUseWPImage ? Theme.lightWhite : .gray], startPoint: .top, endPoint: .bottom)
-                )
+                // @TODO: remove, deprecated by Project Gatherum
+//                Button {
+//                    self.viewMode = .posts
+//                    self.storedVm = self.viewMode.id
+//                } label: {
+//                    Image(systemName: "signpost.left.fill")
+//                }
+//                .disabled(self.storedVm == 3)
+//                .padding([.leading, .trailing], 8)
+//                .padding([.top, .bottom], 7)
+//                .background(
+//                    ZStack(alignment: .bottom) {
+//                        (self.storedVm == 3 ? self.state.theme.tint : Theme.darkBtnColour)
+//                        VStack {
+//                            Spacer()
+//                            LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
+//                                .blendMode(.softLight)
+//                                .opacity(self.storedVm == 3 ? 1 : 0)
+//                                .frame(height: 15)
+//                        }
+//                    }
+//                )
+//                .foregroundStyle(
+//                    .linearGradient(colors: [self.storedVm == 3 ? Theme.base : self.shouldUseWPImage ? Theme.lightWhite : .gray, self.storedVm == 3 ? Theme.cPurple : self.shouldUseWPImage ? Theme.lightWhite : .gray], startPoint: .top, endPoint: .bottom)
+//                )
 
                 /// Hierarchy view mode button
                 Button {

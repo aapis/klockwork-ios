@@ -227,6 +227,7 @@ extension TaskDetail {
             if let ti = task.title {self.title = ti}
             if let jo = task.owner {job = jo}
             self.isSuggested = task.isSuggested
+            self.title = task.title ?? ""
         } else {
             self.job = self.state.job
             self.created = self.state.date

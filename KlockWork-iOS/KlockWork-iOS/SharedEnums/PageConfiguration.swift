@@ -95,28 +95,28 @@ extension PageConfiguration {
         /// Associated icon
         var icon: Image {
             switch self {
-            case .records: Image(systemName: "tray")
-            case .jobs: Image(systemName: "hammer")
-            case .tasks: Image(systemName: "checklist")
-            case .notes: Image(systemName: "text.pad.header")
-            case .companies: Image(systemName: "building.2")
-            case .people: Image(systemName: "person.2")
-            case .projects: Image(systemName: "folder")
-            case .terms: Image(systemName: "list.bullet.rectangle")
+            case .records: Image(systemName: self.iconString)
+            case .jobs: Image(systemName: self.iconString)
+            case .tasks: Image(systemName: self.iconString)
+            case .notes: Image(systemName: self.iconString)
+            case .companies: Image(systemName: self.iconString)
+            case .people: Image(systemName: self.iconString)
+            case .projects: Image(systemName: self.iconString)
+            case .terms: Image(systemName: self.iconString)
             }
         }
 
         /// Alternative icon to use when selected
         var selectedIcon: Image {
             switch self {
-            case .records: Image(systemName: "tray.fill")
-            case .jobs: Image(systemName: "hammer.fill")
-            case .tasks: Image(systemName: "checklist")
-            case .notes: Image(systemName: "text.pad.header")
-            case .companies: Image(systemName: "building.2.fill")
-            case .people: Image(systemName: "person.2.fill")
-            case .projects: Image(systemName: "folder.fill")
-            case .terms: Image(systemName: "list.bullet.rectangle.fill")
+            case .records: Image(systemName: self.iconSelectedString)
+            case .jobs: Image(systemName: self.iconSelectedString)
+            case .tasks: Image(systemName: self.iconSelectedString)
+            case .notes: Image(systemName: self.iconSelectedString)
+            case .companies: Image(systemName: self.iconSelectedString)
+            case .people: Image(systemName: self.iconSelectedString)
+            case .projects: Image(systemName: self.iconSelectedString)
+            case .terms: Image(systemName: self.iconSelectedString)
             }
         }
         
@@ -175,5 +175,19 @@ extension PageConfiguration {
     struct EntityTypePair {
         var key: EntityType
         var value: Int
+    }
+
+    struct CircleIcon: View {
+        public let entity: PageConfiguration.EntityType
+
+        var body: some View {
+            ZStack {
+                Theme.base.opacity(0.3)
+                self.entity.icon
+                    .font(.caption)
+            }
+            .mask(Circle())
+            .frame(width: 25, height: 25)
+        }
     }
 }

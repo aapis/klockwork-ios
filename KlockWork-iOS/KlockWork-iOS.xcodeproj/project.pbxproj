@@ -26,6 +26,7 @@
 		53274B372C12179D008387BF /* ButtonType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B362C12179D008387BF /* ButtonType.swift */; };
 		53274B3C2C13C7E6008387BF /* AssessmentFactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */; };
 		53388FD62F3BBC7100588B4D /* SuperiorTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53388FD52F3BBC5B00588B4D /* SuperiorTabView.swift */; };
+		5343E6132F5E056600E6EE0B /* TaskSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5343E6122F5E055E00E6EE0B /* TaskSelector.swift */; };
 		5349F30C2F5A568F0001AABA /* LogTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5349F30B2F5A568D0001AABA /* LogTask.swift */; };
 		534BDEFA2F50E41300B3B525 /* Widget.Tasks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534BDEF92F50E40B00B3B525 /* Widget.Tasks.swift */; };
 		534BDEFC2F50F3C300B3B525 /* ChecklistDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534BDEFB2F50F3BF00B3B525 /* ChecklistDetail.swift */; };
@@ -178,6 +179,7 @@
 		53274B362C12179D008387BF /* ButtonType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonType.swift; sourceTree = "<group>"; };
 		53274B3B2C13C7E6008387BF /* AssessmentFactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentFactor.swift; sourceTree = "<group>"; };
 		53388FD52F3BBC5B00588B4D /* SuperiorTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuperiorTabView.swift; sourceTree = "<group>"; };
+		5343E6122F5E055E00E6EE0B /* TaskSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSelector.swift; sourceTree = "<group>"; };
 		5349F30B2F5A568D0001AABA /* LogTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTask.swift; sourceTree = "<group>"; };
 		534BDEF92F50E40B00B3B525 /* Widget.Tasks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.Tasks.swift; sourceTree = "<group>"; };
 		534BDEFB2F50F3BF00B3B525 /* ChecklistDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistDetail.swift; sourceTree = "<group>"; };
@@ -339,6 +341,7 @@
 		5311F3FE2C17A03500FB3071 /* Widget */ = {
 			isa = PBXGroup;
 			children = (
+				5343E6122F5E055E00E6EE0B /* TaskSelector.swift */,
 				534BDEFF2F5109DA00B3B525 /* Widget.Dates.swift */,
 				534BDEF92F50E40B00B3B525 /* Widget.Tasks.swift */,
 				53713E392C94D813006C244D /* ViewModeSelector.swift */,
@@ -760,6 +763,7 @@
 				53F926322BFEA00E00948076 /* String.swift in Sources */,
 				53F926062BFE9BF300948076 /* CoreDataCalendarEvent.swift in Sources */,
 				53F926072BFE9BF300948076 /* CoreDataCompanies.swift in Sources */,
+				5343E6132F5E056600E6EE0B /* TaskSelector.swift in Sources */,
 				53C518422C9CF5AB00E2BB2E /* Tabs.Content.Individual.swift in Sources */,
 				53C84F892ECA646A00CBD1E5 /* Tabs.Content.Posts.swift in Sources */,
 				538A53522C6FF1C400711639 /* TermDetail.swift in Sources */,
@@ -986,7 +990,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 26;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1031,7 +1035,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 26;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				ENABLE_HARDENED_RUNTIME = YES;

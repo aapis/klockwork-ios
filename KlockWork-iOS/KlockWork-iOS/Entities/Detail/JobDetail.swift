@@ -29,6 +29,7 @@ struct JobDetail: View {
     @State private var isProjectSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
     @State private var isDeleteAlertPresented: Bool = false
+    @State private var sensitive: Bool = false
     static public let defaultTitle: String = "Descriptive job title"
 
     var body: some View {
@@ -94,6 +95,7 @@ struct JobDetail: View {
                 Section("Settings") {
                     Toggle("Published", isOn: $alive)
                     Toggle("Favourite", isOn: $starred)
+                    Toggle("Sensitive", isOn: $sensitive)
                     DatePicker(
                         "Created",
                         selection: $created,
@@ -192,6 +194,7 @@ extension JobDetail {
             self.overview = self.job!.overview ?? ""
             self.shredable = self.job!.shredable
             self.title  = self.job!.title ?? ""
+            self.sensitive = self.job!.sensitive
 
             if let project = self.job!.project {
                 self.project = project
@@ -224,6 +227,7 @@ extension JobDetail {
             }
             self.job!.uri = URL(string: self.url)
             self.job!.starred = self.starred
+            self.job!.sensitive = self.sensitive
             self.state.job = self.job
         } else {
             let job = CoreDataJob(moc: self.state.moc).createAndReturn(
@@ -236,6 +240,7 @@ extension JobDetail {
                 uri: URL(string: self.url)?.absoluteString ?? "",
                 project: self.project == nil ? DefaultObjects.project : self.project,
                 starred: self.starred,
+                sensitive: self.sensitive,
                 saveByDefault: false
             )
             self.state.job = job

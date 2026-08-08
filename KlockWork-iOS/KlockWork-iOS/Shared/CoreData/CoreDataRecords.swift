@@ -30,6 +30,8 @@ public struct Intersection {
 }
 
 public class CoreDataRecords: ObservableObject {
+    public var objectWillChange: ObservableObjectPublisher
+    
     public var moc: NSManagedObjectContext?
     
     private let lock = NSLock()

@@ -200,6 +200,15 @@ extension Widget {
                                 if !self.searchText.isEmpty {
                                     UI.FilteredList(items: self.items, text: self.$searchText)
                                 } else {
+                                    HStack {
+                                        Spacer()
+                                        Capsule()
+                                            .fill(Theme.lightWhite)
+                                            .frame(width: 100, height: 6)
+                                            .opacity(0.7)
+                                        Spacer()
+                                    }
+                                    .padding()
                                     List {
                                         if let dJob = CoreDataJob(moc: self.state.moc).getDefault() {
                                             Section {

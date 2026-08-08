@@ -36,7 +36,6 @@ struct Home: View {
             VStack(alignment: .leading, spacing: 0){
                 if !self.inSheet {
                     Header(page: self.page, path: $path)
-
                 }
                 Divider().background(.white).frame(height: 1)
 
@@ -1525,6 +1524,7 @@ extension Home {
     }
 
     // MARK: Home.TasksGroup
+    // @TODO: remove me
     struct TasksGroupOLD: View {
         @EnvironmentObject private var state: AppState
         private var col2: [GridItem] { Array(repeating: .init(.flexible()), count: 2) }
@@ -2112,6 +2112,7 @@ extension Home {
                                         callback: {
                                             self.content = task.title ?? task.content ?? "_INVALID"
                                             self.hasFocus = true
+//                                            self.actionOnAppear()
                                         }
                                     )
                                 }
@@ -2143,6 +2144,63 @@ extension Home {
                     with: NSPredicate(format: "isSuggested == true"),
                     sort: [NSSortDescriptor(keyPath: \LogTask.created?, ascending: true)]
                 )
+            }
+
+            /// Fires when view appears
+            /// - Returns: Void
+            private func actionOnAppear() -> Void {
+                if let job = CoreDataJob(moc: self.state.moc).getDefault() {
+                    self.defaultJob = job
+                }
+
+                self.findTasks()
+            }
+
+            /// Find open tasks associated with this job
+            /// - Returns: Void
+            private func findTasks() -> Void {
+                self.tasks = []
+                var current: Job? = self.state.job
+
+                if let job = self.state.job {
+                    current = job
+                } else if self.defaultJob != nil {
+                    current = self.defaultJob!
+                }
+
+                if current != nil {
+                    self.tasks = CoreDataTasks(moc: self.state.moc).find(
+                        with: NSPredicate(
+                            format: "owner == %@ && created > %@ && created <= %@",
+                            current!,
+                            (self.state.date.startOfDay ?? Date()) as CVarArg,
+                            (self.state.date.endOfDay ?? Date()) as CVarArg
+                        ),
+                        limit: 8
+                    )
+                }
+
+                self.id = UUID() // hack to refresh UI
+            }
+
+            /// Fires on submit/return
+            /// - Returns: Void
+            private func actionOnSubmit() -> Void {
+                if !self.content.isEmpty {
+                    CoreDataTasks(moc: self.state.moc).create(
+                        content: "",
+                        title: self.content,
+                        created: Date(),
+                        due: Date().endOfDay!,
+                        job: self.state.job != nil ? self.state.job : self.defaultJob
+                    )
+
+//                    PersistenceController.shared.save()
+                    self.findTasks()
+                }
+
+                self.content = ""
+                self.hasFocus = false
             }
         }
 
@@ -2648,66 +2706,6 @@ extension Home.TaskBlock {
         self.help = help
         self.infoView = infoView
         _tasks = CoreDataTasks.fetch(with: predicate)
-    }
-}
-
-extension Home.QuickAccessTabs.QuickTaskList {
-    /// Fires when view appears
-    /// - Returns: Void
-    private func actionOnAppear() -> Void {
-        if let job = CoreDataJob(moc: self.state.moc).getDefault() {
-            self.defaultJob = job
-        }
-
-        self.findTasks()
-    }
-    
-    /// Find open tasks associated with this job
-    /// - Returns: Void
-    private func findTasks() -> Void {
-        self.tasks = []
-        var current: Job? = self.state.job
-
-        if let job = self.state.job {
-            current = job
-        } else if self.defaultJob != nil {
-            current = self.defaultJob!
-        }
-
-        if current != nil {
-            self.tasks = CoreDataTasks(moc: self.state.moc).find(
-                with: NSPredicate(
-                    format: "owner == %@ && created > %@ && created <= %@",
-                    current!,
-                    (self.state.date.startOfDay ?? Date()) as CVarArg,
-                    (self.state.date.endOfDay ?? Date()) as CVarArg
-                ),
-                limit: 8
-            )
-
-            self.id = UUID() // hack to refresh UI
-        }
-    }
-
-    /// Fires on submit/return
-    /// - Returns: Void
-    private func actionOnSubmit() -> Void {
-        if !self.content.isEmpty {
-            CoreDataTasks(moc: self.state.moc).create(
-                content: "",
-                title: self.content,
-                created: Date(),
-                due: Date().endOfDay!,
-                job: self.state.job != nil ? self.state.job : self.defaultJob,
-                saveByDefault: false
-            )
-
-            PersistenceController.shared.save()
-            self.findTasks()
-        }
-
-        self.content = ""
-        self.hasFocus = false
     }
 }
 
