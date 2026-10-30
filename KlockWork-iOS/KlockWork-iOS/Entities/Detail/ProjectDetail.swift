@@ -94,6 +94,15 @@ struct ProjectDetail: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        self.name = ""
+                        self.abbreviation = ""
+                    } label: {
+                        Text("Clear")
+                    }
+                    .disabled(self.name == "")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
                     Button {
@@ -161,6 +170,7 @@ extension ProjectDetail {
                 colour: self.colour.toStored(),
                 created: self.createdDate,
                 pid: self.pid,
+                alive: self.alive,
                 company: self.company,
                 jobs: NSSet(array: self.jobs),
                 saveByDefault: false

@@ -9,9 +9,8 @@ import SwiftUI
 import CoreData
 
 // @TODO: refactor into one that supports any PageConfiguration enum
-struct Tabs: View {
-    typealias EntityType = PageConfiguration.EntityType
-
+public struct Tabs: View {
+    public typealias EntityType = PageConfiguration.EntityType
     @EnvironmentObject private var state: AppState
     public var inSheet: Bool
     @Binding public var job: Job?
@@ -19,48 +18,94 @@ struct Tabs: View {
     public var content: AnyView? = nil
     public var buttons: AnyView? = nil
     public var title: AnyView? = nil
+    public var mode: TabsViewMode = .read
     static public let animationDuration: Double = 0.2
+    @AppStorage("home.tabLocation") public var tabLocation: Int = 0
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if buttons == nil {
-                switch self.state.today.tableButtonMode {
-                case .actions:
-                    HStack(alignment: .center, spacing: 8) {
-                        AddButton()
-                            .frame(width: 50, height: 45)
-                            .background(Theme.darkBtnColour)
-
-                        ViewModeSelector()
-                    }
-                case .items:
-                    Buttons(inSheet: inSheet, job: $job, selected: $selected)
-                        .swipe([.left, .right]) { swipe in
-                            self.actionOnSwipe(swipe)
-                        }
+            // @TODO: only allowing top/bottom tabs to work on create mode for now don't @ me
+            if self.mode == .create {
+                HStack {
+                    Spacer()
+                    Capsule()
+                        .fill(Theme.lightWhite)
+                        .frame(width: 100, height: 6)
+                        .opacity(0.7)
+                    Spacer()
                 }
-
+                .padding([.top, .bottom])
+                .background(Theme.lightBase.blendMode(.softLight))
+                switch self.tabLocation {
+                case 1:
+                    self.contentRow
+                    self.miniTitleRow
+                    self.buttonRow
+                default:
+                    self.buttonRow
+                    self.miniTitleRow
+                    self.contentRow
+                }
             } else {
-                buttons
-            }
-
-            if title == nil {
-                MiniTitleBar(selected: $selected)
-                    .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
-            } else {
-                title
-            }
-
-            if content == nil {
-                Content(inSheet: inSheet, job: $job, selected: $selected)
-                    .swipe([.left, .right]) { swipe in
-                        self.actionOnSwipe(swipe)
-                    }
-            } else {
-                content
+                self.buttonRow
+                self.miniTitleRow
+                self.contentRow
             }
         }
         .background(.clear)
+    }
+
+    @ViewBuilder private var miniTitleRow: some View {
+        if title == nil {
+            MiniTitleBar(selected: $selected)
+                .border(width: 1, edges: [.bottom], color: self.state.theme.tint)
+        } else {
+            title
+        }
+    }
+
+    @ViewBuilder private var contentRow: some View {
+        if content == nil {
+            switch self.mode {
+            case .create:
+                Tabs.TVMCreate(selected: self.$selected)
+            case .read:
+                Tabs.Content(inSheet: self.inSheet, job: self.$job, selected: self.$selected)
+                    .swipe([.left, .right]) { swipe in
+                        self.actionOnSwipe(swipe)
+                    }
+            case .update:
+                Tabs.TVMUpdate()
+            case .delete:
+                Tabs.TVMDelete()
+            case .dashboard:
+                Tabs.TVMDashboard(selected: self.$selected)
+            }
+        } else {
+            content
+        }
+    }
+
+    @ViewBuilder private var buttonRow: some View {
+        if buttons == nil {
+            switch self.state.today.tableButtonMode {
+            case .actions:
+                HStack(alignment: .center, spacing: 8) {
+                    Home.QuickCreateWidget.AddButton()
+                        .frame(width: 50, height: 45)
+                        .background(Theme.darkBtnColour)
+                    ViewModeSelector()
+                }
+            case .items:
+                Buttons(inSheet: inSheet, job: $job, selected: $selected, tabLocation: self.$tabLocation, mode: self.mode)
+                    .swipe([.left, .right]) { swipe in
+                        self.actionOnSwipe(swipe)
+                    }
+            }
+
+        } else {
+            buttons
+        }
     }
 }
 
@@ -91,44 +136,82 @@ extension Tabs {
 }
 
 extension Tabs {
+    public enum TabsViewMode {
+        case create, read, update, delete, dashboard
+    }
+
     struct Buttons: View {
         @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
+        @Binding public var tabLocation: Int
+        public var mode: TabsViewMode
+        @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
 
         var body: some View {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .center, spacing: 0) {
-                    ForEach(EntityType.allCases, id: \.self) { page in
-                        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .center, spacing: 0) {
+                        ForEach(EntityType.allCases, id: \.self) { page in
                             Button {
                                 selected = page
                             } label: {
                                 (page == selected ? page.selectedIcon : page.icon)
                                     .frame(maxHeight: 20)
                                     .padding(14)
-                                    .background(page == selected ? Theme.darkBtnColour : .clear)
-                                    .foregroundStyle(page == selected ? self.state.theme.tint : .gray)
+                                    .background(
+                                        ZStack(alignment: .bottom) {
+                                            (page == selected ? self.state.theme.tint : .clear)
+                                            VStack {
+                                                Spacer()
+                                                LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
+                                                    .blendMode(.softLight)
+                                                    .opacity(page == self.selected ? 1 : 0)
+                                                    .frame(height: 15)
+                                            }
+                                        }
+                                    )
+                                    .foregroundStyle(
+                                        .linearGradient(colors: [page == self.selected ? Theme.base : self.shouldUseWPImage ? Theme.lightWhite : .gray, page == self.selected ? Theme.cPurple : self.shouldUseWPImage ? Theme.lightWhite : .gray], startPoint: .top, endPoint: .bottom)
+                                    )
                             }
                             .buttonStyle(.plain)
+                            .clipShape(
+                                .rect(
+                                    bottomLeadingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0,
+                                    bottomTrailingRadius: self.mode == .create && self.tabLocation == 1 ? 8 : 0
+                                )
+                            )
+                            .shadow(radius: page == selected ? 4 : 0)
                         }
+                        Spacer()
                     }
-                    Spacer()
                 }
             }
-            .frame(height: 50)
+            .background(
+                ZStack(alignment: .top) {
+                    Theme.cPurple
+                    VStack {
+                        LinearGradient(colors: [Theme.base, .clear], startPoint: .top, endPoint: .bottom)
+                            .blendMode(.softLight)
+                            .opacity(0.4)
+                            .frame(height: 15)
+                        Spacer()
+                    }
+                }
+            )
         }
     }
 
-    struct Content: View {
+    public struct Content: View {
         @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
 
-        var body: some View {
-            switch selected {
+        public var body: some View {
+            switch self.selected {
             case .records:
                 List.Records(job: $job, date: self.state.date, inSheet: self.inSheet)
             case .jobs:
@@ -159,6 +242,101 @@ extension Tabs {
                     }
                     .padding()
                 }
+            }
+        }
+    }
+
+    struct TVMCreate: View {
+        @EnvironmentObject private var state: AppState
+        @Binding public var selected: EntityType
+
+        var body: some View {
+            switch self.selected {
+            case .records:
+                RecordDetail()
+                RecordRecent()
+            case .jobs:
+                JobDetail()
+            case .tasks:
+                TaskDetail()
+                TasksRecent()
+            case .notes:
+                NoteDetail()
+            case .companies:
+                CompanyDetail()
+            case .people:
+                PersonDetail()
+            case .projects:
+                ProjectDetail()
+            case .terms:
+                TermDetail()
+            }
+        }
+    }
+
+    struct TVMUpdate: View {
+        var body: some View {
+            Text("update")
+        }
+    }
+
+    struct TVMDelete: View {
+        var body: some View {
+            Text("delete")
+        }
+    }
+
+    struct TVMDashboard: View {
+        @EnvironmentObject private var state: AppState
+        @Binding public var selected: EntityType
+        @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
+
+        var body: some View {
+            ZStack(alignment: .bottomTrailing) {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: self.isBig ? 16 : 8) {
+                        switch self.selected {
+                        case .records:
+                            Home.QuickAccessTabs.QuickRecordPanel()
+//                            Widget.Tasks.CheckLists() // for testing only
+                            Home.RecordFilters()
+//                            Home.QuickAccessTabs.QuickSearchPanel() // probably not here
+                            Home.QuickHistory()
+                        case .jobs:
+                            HStack(alignment: .top, spacing: self.isBig ? 16 : 8) {
+                                Home.QuickAccessTabs.RecentJobs()
+                                Home.QuickAccessTabs.FavouriteJobs()
+                            }
+                            Home.QuickHistory()
+                        case .tasks:
+                            Home.QuickAccessTabs.QuickTaskList()
+                            Widget.Tasks.CheckLists()
+                            Home.TaskFilters()
+                            Widget.Tasks.DailyOverview()
+                        case .notes:
+                            HStack(alignment: .top, spacing: self.isBig ? 16 : 8) {
+                                Home.QuickAccessTabs.RecentNotes()
+                                Home.QuickAccessTabs.FavouriteNotes()
+                            }
+                            Home.QuickHistory()
+                        case .companies:
+                            Home.QuickHistory()
+                        case .people:
+                            Home.RecentlyMentioned(date: DateHelper.daysAhead(-14, from: self.state.date))
+                            Home.QuickHistory()
+                        case .projects:
+                            Home.QuickHistory()
+                        case .terms:
+                            Home.QuickAccessTabs.QuickSearchPanel()
+                            Home.QuickHistory()
+                        }
+                    }
+                    .padding(self.isBig ? 16 : 8)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                }
+                Home.QuickCreateWidget()
+                    .padding(.trailing)
+                    .padding(.bottom, self.isBig ? 16 : 8)
             }
         }
     }

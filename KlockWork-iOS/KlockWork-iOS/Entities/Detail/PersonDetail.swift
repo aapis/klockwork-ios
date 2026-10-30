@@ -43,13 +43,11 @@ struct PersonDetail: View {
                             displayedComponents: [.date, .hourAndMinute]
                         )
 
-                        if self.lastUpdate != self.created {
-                            DatePicker(
-                                "Last updated",
-                                selection: $lastUpdate,
-                                displayedComponents: [.date, .hourAndMinute]
-                            )
-                        }
+                        DatePicker(
+                            "Last updated",
+                            selection: $lastUpdate,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
                     }
                     .listRowBackground(Theme.textBackground)
 
@@ -76,6 +74,16 @@ struct PersonDetail: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .scrollDismissesKeyboard(.immediately)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        self.name = ""
+                        self.title = ""
+                        self.state.job = nil
+                    } label: {
+                        Text("Clear")
+                    }
+                    .disabled(self.name == "")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     // Creates new entity on tap, then sends user back to Today
                     Button {
@@ -83,7 +91,7 @@ struct PersonDetail: View {
                     } label: {
                         Text("Save")
                     }
-                    .foregroundStyle(self.state.theme.tint)
+                    .disabled(self.name == "" && self.title == "")
                 }
             }
             .sheet(isPresented: $isCompanySelectorPresented) {

@@ -11,6 +11,7 @@ struct CreateEntitiesButton: View {
     @EnvironmentObject private var state: AppState
     @State public var date: Date = DateHelper.startOfDay()
     public var isViewModeSelectorVisible: Bool = false
+    public var isForecastVisible: Bool = true
     public var page: PageConfiguration.AppPage = .planning
 
     var body: some View {
@@ -33,8 +34,10 @@ struct CreateEntitiesButton: View {
 //            .background(.white.opacity(0.1))
 //            .clipShape(.rect(topLeadingRadius: 5, topTrailingRadius: 5))
 
-            Forecast(date: DateHelper.startOfDay(self.state.date), isForecastMember: false, page: self.page)
-                .padding([.trailing], 8)
+            if self.isForecastVisible {
+                Forecast(date: DateHelper.startOfDay(self.state.date), isForecastMember: false, page: self.page)
+                    .padding([.trailing], 8)
+            }
 
             // @TODO: implement settings page
 //            NavigationLink {

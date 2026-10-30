@@ -26,40 +26,78 @@ struct NoteDetail: View {
     @FocusState private var contentFieldFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
-            ZStack(alignment: .topLeading) {
-                RadialGradient(gradient: Gradient(colors: [.black, .clear]), center: .topTrailing, startRadius: 0, endRadius: 400)
-                    .opacity(0.45)
-                    .blendMode(.softLight)
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 1) {
+                ZStack(alignment: .topLeading) {
+                    RadialGradient(gradient: Gradient(colors: [.black, .clear]), center: .topTrailing, startRadius: 0, endRadius: 400)
+                        .opacity(0.45)
+                        .blendMode(.softLight)
 
-                ZStack {
-                    VStack(alignment: .leading, spacing: 0) {
-                        Editor(job: $job, title: $title)
-                        HStack(alignment: .top, spacing: 0) {
-                            TextEditor(text: $content)
-                                .focused($contentFieldFocused)
-                                .padding(8)
-                                .foregroundStyle(.white)
-                            Spacer()
+                    ZStack {
+                        VStack(alignment: .leading, spacing: 0) {
+                            // @TODO: move HStack group into NoteDetail.Editor
+                            HStack(spacing: 0) {
+                                Editor(job: $job, title: $title)
+                                Button {
+                                    self.starred.toggle()
+                                } label: {
+                                    HStack {
+                                        Image(systemName: self.starred ? "star.fill" : "star")
+                                            .frame(maxHeight: 20)
+                                    }
+                                    .padding(14)
+                                    .foregroundStyle(self.starred ? self.state.theme.tint : .gray)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            HStack(alignment: .top, spacing: 0) {
+                                TextEditor(text: $content)
+                                    .focused($contentFieldFocused)
+                                    .padding(8)
+                                    .foregroundStyle(.white)
+                                Spacer()
+                            }
+//                            Spacer()
+//                            PageActionBar.Create(
+//                                page: self.page,
+//                                job: $job,
+//                                onSave: self.actionOnSave
+//                            )
                         }
-                        Spacer()
-                        PageActionBar.Create(
-                            page: self.page,
-                            job: $job,
-                            onSave: self.actionOnSave
-                        )
                     }
                 }
             }
+            .foregroundStyle(self.state.theme.tint)
+            .background(self.page.primaryColour)
+            .scrollContentBackground(.hidden)
+            .navigationTitle(self.note != nil ? title.prefix(25) : "New Note")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        self.content = ""
+                        self.title = ""
+                        self.state.job = nil
+                        self.job = nil
+                    } label: {
+                        Text("Clear")
+                    }
+                    .disabled(self.content == "")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    // Creates new entity on tap, then sends user back to Today
+                    Button {
+                        self.actionOnSave()
+                    } label: {
+                        Text("Save")
+                    }
+                    .disabled(self.content == "" || self.title == "")
+                }
+            }
         }
-        .foregroundStyle(self.state.theme.tint)
-        .background(self.page.primaryColour)
-        .scrollContentBackground(.hidden)
         .onAppear(perform: self.actionOnAppear)
-        .navigationTitle(title.prefix(25))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
     }
 
     struct Editor: View {
@@ -326,8 +364,8 @@ extension NoteDetail {
                 entity: self.note!,
                 alive: self.alive,
                 body: self.content,
-                lastUpdate: Date(),
-                postedDate: Date(),
+                lastUpdate: self.postedDate,
+                postedDate: self.postedDate,
                 starred: self.starred,
                 title: self.title,
                 job: self.job
@@ -336,8 +374,8 @@ extension NoteDetail {
             CoreDataNotes(moc: self.state.moc).create(
                 alive: self.alive,
                 body: self.content,
-                lastUpdate: Date(),
-                postedDate: Date(),
+                lastUpdate: self.postedDate,
+                postedDate: self.postedDate,
                 starred: self.starred,
                 title: self.title,
                 job: self.job

@@ -21,6 +21,8 @@ public enum CalendarEventStatus {
 }
 
 public class CoreDataCalendarEvent: ObservableObject {
+    public var objectWillChange: ObservableObjectPublisher
+    
     public var moc: NSManagedObjectContext?
     public var store: EKEventStore = EKEventStore()
 

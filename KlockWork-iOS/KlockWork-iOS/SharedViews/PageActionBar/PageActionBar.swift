@@ -22,7 +22,7 @@ struct PageActionBar: View {
         .foregroundStyle(self.state.theme.tint)
         .clipShape(.capsule(style: .continuous))
         .shadow(color: .black.opacity(0.2), radius: 6, x: 2, y: 2)
-        .padding()
+        .padding([.leading, .trailing])
         .sheet(isPresented: $isPresented) {
             sheetView
         }
@@ -30,7 +30,7 @@ struct PageActionBar: View {
 
     struct Today: View {
         @EnvironmentObject private var state: AppState
-        public var title: String = "What are you working on now?"
+        public var title: String = "What are you working on?"
         public var prompt: String = "Choose a job"
         @Binding public var job: Job?
         @State private var selectedJobs: [Job] = []
@@ -50,6 +50,8 @@ struct PageActionBar: View {
                 ),
                 isPresented: $isPresented
             )
+            .padding([.leading, .trailing], 5)
+            .padding(.bottom, self.state.job != nil ? 16 : 0)
             .id(self.id)
             .onAppear(perform: self.actionOnAppear)
             .onChange(of: self.job) { // sheet/group view are essentially static unless we manually refresh them, @TODO: fix this
@@ -63,17 +65,18 @@ struct PageActionBar: View {
         }
 
         @ViewBuilder var Group: some View {
-            HStack(alignment: .center, spacing: 10) {
+            HStack(alignment: .center, spacing: 0) {
                 ChooseJobButton
                 Spacer()
-                AddButton()
-                    .foregroundStyle((self.job?.backgroundColor ?? self.page.primaryColour).isBright() ? self.page.primaryColour : self.state.theme.tint)
+                Home.QuickCreateWidget(isGuestView: true)
+                    .padding(.trailing)
             }
             .background(
                 ZStack {
                     if self.job == nil {
-                        self.page.primaryColour
-                        Color.white.blendMode(.softLight)
+//                        self.page.primaryColour
+//                        Color.white.blendMode(.softLight) // @TODO: implement for light mode
+                        Theme.base.blendMode(.softLight).opacity(0.6)
                     } else {
                         self.job?.backgroundColor
                     }
@@ -97,7 +100,7 @@ struct PageActionBar: View {
                             .lineLimit(1)
                             .fontWeight(.bold)
                     } else {
-                        Text(self.job!.title ?? self.job!.jid.string)
+                        Text(self.job!.titleOrId())
                             .lineLimit(1)
                             .fontWeight(.bold)
                     }

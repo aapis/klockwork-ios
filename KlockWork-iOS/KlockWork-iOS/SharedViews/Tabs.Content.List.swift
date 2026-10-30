@@ -6,8 +6,22 @@
 //
 
 import SwiftUI
+import CoreData
 
 extension Tabs.Content {
+    public enum TCRecordType: CaseIterable {
+        case link, none
+
+        var icon: String {
+            switch self {
+            case .link:
+                "link"
+            default:
+                "circle.dotted"
+            }
+        }
+    }
+
     struct List {
         struct Separator: View {
             public var label: String
@@ -52,15 +66,15 @@ extension Tabs.Content {
                     if items.count > 0 {
                         ForEach(items) { record in
                             Individual.SingleRecordDetailedLink(record: record)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No records found for \(self.state.date.formatted(date: .abbreviated, time: .omitted))")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle(self.pageTitle)
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -90,12 +104,18 @@ extension Tabs.Content {
                     if let job = self.state.job {
                         Separator(label: "Current")
                         Individual.SingleJobDetailedLink(job: job)
+                            .listRowInsets(.none)
+                            .listRowSpacing(.none)
+                            .listRowSeparator(.hidden)
                     }
 
                     if self.favouriteItems.count > 0 {
                         Separator(label: "Starred (\(self.favouriteItems.count))", description: "All time")
                         ForEach(self.favouriteItems, id: \.self) { jerb in
                             Individual.SingleJobDetailedLink(job: jerb)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     }
 
@@ -103,15 +123,15 @@ extension Tabs.Content {
                         Separator(label: "Recent (\(self.items.count))", description: "< 30 days")
                         ForEach(items) { jerb in
                             Individual.SingleJobDetailedLink(job: jerb)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No jobs found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Jobs")
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -137,16 +157,20 @@ extension Tabs.Content {
                 SwiftUI.List {
                     if items.count > 0 {
                         ForEach(items, id: \.objectID) { task in
-                            Individual.SingleTaskDetailedChecklistItem(task: task)
+                            Individual.SingleTaskDetailedChecklistItem(task: task, includeDueDate: true)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                                .padding([.leading, .trailing], -16)
+                                .padding([.top], -16)
+                                .padding([.bottom], -12)
                         }
                     } else {
                         StatusMessage.Warning(message: "No tasks found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Tasks")
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -171,16 +195,20 @@ extension Tabs.Content {
                 SwiftUI.List {
                     if items.count > 0 {
                         ForEach(items, id: \.objectID) { task in
-                            Individual.SingleTaskDetailedChecklistItem(task: task)
+                            Individual.SingleTaskDetailedChecklistItem(task: task, includeDueDate: true)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                                .padding([.leading, .trailing], -16)
+                                .padding([.top], -16)
+                                .padding([.bottom], -12)
                         }
                     } else {
                         StatusMessage.Warning(message: "No tasks found")
                     }
                 }
-                .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
+                .listStyle(.inset)
                 .listSectionSpacing(0)
                 .navigationTitle(self.label)
                 .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
@@ -208,21 +236,24 @@ extension Tabs.Content {
                         Separator(label: "Starred (\(self.favouriteItems.count))", description: "All time")
                         ForEach(self.favouriteItems, id: \.self) { note in
                             Individual.SingleNoteDetailedLink(note: note)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     }
                     if items.count > 0 {
                         Separator(label: "All (\(self.items.count))")
                         ForEach(items) { note in
                             Individual.SingleNoteDetailedLink(note: note)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No notes found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .navigationTitle("Notes")
             }
 
@@ -234,7 +265,7 @@ extension Tabs.Content {
             }
         }
 
-        // MARK: HierarchyExplorer
+        // MARK: Tabs.Content.List.HierarchyExplorer
         struct HierarchyExplorer: View {
             @EnvironmentObject private var state: AppState
             public var inSheet: Bool
@@ -243,6 +274,10 @@ extension Tabs.Content {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
+                    PageHeader(
+                        title: "Hierarchy Explorer",
+                        description: "Companies are listed alphabetically, with the default company first."
+                    )
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             if self.items.count > 0 {
@@ -257,7 +292,6 @@ extension Tabs.Content {
                     }
                 }
                 .navigationTitle("Hierarchy Explorer")
-                .background(self.page.primaryColour)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
                 .navigationBarTitleDisplayMode(.inline)
@@ -367,13 +401,33 @@ extension Tabs.Content {
                     if self.isPresented {
                         if let pJobs = self.entity.jobs {
                             if let jobs = pJobs.allObjects as? [Job] {
-                                ForEach(jobs.filter({$0.alive == true}).sorted(by: {
-                                    $0.title ?? "" > $1.title ?? ""
-                                }), id: \.objectID) { job in
-                                    ThirdLevel(entity: job)
+                                if jobs.count > 0 {
+                                    ForEach(jobs.filter({$0.alive == true}).sorted(by: {
+                                        $0.title ?? "" < $1.title ?? ""
+                                    }), id: \.objectID) { job in
+                                        ThirdLevel(entity: job)
+                                    }
+                                } else {
+                                    // @TODO: convert to struct
+                                    HStack(spacing: 0) {
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.company?.backgroundColor ?? .white)
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.backgroundColor)
+                                            .frame(width: 15)
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.backgroundColor)
+                                            .frame(width: 15)
+                                        PageConfiguration.CircleIcon(entity: .jobs)
+                                            .foregroundStyle(.white.opacity(0.5))
+                                        Text("Nothing to show")
+                                            .foregroundStyle(.gray)
+                                            .padding(8)
+                                        Spacer()
+                                    }
+                                    .background(self.entity.backgroundColor)
                                 }
-                            } else {
-                                StatusMessage.Warning(message: "\(self.entity.name ?? "_PROJECT") doesn't have any jobs associated with it.")
                             }
                         }
                     }
@@ -419,6 +473,8 @@ extension Tabs.Content {
                 @State private var newTaskContent: String = "" // @TODO: move this to a new struct
                 @State private var newNoteTitle: String = "" // @TODO: move this to a new struct
                 @State private var id: UUID = UUID()
+                @FocusState private var isCreateTaskFieldActive: Bool
+                @FocusState private var isCreateNoteFieldActive: Bool
 
                 var body: some View {
                     VStack(alignment: .leading, spacing: 0) {
@@ -427,6 +483,8 @@ extension Tabs.Content {
                         // @TODO: refactor to follow the pattern set in previous levels
                         if self.isPresented {
                             VStack(alignment: .leading, spacing: 0) {
+                                /// Checklists
+                                ChecklistStack(entity: self.entity)
                                 /// Tasks
                                 ZStack(alignment: .leading) {
                                     self.entity.backgroundColor
@@ -442,10 +500,10 @@ extension Tabs.Content {
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(self.entity.project?.backgroundColor ?? self.entity.backgroundColor)
                                             .frame(width: 15)
-
-                                        HStack(spacing: 0) {
+                                        HStack {
+                                            PageConfiguration.CircleIcon(entity: .tasks)
                                             if self.tasks.isEmpty {
                                                 Text("No Tasks")
                                                     .opacity(0.5)
@@ -456,7 +514,7 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        RowAddButton(isPresented: $isCreateTaskPanelPresented)
+                                        RowAddButton(icon: "plus", isPresented: $isCreateTaskPanelPresented)
                                     }
                                 }
 
@@ -479,10 +537,12 @@ extension Tabs.Content {
                                                         self.isCreateTaskPanelPresented.toggle()
                                                     }
                                                 }
+                                                .focused(self.$isCreateTaskFieldActive)
                                                 .padding()
                                         }
                                     }
-                                    .background(.orange)
+                                    .background(.white)
+                                    .foregroundStyle(Theme.base)
                                     .onDisappear(perform: self.actionPostSave)
                                 }
 
@@ -507,10 +567,11 @@ extension Tabs.Content {
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
                                         Rectangle()
-                                            .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
+                                            .foregroundStyle(self.entity.project?.backgroundColor ?? self.entity.backgroundColor)
                                             .frame(width: 15)
 
-                                        HStack(spacing: 0) {
+                                        HStack {
+                                            PageConfiguration.CircleIcon(entity: .notes)
                                             if self.notes.isEmpty {
                                                 Text("No Notes")
                                                     .opacity(0.5)
@@ -521,7 +582,7 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        RowAddButton(isPresented: $isCreateNotePanelPresented)
+                                        RowAddButton(icon: "plus", isPresented: $isCreateNotePanelPresented)
                                     }
                                 }
 
@@ -544,10 +605,11 @@ extension Tabs.Content {
                                                         self.isCreateNotePanelPresented.toggle()
                                                     }
                                                 }
+                                                .focused(self.$isCreateNoteFieldActive)
                                                 .padding()
                                         }
                                     }
-                                    .background(.orange)
+                                    .background(.white)
                                     .onDisappear(perform: self.actionPostSave)
                                 }
 
@@ -572,13 +634,12 @@ extension Tabs.Content {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
-                                        if self.terms.isEmpty {
-                                            Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
-                                                .frame(width: 15)
-                                        }
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.project?.backgroundColor ?? self.entity.backgroundColor)
+                                            .frame(width: 15)
 
-                                        HStack(spacing: 0) {
+                                        HStack {
+                                            PageConfiguration.CircleIcon(entity: .terms)
                                             if self.terms.isEmpty {
                                                 Text("No Terms")
                                                     .opacity(0.5)
@@ -586,11 +647,17 @@ extension Tabs.Content {
                                                 NavigationLink {
                                                     TermFilter(job: self.entity)
                                                 } label: {
-                                                    ListRow(
-                                                        name: terms.count == 1 ? "1 Term" : "\(terms.count) Terms",
-                                                        colour: self.entity.backgroundColor,
-                                                        icon: "chevron.right"
-                                                    )
+                                                    ZStack {
+                                                        ListRow(
+                                                            name: self.terms.count == 1 ? "1 Term" : "\(self.terms.count) Terms",
+                                                            colour: self.entity.backgroundColor,
+                                                            icon: "chevron.right"
+                                                        )
+                                                        LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                                            .opacity(0.6)
+                                                            .blendMode(.softLight)
+                                                            .frame(height: 50)
+                                                    }
                                                 }
                                             }
                                         }
@@ -598,14 +665,13 @@ extension Tabs.Content {
                                     }
                                 }
 
-                                /// Record view link
+                                /// Records
                                 ZStack(alignment: .leading) {
                                     self.entity.backgroundColor
                                     LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
                                         .opacity(0.6)
                                         .blendMode(.softLight)
                                         .frame(height: 50)
-
                                     HStack(alignment: .top, spacing: 0) {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.company?.colour ?? Theme.rowColourAsDouble))
@@ -613,13 +679,11 @@ extension Tabs.Content {
                                         Rectangle()
                                             .foregroundStyle(Color.fromStored(self.entity.project?.colour ?? Theme.rowColourAsDouble))
                                             .frame(width: 15)
-                                        if self.records.isEmpty {
-                                            Rectangle()
-                                                .foregroundStyle(Color.fromStored(self.entity.colour ?? Theme.rowColourAsDouble))
-                                                .frame(width: 15)
-                                        }
-
-                                        HStack(spacing: 0) {
+                                        Rectangle()
+                                            .foregroundStyle(self.entity.project?.backgroundColor ?? self.entity.backgroundColor)
+                                            .frame(width: 15)
+                                        HStack {
+                                            PageConfiguration.CircleIcon(entity: .records)
                                             if self.records.isEmpty {
                                                 Text("No Records")
                                                     .opacity(0.5)
@@ -627,11 +691,17 @@ extension Tabs.Content {
                                                 NavigationLink {
                                                     RecordFilter(job: self.entity)
                                                 } label: {
-                                                    ListRow(
-                                                        name: "\(self.records.count) Records",
-                                                        colour: self.entity.backgroundColor,
-                                                        icon: "chevron.right"
-                                                    )
+                                                    ZStack {
+                                                        ListRow(
+                                                            name: self.records.count == 1 ? "1 Record" : "\(self.records.count) Records",
+                                                            colour: self.entity.backgroundColor,
+                                                            icon: "chevron.right"
+                                                        )
+                                                        LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                                            .opacity(0.6)
+                                                            .blendMode(.softLight)
+                                                            .frame(height: 50)
+                                                    }
                                                 }
                                             }
                                         }
@@ -645,6 +715,12 @@ extension Tabs.Content {
                     }
                     .id(self.id)
                     .onAppear(perform: self.actionOpenIfSelected)
+                    .onChange(of: self.isCreateNotePanelPresented) {
+                        self.actionOnChangePresentation()
+                    }
+                    .onChange(of: self.isCreateTaskPanelPresented) {
+                        self.actionOnChangePresentation()
+                    }
                 }
 
                 init(entity: Job) {
@@ -684,6 +760,24 @@ extension Tabs.Content {
                         }
                     }
                 }
+                
+                /// Fires when presentation changes
+                /// - Returns: Void
+                private func actionOnChangePresentation() -> Void {
+                    if self.isPresented {
+                        if self.isCreateNotePanelPresented {
+                            self.isCreateNoteFieldActive = true
+                        } else {
+                            self.isCreateNoteFieldActive = false
+                        }
+
+                        if self.isCreateTaskPanelPresented {
+                            self.isCreateTaskFieldActive = true
+                        } else {
+                            self.isCreateTaskFieldActive = false
+                        }
+                    }
+                }
 
                 /// Tap/click handler. Opens to show list of jobs.
                 /// - Returns: Void
@@ -695,7 +789,8 @@ extension Tabs.Content {
                 /// - Returns: Void
                 private func actionOnCreateTask() -> Void {
                     CoreDataTasks(moc: self.state.moc).create(
-                        content: self.newTaskContent,
+                        content: "",
+                        title: self.newTaskContent,
                         created: Date(),
                         due: DateHelper.endOfDay() ?? Date(),
                         job: self.entity
@@ -721,7 +816,6 @@ extension Tabs.Content {
                 }
 
                 /// Force view refresh
-                /// @TODO: may be unnecessary in later versions, confirm this still works
                 /// - Returns: Void
                 private func actionPostSave() -> Void {
                     if self.didSave {
@@ -733,9 +827,155 @@ extension Tabs.Content {
                 }
             }
 
+            struct ChecklistStack: View {
+                @EnvironmentObject private var state: AppState
+                public var entity: Job
+                @State private var isPresented: Bool = false
+                @State private var content: String = ""
+                @State private var items: [Checklist] = []
+                @State private var didSave: Bool = false
+                @State private var id: UUID = UUID()
+                @FocusState private var isFieldFocused: Bool
+
+                var body: some View {
+                    VStack(alignment: .leading, spacing: 0) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ZStack(alignment: .leading) {
+                                self.entity.backgroundColor
+                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                    .opacity(0.6)
+                                    .blendMode(.softLight)
+                                    .frame(height: 50)
+                                HStack(alignment: .center, spacing: 0) {
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.company?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    HStack {
+                                        PageConfiguration.CircleIcon(entity: .tasks)
+                                        if self.items.isEmpty {
+                                            Text("No Lists")
+                                                .opacity(0.5)
+                                        } else {
+                                            Text(self.items.count == 1 ? "1 List" : "\(self.items.count) Lists")
+                                        }
+                                    }
+                                    .padding(.leading, 8)
+                                    Spacer()
+                                    RowAddButton(icon: "plus", isPresented: self.$isPresented)
+                                }
+                            }
+                        }
+
+                        /// Quick task creator
+                        if self.isPresented {
+                            VStack(alignment: .leading, spacing: 0) {
+                                HStack(alignment: .center, spacing: 0) {
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.company?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    TextField("", text: self.$content, prompt: Text("Groceries, Camping Supplies, ...").foregroundStyle(Theme.base.opacity(0.5)), axis: .horizontal)
+                                        .submitLabel(.go)
+                                        .onSubmit {
+                                            self.actionOnCreate()
+                                            self.content = ""
+                                            withAnimation(.linear(duration: 0.2)) {
+                                                self.isPresented.toggle()
+                                            }
+                                        }
+                                        .focused(self.$isFieldFocused)
+                                        .padding()
+                                }
+                            }
+                            .background(.white)
+                            .foregroundStyle(Theme.base)
+                            .onDisappear(perform: self.actionPostSave)
+                        }
+
+                        if !self.items.isEmpty {
+                            ForEach(self.items, id: \.self) { item in
+                                Row(entity: item)
+                            }
+                        }
+                    }
+                    .id(self.id)
+                    .onAppear(perform: self.actionOnAppear)
+                }
+
+                /// Onload handler. Populates task and note lists
+                /// - Returns: Void
+                private func actionOnAppear() -> Void {
+                    if let items = self.entity.checklists?.allObjects as? [Checklist] {
+                        self.items = items
+                    }
+                }
+
+                /// Fires when creating an Entity using the quick creator
+                /// - Returns: Void
+                private func actionOnCreate() -> Void {
+                    let defaultTask: LogTask = CoreDataTasks(moc: self.state.moc).createAndReturn(
+                        content: "",
+                        title: "Edit me",
+                        created: self.state.date,
+                        due: Date.distantPast,
+                        saveByDefault: false
+                    )
+
+                    CoreDataChecklists(moc: self.state.moc).create(
+                        colour: self.entity.colour ?? Theme.rowColourAsDouble,
+                        label: self.content,
+                        overview: "",
+                        tasks: NSSet(array: [defaultTask]),
+                        jobs: [self.state.job]
+                    )
+
+                    self.didSave = true
+                }
+
+                /// Force view refresh
+                /// - Returns: Void
+                private func actionPostSave() -> Void {
+                    if self.didSave {
+                        self.id = UUID()
+                        self.isPresented.toggle()
+                    }
+
+                    self.didSave = false
+                }
+
+                private struct Row: View {
+                    typealias Button = Tabs.Content.Individual.SingleChecklist
+                    public var entity: Checklist
+
+                    var body: some View {
+                        if let jobs = self.entity.jobs?.allObjects as? [Job] {
+                            HStack(spacing: 0) {
+                                Rectangle()
+                                    .foregroundStyle(jobs.first?.project?.company?.backgroundColor ?? Theme.rowColour)
+                                    .frame(width: 15)
+                                Rectangle()
+                                    .foregroundStyle(jobs.first?.project?.backgroundColor ?? Theme.rowColour)
+                                    .frame(width: 15)
+                                Rectangle()
+                                    .foregroundStyle(jobs.first?.project?.backgroundColor ?? Theme.rowColour)
+                                    .frame(width: 15)
+                                Button(checklist: self.entity)
+                            }
+                        }
+                    }
+                }
+            }
+
             struct FourthLevel: View {
                 typealias Button = Tabs.Content.Individual.SingleTaskChecklistItem
-
                 public let entity: LogTask
                 @State private var isPresented: Bool = false
 
@@ -748,11 +988,10 @@ extension Tabs.Content {
                             .foregroundStyle(Color.fromStored(self.entity.owner?.project?.colour ?? Theme.rowColourAsDouble))
                             .frame(width: 15)
                         Rectangle()
-                            .foregroundStyle(self.entity.owner?.backgroundColor ?? Theme.rowColour)
+                            .foregroundStyle(self.entity.owner?.project?.backgroundColor ?? Theme.rowColour)
                             .frame(width: 15)
 
                         Button(task: self.entity)
-                            .border(width: 1, edges: [.bottom], color: Theme.cPurple.opacity(0.6))
                     }
                 }
 
@@ -765,7 +1004,7 @@ extension Tabs.Content {
 
             // @TODO: refactor + remove in favour of pattern defined in previous steps
             struct FourthLevelNotes: View {
-                typealias Button = Tabs.Content.Individual.SingleNote
+                typealias Button = Tabs.Content.Individual.SingleNoteDetailedLink
 
                 public let entity: Note
                 @State private var isPresented: Bool = false
@@ -779,11 +1018,10 @@ extension Tabs.Content {
                             .foregroundStyle(Color.fromStored(self.entity.mJob?.project?.colour ?? Theme.rowColourAsDouble))
                             .frame(width: 15)
                         Rectangle()
-                            .foregroundStyle(self.entity.mJob?.backgroundColor ?? Theme.rowColour)
+                            .foregroundStyle(self.entity.mJob?.project?.backgroundColor ?? Theme.rowColour)
                             .frame(width: 15)
 
                         Button(note: self.entity)
-                            .border(width: 1, edges: [.bottom], color: Theme.cPurple.opacity(0.6))
                     }
                 }
 
@@ -863,15 +1101,15 @@ extension Tabs.Content {
                     if items.count > 0 {
                         ForEach(items, id: \Company.objectID) { item in
                             Individual.SingleCompanyDetailedLink(entity: item)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No companies found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Companies")
             }
@@ -893,15 +1131,15 @@ extension Tabs.Content {
                     if items.count > 0 {
                         ForEach(items, id: \Person.objectID) { item in
                             Individual.SinglePersonDetailedLink(person: item)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No people found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("People")
             }
@@ -923,15 +1161,15 @@ extension Tabs.Content {
                     if items.count > 0 {
                         ForEach(items, id: \Project.objectID) { item in
                             Individual.SingleProjectDetailedLink(entity: item)
+                                .listRowInsets(.none)
+                                .listRowSpacing(.none)
+                                .listRowSeparator(.hidden)
                         }
                     } else {
                         StatusMessage.Warning(message: "No projects found")
                     }
                 }
                 .listStyle(.plain)
-                .listRowInsets(.none)
-                .listRowSpacing(.none)
-                .listRowSeparator(.hidden)
                 .listSectionSpacing(0)
                 .navigationTitle("Projects")
             }

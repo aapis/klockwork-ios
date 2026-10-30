@@ -32,32 +32,47 @@ struct Main: View {
     }
 
     var body: some View {
+        SuperiorTabView()
+            .tint(self.state.theme.tint)
+            .onAppear(perform: self.onApplicationBoot)
+            .environmentObject(self.state)
+            .environment(\.colorScheme, .dark) // @TODO: Added this back 02/06/26 as temp fix for text formatting issues, REMOVE eventually
+            .onChange(of: self.state.date) {
+                self.state.dueTodayCount = CoreDataTasks(moc: self.state.moc).dueToday(self.state.date).count
+            }
+    }
+
+    var body2: some View {
         TabView {
             Home(inSheet: false)
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")
                 }
+                .badge(self.state.dueTodayCount)
             Today(inSheet: false)
-            .tabItem {
-                Image(systemName: "tray")
-                Text("Today")
-            }
+                .tabItem {
+                    Image(systemName: "tray")
+                    Text("Today")
+                }
             Explore()
-            .tabItem {
-                Image(systemName: "globe.desk")
-                Text("Explore")
-            }
+                .tabItem {
+                    Image(systemName: "globe.desk")
+                    Text("Explore")
+                }
             Find()
-            .tabItem {
-                Image(systemName: "magnifyingglass")
-                Text("Find")
-            }
+                .tabItem {
+                    Image(systemName: "magnifyingglass")
+                    Text("Find")
+                }
         }
-        .preferredColorScheme(.dark) // intentionally forcing dark mode on this view for aesthetics
         .tint(self.state.theme.tint)
         .onAppear(perform: self.onApplicationBoot)
         .environmentObject(self.state)
+        .environment(\.colorScheme, .dark) // @TODO: Added this back 02/06/26 as temp fix for text formatting issues, REMOVE eventually
+        .onChange(of: self.state.date) {
+            self.state.dueTodayCount = CoreDataTasks(moc: self.state.moc).dueToday(self.state.date).count
+        }
     }
 }
 

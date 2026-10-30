@@ -22,62 +22,90 @@ struct TermDetail: View {
     public var page: PageConfiguration.AppPage = .create
 
     var body: some View {
-        VStack {
-            List {
-                Section("Term") {
-                    TextField("Name", text: $name, axis: .vertical)
-                }
-                .listRowBackground(Theme.textBackground)
+        NavigationStack {
+            VStack {
+                List {
+                    Section("Term") {
+                        TextField("Name", text: $name, axis: .vertical)
+                    }
+                    .listRowBackground(Theme.textBackground)
 
-                Section("Definitions") {
-                    ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { definition in
-                        if definition.job != nil {
-                            DefinitionLink(definition: definition)
+                    Section("Definitions") {
+                        if !self.definitions.isEmpty {
+                            ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { definition in
+                                if definition.job != nil {
+                                    DefinitionLink(definition: definition)
+                                }
+                            }
+                        } else {
+                            HStack {
+                                Spacer()
+                                Button {
+
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "plus")
+                                            .bold()
+                                    }
+                                }
+                                Spacer()
+                            }
                         }
                     }
-                }
-                .listRowBackground(Theme.textBackground)
+                    .listRowBackground(Theme.textBackground)
 
-                Section("Settings") {
-                    Toggle("Published", isOn: $alive)
-                    DatePicker(
-                        "Created",
-                        selection: $created,
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                    // @TODO: implement JobPicker as a sheet
-                }
-                .listRowBackground(Theme.textBackground)
+                    Section("Settings") {
+                        Toggle("Published", isOn: $alive)
+                        DatePicker(
+                            "Created",
+                            selection: $created,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        // @TODO: implement JobPicker as a sheet
+                    }
+                    .listRowBackground(Theme.textBackground)
 
-                if self.term != nil {
-                    Button("Delete Term", role: .destructive, action: self.actionInitiateDelete)
-                        .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
-                            Button("Yes", role: .destructive) {
-                                self.actionOnDelete()
+                    if self.term != nil {
+                        Button("Delete Term", role: .destructive, action: self.actionInitiateDelete)
+                            .alert("Are you sure?", isPresented: $isDeleteAlertPresented) {
+                                Button("Yes", role: .destructive) {
+                                    self.actionOnDelete()
+                                }
+                            } message: {
+                                Text("This term will be permanently deleted.")
                             }
-                        } message: {
-                            Text("This term will be permanently deleted.")
-                        }
-                        .listRowBackground(Color.red)
-                        .foregroundStyle(.white)
+                            .listRowBackground(Color.red)
+                            .foregroundStyle(.white)
+                    }
                 }
+                Spacer()
             }
-            Spacer()
-        }
-        .background(self.page.primaryColour)
-        .onAppear(perform: actionOnAppear)
-        .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .scrollContentBackground(.hidden)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                // Creates new entity on tap, then sends user back to Today
-                Button {
-                    self.actionOnSave()
-                } label: {
-                    Text("Save")
+            .background(self.page.primaryColour)
+            .onAppear(perform: actionOnAppear)
+            .navigationTitle(self.term != nil ? "Term" : "New Term")
+            .scrollContentBackground(.hidden)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Theme.textBackground.opacity(0.7), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .scrollDismissesKeyboard(.immediately)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        self.name = ""
+                    } label: {
+                        Text("Clear")
+                    }
+                    .disabled(self.name == "")
                 }
-                .foregroundStyle(self.state.theme.tint)
+                ToolbarItem(placement: .topBarTrailing) {
+                    // Creates new entity on tap, then sends user back to Today
+                    Button {
+                        self.actionOnSave()
+                    } label: {
+                        Text("Save")
+                    }
+                    .foregroundStyle(self.state.theme.tint)
+                }
             }
         }
     }
@@ -114,12 +142,14 @@ extension TermDetail {
             self.term!.alive = self.alive
             self.term!.definitions = NSSet(array: self.definitions)
         } else {
-//            CoreDataTaxonomyTerms(moc: self.state.moc).create(
-//                message: self.message,
-//                timestamp: self.timestamp,
-//                job: self.job,
-//                saveByDefault: false
-//            )
+            CoreDataTaxonomyTerms(moc: self.state.moc).create(
+                alive: self.alive,
+                created: self.created,
+                lastUpdate: self.created,
+                name: self.name,
+                definitions: self.definitions,
+                saveByDefault: false
+            )
         }
 
         PersistenceController.shared.save()
