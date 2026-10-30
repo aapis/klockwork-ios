@@ -17,9 +17,11 @@ struct ChecklistDetail: View {
     @State private var tasks: [LogTask] = []
     @State private var outcomes: [LogTask] = []
     @State private var colour: Color = .clear
+    @State private var jobs: [Job] = []
     @State private var isDeleteConfirmPresented: Bool = false
     @State private var isTaskSelectorPresented: Bool = false
     @State private var isOutcomeTaskSelectorPresented: Bool = false
+    @State private var isJobSelectorPresented: Bool = false
     @State private var starred: Bool = false
     public var checklist: Checklist?
     private let page: PageConfiguration.AppPage = .create
@@ -44,6 +46,18 @@ struct ChecklistDetail: View {
                     .padding()
                     .background(Theme.textBackground)
                     .clipShape(.rect(cornerRadius: 4))
+
+
+                    VStack(alignment: .leading) {
+                        Widget.JobSelector.Multi.FormField(
+                            jobs: self.$jobs,
+                            isJobSelectorPresented: self.$isJobSelectorPresented
+                        )
+                    }
+                    .padding()
+//                    .foregroundStyle(self.job?.backgroundColor.isBright() ?? false ? Theme.base : .white)
+//                    .background(self.job?.backgroundColor ?? Theme.textBackground)
+                    .clipShape(.rect(cornerRadius: 4))
                     VStack(alignment: .leading, spacing: 1) {
                         HStack {
                             Image(systemName: PageConfiguration.EntityType.tasks.iconString)
@@ -54,6 +68,7 @@ struct ChecklistDetail: View {
                                 self.tasks.append(
                                     CoreDataTasks(moc: self.state.moc).createAndReturn(content: "", title: "Edit me", created: self.state.date, due: Date.distantPast, saveByDefault: false)
                                 )
+                                self.actionOnSave(shouldDismiss: false)
                             } label: {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title2)
@@ -221,6 +236,15 @@ struct ChecklistDetail: View {
             )
             .presentationBackground(Theme.cPurple)
         }
+        .sheet(isPresented: self.$isJobSelectorPresented) {
+            Widget.JobSelector.Multi(
+                title: "Assign to Job(s)",
+                filter: .all,
+                showing: self.$isJobSelectorPresented,
+                selectedJobs: self.$jobs
+            )
+            .presentationBackground(self.page.primaryColour)
+        }
     }
 
     /// Onload handler
@@ -229,9 +253,10 @@ struct ChecklistDetail: View {
         self.colour = self.checklist?.backgroundColour ?? .clear
         self.label = self.checklist?.label ?? ""
         self.overview = self.checklist?.overview ?? ""
-        self.tasks = self.checklist?.tasks?.allObjects as? [LogTask] ?? []
-        self.outcomes = self.checklist?.outcomes?.allObjects as? [LogTask] ?? []
+        self.tasks = (self.checklist?.tasks?.allObjects as? [LogTask] ?? []).sorted(by: {$0.created ?? Date.now > $1.created ?? Date.now})
+        self.outcomes = (self.checklist?.outcomes?.allObjects as? [LogTask] ?? []).sorted(by: {$0.created ?? Date.now > $1.created ?? Date.now})
         self.starred = self.checklist?.starred ?? false
+        self.jobs = self.checklist?.jobs?.allObjects as? [Job] ?? []
     }
 
     /// Save handler. Fires when user taps Save button.
@@ -245,7 +270,8 @@ struct ChecklistDetail: View {
                 lastUpdate: Date(),
                 overview: self.overview,
                 tasks: NSSet(array: self.tasks),
-                outcomes: NSSet(array: self.outcomes)
+                outcomes: NSSet(array: self.outcomes),
+                jobs: NSSet(array: self.jobs)
             )
         } else {
             self.checklist!.colour = self.colour.toStored()
@@ -255,6 +281,7 @@ struct ChecklistDetail: View {
             self.checklist!.tasks = NSSet(array: self.tasks)
             self.checklist!.outcomes = NSSet(array: self.outcomes)
             self.checklist!.starred = self.starred
+            self.checklist!.jobs = NSSet(array: self.jobs)
 
             PersistenceController.shared.save()
         }

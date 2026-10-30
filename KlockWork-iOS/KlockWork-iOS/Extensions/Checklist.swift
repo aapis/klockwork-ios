@@ -15,4 +15,5 @@ extension Checklist {
 
         return Color.clear
     }
+    var foregroundColor: Color { self.backgroundColor.isBright() ? .black : .white }
 }

@@ -8,6 +8,95 @@
 
 import SwiftUI
 
+struct PageHeader: View {
+    public var title: String
+    public var description: String = ""
+    @AppStorage("global.showPageHeaders") private var showPageHeaders: Bool = false
+
+    var body: some View {
+        if self.showPageHeaders {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text(self.title)
+                        .font(.title2)
+                    Spacer()
+                }
+                HStack {
+                    Text(self.description)
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.lightWhite)
+                    Spacer()
+                }
+            }
+            .padding()
+            .background(
+                ZStack(alignment: .bottom) {
+                    Theme.cPurple
+                    LinearGradient(colors: [Theme.base, .clear], startPoint: .bottom, endPoint: .top)
+                        .blendMode(.softLight)
+                        .frame(height: 40)
+                }
+            )
+        }
+    }
+}
+
+struct SidebarTitle: View {
+    public var title: String
+    public var description: String = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text(self.title)
+                    .font(.body)
+                    .bold()
+                Spacer()
+            }
+            HStack {
+                Text(self.description)
+                    .font(.caption)
+                    .foregroundStyle(Theme.lightWhite)
+                Spacer()
+            }
+        }
+        .padding(8)
+        .background(Theme.lightBase.blendMode(.softLight))
+    }
+}
+
+struct DateInformation: View {
+    @EnvironmentObject private var state: AppState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("\(self.state.date.formatted(Date.FormatStyle().weekday())), \(DateHelper.todayShort(self.state.date, format: "MMMM d"))")
+                    .foregroundStyle(.white)
+                    .font(.title)
+                    .bold()
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(1)
+                Spacer()
+            }
+            HStack(alignment: .top, spacing: 0) {
+                Text(
+                    String(
+                        format: "%@.%@ %@",
+                        self.state.date.formatted(Date.FormatStyle().week(.twoDigits)),
+                        self.state.date.formatted(Date.FormatStyle().weekday(.oneDigit)),
+                        DateHelper.todayShort(self.state.date, format: "dd.MM.YYYY")
+                    )
+                )
+                .font(.caption)
+                .fontDesign(.monospaced)
+                .foregroundStyle(DateHelper.isInCurrentYear(self.state.date) ? DateHelper.isToday(self.state.date) ? .yellow : Theme.lightWhite : .gray)
+            }
+        }
+        .padding([.leading, .trailing])
+    }
+}
+
 struct Today: View {
     typealias EntityType = PageConfiguration.EntityType
     typealias PlanType = PageConfiguration.PlanType
@@ -26,24 +115,30 @@ struct Today: View {
     @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
     @FocusState private var textFieldActive: Bool
     private let page: PageConfiguration.AppPage = .today
-    
+
     var body: some View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 0) {
                 if !inSheet {
                     Header(page: self.page, path: $path)
                 }
-                switch(self.viewMode) {
-                case 1:
-                    Tabs.Content.List.HierarchyExplorer(inSheet: false)
-                case 2:
-                    Widget.ActivityCalendar(searchTerm: $text, showActivity: false)
-                case 3:
-                    Tabs.Content.Posts.Records(job: self.$job, date: self.state.date, inSheet: false)
-                case 0:
-                    main
-                default:
-                    main
+                ZStack(alignment: .topLeading) {
+                    switch(self.viewMode) {
+                    case 1:
+                        ZStack(alignment: .bottomTrailing) {
+                            Tabs.Content.List.HierarchyExplorer(inSheet: false)
+                            Home.QuickCreateWidget()
+                                .padding(.trailing)
+                                .padding(.bottom, self.state.job != nil ? 16 : 0)
+                        }
+                    case 2:
+                        Widget.ActivityCalendar(searchTerm: $text, showActivity: false)
+                    case 3:
+                        Tabs.Content.Posts.Records(job: self.$job, date: self.state.date, inSheet: false)
+                    default:
+                        main
+                    }
+                    GASidebar()
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -68,16 +163,16 @@ struct Today: View {
 
     var main: some View {
         VStack(alignment: .leading, spacing: 0) {
+            PageHeader(
+                title: "By Entity Type",
+                description: self.selected.filterDescription
+            )
             ZStack(alignment: .bottomLeading) {
                 Tabs(inSheet: inSheet, job: $job, selected: $selected)
                 if !inSheet {
-                    // @TODO: each one of these could include the create entity button, but for now it's only relevant to the Records tab
-                    if [.records, .terms].contains(where: {$0 == selected}) {
-                        Home.QuickCreateWidget()
-                            .padding(.trailing)
-                            .padding(.bottom, self.state.job != nil ? 16 : 0)
-                    }
-
+                    Home.QuickCreateWidget()
+                        .padding(.trailing)
+                        .padding(.bottom, self.state.job != nil ? 16 : 0)
                     if self.state.job != nil {
                         LinearGradient(colors: [.black, .clear], startPoint: .bottom, endPoint: .top)
                             .frame(height: 50)
@@ -119,24 +214,26 @@ extension Today {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Button {
-                        self.isCalendarPresented.toggle()
-                    } label: {
-                        Text("\(self.state.date.formatted(Date.FormatStyle().weekday())), \(DateHelper.todayShort(self.state.date, format: "MMMM dd"))")
-                            .font(.title)
-                            .bold()
-                    }
-                    .buttonStyle(.plain)
-                    Spacer()
-                }
-                .padding([.leading, .trailing])
+//                HStack {
+//                    Button {
+//                        self.isCalendarPresented.toggle()
+//                    } label: {
+//                        Text("\(self.state.date.formatted(Date.FormatStyle().weekday())), \(DateHelper.todayShort(self.state.date, format: "MMMM dd"))")
+//                            .font(.title)
+//                            .bold()
+//                    }
+//                    .buttonStyle(.plain)
+//                    Spacer()
+//                }
+//                .padding([.leading, .trailing])
+                DateInformation()
                 HStack(alignment: .top) {
-                    Text(DateHelper.todayShort(self.state.date, format: "dd/MM/YYYY"))
-                        .font(.caption)
-                        .fontDesign(.monospaced)
-                        .padding(.leading)
-                        .foregroundStyle(self.state.theme.tint)
+
+//                    Text(DateHelper.todayShort(self.state.date, format: "dd/MM/YYYY"))
+//                        .font(.caption)
+//                        .fontDesign(.monospaced)
+//                        .padding(.leading)
+//                        .foregroundStyle(self.state.theme.tint)
                     Spacer()
                     CreateEntitiesButton(isViewModeSelectorVisible: true, isForecastVisible: false, page: self.page)
                 }
@@ -196,6 +293,26 @@ extension Today {
                     self.focused = true
                 }
             })
+        }
+
+        /// Form action
+        /// - Returns: Void
+        private func actionOnSubmit() -> Void {
+            if !self.text.isEmpty {
+                if let job = self.job {
+                    let model = CoreDataRecords(moc: self.state.moc)
+                    let record = model.createWithJobAndReturn(
+                        job: job,
+                        date: Date(),
+                        text: self.text,
+                        people: self.state.today.associatedEntityStorage.person
+                    )
+
+                    model.addLinks(from: self.text, record: record)
+                    self.text = ""
+                    self.state.today.associatedEntityStorage.clear()
+                }
+            }
         }
 
         struct PersonSelector: View {
@@ -319,26 +436,6 @@ extension Today.Header {
     /// - Returns: Void
     private func actionOnCreateSheetDismissed() -> Void {
         DefaultObjects.deleteDefaultJobs()
-    }
-}
-
-extension Today.Editor {
-    /// Form action
-    /// - Returns: Void
-    private func actionOnSubmit() -> Void {
-        if !text.isEmpty {
-            if let job = self.job {
-                CoreDataRecords(moc: self.state.moc).createWithJob(
-                    job: job,
-                    date: Date(),
-                    text: text,
-                    people: self.state.today.associatedEntityStorage.person
-                )
-                text = ""
-
-                self.state.today.associatedEntityStorage.clear()
-            }
-        }
     }
 }
 

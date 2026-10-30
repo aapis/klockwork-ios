@@ -11,14 +11,14 @@ struct ProjectDetail: View {
     @EnvironmentObject private var state: AppState
     @Environment(\.dismiss) private var dismiss
     public var project: Project?
-    @AppStorage("entity.project.abbreviation") private var abbreviation: String = ""
+    @State private var abbreviation: String = ""
     @State private var alive: Bool = false
     @State private var colour: Color = .clear
     @State public var company: Company?
     @State private var jobs: [Job] = []
     @State private var createdDate: Date = Date()
     @State private var lastUpdate: Date = Date()
-    @AppStorage("entity.project.name") private var name: String = ""
+    @State private var name: String = ""
     @State private var pid: Int64 = 0
     @State private var isCompanySelectorPresent: Bool = false
     @State private var isJobSelectorPresented: Bool = false
@@ -170,6 +170,7 @@ extension ProjectDetail {
                 colour: self.colour.toStored(),
                 created: self.createdDate,
                 pid: self.pid,
+                alive: self.alive,
                 company: self.company,
                 jobs: NSSet(array: self.jobs),
                 saveByDefault: false

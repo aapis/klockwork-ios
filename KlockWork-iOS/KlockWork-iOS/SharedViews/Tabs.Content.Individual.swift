@@ -57,45 +57,80 @@ extension Tabs.Content {
         struct SingleRecordDetailedLink: View {
             @EnvironmentObject private var state: AppState
             @Environment(\.dismiss) private var dismiss
+            @Environment(\.openURL) var openURL
             public var record: LogRecord?
             public var callback: ((LogRecord?) -> Void)? = nil
             public var onActionDelete: (() -> Void)? = nil
             public var onAction: (() -> Void)? = nil
             public var inSheet: Bool = false
+            @State private var comments: [LogRecordComment] = []
+            @State private var typeButtonAction: (() -> Void) = {}
             @State private var isCompanyPresented: Bool = false
             @State private var isProjectPresented: Bool = false
             @State private var isDeleteAlertPresented: Bool = false
+            @State private var isCommentPopupShowing: Bool = false
             private let page: PageConfiguration.AppPage = .create
-            
-            var body: some View {
-                VStack(alignment: .leading, spacing: 1) {
-                    if self.record != nil {
-                        NavigationLink {
-                            RecordDetail(record: self.record)
-                                .background(self.page.primaryColour)
-                                .scrollContentBackground(.hidden)
-                        } label: {
-                            HStack(alignment: .center) {
-                                Text(self.record?.message ?? "_RECORD_CONTENT")
-                                    .multilineTextAlignment(.leading)
-                                //                                    .lineLimit(1)
-                                Spacer()
-                            }
-                            //                            .padding(.bottom, 8)
-                        }
 
-                        if self.record?.timestamp != nil {
-                            Timestamp(text: self.record!.timestamp!.formatted(date: .omitted, time: .shortened), fullWidth: false, alignment: .trailing)
-                                .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+            var body: some View {
+                HStack(alignment: .top) {
+                    if UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape {
+                        HStack {
+                            Image(systemName: self.record?.tcType.icon ?? "")
+                                .padding()
+                                .background(
+                                    LinearGradient(colors: [Theme.base, .clear], startPoint: .bottomTrailing, endPoint: .topLeading)
+                                        .opacity(0.3)
+                                )
+                                .clipShape(.rect(cornerRadius: 16))
+                        }
+                        .padding(.trailing)
+                        .blendMode(.softLight)
+                    }
+                    VStack {
+                        if self.record != nil {
+                            NavigationLink {
+                                RecordDetail(record: self.record)
+                                    .background(self.page.primaryColour)
+                                    .scrollContentBackground(.hidden)
+                            } label: {
+                                HStack(alignment: .center) {
+                                    if self.record?.job?.sensitive ?? false {
+                                        Image(systemName: "eye.slash.fill")
+                                            .blendMode(.softLight)
+                                    }
+                                    Text((self.record?.job?.sensitive ?? false) ? "Sensitive" : self.record?.message ?? "_RECORD_CONTENT")
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
+                            }
+                            if self.record?.timestamp != nil {
+                                HStack {
+                                    Timestamp(text: self.record!.timestamp!.formatted(date: .omitted, time: .shortened), fullWidth: false, alignment: .trailing)
+                                        .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                                    Text("\(self.comments.count) \(self.comments.count > 1 || self.comments.isEmpty ? "Comments" : "Comment")")
+                                        .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black.opacity(0.55) : .white.opacity(0.55))
+                                        .font(.system(.caption, design: .monospaced))
+                                        .padding(3)
+                                        .background(Theme.lightWhite.blendMode(.softLight))
+                                        .clipShape(.rect(cornerRadius: 3))
+                                }
+                            }
                         }
                     }
                 }
-//                .frame(minHeight: 45)
                 .listRowBackground(
                     Common.TypedListRowBackground(colour: (self.record?.job?.backgroundColor ?? Theme.rowColour), type: .records)
                 )
-                .foregroundStyle((self.record?.job?.backgroundColor ?? Theme.rowColour).isBright() ? .black : .white)
+                .foregroundStyle(self.record?.job?.foregroundColor ?? Theme.base)
                 .onAppear(perform: self.actionOnAppear)
+                .swipeActions(edge: .leading) {
+                    Button {
+                        self.isCommentPopupShowing = true
+                    } label: {
+                        Image(systemName: "bubble.left.fill")
+                    }
+                    .tint(.blue)
+                }
                 .swipeActions(edge: .trailing) {
                     Button {
                         self.actionOnSoftDelete()
@@ -125,6 +160,9 @@ extension Tabs.Content {
                         Image(systemName: "trash")
                     }
                     .tint(.red)
+                }
+                .sheet(isPresented: self.$isCommentPopupShowing) {
+                    CommentDetail()
                 }
                 // @TODO: after converting to list, these fire whenever the row is tapped. fix that and re-enable this functionality
 //                .sheet(isPresented: $isCompanyPresented) {
@@ -164,8 +202,9 @@ extension Tabs.Content {
             /// Onload handler. Sets state vars isCompleted and isCancelled to default state
             /// - Returns: Void
             private func actionOnAppear() -> Void {
-//                self.isCompleted = self.task.completedDate != nil
-//                self.isCancelled = self.task.cancelledDate != nil
+                if let record = self.record {
+                    self.comments = CoreDataRecords(moc: self.state.moc).commentsForRecord(record)
+                }
             }
 
             /// Save handler. Saves completed or cancelled status for the given task.
@@ -449,11 +488,16 @@ extension Tabs.Content {
                     NavigationLink {
                         JobDetail(job: job)
                     } label: {
-                        HStack(alignment: .center) {
+                        VStack(alignment: .leading, spacing: 0) {
                             Text(job?.title ?? job?.jid.string ?? "Job title")
                                 .lineLimit(1)
-
-                            Spacer()
+                                .bold()
+                            if let overview = self.job?.overview {
+                                Text(overview)
+                                    .lineLimit(1)
+                                    .font(.caption)
+                                    .foregroundStyle(self.job?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite)
+                            }
                         }
                         .padding(.bottom, 8)
                     }
@@ -615,10 +659,16 @@ extension Tabs.Content {
                     Button {
                         if let cb = self.callback { cb(self.job ?? nil) }
                     } label: {
-                        HStack(alignment: .center) {
+                        VStack(alignment: .leading, spacing: 0) {
                             Text(job?.title ?? job?.jid.string ?? "Job title")
                                 .lineLimit(1)
-                            Spacer()
+                                .bold()
+                            if let overview = self.job?.overview {
+                                Text(overview)
+                                    .lineLimit(1)
+                                    .font(.caption)
+                                    .foregroundStyle(self.job?.backgroundColor.isBright() ?? false ? Theme.lightBase : Theme.lightWhite)
+                            }
                         }
                         .padding(.bottom, 8)
                     }
@@ -1309,7 +1359,7 @@ extension Tabs.Content {
                     }
                     .font(.title2)
                     .bold()
-                    .foregroundStyle(self.isComplete || self.isCancelled ? Theme.lightWhite : self.checklist.backgroundColour)
+                    .foregroundStyle(self.isComplete || self.isCancelled ? Theme.lightWhite : self.checklist.backgroundColour.isBright() ? Theme.base : self.checklist.backgroundColour)
                     .padding()
                     .background(self.bgColour)
                 }
@@ -1635,6 +1685,25 @@ extension Tabs.Content {
 //                isCompleted.toggle()
 //                self.actionOnSave()
 //                if let cb = callback { cb() }
+            }
+        }
+
+        struct SingleChecklist: View {
+            public let checklist: Checklist
+
+            var body: some View {
+                NavigationLink {
+                    Widget.Tasks.ChecklistView(checklist: self.checklist, inSheet: false)
+                        .background(Theme.cPurple)
+                        .scrollContentBackground(.hidden)
+                } label: {
+                    ListRow(
+                        name: self.checklist.label ?? "_LABEL",
+                        colour: self.checklist.colour != nil ? Color.fromStored(self.checklist.colour ?? Theme.rowColourAsDouble) : Theme.rowColour,
+                        icon: "chevron.right"
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
 

@@ -35,8 +35,11 @@
 		536129A12E136B2B0006B0FC /* CDSavedSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536129A02E136B2B0006B0FC /* CDSavedSearch.swift */; };
 		536B32B22C1A03BB00E01517 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536B32B12C1A038E00E01517 /* AppState.swift */; };
 		536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 536E4F682C0D77A600FDC1F4 /* ActionType.swift */; };
+		53704713308D42B3003F2D3B /* LogRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53704712308D42AE003F2D3B /* LogRecord.swift */; };
+		53704715308D47B0003F2D3B /* LinkContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53704714308D47B0003F2D3B /* LinkContextMenu.swift */; };
+		53704717308D4840003F2D3B /* StringHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53704716308D4840003F2D3B /* StringHelper.swift */; };
+		53704746308D781C003F2D3B /* CommentDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53704745308D7817003F2D3B /* CommentDetail.swift */; };
 		53713E362C94CFA9006C244D /* DateStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53713E352C94CFA6006C244D /* DateStrip.swift */; };
-		53713E382C94D805006C244D /* AddButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53713E372C94D7FB006C244D /* AddButton.swift */; };
 		53713E3A2C94D816006C244D /* ViewModeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53713E392C94D813006C244D /* ViewModeSelector.swift */; };
 		53733D512C851CF500212DD6 /* Logo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53733D502C851CF200212DD6 /* Logo.swift */; };
 		537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582CB2BFFD70D00CB528C /* RecordDetail.swift */; };
@@ -45,6 +48,10 @@
 		537582D72C004A9600CB528C /* StatusMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537582D62C004A9600CB528C /* StatusMessage.swift */; };
 		53776C5A2F32DB8500021705 /* OmniCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53776C592F32DB7D00021705 /* OmniCreator.swift */; };
 		53776C602F33038B00021705 /* BetaLaunch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 53776C5F2F33038B00021705 /* BetaLaunch.storyboard */; };
+		53784CAC3093C1860034F789 /* GACalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53784CAB3093C1860034F789 /* GACalendar.swift */; };
+		53784CAE3093C6210034F789 /* EntitiesInRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53784CAD3093C60E0034F789 /* EntitiesInRange.swift */; };
+		53784CB03093CB6E0034F789 /* GADateNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53784CAF3093CB600034F789 /* GADateNavigation.swift */; };
+		53784CB23093CED70034F789 /* GASidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53784CB13093CED10034F789 /* GASidebar.swift */; };
 		5380795F2C1CF6B100B97D55 /* PageActionBar.Create.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5380795E2C1CF6AA00B97D55 /* PageActionBar.Create.swift */; };
 		538328682C1BE8B900105B14 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538328672C1BE8B000105B14 /* ErrorView.swift */; };
 		5387AE892C0143D100EEC581 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5387AE882C0143D100EEC581 /* SearchBar.swift */; };
@@ -190,8 +197,11 @@
 		536129A02E136B2B0006B0FC /* CDSavedSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CDSavedSearch.swift; path = ../../KlockWork/KWCore/Sources/Query/CDSavedSearch.swift; sourceTree = "<group>"; };
 		536B32B12C1A038E00E01517 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		536E4F682C0D77A600FDC1F4 /* ActionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionType.swift; sourceTree = "<group>"; };
+		53704712308D42AE003F2D3B /* LogRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogRecord.swift; sourceTree = "<group>"; };
+		53704714308D47B0003F2D3B /* LinkContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkContextMenu.swift; sourceTree = "<group>"; };
+		53704716308D4840003F2D3B /* StringHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringHelper.swift; sourceTree = "<group>"; };
+		53704745308D7817003F2D3B /* CommentDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentDetail.swift; sourceTree = "<group>"; };
 		53713E352C94CFA6006C244D /* DateStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateStrip.swift; sourceTree = "<group>"; };
-		53713E372C94D7FB006C244D /* AddButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddButton.swift; sourceTree = "<group>"; };
 		53713E392C94D813006C244D /* ViewModeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModeSelector.swift; sourceTree = "<group>"; };
 		53733D502C851CF200212DD6 /* Logo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logo.swift; sourceTree = "<group>"; };
 		537582CB2BFFD70D00CB528C /* RecordDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDetail.swift; sourceTree = "<group>"; };
@@ -202,6 +212,10 @@
 		537582D62C004A9600CB528C /* StatusMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusMessage.swift; sourceTree = "<group>"; };
 		53776C592F32DB7D00021705 /* OmniCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniCreator.swift; sourceTree = "<group>"; };
 		53776C5F2F33038B00021705 /* BetaLaunch.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BetaLaunch.storyboard; sourceTree = "<group>"; };
+		53784CAB3093C1860034F789 /* GACalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GACalendar.swift; sourceTree = "<group>"; };
+		53784CAD3093C60E0034F789 /* EntitiesInRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitiesInRange.swift; sourceTree = "<group>"; };
+		53784CAF3093CB600034F789 /* GADateNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GADateNavigation.swift; sourceTree = "<group>"; };
+		53784CB13093CED10034F789 /* GASidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GASidebar.swift; sourceTree = "<group>"; };
 		5380795E2C1CF6AA00B97D55 /* PageActionBar.Create.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageActionBar.Create.swift; sourceTree = "<group>"; };
 		538328672C1BE8B000105B14 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		5387AE882C0143D100EEC581 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
@@ -345,7 +359,6 @@
 				534BDEFF2F5109DA00B3B525 /* Widget.Dates.swift */,
 				534BDEF92F50E40B00B3B525 /* Widget.Tasks.swift */,
 				53713E392C94D813006C244D /* ViewModeSelector.swift */,
-				53713E372C94D7FB006C244D /* AddButton.swift */,
 				53713E352C94CFA6006C244D /* DateStrip.swift */,
 				53B58C7D2C93EDEC004F5DB7 /* CreateEntitiesButton.swift */,
 				53B58C7B2C93EC65004F5DB7 /* TaskForecast.swift */,
@@ -373,6 +386,7 @@
 		53274B3A2C13C7DB008387BF /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				53704712308D42AE003F2D3B /* LogRecord.swift */,
 				5349F30B2F5A568D0001AABA /* LogTask.swift */,
 				534BDEFD2F5100B600B3B525 /* Checklist.swift */,
 				53913B822F49442400B6173D /* Person.swift */,
@@ -394,6 +408,10 @@
 		537582D32C00338E00CB528C /* SharedViews */ = {
 			isa = PBXGroup;
 			children = (
+				53784CAF3093CB600034F789 /* GADateNavigation.swift */,
+				53784CAD3093C60E0034F789 /* EntitiesInRange.swift */,
+				53784CAB3093C1860034F789 /* GACalendar.swift */,
+				53704714308D47B0003F2D3B /* LinkContextMenu.swift */,
 				53388FD52F3BBC5B00588B4D /* SuperiorTabView.swift */,
 				53C84F882ECA646A00CBD1E5 /* Tabs.Content.Posts.swift */,
 				530C8D1F2C1BE87600ED3AD1 /* Error */,
@@ -521,6 +539,7 @@
 		53D4CB552BFE930100AFEDEA /* KlockWork-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				53704716308D4840003F2D3B /* StringHelper.swift */,
 				53274B3A2C13C7DB008387BF /* Extensions */,
 				53E3A26F2C098DEE004A85C3 /* Forms */,
 				539135012C03EF0300B48494 /* Libraries */,
@@ -549,6 +568,7 @@
 		53D4CB6F2BFE93B000AFEDEA /* Pages */ = {
 			isa = PBXGroup;
 			children = (
+				53784CB13093CED10034F789 /* GASidebar.swift */,
 				5306A7DC2E0A085900B4C878 /* Home.swift */,
 				53147EBC2C72A52F008850A9 /* Activities */,
 				538A535F2C72765F00711639 /* Explore */,
@@ -563,6 +583,7 @@
 		53D4CB752BFE93B000AFEDEA /* Detail */ = {
 			isa = PBXGroup;
 			children = (
+				53704745308D7817003F2D3B /* CommentDetail.swift */,
 				534BDEFB2F50F3BF00B3B525 /* ChecklistDetail.swift */,
 				53B72B5B2C77DDE600324E15 /* DefinitionDetail.swift */,
 				538A53512C6FF1C200711639 /* TermDetail.swift */,
@@ -735,7 +756,6 @@
 				53E50C1B2C0E635A00A85FDC /* Factors.swift in Sources */,
 				53274B352C1214E0008387BF /* LegendLabel.swift in Sources */,
 				537582CE2BFFEB7500CB528C /* EdgeBorder.swift in Sources */,
-				53713E382C94D805006C244D /* AddButton.swift in Sources */,
 				53C518402C9CF56B00E2BB2E /* Tabs.Content.List.swift in Sources */,
 				5380795F2C1CF6B100B97D55 /* PageActionBar.Create.swift in Sources */,
 				538A10332C31C7D70028B785 /* RowAddButton.swift in Sources */,
@@ -757,6 +777,7 @@
 				53F926302BFEA00E00948076 /* View.swift in Sources */,
 				53147EBE2C72A53A008850A9 /* FlashcardActivity.swift in Sources */,
 				53E50C1D2C0E638100A85FDC /* Factor.swift in Sources */,
+				53784CB03093CB6E0034F789 /* GADateNavigation.swift in Sources */,
 				53F926312BFEA00E00948076 /* Date.swift in Sources */,
 				53E50C232C0FED0800A85FDC /* PlanTabs.swift in Sources */,
 				534BDEFC2F50F3C300B3B525 /* ChecklistDetail.swift in Sources */,
@@ -784,12 +805,14 @@
 				53274B332C120C5B008387BF /* ButtonAction.swift in Sources */,
 				53F9260B2BFE9BF300948076 /* CoreDataPerson.swift in Sources */,
 				53F9260C2BFE9BF300948076 /* CoreDataPlan.swift in Sources */,
+				53704746308D781C003F2D3B /* CommentDetail.swift in Sources */,
 				53F9260D2BFE9BF300948076 /* CoreDataProjectConfiguration.swift in Sources */,
 				5324416F2C067F5D00659F14 /* Assessment.swift in Sources */,
 				53E6974E2C23ABB0005A7375 /* ProjectSelector.swift in Sources */,
 				53B2C3692C1F7D65003507CE /* DefaultObjects.swift in Sources */,
 				5324416D2C06485800659F14 /* ActivityCalendar.swift in Sources */,
 				5311F4022C17BFFF00FB3071 /* AssessmentThresholdForm.swift in Sources */,
+				53704715308D47B0003F2D3B /* LinkContextMenu.swift in Sources */,
 				53F9260E2BFE9BF300948076 /* CoreDataProjects.swift in Sources */,
 				53F9260F2BFE9BF400948076 /* CoreDataRecords.swift in Sources */,
 				53F926102BFE9BF400948076 /* CoreDataTasks.swift in Sources */,
@@ -817,6 +840,7 @@
 				536E4F692C0D77A600FDC1F4 /* ActionType.swift in Sources */,
 				539134F22C03879E00B48494 /* Find.swift in Sources */,
 				53D4CB872BFE93B000AFEDEA /* Notes.swift in Sources */,
+				53704713308D42B3003F2D3B /* LogRecord.swift in Sources */,
 				53D4CB7F2BFE93B000AFEDEA /* Today.swift in Sources */,
 				5311F4002C17A03D00FB3071 /* Widget.swift in Sources */,
 				53D4CB7B2BFE93B000AFEDEA /* Main.swift in Sources */,
@@ -824,6 +848,7 @@
 				537582D72C004A9600CB528C /* StatusMessage.swift in Sources */,
 				53D4CB572BFE930100AFEDEA /* KlockWork_iOSApp.swift in Sources */,
 				53E50C1F2C0E6ABE00A85FDC /* Rainbow.swift in Sources */,
+				53784CB23093CED70034F789 /* GASidebar.swift in Sources */,
 				532441682C0531C800659F14 /* Rollups.swift in Sources */,
 				539134F62C039F2600B48494 /* People.swift in Sources */,
 				5311F3FD2C179CC100FB3071 /* DataExplorer.swift in Sources */,
@@ -838,13 +863,16 @@
 				53C518442C9CF5CB00E2BB2E /* Tabs.Content.Common.swift in Sources */,
 				53D4CB862BFE93B000AFEDEA /* Jobs.swift in Sources */,
 				53D4CB7D2BFE93B000AFEDEA /* Explore.swift in Sources */,
+				53784CAC3093C1860034F789 /* GACalendar.swift in Sources */,
 				53E50C192C0E61DB00A85FDC /* Legend.swift in Sources */,
 				539C36152F4EA86B00C87C48 /* ChecklistActivity.swift in Sources */,
 				539134EE2C028F6900B48494 /* ProjectDetail.swift in Sources */,
 				539134F82C039F3100B48494 /* Records.swift in Sources */,
 				538A534C2C6FE8DA00711639 /* TermFilter.swift in Sources */,
+				53784CAE3093C6210034F789 /* EntitiesInRange.swift in Sources */,
 				53E6974C2C23ABA7005A7375 /* CompanySelector.swift in Sources */,
 				537582CC2BFFD70D00CB528C /* RecordDetail.swift in Sources */,
+				53704717308D4840003F2D3B /* StringHelper.swift in Sources */,
 				53B72B5C2C77DDE900324E15 /* DefinitionDetail.swift in Sources */,
 				534BDF002F5109F500B3B525 /* Widget.Dates.swift in Sources */,
 				5311F3F92C1794FD00FB3071 /* PageActionBar.Planning.swift in Sources */,
@@ -990,7 +1018,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1010,8 +1038,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = BetaLaunch.storyboard;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -1035,7 +1062,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "KlockWork-iOS/KlockWork_iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"KlockWork-iOS/Preview Content\"";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1055,8 +1082,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = BetaLaunch.storyboard;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";

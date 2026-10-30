@@ -7,16 +7,14 @@
 
 import SwiftUI
 
-struct PageConfiguration {
+public struct PageConfiguration {
     let entityType: EntityType
     let planType: PlanType
 
     var description: String {
         return "Entity"
     }
-}
 
-extension PageConfiguration {
     enum PlanType: CaseIterable, Equatable {
         case daily, feature, upcoming, overdue
 
@@ -61,7 +59,7 @@ extension PageConfiguration {
         }
     }
 
-    enum EntityType: CaseIterable, Equatable {
+    public enum EntityType: CaseIterable, Equatable {
         case records, tasks, notes, people, companies, projects, jobs, terms
 
         /// Interface-friendly representation
@@ -145,6 +143,27 @@ extension PageConfiguration {
             case .projects: "folder.fill"
             case .jobs: "hammer.fill"
             case .terms: "list.bullet.rectangle.fill"
+            }
+        }
+
+        var filterDescription: String {
+            switch self {
+            case .records:
+                "Records and comments made on records on the selected date."
+            case .tasks:
+                "All open tasks, sorted by due date."
+            case .notes:
+                "Your favourite notes, followed by everything else, alphabetically."
+            case .people:
+                "All people, alphabetically."
+            case .companies:
+                "All companies, alphabetically."
+            case .projects:
+                "All projects, alphabetically."
+            case .jobs:
+                "The currently selected job, your favourites, and any you've interacted with recently."
+            case .terms:
+                "All terms for the selected job."
             }
         }
     }

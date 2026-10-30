@@ -28,6 +28,7 @@ struct Home: View {
     @AppStorage("home.backgroundWallpaper") public var homeWallpaper: String = ""
     @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
     @AppStorage("today.viewMode") private var viewMode: Int = 0
+    @AppStorage("recordBlock.isSidebarShowing") private var isSidebarShowing: Bool = false
     public var inSheet: Bool
     private let page: PageConfiguration.AppPage = .today
 
@@ -38,12 +39,14 @@ struct Home: View {
                     Header(page: self.page, path: $path)
                 }
                 Divider().background(.white).frame(height: 1)
-
-                switch(self.viewMode) {
-                case 2:
-                    Widget.ActivityCalendar(searchTerm: $text, showActivity: false)
-                default:
-                    Tabs(inSheet: self.inSheet, job: self.$job, selected: self.$selected, mode: .dashboard)
+                ZStack(alignment: .topLeading) {
+                    switch(self.viewMode) {
+                    case 2:
+                        Widget.ActivityCalendar(searchTerm: self.$text, showActivity: false)
+                    default:
+                        Tabs(inSheet: self.inSheet, job: self.$job, selected: self.$selected, mode: .dashboard)
+                    }
+                    GASidebar()
                 }
             }
             .background(
@@ -52,6 +55,7 @@ struct Home: View {
                         self.backgroundColour
                     } else {
                         Image("wallpaper-\(self.homeWallpaper)")
+//                            .resizable(resizingMode: .tile) // @TODO: Works, but needs more testing
                     }
                 }
                 .ignoresSafeArea(.all)
@@ -68,21 +72,20 @@ struct Home: View {
         }
     }
 
-    var main: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ZStack(alignment: .bottom) {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading) {
-                        Home.QuickAccessTabs()
-                            .padding(.top, 8)
-                        Home.QuickHistory()
-                        Home.TaskFilters()
-                        Widget.Tasks.DailyOverview()
-                    }
-                }
-                Home.QuickCreateWidget()
-            }
-            .padding([.leading, .bottom, .trailing], 8)
+    /// Fires when view appears or some settings are changed
+    /// - Returns: Void
+    private func actionOnAppear() -> Void {
+        self.isSidebarShowing = false
+
+        switch self.homeBackgroundColourChoice {
+        case -1: self.backgroundColour = Color.iOSBetaBg
+        case 0: self.backgroundColour = Theme.cOrange
+        case 1: self.backgroundColour = Theme.cPurple
+        case 2: self.backgroundColour = Theme.cGreen
+        case 3: self.backgroundColour = Theme.cRoyal
+        case 4: self.backgroundColour = Theme.cRed
+        case 5: self.backgroundColour = Theme.slate
+        default: self.backgroundColour = Theme.cOrange
         }
     }
 }
@@ -104,31 +107,10 @@ extension Home {
                         .opacity(0.2)
                         .blendMode(.softLight)
                         .frame(height: 45)
-
-                    HStack(spacing: 0) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            HStack {
-                                Button {
-                                    self.isCalendarPresented.toggle()
-                                } label: {
-                                    Text("\(self.state.date.formatted(Date.FormatStyle().weekday())), \(DateHelper.todayShort(self.state.date, format: "MMMM dd"))")
-                                        .font(.title)
-                                        .bold()
-                                        .multilineTextAlignment(.leading)
-                                }
-                                .buttonStyle(.plain)
-                                .padding([.leading, .trailing])
-                                Spacer()
-                            }
-                            HStack(alignment: .top, spacing: 0) {
-                                Text(DateHelper.todayShort(self.state.date, format: "dd/MM/YYYY"))
-                                    .font(.caption)
-                                    .fontDesign(.monospaced)
-                                    .padding([.leading, .bottom])
-                                    .foregroundStyle(self.state.theme.tint)
-                                Spacer()
-                            }
-                        }
+                    HStack {
+                        DateInformation()
+                            .padding(.bottom)
+                        Spacer()
                     }
                 }
             }
@@ -162,12 +144,20 @@ extension Home {
         public var infoView: AnyView? = nil
         public var des: Int = 0 // @TODO: delete entirely
         public var help: String? = nil
+        @AppStorage("recordBlock.isSidebarShowing") private var isSidebarShowing: Bool = false
 
         var body: some View {
             NavigationLink {
                 PlanTabs.RecordsByPredicate(predicate: self.predicate)
                     .navigationTitle(self.label)
                     .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button {
+                                self.isSidebarShowing.toggle()
+                            } label: {
+                                Image(systemName: "sidebar.leading")
+                            }
+                        }
                         ToolbarItem(placement: .topBarTrailing) {
                             if let view = self.infoView {
                                 NavigationLink {
@@ -435,7 +425,7 @@ extension Home {
                             }
                         }
                     }
-                    .frame(height: 130)
+                    .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
 
                     VStack(alignment: .leading, spacing: 1) {
@@ -475,7 +465,7 @@ extension Home {
             .padding(4)
             .background(
                 ZStack {
-                    self.state.job?.backgroundColor ?? Theme.textBackground
+                    self.state.job?.backgroundColor ?? Theme.cPurple
                     LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                 }
             )
@@ -564,7 +554,6 @@ extension Home {
                 }
                 .font(.caption)
                 .padding(4)
-//                .frame(height: 130)
                 .background(
                     ZStack {
                         self.state.job?.backgroundColor ?? Theme.textBackground
@@ -613,7 +602,7 @@ extension Home {
                 .padding(4)
                 .background(
                     ZStack {
-                        self.state.job?.backgroundColor ?? Theme.textBackground
+                        self.state.job?.backgroundColor ?? Theme.cPurple
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -910,6 +899,7 @@ extension Home {
         struct FavouriteThisJob: View {
             @EnvironmentObject private var state: AppState
             @State private var starred: Bool = false
+            @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
 
             var body: some View {
                 Button {
@@ -924,6 +914,7 @@ extension Home {
                     }
                     .padding(4)
                     .background(Theme.textBackground)
+                    .font(self.isBig ? .body : .caption)
                 }
                 .buttonStyle(.plain)
                 .onAppear(perform: self.actionOnAppear)
@@ -1000,6 +991,7 @@ extension Home {
             @EnvironmentObject private var state: AppState
             public let job: Job
             public var icon: String = "hammer.circle.fill"
+            @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
 
             var body: some View {
                 Button {
@@ -1020,7 +1012,7 @@ extension Home {
                                 .font(.caption)
                         }
                     }
-                    .font(.caption)
+                    .font(self.isBig ? .body :  .caption)
                     .padding(4)
                     .background(self.job.backgroundColor)
                     .foregroundStyle(self.job.backgroundColor.isBright() ? Theme.base : .white)
@@ -1037,6 +1029,7 @@ extension Home {
             public var colour: Color = Theme.textBackground
             public var iconColour: Color? = nil
             public var callback: AnyView? = nil
+            @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
 
             var body: some View {
                 NavigationLink {
@@ -1061,7 +1054,7 @@ extension Home {
                             Image(systemName: "chevron.right")
                         }
                     }
-                    .font(.caption)
+                    .font(self.isBig ? .body :  .caption)
                     .padding(4)
                     .background(self.colour)
                 }
@@ -1077,6 +1070,7 @@ extension Home {
             public var colour: Color = Theme.textBackground
             public var iconColour: Color? = nil
             public var callback: (() -> Void)?
+            @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
 
             var body: some View {
                 Button {
@@ -1101,7 +1095,7 @@ extension Home {
 //                            Image(systemName: "chevron.right")
 //                        }
                     }
-                    .font(.caption)
+                    .font(self.isBig ? .body :  .caption)
                     .padding(4)
                     .background(self.colour)
                 }
@@ -1121,6 +1115,8 @@ extension Home {
                     Spacer()
                 }
                 HStack(spacing: 0) {
+                    SidebarToggle()
+                    Divider().background(Theme.base).frame(width: 1)
                     AddButton(plain: false)
                     // Button action doesn't always fire properly in this context so hiding it there for now
                     if !self.isGuestView {
@@ -1137,14 +1133,102 @@ extension Home {
             }
         }
 
+        // MARK: Home.QuickCreateWidget.SidebarToggle
+        struct SidebarToggle: View {
+            @EnvironmentObject private var state: AppState
+            @AppStorage("recordBlock.isSidebarShowing") private var isSidebarShowing: Bool = false
+
+            var body: some View {
+                Button {
+                    self.isSidebarShowing.toggle()
+                } label: {
+                    Image(systemName: "sidebar.leading")
+                }
+                .buttonStyle(.plain)
+                .font(.title3)
+                .bold()
+                .frame(height: 40)
+                .padding([.leading, .trailing], 14)
+                .background(
+                    ZStack(alignment: .leading) {
+                        (self.isSidebarShowing ? Theme.cPurple : self.state.theme.tint)
+                        LinearGradient(colors: [.white, .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            .blendMode(.softLight)
+                        LinearGradient(colors: [Theme.base, .clear], startPoint: .leading, endPoint: .trailing)
+                            .blendMode(.softLight)
+                            .frame(width: 15)
+                    }
+                )
+                .foregroundStyle(
+                    .linearGradient(colors: [self.isSidebarShowing ? self.state.theme.tint : Theme.base, self.isSidebarShowing ? self.state.theme.tint : Theme.cPurple], startPoint: .top, endPoint: .bottom)
+                )
+            }
+        }
+
+        // MARK: Home.QuickCreateWidget.AddButton
+        struct AddButton: View {
+            typealias Entity = PageConfiguration.EntityType
+            @Environment(\.dismiss) private var dismiss
+            @EnvironmentObject private var state: AppState
+            public var plain: Bool = true
+            @State private var isCreatePanelShowing: Bool = false
+            @State private var confirmIntendedToDismiss: Bool = false
+            @AppStorage("recordBlock.isSidebarShowing") private var isSidebarShowing: Bool = false
+
+            var body: some View {
+                VStack(alignment: .leading) {
+                    Button {
+                        self.isSidebarShowing = false
+                        self.isCreatePanelShowing.toggle()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundStyle(
+                                .linearGradient(colors: [self.isCreatePanelShowing ? self.state.theme.tint : Theme.base, self.isCreatePanelShowing ? self.state.theme.tint : Theme.cPurple], startPoint: .top, endPoint: .bottom)
+                            )
+                            .font(.title2)
+                            .bold()
+                            .frame(height: 40)
+                            .padding([.leading, .trailing])
+                            .background(
+                                ZStack {
+                                    self.isCreatePanelShowing ? Theme.cPurple : self.state.theme.tint
+                                    if !self.plain {
+                                        LinearGradient(colors: [.white, .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                            .blendMode(.softLight)
+                                    }
+                                }
+                            )
+                    }
+                }
+                .sheet(isPresented: self.$isCreatePanelShowing, onDismiss: self.actionDidSheetDismiss) {
+                    OmniCreator()
+                }
+                .alert("You may have unsaved data, are you sure?", isPresented: self.$confirmIntendedToDismiss) {
+                    Button("Confirm", role: .destructive) {
+                        self.confirmIntendedToDismiss = false
+                    }
+                    Button("Cancel", role: .cancel) {
+                        self.isCreatePanelShowing = true
+                    }
+                }
+            }
+
+            private func actionDidSheetDismiss() -> Void {
+                // @TODO: this works, but may be unnecessary since field data is saved anyways
+        //        self.confirmIntendedToDismiss = true
+            }
+        }
+
         struct ResetButton: View {
             @EnvironmentObject private var state: AppState
             @State private var backgroundColour: Color = Theme.cOrange
             @State private var isJobSelectorPresented: Bool = false
             @State private var job: Job? = nil // @TODO: refactor code that requires this
+            @AppStorage("recordBlock.isSidebarShowing") private var isSidebarShowing: Bool = false
 
             var body: some View {
                 Button {
+                    self.isSidebarShowing = false
                     if self.state.job != nil {
                         self.state.job = nil
                         self.state.date = Date.now
@@ -1268,6 +1352,9 @@ extension Home {
     struct RecordFilters: View {
         @EnvironmentObject private var state: AppState
         @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+        @State private var isBig: Bool = UIDevice.current.model == "iPad"
+        @State private var isWide: Bool = UIDevice.current.orientation.isLandscape
+        @State private var orientation: UIDeviceOrientation = UIDevice.current.orientation
 
         var body: some View {
             VStack(alignment: .leading) {
@@ -1278,84 +1365,122 @@ extension Home {
                 )
                 .padding([.leading, .top], 4)
 
-                VStack(alignment: .leading, spacing: 1) {
-                    ScrollView(.vertical) {
-                        VStack(spacing: 1) {
-                            if let job = self.state.job {
-                                RecordBlock(
-                                    colour: .indigo,
-                                    fgColour: Theme.base,
-                                    label: job.titleOrId(),
-                                    icon: "hammer.circle.fill",
-                                    predicate: NSPredicate(
-                                        format: "job == %@ && alive == true",
-                                        job as CVarArg
-                                    ),
-                                    infoView: AnyView(Home.DetailedInformation()),
-                                    des: 1,
-                                    help: "~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")/\(job.titleOrId())"
-                                )
-                                if let project = job.project {
-                                    RecordBlock(
-                                        colour: project.backgroundColor,
-                                        fgColour: project.backgroundColor.isBright() ? Theme.base : .white,
-                                        label: "\(project.name ?? "_PROJECT")",
-                                        icon: "folder.circle.fill",
-                                        predicate: NSPredicate(
-                                            format: "job.project == %@ && alive == true",
-                                            project as CVarArg
-                                        ),
-                                        infoView: AnyView(Home.DetailedInformation()),
-                                        des: 1,
-                                        help: "~/\(project.company?.abbreviation ?? "_COMPANY")/\(project.abbreviation ?? "_PROJECT")"
-                                    )
-                                    if let company = project.company {
-                                        RecordBlock(
-                                            colour: company.backgroundColor,
-                                            fgColour: company.backgroundColor.isBright() ? Theme.base : .white,
-                                            label: "\(company.name ?? "_COMPANY")",
-                                            icon: "building.2.crop.circle.fill",
-                                            predicate: NSPredicate(
-                                                format: "job.project.company == %@ && alive == true",
-                                                company as CVarArg,
-                                            ),
-                                            infoView: AnyView(Home.DetailedInformation()),
-                                            des: 1,
-                                            help: "~/\(company.abbreviation ?? "_COMPANY")"
-                                        )
-                                    }
-                                }
-                            }
-                            RecordBlock(
-                                colour: .indigo,
-                                fgColour: Theme.base,
-                                label: "\(DateHelper.todayShort(DateHelper.daysAhead(-14, from: self.state.date), format: "MMM dd")) - \(DateHelper.todayShort(self.state.date, format: "MMM dd"))",
-                                icon: "triangle.circle.fill",
-                                predicate: NSPredicate(
-                                    format: "timestamp > %@ && timestamp <= %@",
-                                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
-                                    DateHelper.endOfDay(self.state.date)! as CVarArg
-                                ),
-                                infoView: AnyView(Home.DetailedInformation()),
-                                des: 1,
-                                help: "Published only"
-                            )
-                            .foregroundStyle(Theme.lightWhite)
-                        }
-                        .font(.caption)
-                        Spacer()
-                    }
-                    .frame(maxHeight: 130)
+                if self.isBig {
+//                    if self.isWide {
+//                        Columns(count: 3, view: AnyView(self.filters))
+//                    } else {
+//                        Columns(count: 2, view: AnyView(self.filters))
+//                    }
+                    Columns(count: 2, view: AnyView(self.filters))
+                } else {
+                    self.main
                 }
             }
             .padding(4)
             .background(
                 ZStack {
-                    (self.state.job?.backgroundColor ?? Theme.textBackground)
+                    (self.state.job?.backgroundColor ?? Theme.cPurple)
                     LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: 4))
+            .onChange(of: self.orientation) {
+                self.isWide = UIDevice.current.orientation.isLandscape
+                self.isBig = UIDevice.current.model == "iPad"
+                print("DERPO rwide=\(self.isWide)")
+            }
+        }
+
+        var main: some View {
+            VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 1) {
+                    ScrollView(.vertical) {
+                        VStack(spacing: 4) {
+                            self.filters
+                        }
+                        Spacer()
+                    }
+                    .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
+                }
+            }
+        }
+
+        @ViewBuilder private var filters: some View {
+            if let job = self.state.job {
+                if let company = self.state.job?.project?.company {
+                    RecordBlock(
+                        colour: company.backgroundColor,
+                        fgColour: company.backgroundColor.isBright() ? Theme.base : .white,
+                        label: "\(company.name ?? "_COMPANY")",
+                        icon: "building.2.crop.circle.fill",
+                        predicate: NSPredicate(
+                            format: "job.project.company == %@ && alive == true",
+                            company as CVarArg,
+                        ),
+                        infoView: AnyView(Home.DetailedInformation()),
+                        des: 1,
+                        help: "~/\(company.abbreviation ?? "_COMPANY")"
+                    )
+                }
+                if let project = self.state.job?.project {
+                    RecordBlock(
+                        colour: project.backgroundColor,
+                        fgColour: project.backgroundColor.isBright() ? Theme.base : .white,
+                        label: "\(project.name ?? "_PROJECT")",
+                        icon: "folder.circle.fill",
+                        predicate: NSPredicate(
+                            format: "job.project == %@ && alive == true",
+                            project as CVarArg
+                        ),
+                        infoView: AnyView(Home.DetailedInformation()),
+                        des: 1,
+                        help: "~/\(project.company?.abbreviation ?? "_COMPANY")/\(project.abbreviation ?? "_PROJECT")"
+                    )
+
+                }
+                RecordBlock(
+                    colour: .indigo,
+                    fgColour: Theme.base,
+                    label: job.titleOrId(),
+                    icon: "hammer.circle.fill",
+                    predicate: NSPredicate(
+                        format: "job == %@ && alive == true",
+                        job as CVarArg
+                    ),
+                    infoView: AnyView(Home.DetailedInformation()),
+                    des: 1,
+                    help: "~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")/\(job.titleOrId())"
+                )
+            }
+            RecordBlock(
+                colour: .indigo,
+                fgColour: Theme.base,
+                label: DateHelper.todayShort(self.state.date, format: "YYYY/MMMM"),
+                icon: "triangle.circle.fill",
+                predicate: NSPredicate(
+                    format: "timestamp > %@ && timestamp <= %@",
+                    DateHelper.startOfMonth(for: self.state.date)! as CVarArg,
+                    DateHelper.endOfMonth(for: self.state.date)! as CVarArg
+                ),
+                infoView: AnyView(Home.DetailedInformation()),
+                des: 1,
+                help: "Published only"
+            )
+            RecordBlock(
+                colour: .indigo,
+                fgColour: Theme.base,
+                label: "\(DateHelper.todayShort(DateHelper.daysAhead(-14, from: self.state.date), format: "YYYY/MMM dd")) - \(DateHelper.todayShort(self.state.date, format: "MMM dd"))",
+                icon: "triangle.circle.fill",
+                predicate: NSPredicate(
+                    format: "timestamp > %@ && timestamp <= %@",
+                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                    DateHelper.endOfDay(self.state.date)! as CVarArg
+                ),
+                infoView: AnyView(Home.DetailedInformation()),
+                des: 1,
+                help: "Published only"
+            )
+            .foregroundStyle(Theme.lightWhite)
         }
     }
 
@@ -1363,6 +1488,9 @@ extension Home {
     struct TaskFilters: View {
         @EnvironmentObject private var state: AppState
         @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+        @State private var isBig: Bool = UIDevice.current.model == "iPad"
+        @State private var isWide: Bool = UIDevice.current.orientation.isLandscape
+        @State private var orientation: UIDeviceOrientation = UIDevice.current.orientation
 
         var body: some View {
             VStack(alignment: .leading) {
@@ -1373,116 +1501,168 @@ extension Home {
                 )
                 .padding([.leading, .top], 4)
 
-                VStack(alignment: .leading, spacing: 1) {
-                    ScrollView(.vertical) {
-                        VStack(spacing: 1) {
-                            if let job = self.state.job {
-                                TaskBlock(
-                                    colour: .indigo,
-                                    fgColour: Theme.base,
-                                    label: job.titleOrId(),
-                                    icon: "hammer.circle.fill",
-                                    predicate: NSPredicate(
-                                        format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner == %@",
-                                        job as CVarArg
-                                    ),
-                                    infoView: AnyView(Home.DetailedInformation()),
-                                    des: 1,
-                                    help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")/\(job.titleOrId())"
-                                )
-                                if let project = job.project {
-                                    TaskBlock(
-                                        colour: project.backgroundColor,
-                                        fgColour: project.backgroundColor.isBright() ? Theme.base : .white,
-                                        label: "\(project.name ?? "_PROJECT")",
-                                        icon: "folder.circle.fill",
-                                        predicate: NSPredicate(
-                                            format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project == %@",
-                                            project as CVarArg
-                                        ),
-                                        infoView: AnyView(Home.DetailedInformation()),
-                                        des: 1,
-                                        help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")"
-                                    )
-                                    if let company = project.company {
-                                        TaskBlock(
-                                            colour: company.backgroundColor,
-                                            fgColour: company.backgroundColor.isBright() ? Theme.base : .white,
-                                            label: "\(company.name ?? "_COMPANY")",
-                                            icon: "building.2.crop.circle.fill",
-                                            predicate: NSPredicate(
-                                                format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project.company == %@",
-                                                company as CVarArg,
-                                            ),
-                                            infoView: AnyView(Home.DetailedInformation()),
-                                            des: 1,
-                                            help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")"
-                                        )
-                                    }
-                                }
-                                TaskBlock(
-                                    colour: .indigo,
-                                    fgColour: Theme.base,
-                                    label: "New",
-                                    icon: "triangle.circle.fill",
-                                    predicate: NSPredicate(
-                                        format: "owner == %@ && created > %@ && created <= %@ && owner.project.alive == true && owner.project.company.hidden == false && completedDate != nil && cancelledDate != nil",
-                                        job,
-                                        self.state.date.startOfDay! as CVarArg,
-                                        self.state.date.endOfDay! as CVarArg
-                                    ),
-                                    infoView: AnyView(Home.DetailedInformation()),
-                                    des: 1,
-                                    help: "Created today"
-                                )
-                                TaskBlock(
-                                    colour: .indigo,
-                                    fgColour: Theme.base,
-                                    label: "Done",
-                                    icon: "triangle.circle.fill",
-                                    predicate: NSPredicate(
-                                        format: "owner == %@ && completedDate > %@ && completedDate <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
-                                        job,
-                                        self.state.date.startOfDay! as CVarArg,
-                                        self.state.date.endOfDay! as CVarArg
-                                    ),
-                                    infoView: AnyView(Home.DetailedInformation()),
-                                    des: 1,
-                                    help: "Completed today"
-                                )
-                            }
-                            TaskBlock(
-                                colour: .indigo,
-                                fgColour: Theme.base,
-                                label: "\(DateHelper.todayShort(DateHelper.daysAhead(-14, from: self.state.date), format: "MMM dd")) - \(DateHelper.todayShort(self.state.date, format: "MMM dd"))",
-                                icon: "triangle.circle.fill",
-                                predicate: NSPredicate(
-                                    format: "((due > %@ && due <= %@) || (completedDate > %@ && completedDate <= %@)) && owner.project.company.hidden == false",
-                                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
-                                    DateHelper.endOfDay(self.state.date)! as CVarArg,
-                                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
-                                    DateHelper.endOfDay(self.state.date)! as CVarArg
-                                ),
-                                infoView: AnyView(Home.DetailedInformation()),
-                                des: 1,
-                                help: "All statuses"
-                            )
-                            .foregroundStyle(Theme.lightWhite)
-                        }
-                        .font(.caption)
-                        Spacer()
+                if self.isBig {
+                    if self.isWide {
+                        Columns(count: 3, view: AnyView(self.filters))
+                    } else {
+                        Columns(count: 2, view: AnyView(self.filters))
                     }
-                    .frame(maxHeight: 130)
+                } else {
+                    self.main
                 }
             }
             .padding(4)
             .background(
                 ZStack {
-                    (self.state.job?.backgroundColor ?? Theme.textBackground)
+                    (self.state.job?.backgroundColor ?? Theme.cPurple)
                     LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: 4))
+            .onChange(of: self.orientation) {
+                self.isWide = UIDevice.current.orientation.isLandscape
+                self.isBig = UIDevice.current.model == "iPad"
+                print("DERPO twide=\(self.isWide)")
+            }
+        }
+
+        var main: some View {
+            VStack(alignment: .leading, spacing: 1) {
+                ScrollView(.vertical) {
+                    VStack(spacing: 4) {
+                        self.filters
+                    }
+                    .font(.caption)
+                    Spacer()
+                }
+                .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
+            }
+        }
+
+        @ViewBuilder private var filters: some View {
+            if let job = self.state.job {
+                if let company = self.state.job?.project?.company {
+                    TaskBlock(
+                        colour: company.backgroundColor,
+                        fgColour: company.backgroundColor.isBright() ? Theme.base : .white,
+                        label: "\(company.name ?? "_COMPANY")",
+                        icon: "building.2.crop.circle.fill",
+                        predicate: NSPredicate(
+                            format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project.company == %@",
+                            company as CVarArg,
+                        ),
+                        infoView: AnyView(Home.DetailedInformation()),
+                        des: 1,
+                        help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")"
+                    )
+                }
+                if let project = job.project {
+                    TaskBlock(
+                        colour: project.backgroundColor,
+                        fgColour: project.backgroundColor.isBright() ? Theme.base : .white,
+                        label: "\(project.name ?? "_PROJECT")",
+                        icon: "folder.circle.fill",
+                        predicate: NSPredicate(
+                            format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner.project == %@",
+                            project as CVarArg
+                        ),
+                        infoView: AnyView(Home.DetailedInformation()),
+                        des: 1,
+                        help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")"
+                    )
+                }
+                TaskBlock(
+                    colour: .indigo,
+                    fgColour: Theme.base,
+                    label: job.titleOrId(),
+                    icon: "hammer.circle.fill",
+                    predicate: NSPredicate(
+                        format: "completedDate == nil && cancelledDate == nil && owner.project.company.hidden == false && owner == %@",
+                        job as CVarArg
+                    ),
+                    infoView: AnyView(Home.DetailedInformation()),
+                    des: 1,
+                    help: "Open in ~/\(job.project?.company?.abbreviation ?? "_COMPANY")/\(job.project?.abbreviation ?? "_PROJECT")/\(job.titleOrId())"
+                )
+                TaskBlock(
+                    colour: .indigo,
+                    fgColour: Theme.base,
+                    label: "New",
+                    icon: "triangle.circle.fill",
+                    predicate: NSPredicate(
+                        format: "owner == %@ && created > %@ && created <= %@ && owner.project.alive == true && owner.project.company.hidden == false && completedDate != nil && cancelledDate != nil",
+                        job,
+                        self.state.date.startOfDay! as CVarArg,
+                        self.state.date.endOfDay! as CVarArg
+                    ),
+                    infoView: AnyView(Home.DetailedInformation()),
+                    des: 1,
+                    help: "Created today"
+                )
+                TaskBlock(
+                    colour: .indigo,
+                    fgColour: Theme.base,
+                    label: "Done",
+                    icon: "triangle.circle.fill",
+                    predicate: NSPredicate(
+                        format: "owner == %@ && completedDate > %@ && completedDate <= %@ && owner.project.alive == true && owner.project.company.hidden == false",
+                        job,
+                        self.state.date.startOfDay! as CVarArg,
+                        self.state.date.endOfDay! as CVarArg
+                    ),
+                    infoView: AnyView(Home.DetailedInformation()),
+                    des: 1,
+                    help: "Completed today"
+                )
+            }
+            TaskBlock(
+                colour: .indigo,
+                fgColour: Theme.base,
+                label: DateHelper.todayShort(self.state.date, format: "YYYY/MMMM"),
+                icon: "triangle.circle.fill",
+                predicate: NSPredicate(
+                    format: "((due > %@ && due <= %@) || (completedDate > %@ && completedDate <= %@)) && owner.project.company.hidden == false",
+                    DateHelper.startOfMonth(for: self.state.date)! as CVarArg,
+                    DateHelper.endOfMonth(for: self.state.date)! as CVarArg,
+                    DateHelper.startOfMonth(for: self.state.date)! as CVarArg,
+                    DateHelper.endOfMonth(for: self.state.date)! as CVarArg,
+                ),
+                infoView: AnyView(Home.DetailedInformation()),
+                des: 1,
+                help: "All statuses"
+            )
+            TaskBlock(
+                colour: .indigo,
+                fgColour: Theme.base,
+                label: "\(DateHelper.todayShort(DateHelper.daysAhead(-14, from: self.state.date), format: "YYYY/MMM dd")) - \(DateHelper.todayShort(self.state.date, format: "MMM dd"))",
+                icon: "triangle.circle.fill",
+                predicate: NSPredicate(
+                    format: "((due > %@ && due <= %@) || (completedDate > %@ && completedDate <= %@)) && owner.project.company.hidden == false",
+                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                    DateHelper.endOfDay(self.state.date)! as CVarArg,
+                    DateHelper.daysAhead(-14, from: self.state.date) as CVarArg,
+                    DateHelper.endOfDay(self.state.date)! as CVarArg
+                ),
+                infoView: AnyView(Home.DetailedInformation()),
+                des: 1,
+                help: "All statuses"
+            )
+            .foregroundStyle(Theme.lightWhite)
+        }
+    }
+
+    // MARK: Home.Columns
+    struct Columns: View {
+        public var count: Int
+        public var view: AnyView
+        private var columns: [GridItem] {
+            return Array(repeating: GridItem(.flexible()), count: self.count)
+        }
+
+        var body: some View {
+            LazyVGrid(columns: self.columns, alignment: .leading) {
+                self.view
+            }
         }
     }
 
@@ -1715,7 +1895,7 @@ extension Home {
             .padding(4)
             .background(
                 ZStack {
-                    (self.state.job?.backgroundColor ?? Theme.textBackground)
+                    (self.state.job?.backgroundColor ?? Theme.cPurple)
                     LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
                 }
             )
@@ -1898,9 +2078,11 @@ extension Home {
             @EnvironmentObject private var state: AppState
             @State private var content: String = ""
             @State private var defaultJob: Job? = nil
+            @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
             @FocusState public var hasFocus: Bool
             @AppStorage("home.isQuickRecordFocused") private var isQuickRecordFocused: Bool = false
             @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+            @AppStorage("recordBlock.isSidebarShowing") private var isSidebarShowing: Bool = false
             private let page: PageConfiguration.AppPage = .today
 
             var body: some View {
@@ -1932,23 +2114,31 @@ extension Home {
                     }
                     HStack {
                         ZStack(alignment: .trailing) {
-                            TextField("", text: $content, prompt: Text("What's on your mind?").foregroundStyle((self.state.job?.backgroundColor ?? self.defaultJob?.backgroundColor ?? .clear).isBright() || self.hasFocus ? Theme.lightBase.opacity(0.5) : Theme.lightWhite.opacity(0.5)))
+                            // Yikes this is gross, sorry
+                            TextField("", text: $content, prompt: Text("What's on your mind?").foregroundStyle((self.state.job?.backgroundColor ?? self.defaultJob?.backgroundColor ?? .clear).isBright() || self.hasFocus ? Theme.lightBase.opacity(0.5) : Theme.lightWhite.opacity(0.5)), axis: .vertical)
                                 .onSubmit(self.actionOnSubmit)
                                 .padding()
-                                .lineLimit(1...3)
                                 .textSelection(.enabled)
-                                .submitLabel(.go)
+                                .submitLabel(.send)
                                 .multilineTextAlignment(.leading)
+                                .lineLimit(12, reservesSpace: self.isBig ? true : false)
                                 .textFieldStyle(.plain)
                                 .focused(self.$hasFocus)
                                 .onChange(of: self.hasFocus) {
+                                    self.isSidebarShowing = false
                                     if self.hasFocus == false {
                                         self.isQuickRecordFocused = false
                                     } else {
                                         self.isQuickRecordFocused = true
                                     }
                                 }
-                                .foregroundStyle(Theme.base)
+                                .onChange(of: self.content) {
+                                    if let newLineIndex = self.content.lastIndex(of: "\n") {
+                                        self.content.remove(at: newLineIndex)
+                                        self.actionOnSubmit()
+                                    }
+                                }
+                                .foregroundStyle((self.state.job?.backgroundColor ?? .clear).isBright() ? Theme.base : .white)
 
                             if self.content != "" {
                                 Button {
@@ -2027,16 +2217,21 @@ extension Home {
                     VStack(alignment: .leading, spacing: 1) {
                         VStack(alignment: .leading) {
                             ZStack(alignment: .trailing) {
-                                TextField("", text: $content, prompt: Text("Oranges, mangoes, revolution @ 1500...").foregroundStyle((self.state.job?.backgroundColor ?? self.defaultJob?.backgroundColor ?? .clear).isBright() || self.hasFocus ? Theme.lightBase.opacity(0.5) : Theme.lightWhite.opacity(0.5)))
+                                TextField("", text: $content, prompt: Text("Oranges, mangoes, revolution @ 1500...").foregroundStyle((self.state.job?.backgroundColor ?? self.defaultJob?.backgroundColor ?? .clear).isBright() || self.hasFocus ? Theme.lightBase.opacity(0.5) : Theme.lightWhite.opacity(0.5)), axis: .vertical)
                                     .onSubmit(self.actionOnSubmit)
                                     .padding()
-                                    .lineLimit(1...3)
                                     .textSelection(.enabled)
-                                    .submitLabel(.go)
+                                    .submitLabel(.send)
                                     .multilineTextAlignment(.leading)
                                     .textFieldStyle(.plain)
                                     .focused(self.$hasFocus)
-                                    .foregroundStyle(Theme.base)
+                                    .onChange(of: self.content) {
+                                        if let newLineIndex = self.content.lastIndex(of: "\n") {
+                                            self.content.remove(at: newLineIndex)
+                                            self.actionOnSubmit()
+                                        }
+                                    }
+                                    .foregroundStyle((self.state.job?.backgroundColor ?? .clear).isBright() ? Theme.base : .white)
                                 if self.content != "" {
                                     Button {
                                         self.content = ""
@@ -2072,7 +2267,7 @@ extension Home {
                                 }
                             }
                         }
-                        .frame(maxHeight: 130)
+                        .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
                         .padding([.top, .bottom], 8)
                         .padding([.leading, .trailing], 4)
                         .background(
@@ -2237,13 +2432,13 @@ extension Home {
                             }
                         }
                     }
-                    .frame(height: 130)
+                    .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
                 }
                 .tint(self.state.theme.tint)
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? Theme.cPurple)
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -2301,13 +2496,13 @@ extension Home {
                             }
                         }
                     }
-                    .frame(height: 130)
+                    .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
                 }
                 .tint(self.state.theme.tint)
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? Theme.cPurple)
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -2338,13 +2533,13 @@ extension Home {
                             }
                         }
                     }
-                    .frame(height: 130)
+                    .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
                 }
                 .tint(self.state.theme.tint)
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? Theme.cPurple)
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -2383,7 +2578,7 @@ extension Home {
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? Theme.cPurple)
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -2416,13 +2611,13 @@ extension Home {
                             }
                         }
                     }
-                    .frame(height: 130)
+                    .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
                 }
                 .tint(self.state.theme.tint)
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? Theme.cPurple)
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -2455,13 +2650,13 @@ extension Home {
                             }
                         }
                     }
-                    .frame(height: 130)
+                    .frame(maxHeight: (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape) ? .infinity : 130)
                 }
                 .tint(self.state.theme.tint)
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? Theme.cPurple)
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
                 )
@@ -2663,22 +2858,6 @@ extension Home.QuickHistory.RecentJobsWidget {
     }
 }
 
-extension Home {
-    /// Fires when view appears or some settings are changed
-    /// - Returns: Void
-    private func actionOnAppear() -> Void {
-        switch self.homeBackgroundColourChoice {
-        case -1: self.backgroundColour = Color.iOSBetaBg
-        case 0: self.backgroundColour = Theme.cOrange
-        case 1: self.backgroundColour = Theme.cPurple
-        case 2: self.backgroundColour = Theme.cGreen
-        case 3: self.backgroundColour = Theme.cRoyal
-        case 4: self.backgroundColour = Theme.cRed
-        default: self.backgroundColour = Theme.cOrange
-        }
-    }
-}
-
 extension Home.RecordBlock {
     init(colour: Color = .clear, fgColour: Color? = nil, label: String, icon: String, predicate: NSPredicate, target: AnyView? = nil, infoView: AnyView? = nil, des: Int = 0, help: String? = nil) {
         self.colour = colour
@@ -2721,24 +2900,30 @@ extension Home.QuickAccessTabs.QuickRecordPanel {
     /// Fires on submit/return
     /// - Returns: Void
     private func actionOnSubmit() -> Void {
+        let model = CoreDataRecords(moc: self.state.moc)
+        var record: LogRecord?
         if self.state.job == nil {
             if let job = CoreDataJob(moc: self.state.moc).getDefault() {
-                CoreDataRecords(moc: self.state.moc).createWithJob(
+                record = model.createWithJobAndReturn(
                     job: job,
                     date: Date(), // using current date instead of self.state.date intentionally
                     text: self.content
                 )
             }
         } else {
-            CoreDataRecords(moc: self.state.moc).createWithJob(
+            record = model.createWithJobAndReturn(
                 job: self.state.job!,
                 date: Date(), // using current date instead of self.state.date intentionally
                 text: self.content
             )
         }
 
+        if let rec = record {
+            model.addLinks(from: self.content, record: rec)
+        }
         self.content = ""
         self.hasFocus = false
+        self.state.today.associatedEntityStorage.clear()
     }
 }
 
@@ -2749,6 +2934,7 @@ struct SectionTitle: View {
     public var icon: String? = nil
     public var alignment: Alignment = .leading
     public var font: Font = .caption
+    @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
 
     var body: some View {
         HStack(spacing: self.label == "" ? 0 : 8) {
@@ -2758,6 +2944,7 @@ struct SectionTitle: View {
             if let icon = self.icon {
                 Image(systemName: icon)
                     .symbolRenderingMode(.hierarchical)
+                    .font(self.isBig ? .body : self.font)
             }
             Text(self.uppercase ? self.label.uppercased() : self.label)
                 .lineLimit(1)

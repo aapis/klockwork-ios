@@ -8,13 +8,13 @@
 import SwiftUI
 
 // Thanks https://stackoverflow.com/a/75375148
-struct Swipe: OptionSet, Equatable {
+public struct Swipe: OptionSet, Equatable {
 
-    init(rawValue: Int) {
+    public init(rawValue: Int) {
         self.rawValue = rawValue
     }
 
-    let rawValue: Int
+   public let rawValue: Int
 
     var swiped: ((DragGesture.Value, Double) -> Bool) = { _, _ in false } // prevents a crash if someone creates a swipe directly using the init
 

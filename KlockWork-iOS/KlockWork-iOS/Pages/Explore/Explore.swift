@@ -148,6 +148,16 @@ struct Explore: View {
                             }
                         }
                         .listRowBackground(Theme.textBackground)
+                        NavigationLink {
+                            EmptyView()
+                        } label: {
+                            HStack {
+                                Image(systemName: "link.circle")
+                                    .foregroundStyle(self.state.theme.tint)
+                                Text("Link Library")
+                            }
+                        }
+                        .listRowBackground(Theme.textBackground)
                     }
                 }
                 Spacer()

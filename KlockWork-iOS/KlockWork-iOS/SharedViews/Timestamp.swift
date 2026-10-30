@@ -34,7 +34,7 @@ struct Timestamp: View {
                 }
             }
             .padding(3)
-            .background((self.clear ? Color.clear : Color.white.opacity(0.4)).blendMode(.softLight))
+            .background((self.clear ? Color.clear : Theme.lightWhite).blendMode(.softLight))
             .clipShape(.rect(cornerRadius: 3))
 
             if self.alignment == .leading {

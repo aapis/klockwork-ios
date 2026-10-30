@@ -6,8 +6,22 @@
 //
 
 import SwiftUI
+import CoreData
 
 extension Tabs.Content {
+    public enum TCRecordType: CaseIterable {
+        case link, none
+
+        var icon: String {
+            switch self {
+            case .link:
+                "link"
+            default:
+                "circle.dotted"
+            }
+        }
+    }
+
     struct List {
         struct Separator: View {
             public var label: String
@@ -260,6 +274,10 @@ extension Tabs.Content {
 
             var body: some View {
                 VStack(alignment: .leading, spacing: 0) {
+                    PageHeader(
+                        title: "Hierarchy Explorer",
+                        description: "Companies are listed alphabetically, with the default company first."
+                    )
                     ScrollView {
                         VStack(alignment: .leading, spacing: 0) {
                             if self.items.count > 0 {
@@ -465,6 +483,8 @@ extension Tabs.Content {
                         // @TODO: refactor to follow the pattern set in previous levels
                         if self.isPresented {
                             VStack(alignment: .leading, spacing: 0) {
+                                /// Checklists
+                                ChecklistStack(entity: self.entity)
                                 /// Tasks
                                 ZStack(alignment: .leading) {
                                     self.entity.backgroundColor
@@ -494,7 +514,7 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        RowAddButton(title: "+ Task", isPresented: $isCreateTaskPanelPresented)
+                                        RowAddButton(icon: "plus", isPresented: $isCreateTaskPanelPresented)
                                     }
                                 }
 
@@ -562,7 +582,7 @@ extension Tabs.Content {
                                         .padding(.leading, 8)
 
                                         Spacer()
-                                        RowAddButton(title: "+ Note", isPresented: $isCreateNotePanelPresented)
+                                        RowAddButton(icon: "plus", isPresented: $isCreateNotePanelPresented)
                                     }
                                 }
 
@@ -807,9 +827,155 @@ extension Tabs.Content {
                 }
             }
 
+            struct ChecklistStack: View {
+                @EnvironmentObject private var state: AppState
+                public var entity: Job
+                @State private var isPresented: Bool = false
+                @State private var content: String = ""
+                @State private var items: [Checklist] = []
+                @State private var didSave: Bool = false
+                @State private var id: UUID = UUID()
+                @FocusState private var isFieldFocused: Bool
+
+                var body: some View {
+                    VStack(alignment: .leading, spacing: 0) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ZStack(alignment: .leading) {
+                                self.entity.backgroundColor
+                                LinearGradient(gradient: Gradient(colors: [Theme.base, .clear]), startPoint: .trailing, endPoint: .leading)
+                                    .opacity(0.6)
+                                    .blendMode(.softLight)
+                                    .frame(height: 50)
+                                HStack(alignment: .center, spacing: 0) {
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.company?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    HStack {
+                                        PageConfiguration.CircleIcon(entity: .tasks)
+                                        if self.items.isEmpty {
+                                            Text("No Lists")
+                                                .opacity(0.5)
+                                        } else {
+                                            Text(self.items.count == 1 ? "1 List" : "\(self.items.count) Lists")
+                                        }
+                                    }
+                                    .padding(.leading, 8)
+                                    Spacer()
+                                    RowAddButton(icon: "plus", isPresented: self.$isPresented)
+                                }
+                            }
+                        }
+
+                        /// Quick task creator
+                        if self.isPresented {
+                            VStack(alignment: .leading, spacing: 0) {
+                                HStack(alignment: .center, spacing: 0) {
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.company?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    Rectangle()
+                                        .foregroundStyle(self.entity.project?.backgroundColor ?? Theme.rowColour)
+                                        .frame(width: 15)
+                                    TextField("", text: self.$content, prompt: Text("Groceries, Camping Supplies, ...").foregroundStyle(Theme.base.opacity(0.5)), axis: .horizontal)
+                                        .submitLabel(.go)
+                                        .onSubmit {
+                                            self.actionOnCreate()
+                                            self.content = ""
+                                            withAnimation(.linear(duration: 0.2)) {
+                                                self.isPresented.toggle()
+                                            }
+                                        }
+                                        .focused(self.$isFieldFocused)
+                                        .padding()
+                                }
+                            }
+                            .background(.white)
+                            .foregroundStyle(Theme.base)
+                            .onDisappear(perform: self.actionPostSave)
+                        }
+
+                        if !self.items.isEmpty {
+                            ForEach(self.items, id: \.self) { item in
+                                Row(entity: item)
+                            }
+                        }
+                    }
+                    .id(self.id)
+                    .onAppear(perform: self.actionOnAppear)
+                }
+
+                /// Onload handler. Populates task and note lists
+                /// - Returns: Void
+                private func actionOnAppear() -> Void {
+                    if let items = self.entity.checklists?.allObjects as? [Checklist] {
+                        self.items = items
+                    }
+                }
+
+                /// Fires when creating an Entity using the quick creator
+                /// - Returns: Void
+                private func actionOnCreate() -> Void {
+                    let defaultTask: LogTask = CoreDataTasks(moc: self.state.moc).createAndReturn(
+                        content: "",
+                        title: "Edit me",
+                        created: self.state.date,
+                        due: Date.distantPast,
+                        saveByDefault: false
+                    )
+
+                    CoreDataChecklists(moc: self.state.moc).create(
+                        colour: self.entity.colour ?? Theme.rowColourAsDouble,
+                        label: self.content,
+                        overview: "",
+                        tasks: NSSet(array: [defaultTask]),
+                        jobs: [self.state.job]
+                    )
+
+                    self.didSave = true
+                }
+
+                /// Force view refresh
+                /// - Returns: Void
+                private func actionPostSave() -> Void {
+                    if self.didSave {
+                        self.id = UUID()
+                        self.isPresented.toggle()
+                    }
+
+                    self.didSave = false
+                }
+
+                private struct Row: View {
+                    typealias Button = Tabs.Content.Individual.SingleChecklist
+                    public var entity: Checklist
+
+                    var body: some View {
+                        if let jobs = self.entity.jobs?.allObjects as? [Job] {
+                            HStack(spacing: 0) {
+                                Rectangle()
+                                    .foregroundStyle(jobs.first?.project?.company?.backgroundColor ?? Theme.rowColour)
+                                    .frame(width: 15)
+                                Rectangle()
+                                    .foregroundStyle(jobs.first?.project?.backgroundColor ?? Theme.rowColour)
+                                    .frame(width: 15)
+                                Rectangle()
+                                    .foregroundStyle(jobs.first?.project?.backgroundColor ?? Theme.rowColour)
+                                    .frame(width: 15)
+                                Button(checklist: self.entity)
+                            }
+                        }
+                    }
+                }
+            }
+
             struct FourthLevel: View {
                 typealias Button = Tabs.Content.Individual.SingleTaskChecklistItem
-
                 public let entity: LogTask
                 @State private var isPresented: Bool = false
 
@@ -826,7 +992,6 @@ extension Tabs.Content {
                             .frame(width: 15)
 
                         Button(task: self.entity)
-                            .border(width: 1, edges: [.bottom], color: Theme.cPurple.opacity(0.6))
                     }
                 }
 
@@ -857,7 +1022,6 @@ extension Tabs.Content {
                             .frame(width: 15)
 
                         Button(note: self.entity)
-                            .border(width: 1, edges: [.bottom], color: Theme.cPurple.opacity(0.6))
                     }
                 }
 

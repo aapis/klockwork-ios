@@ -9,8 +9,8 @@ import SwiftUI
 import CoreData
 
 // @TODO: refactor into one that supports any PageConfiguration enum
-struct Tabs: View {
-    typealias EntityType = PageConfiguration.EntityType
+public struct Tabs: View {
+    public typealias EntityType = PageConfiguration.EntityType
     @EnvironmentObject private var state: AppState
     public var inSheet: Bool
     @Binding public var job: Job?
@@ -22,13 +22,20 @@ struct Tabs: View {
     static public let animationDuration: Double = 0.2
     @AppStorage("home.tabLocation") public var tabLocation: Int = 0
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if self.mode == .read {
-                Divider().background(.white).frame(height: 1)
-            }
             // @TODO: only allowing top/bottom tabs to work on create mode for now don't @ me
             if self.mode == .create {
+                HStack {
+                    Spacer()
+                    Capsule()
+                        .fill(Theme.lightWhite)
+                        .frame(width: 100, height: 6)
+                        .opacity(0.7)
+                    Spacer()
+                }
+                .padding([.top, .bottom])
+                .background(Theme.lightBase.blendMode(.softLight))
                 switch self.tabLocation {
                 case 1:
                     self.contentRow
@@ -129,7 +136,7 @@ extension Tabs {
 }
 
 extension Tabs {
-    enum TabsViewMode {
+    public enum TabsViewMode {
         case create, read, update, delete, dashboard
     }
 
@@ -184,6 +191,7 @@ extension Tabs {
             }
             .background(
                 ZStack(alignment: .top) {
+                    Theme.cPurple
                     VStack {
                         LinearGradient(colors: [Theme.base, .clear], startPoint: .top, endPoint: .bottom)
                             .blendMode(.softLight)
@@ -196,13 +204,13 @@ extension Tabs {
         }
     }
 
-    struct Content: View {
+    public struct Content: View {
         @EnvironmentObject private var state: AppState
         public var inSheet: Bool
         @Binding public var job: Job?
         @Binding public var selected: EntityType
 
-        var body: some View {
+        public var body: some View {
             switch self.selected {
             case .records:
                 List.Records(job: $job, date: self.state.date, inSheet: self.inSheet)
@@ -281,11 +289,12 @@ extension Tabs {
     struct TVMDashboard: View {
         @EnvironmentObject private var state: AppState
         @Binding public var selected: EntityType
+        @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
 
         var body: some View {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: self.isBig ? 16 : 8) {
                         switch self.selected {
                         case .records:
                             Home.QuickAccessTabs.QuickRecordPanel()
@@ -294,7 +303,7 @@ extension Tabs {
 //                            Home.QuickAccessTabs.QuickSearchPanel() // probably not here
                             Home.QuickHistory()
                         case .jobs:
-                            HStack(alignment: .top, spacing: 1) {
+                            HStack(alignment: .top, spacing: self.isBig ? 16 : 8) {
                                 Home.QuickAccessTabs.RecentJobs()
                                 Home.QuickAccessTabs.FavouriteJobs()
                             }
@@ -305,7 +314,7 @@ extension Tabs {
                             Home.TaskFilters()
                             Widget.Tasks.DailyOverview()
                         case .notes:
-                            HStack(alignment: .top, spacing: 1) {
+                            HStack(alignment: .top, spacing: self.isBig ? 16 : 8) {
                                 Home.QuickAccessTabs.RecentNotes()
                                 Home.QuickAccessTabs.FavouriteNotes()
                             }
@@ -322,12 +331,12 @@ extension Tabs {
                             Home.QuickHistory()
                         }
                     }
-                    .padding(8)
+                    .padding(self.isBig ? 16 : 8)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
                 }
                 Home.QuickCreateWidget()
                     .padding(.trailing)
-                    .padding(.bottom, 8)
+                    .padding(.bottom, self.isBig ? 16 : 8)
             }
         }
     }

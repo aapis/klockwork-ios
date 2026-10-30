@@ -14,8 +14,8 @@ struct NoteDetail: View {
     public var note: Note? = nil
     @State private var versions: [NoteVersion] = []
     @State private var current: NoteVersion? = nil
-    @AppStorage("entity.note.content") private var content: String = ""
-    @AppStorage("entity.note.title") private var title: String = ""
+    @State private var content: String = ""
+    @State private var title: String = ""
     @State public var job: Job? = nil
     @State private var starred: Bool = false
     @State private var postedDate: Date = Date()
@@ -364,8 +364,8 @@ extension NoteDetail {
                 entity: self.note!,
                 alive: self.alive,
                 body: self.content,
-                lastUpdate: Date(),
-                postedDate: Date(),
+                lastUpdate: self.postedDate,
+                postedDate: self.postedDate,
                 starred: self.starred,
                 title: self.title,
                 job: self.job
@@ -374,8 +374,8 @@ extension NoteDetail {
             CoreDataNotes(moc: self.state.moc).create(
                 alive: self.alive,
                 body: self.content,
-                lastUpdate: Date(),
-                postedDate: Date(),
+                lastUpdate: self.postedDate,
+                postedDate: self.postedDate,
                 starred: self.starred,
                 title: self.title,
                 job: self.job

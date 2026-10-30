@@ -51,7 +51,11 @@ extension Widget {
 
         var body: some View {
             NavigationStack {
-                VStack {
+                VStack(alignment: .leading, spacing: 0) {
+                    PageHeader(
+                        title: "Calendar",
+                        description: "Browse through your data by date."
+                    )
                     Grid(alignment: .topLeading, horizontalSpacing: 5, verticalSpacing: 0) {
                         MonthNav(date: $date, page: self.page)
 

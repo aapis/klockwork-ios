@@ -187,7 +187,6 @@ extension Widget {
             @FetchRequest private var recentItems: FetchedResults<Job>
             @FetchRequest private var favouriteItems: FetchedResults<Job>
             @Binding public var job: Job?
-
             private var columns: [GridItem] {
                 return Array(repeating: GridItem(.flexible(), spacing: 1), count: 1) // @TODO: allow user to select more than 1
             }
@@ -349,6 +348,7 @@ extension Widget {
                 /// - Returns: Void
                 private func actionOnChangeInput() -> Void {
                     self.jobs = items.filter {
+                        $0.alive &&
                         $0.titleOrId().lowercased().contains(self.text.lowercased()) ||
                         ($0.overview ?? "").lowercased().contains(self.text.lowercased()) ||
                         ($0.project?.name?.lowercased() ?? "").contains(self.text.lowercased()) ||

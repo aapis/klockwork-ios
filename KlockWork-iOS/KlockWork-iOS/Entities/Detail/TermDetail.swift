@@ -14,7 +14,7 @@ struct TermDetail: View {
     @Environment(\.dismiss) private var dismiss
     public var term: TaxonomyTerm?
     @State private var created: Date = Date()
-    @AppStorage("entity.term.name") private var name: String = ""
+    @State private var name: String = ""
     @State private var definitions: [TaxonomyTermDefinitions] = []
     @State private var alive: Bool = false
     @State private var isSaveAlertPresented: Bool = false
@@ -31,9 +31,24 @@ struct TermDetail: View {
                     .listRowBackground(Theme.textBackground)
 
                     Section("Definitions") {
-                        ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { definition in
-                            if definition.job != nil {
-                                DefinitionLink(definition: definition)
+                        if !self.definitions.isEmpty {
+                            ForEach(self.definitions, id: \TaxonomyTermDefinitions.objectID) { definition in
+                                if definition.job != nil {
+                                    DefinitionLink(definition: definition)
+                                }
+                            }
+                        } else {
+                            HStack {
+                                Spacer()
+                                Button {
+
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "plus")
+                                            .bold()
+                                    }
+                                }
+                                Spacer()
                             }
                         }
                     }
@@ -127,12 +142,14 @@ extension TermDetail {
             self.term!.alive = self.alive
             self.term!.definitions = NSSet(array: self.definitions)
         } else {
-//            CoreDataTaxonomyTerms(moc: self.state.moc).create(
-//                message: self.message,
-//                timestamp: self.timestamp,
-//                job: self.job,
-//                saveByDefault: false
-//            )
+            CoreDataTaxonomyTerms(moc: self.state.moc).create(
+                alive: self.alive,
+                created: self.created,
+                lastUpdate: self.created,
+                name: self.name,
+                definitions: self.definitions,
+                saveByDefault: false
+            )
         }
 
         PersistenceController.shared.save()

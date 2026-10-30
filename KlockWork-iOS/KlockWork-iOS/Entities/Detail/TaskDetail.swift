@@ -26,8 +26,8 @@ struct TaskDetail: View {
     @State private var isJobSelectorPresented: Bool = false
     @State private var isSaveAlertPresented: Bool = false
     @State private var isDeleteAlertPresented: Bool = false
-    @AppStorage("entity.task.title") private var title: String = ""
-    @AppStorage("entity.task.content") private var content: String = ""
+    @State private var title: String = ""
+    @State private var content: String = ""
 //    @State private var title: String = ""
 //    @State private var content: String = ""
     @State private var isSuggested: Bool = false
@@ -252,6 +252,8 @@ extension TaskDetail {
             }
         } else {
             CoreDataTasks(moc: self.state.moc).create(
+                isSuggested: self.isSuggested,
+                completedDate: self.isCompleted ? Date.now : nil,
                 content: self.content,
                 title: self.title,
                 created: self.created,

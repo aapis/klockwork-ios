@@ -16,12 +16,15 @@ struct AppSettings: View {
     @AppStorage("home.backgroundWallpaper") public var homeWallpaper: String = ""
     @AppStorage("home.backgroundWallpaperAttachmentPoint") public var homeWallpaperAttachmentPoint: Int = 0
     @AppStorage("home.shouldUseWPImage") public var shouldUseWPImage: Bool = false
+    @AppStorage("global.showPageHeaders") private var showPageHeaders: Bool = false
     private let page: PageConfiguration.AppPage = .settings
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             List {
                 Section("UI Customization") {
+                    Toggle("Show page headers", isOn: self.$showPageHeaders)
+                        .listRowBackground(Theme.textBackground)
                     ColorPicker("Accent Colour", selection: self.$tint)
                         .onChange(of: self.tint) {
                             self.actionOnChangeTint()
@@ -69,6 +72,7 @@ struct AppSettings: View {
                             Text("Green").tag(2)
                             Text("Royal").tag(3)
                             Text("Red").tag(4)
+                            Text("Slate").tag(5)
                         }
                         .listRowBackground(Theme.textBackground)
                         .listRowSeparator(.hidden)

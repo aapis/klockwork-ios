@@ -17,12 +17,12 @@ struct JobDetail: View {
     @State private var colour: Color = .clear
     @State public var company: Company? = nil
     @State private var created: Date = Date()
-    @AppStorage("entity.job.jid") private var jid: String = ""
+    @State private var jid: String = ""
     @State private var lastUpdate: Date = Date()
-    @AppStorage("entity.job.overview") private var overview: String = ""
+    @State private var overview: String = ""
     @State private var shredable: Bool = false
-    @AppStorage("entity.job.title") private var title: String = ""
-    @AppStorage("entity.job.url") private var url: String = "https://"
+    @State private var title: String = ""
+    @State private var url: String = "https://"
     @State public var project: Project? = nil
     @State public var starred: Bool = false
     @State private var isCompanySelectorPresented: Bool = false

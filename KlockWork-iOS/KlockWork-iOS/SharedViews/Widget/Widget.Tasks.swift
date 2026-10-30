@@ -139,6 +139,7 @@ extension Widget {
                     HStack(alignment: .top) {
                         Image(systemName: "star.fill")
                             .font(.caption)
+                            .foregroundStyle(self.state.job?.backgroundColor.isBright() ?? false ? Theme.base : .white)
                         SectionTitle(
                             label: "Checklists",
                             uppercase: true,
@@ -174,7 +175,7 @@ extension Widget {
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? Theme.cPurple)
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
                     }
                 )
@@ -205,7 +206,7 @@ extension Widget {
                     Button {
                         self.isListPresented.toggle()
                     } label: {
-                        VStack(alignment: .leading, spacing: 1) {
+                        VStack(alignment: .leading, spacing: 0) {
                             VStack(alignment: .leading, spacing: 1) {
                                 HStack {
                                     Text(self.checklist.label ?? "_NO_NAME")
@@ -221,7 +222,8 @@ extension Widget {
                             }
                             .padding(4)
                             .background(self.backgroundColour)
-                            .foregroundStyle(self.backgroundColour.isBright() ? Theme.base : .white)
+                            .foregroundStyle(self.remainingCount == 0 ? Theme.base : self.backgroundColour.isBright() ? Theme.base : .white)
+                            .border(width: 1, edges: [.bottom], color: Theme.lightBase)
                             if let overview = self.checklist.overview {
                                 HStack(alignment: .top, spacing: 0) {
                                     Text(overview)
@@ -231,7 +233,7 @@ extension Widget {
                                     Spacer()
                                 }
                                 .padding(4)
-                                .background(Theme.textBackground)
+                                .background(!self.backgroundColour.isBright() ? Theme.cPurple : Theme.textBackground)
                             }
                             Spacer()
                         }
@@ -459,10 +461,10 @@ extension Widget {
             /// - Returns: Void
             private func actionOnAppear() -> Void {
                 self.tasks = (self.checklist.tasks?.allObjects as? [LogTask] ?? [])
-//                    .sorted(by: {$0.created ?? Date() < $1.created ?? Date()})
+                    .sorted(by: {$0.created ?? Date.now > $1.created ?? Date.now})
                     .sorted(by: {$0.title ?? "" < $1.title ?? ""})
                 self.outcomes = (self.checklist.outcomes?.allObjects as? [LogTask] ?? [])
-//                    .sorted(by: {$0.created ?? Date() < $1.created ?? Date()})
+                    .sorted(by: {$0.created ?? Date.now > $1.created ?? Date.now})
                     .sorted(by: {$0.title ?? "" < $1.title ?? ""})
                 self.selected = self.tasks.filter {$0.isComplete == true}
                 self.backgroundColour = self.checklist.backgroundColour
@@ -677,7 +679,7 @@ extension Widget {
                 .padding(4)
                 .background(
                     ZStack {
-                        (self.state.job?.backgroundColor ?? Theme.textBackground)
+                        (self.state.job?.backgroundColor ?? Theme.cPurple)
                         LinearGradient(colors: [.clear, Theme.textBackground], startPoint: .bottom, endPoint: .top)
                     }
                 )

@@ -20,6 +20,7 @@ class AppState: ObservableObject {
     @Published var person: Person?
     @Published var dueTodayCount: Int = 0
     @Published var view: AnyView = AnyView(Home(inSheet: false))
+    @Published var calendar = ASCalendar()
 
     init() {
         // @TODO: this seems unnecessary and prone to error when state changes. Fix.
@@ -150,4 +151,8 @@ class Activities {
             }
         }
     }
+}
+
+struct ASCalendar {
+    var selected: Date = Date.now
 }

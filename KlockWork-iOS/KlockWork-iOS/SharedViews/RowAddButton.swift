@@ -10,6 +10,7 @@ import SwiftUI
 struct RowAddButton: View {
     @EnvironmentObject private var state: AppState
     public var title: String = "Add"
+    public var icon: String? = nil
     @Binding public var isPresented: Bool
     public var animationDuration: CGFloat = 0.1
 
@@ -23,13 +24,23 @@ struct RowAddButton: View {
                 RadialGradient(colors: [Theme.base, .clear], center: .center, startRadius: 0, endRadius: 40)
                     .blendMode(.softLight)
                     .opacity(0.8)
-                Text(self.title)
-                    .font(.caption)
-                    .padding(6)
-                    .padding([.leading, .trailing], 8)
-                    .background(self.isPresented ? self.state.theme.tint : .white)
-                    .foregroundStyle(Theme.base)
-                    .clipShape(.capsule(style: .continuous))
+                if let icon = self.icon {
+                    Image(systemName: icon)
+                        .font(.caption)
+                        .padding(6)
+                        .padding([.leading, .trailing], 8)
+                        .background(self.isPresented ? self.state.theme.tint : .white)
+                        .foregroundStyle(Theme.base)
+                        .clipShape(.capsule(style: .continuous))
+                } else {
+                    Text(self.title)
+                        .font(.caption)
+                        .padding(6)
+                        .padding([.leading, .trailing], 8)
+                        .background(self.isPresented ? self.state.theme.tint : .white)
+                        .foregroundStyle(Theme.base)
+                        .clipShape(.capsule(style: .continuous))
+                }
             }
         }
         .frame(width: 80)

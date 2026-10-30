@@ -82,9 +82,7 @@ struct DefinitionDetail: View {
             .presentationBackground(self.page.primaryColour)
         }
     }
-}
 
-extension DefinitionDetail {
     /// Onload handler. Sets timestamp and message fields.
     /// - Returns: Void
     private func actionOnAppear() -> Void {

@@ -87,16 +87,5 @@ extension Jobs {
     private func toggleCreateSheet() -> Void {
         self.isCreateEditorPresented.toggle()
     }
-    
-    /// Delete items
-    /// - Parameter offsets: IndexSet
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-//                self.state.moc.delete(offsets[index])
-//                modelContext.delete(items[index])
-            }
-        }
-    }
 }
 

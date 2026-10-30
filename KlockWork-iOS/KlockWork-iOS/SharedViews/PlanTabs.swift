@@ -1091,52 +1091,59 @@ extension PlanTabs {
         @State private var id: UUID = UUID()
         @State private var job: Job? = nil // @TODO: replace with state.job
         @State private var recentInteractions: [String] = []
+        @State private var isBig: Bool = (UIDevice.current.model == "iPad" ||  UIDevice.current.orientation.isLandscape)
         public var page: PageConfiguration.AppPage = .planning
         public var inSheet: Bool = false
         public var predicate: NSPredicate
         @AppStorage("home.backgroundColour") private var homeBackgroundColourChoice: Int = 0
         @AppStorage("home.backgroundWallpaper") private var homeWallpaper: String = ""
         @AppStorage("home.shouldUseWPImage") private var shouldUseWPImage: Bool = false
+        @AppStorage("recordBlock.isSidebarShowing") private var isSidebarShowing: Bool = false
 
         var body: some View {
             NavigationStack {
-                VStack(alignment: .leading, spacing: 1) {
-                    TaskForecast(callback: self.actionForecastCallback, daysToShow: -14, page: self.page)
-                        .padding(.bottom)
-                    if !self.tasks.isEmpty {
-                        List {
-                            ForEach(self.overdue) { row in
-                                Section {
-                                    ForEach(row.items) { item in
-                                        Row(
-                                            record: item,
-                                            onAction: self.actionOnAppear,
-                                            inSheet: self.inSheet
-                                        )
+                ZStack(alignment: .topLeading) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        TaskForecast(callback: self.actionForecastCallback, daysToShow: -14, page: self.page)
+                        if !self.tasks.isEmpty {
+                            List {
+                                ForEach(self.overdue) { row in
+                                    Section {
+                                        ForEach(row.items) { item in
+                                            Row(
+                                                record: item,
+                                                onAction: self.actionOnAppear,
+                                                inSheet: self.inSheet
+                                            )
                                             .listRowInsets(.none)
                                             .listRowSpacing(.none)
                                             .listRowSeparator(.hidden)
-//                                            .listRowBackground(Color.clear)
+                                        }
+                                    } header: {
+                                        Timestamp(text: "\(row.items.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
+
                                     }
-                                } header: {
-                                    Timestamp(text: "\(row.items.count) on \(row.date)", fullWidth: true, alignment: .leading, clear: true)
+                                    .listSectionSpacing(0)
                                 }
-                                .listSectionSpacing(0)
                             }
-                        }
-                        .listStyle(.inset)
-                        Spacer()
-                    } else {
-                        HStack {
-                            Text("No tasks found")
+                            .background(Theme.cPurple)
+                            .listStyle(.inset)
+                            Spacer()
+                        } else {
+                            HStack {
+                                Text("No tasks found")
+                                Spacer()
+                            }
+                            .padding()
+                            .background(Theme.textBackground)
+                            .clipShape(.rect(cornerRadius: 16))
+                            .padding(8)
                             Spacer()
                         }
-                        .padding()
-                        .background(Theme.textBackground)
-                        .clipShape(.rect(cornerRadius: 16))
-                        .padding(8)
-                        Spacer()
                     }
+                    .disabled(self.isSidebarShowing)
+                    (self.isSidebarShowing ? Theme.lightBase : .clear)
+                    GASidebar()
                 }
             }
             .background(
